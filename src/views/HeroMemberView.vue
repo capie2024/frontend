@@ -4,9 +4,43 @@ import PageControl from "@/components/work-shop/PageControl.vue";
 import SideBar from "@/components/work-shop/SideBar.vue";
 import { onMounted, ref } from "vue";
 import PaypalCheckout from "@/components/PaypalCheckout.vue";
+import axios from "axios";
+import { computed } from "vue";
 
-onMounted(() => {
+
+const isHeroMember = ref(false)
+const checkHeroMember = async() => {
+  console.log("已執行");
+  
+  const userToken = localStorage.getItem("token");
+  console.log(userToken);
+  
+  try {
+    const res = await axios.get("http://localhost:3000/api/check-hero-member",{
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+    }
+  });
+  console.log(res);
+  
+  }catch(error){
+    console.log(error);
+  }  
+}
+console.log(isHeroMember.value);
+
+const switchBtn = (value) => {
+  console.log("已執行");
+  console.log(value);
+  
+  isHeroMember.value = value
+}
+
+onMounted(async() => {
     import("@/assets/js/hero-member/hero-member-animation.js")
+    await checkHeroMember()
+    console.log(isHeroMember.value);
+    
 })
 
 </script>
@@ -289,7 +323,7 @@ onMounted(() => {
                     </ul>
                     <div class="hero-member-main-member-type-section-content-item-btn">
                       <!-- <button>立即前往 Patreon</button> -->
-                      <PaypalCheckout />
+                      <PaypalCheckout @update-isheromember="switchBtn" />
                     </div>
                   </div>
                 </a>

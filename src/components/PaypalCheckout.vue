@@ -33,35 +33,52 @@ onMounted(async () => {
             }),
           });
 
-          const order = await response.json();
+          const { order } = await response.json();
+          // console.log(order);
+          return order.id
 
-          return order.id;
         },
         async onApprove(data, actions){
           const order = await actions.order.capture();
-
-          const response = await fetch("http://localhost:3000/api/get-paypal-order", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            body: JSON.stringify({
-              orderID: order.id,
-            }),
-          });
-
-          const result = await response.json();
-
-          console.log(result.data);
-          console.log(result);
-          if(result.data){
+          console.log(order);
+          
+          if(order.status === 'COMPLETED'){
+            sweetalert.fire({
+              icon: 'success',
+              title: '付款成功',
+            })
+            const userToken = localStorage.getItem("token");
             
+            try {
+              const res = await axios.post('http://localhost:3000/api/save-paypal-order',
+                {
+                  order: order
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${userToken}`,
+                  }
+                }
+              );
+
+              console.log(res);
+              console.log("已將訂單資訊傳入資料庫");
+              emit('update-isheromember', true)
+              
+            } catch (error) {
+              console.log(error);              
+            }
+          }else if(order.status !== 'COMPLETED'){
+            sweetalert.fire({
+              icon: 'error',
+              title: '付款失敗，請重新嘗試',
+            })
           }
-        }
+        },
 
       })
       .render("#paypal-button-container");
+
   } catch (error) {
     console.log(error);
   }

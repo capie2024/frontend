@@ -205,8 +205,11 @@
 </template>
 
 <style scoped>
+<<<<<<< HEAD
 @import '@/assets/base.css';
 
+=======
+>>>>>>> 15c7315 (add faq-info.vue)
 body {
     background-color: #000;
 }

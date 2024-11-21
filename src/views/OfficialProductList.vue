@@ -420,8 +420,6 @@
   
 </script>
 <style scoped>
-@import '@/assets/reset.css';
-
 .All{
     display: flex;   
     position: relative;

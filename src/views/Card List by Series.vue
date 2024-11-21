@@ -599,8 +599,6 @@ export default {
 };
 </script>
 <style scoped>
-@import '@/assets/reset.css';
-
 .All{
     position: relative;
 }
@@ -739,7 +737,7 @@ nav{
     border-radius: 5px;
     justify-content: space-between;
     position: fixed;
-    width: calc(99.5% - 270px);
+    width: calc(100% - 270px);
     top:0px;
     left: 270px;
 }

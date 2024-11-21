@@ -3,6 +3,8 @@ import HomeView from "../views/HomeView.vue";
 import CardInfo from "../views/CardInfo.vue";
 import WorkShopView from "@/views/WorkShopView.vue";
 import HeroMemberView from "@/views/HeroMemberView.vue";
+import OfficialProductList from "@/views/OfficialProductList.vue";
+import CardListbySeries from "@/views/Card List by Series.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +36,16 @@ const router = createRouter({
       path: "/hero-member",
       name: "hero-member",
       component: HeroMemberView,
+    },
+    {
+      path: "/OfficialProductList",
+      name: "OfficialProductList",
+      component: OfficialProductList,
+    },
+    {
+      path: "/Card List by Series",
+      name: "Card List by Series",
+      component: CardListbySeries,
     },
   ],
 });

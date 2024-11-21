@@ -187,7 +187,9 @@
     </body>
 </template>
 
-<style>
+<style scoped>
+@import '@/assets/base.css';
+
 .root-container {
     display: grid;
     grid-template-areas:

@@ -35,11 +35,15 @@ const router = createRouter({
       component: () => import('../views/Faq.vue')
     },
     {
+      path: '/faq-info',
+      name: 'faq',
+      component: () => import('../views/FaqInfo.vue')
+    },
+    {
       path: "/main-page",
       name: "main-page",
       component: MainPage,
     },
-    }
     {
       path: "/account-page",
       name: "account-page",

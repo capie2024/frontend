@@ -204,7 +204,9 @@
     </body>
 </template>
 
-<style>
+<style scoped>
+@import '@/assets/base.css';
+
 body {
     background-color: #000;
 }

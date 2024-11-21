@@ -35,6 +35,11 @@ const router = createRouter({
       name: "hero-member",
       component: HeroMemberView,
     },
+    {
+      path: '/faq',
+      name: 'faq',
+      component: () => import('../views/Faq.vue')
+    }
   ],
 });
 

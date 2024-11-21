@@ -43,8 +43,8 @@ const router = createRouter({
       component: OfficialProductList,
     },
     {
-      path: "/Card List by Series",
-      name: "Card List by Series",
+      path: "/Card-List-by-Series",
+      name: "Card-List-by-Series",
       component: CardListbySeries,
     },
   ],

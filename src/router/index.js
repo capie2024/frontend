@@ -53,6 +53,11 @@ const router = createRouter({
 =======
       name: 'faq-info',
       component: () => import('../views/FaqInfo.vue')
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/Login.vue')
     }
 >>>>>>> 15c7315 (add faq-info.vue)
   ],

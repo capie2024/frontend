@@ -204,7 +204,7 @@
     </body>
 </template>
 
-<style>
+<style scoped>
 body {
     background-color: #000;
 }

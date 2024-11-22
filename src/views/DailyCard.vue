@@ -1,5 +1,5 @@
 <template>
-    <body class="overflow-hidden root-container">
+    <body class="overflow-hidden bg-black root-container">
         <header class="z-10 h-16 md:mt-2 md:mr-2 header-bg md:rounded-t-2xl">
             <nav class="header-container">
                 <button class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50">
@@ -13,7 +13,9 @@
                     </svg>
                 </button>
                 <div class="w-full min-w-0 text-lg font-bold text-white md:text-2xl">
-                    <h2 class="invisible text-2xl font-bold truncate">每日卡歷史回顧</h2>
+                    <!-- <div data-v-57e635bc="" class="flex items-center gap-4"> -->
+                        <h2 class="text-2xl font-bold truncate">每日卡歷史回顧</h2>
+                    <!-- </div> -->
                 </div>
                 <div class="z-10 notice">
                     <input type="checkbox" id="notice-jump">
@@ -122,29 +124,62 @@
         <div class="background"></div>
         <main class="relative content-container bg-base md:my-2 md:mr-2 z-1">
             <div class="h-full px-4 content scroll-smooth scrollbar md:px-6">
-                <section class="w-full md:grid md:place-content-center">
-                    <div class="flex flex-col items-center justify-center gap-4 p-4 shadow-lg rounded-xl">
-                        <div class="flex items-center gap-2">
-                            <img src="../img/bottleneko-icon.png" alt="" class="h-[5rem] w-[5rem] rounded-full">
-                        </div>
-                        <h3 class="text-2xl font-bold text-white">會員登入</h3>
-                        <div class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path></svg>
-                            <input type="email" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500" placeholder="信箱">
-                        </div>
-                        <div class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-                            <input type="password" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500" placeholder="密碼">
-                        </div>
-                        <div class="flex flex-col w-full gap-2">
-                            <button class="flex items-center justify-center w-full gap-2 p-2 text-white rounded-2xl ring ring-white/50 hover:bg-white/90 hover:text-zinc-900" disabled>登入</button>
-                            <button class="flex items-center justify-center w-full gap-2 p-2 rounded-2xl text-cyan-500/50 hover:text-cyan-500">還沒有帳號？前往註冊</button>
-                        </div>
-                        <hr class="w-full my-4 border border-zinc-700/50">
-                        <button data-v-91445d95="" class="flex items-center w-full gap-2 p-2 bg-white border shadow rounded-2xl">
-                            <img src="../img/google-icon.png" class="flex-none size-7">
-                            <span class="block w-full text-center"> Sign in with Google</span>
-                        </button>
+                <section class="main-container">
+                    <input type="checkbox" id="list-switch">
+                    <label for="list-switch" class="list-switch w-[6.5rem] h-fit p-1 bg-zinc-600/80 text-zinc-200 default-transition rounded-full mb-2.5 relative z-10">
+                        <span class="hide">Close</span><svg data-v-896c8a0b="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="rotate-180 stroke-2 size-6 default-transition"><path stroke-linecap="round" stroke-linejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"></path></svg>
+                    </label>
+                    <ul class="date-list absolute z-10 top-0 right-0 bottom-0 default-transition w-[6.5rem] left-0 sticky top-16 md:top-[4.5rem] relative h-fit max-h-[calc(100vh-14rem)] md:max-h-[calc(100vh-12rem)] bg-zinc-600/80 rounded-xl">
+                        <li><a href="#" class="date">2024.11.09</a></li>
+                        <li><a href="#" class="date text-cyan-300">2024.11.08</a></li>
+                        <li><a href="#" class="date">2024.11.07</a></li>
+                        <li><a href="#" class="date">2024.11.06</a></li>
+                        <li><a href="#" class="date">2024.11.05</a></li>
+                        <li><a href="#" class="date">2024.11.04</a></li>
+                        <li><a href="#" class="date">2024.11.03</a></li>
+                        <li><a href="#" class="date">2024.11.02</a></li>
+                        <li><a href="#" class="date">2024.11.01</a></li>
+                        <li><a href="#" class="date">2024.10.31</a></li>
+                    </ul>
+                    <div class="content-block absolute -top-2 z-1 mt-2 flex flex-col gap-4 md:gap-6 default-transition ml-[calc(6.5rem+1rem)]">
+                        <div id="tab-ghost" class="absolute rounded-lg shadow will-change-auto bg-gradient-to-r from-lime-500 to-cyan-500 shadow-sky-500/50" data-flip-id="auto-2"></div>
+                        <nav class="relative flex flex-wrap items-center gap-2 rounded-lg">
+                            <button id="tab-series" class="flex items-center gap-2 py-1 pl-1 pr-2 rounded-lg will-change-auto bg-black/50 hover:bg-zinc-800/50 text-zinc-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path>
+                                </svg>
+                                <span class="text-sm font-bold select-none whitespace-nowrap">系列</span>
+                            </button>
+                            <button id="tab-today" class="flex items-center gap-2 py-1 pl-1 pr-2 text-white rounded-lg will-change-auto" data-flip-id="auto-1" style="translate: none; rotate: none; scale: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path>
+                                </svg>
+                                <span class="text-sm font-bold select-none whitespace-nowrap">日期</span>
+                            </button>
+                            <h3 data-v-896c8a0b="" class="font-bold text-red-500">＊僅顯示最近10天的資料內容</h3>
+                        </nav>
+                        <section class="relative py-0 grid-container z-1">
+                            <h3 id="2024.11.08" class="text-xl font-bold text-white col-span-full">2024.11.08</h3>
+                            <div class="card">
+                                <img data-v-896c8a0b="" src="https://ws-tcg.com/wordpress/wp-content/images/today_card/20241108_go01.png" class="select-none daily-card rounded-xl" data-fancybox="daily" data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売">
+                            </div>
+                            <div class="card">
+                                <img data-v-896c8a0b="" src="https://ws-tcg.com/wordpress/wp-content/images/today_card/20241108_go01.png" class="select-none daily-card rounded-xl" data-fancybox="daily" data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売">
+                            </div>
+                            <div class="card">
+                                <img data-v-896c8a0b="" src="https://ws-tcg.com/wordpress/wp-content/images/today_card/20241108_go01.png" class="select-none daily-card rounded-xl" data-fancybox="daily" data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売">
+                            </div>
+                            <div class="card">
+                                <img data-v-896c8a0b="" src="https://ws-tcg.com/wordpress/wp-content/images/today_card/20241108_go01.png" class="select-none daily-card rounded-xl" data-fancybox="daily" data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売">
+                            </div>
+                            <div class="card">
+                                <img data-v-896c8a0b="" src="https://ws-tcg.com/wordpress/wp-content/images/today_card/20241108_go01.png" class="select-none daily-card rounded-xl" data-fancybox="daily" data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売">
+                            </div>
+                            <div class="card">
+                                <img data-v-896c8a0b="" src="https://ws-tcg.com/wordpress/wp-content/images/today_card/20241108_go01.png" class="select-none daily-card rounded-xl" data-fancybox="daily" data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売">
+                            </div>
+                            <div class="card">
+                                <img data-v-896c8a0b="" src="https://ws-tcg.com/wordpress/wp-content/images/today_card/20241108_go01.png" class="select-none daily-card rounded-xl" data-fancybox="daily" data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売">
+                            </div>
+                        </section>
                     </div>
                 </section>
             </div>
@@ -154,14 +189,6 @@
 
 <style scoped>
 @import '@/assets/base.css';
-
-body {
-    background-color: #000;
-}
-
-input:focus {
-    outline: 2px solid transparent;
-}
 
 .root-container {
     display: grid;
@@ -305,6 +332,10 @@ header {
     opacity: 0.8;
 }
 
+/* .notice:hover .notice-txt {
+    opacity: 1;
+} */
+
 .notice-grid-up h2{
     color: white;
     font-weight: bolder;
@@ -414,22 +445,69 @@ header {
     }
 }
 
-section {
-    height: 100%;
+.main-container {
+    min-height: 340px;
+    position: relative;
+    z-index: 1;
 }
 
-section > div {
-    width: 500px;
-    background-color: rgb(24, 24, 27);
+#list-switch, .list-switch {
+    display: none;
 }
 
-.bg-input {
-    background-color: rgb(39, 39, 42);
-    color: #fff;
+.date-list {
+    grid-area: date-list;
+    transition-duration: .3s;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
 }
 
-.bg-input:focus-within {
-    background-color: rgb(63, 63, 70);
+.date-list li {
+    cursor: pointer;
+    background-color: (82, 82, 91, .8);
+    text-align: center;
+    padding: .5rem;
+}
+
+.date {
+    text-decoration: none;
+    font-size: .875rem;
+    font-weight: 700;
+    line-height: 1.25rem;
+    color: rgb(228 228 231);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+}
+
+#tab-ghost {
+    translate: none; 
+    rotate: none; 
+    scale: none; 
+    padding: 0px; 
+    grid-area: 1 / 1 / 1 / 1; 
+    transition: none; 
+    position: absolute; 
+    width: 72px; 
+    height: 32px; 
+    top: 0px; 
+    left: 0px; 
+    transform: translate3d(80px, 0px, 0px);
+}
+
+.grid-container {
+    margin-top: 1rem;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.card {
+    cursor: pointer;
+}
+
+@media screen and (min-width: 1440px) {
+    .grid-container {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
 }
 
 @media screen and (width < 1200px) {
@@ -459,13 +537,13 @@ section > div {
     }
 
     .sidebar-container {
-        width: 100%;
-        max-height: 65.5px;
-        position: fixed;
-        bottom: 0;
-        z-index: 999;
-        display: unset;
-        padding: 0;
+      width: 100%;
+      max-height: 65.5px;
+      position: fixed;
+      bottom: 0;
+      z-index: 999;
+      display: unset;
+      padding: 0;
     }
     
     .sidebar-container::before {
@@ -478,25 +556,24 @@ section > div {
         right: 0;
         background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
     }
-    
     .sidebar-head {
-        display: none;
+      display: none;
     }
 
     .sidebar-menu {
-        display: flex;
-        width: 100%;
-        margin: 0px;
-        top: 2.5rem;
+      display: flex;
+      width: 100%;
+      margin: 0px;
+      top: 2.5rem;
     }
-
+  
     .sidebar-menu > li {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
     }
 
     .sidebar-menu > .md-menu {
@@ -504,21 +581,21 @@ section > div {
     }
 
     .sidebar-menu li h2 {
-        font-size: 9px;
+      font-size: 9px;
     }
-
+  
     .sidebar-menu a {
-        width: 100%;
-        height: 100%;
-        flex-direction: column;
-        gap: .25rem;
-        justify-content: space-between;
-        padding: 8px 12px 12px;
-        box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      gap: .25rem;
+      justify-content: space-between;
+      padding: 8px 12px 12px;
+      box-sizing: border-box;
     }
-
+  
     .translate-btn {
-        display: none;
+      display: none;
     }
 
     .translate-btn + p {
@@ -533,18 +610,68 @@ section > div {
         border-radius: 0;
     }
 
-    section {
-        height: fit-content;
+    .list-switch {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .25rem;
+    }
+
+    #list-switch:checked ~ .list-switch {
+        text-align: center;
+        width: fit-content;
+        position: absolute;
+        left: -.5rem;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        transition-duration: .3s;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(.4,0,.2,1);
+    }
+
+    #list-switch:checked ~ .list-switch .hide {
+        display: none;
+    }
+
+    #list-switch:checked ~ .list-switch > svg {
+        transform: rotate(0deg);
+        transition-duration: .3s;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(.4,0,.2,1);
+    }
+
+    #list-switch:checked ~ .date-list {
+        position: relative;
+        top: -2.5rem;
+        left: -7rem;
+        transition-duration: .3s;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(.4,0,.2,1);
+    }
+
+    #list-switch:checked ~ .content-block {
+        margin-left: 0;
+    }
+
+    #list-switch:checked ~ .content-block nav {
+        margin-left: 2rem;
+    }
+
+    #list-switch:checked ~ .content-block #tab-ghost {
+        left: 2rem;
+    }
+}
+
+@media screen and (width < 1024px) {
+    .grid-container {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
 @media screen and (width < 768px) {
-    body {
-        background-color: #121212;
-    }
-    section > div {
-        width: 100%;
-        background-color: #121212;
+    .grid-container {
+        gap: 1rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 </style>

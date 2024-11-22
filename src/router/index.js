@@ -3,23 +3,20 @@ import HomeView from "../views/HomeView.vue";
 import CardInfo from "../views/CardInfo.vue";
 import WorkShopView from "@/views/WorkShopView.vue";
 import HeroMemberView from "@/views/HeroMemberView.vue";
+import OfficialProductList from "@/views/OfficialProductList.vue";
+import CardListbySeries from "@/views/Card List by Series.vue";
+import MainPage from "@/views/MainPage.vue";
+import AccountPage from "@/views/AccountPage.vue";
+import DailyCard from "../views/DailyCard.vue";
+import Faq from "../views/Faq.vue";
+import FaqInfo from "../views/FaqInfo.vue";
+import Login from "../views/Login.vue";
+import Signup from "../views/Signup.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: "/",
-      name: "home",
-      component: HomeView,
-    },
-    {
-      path: "/about",
-      name: "about",
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import("../views/AboutView.vue"),
-    },
     {
       path: "/card-info",
       name: "card-info",
@@ -36,24 +33,50 @@ const router = createRouter({
       component: HeroMemberView,
     },
     {
+
+      path: "/OfficialProductList",
+      name: "OfficialProductList",
+      component: OfficialProductList,
+    },
+    {
+      path: "/Card-List-by-Series",
+      name: "CardListbySeries",
+      component: CardListbySeries,
+    },
+    {
+      path: '/daily-card',
+      name: 'daily-info',
+      component: DailyCard
+    },
+    {
       path: '/faq',
       name: 'faq',
-      component: () => import('../views/Faq.vue')
+      component: Faq
     },
     {
       path: '/faq-info',
-      name: 'faq-info',
-      component: () => import('../views/FaqInfo.vue')
+      name: 'faq',
+      component: FaqInfo
+    },
+    {
+      path: "/main-page",
+      name: "main-page",
+      component: MainPage,
+    },
+    {
+      path: "/account-page",
+      name: "account-page",
+      component: AccountPage,
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/Login.vue')
+      component: Login
     },
     {
       path: '/signup',
       name: 'signup',
-      component: () => import('../views/Signup.vue')
+      component: Signup
     }
   ],
 });

@@ -11,11 +11,14 @@ import { RouterLink, RouterView } from "vue-router";
     <RouterLink to="/OfficialProductList">OfficialProductList</RouterLink>
     <RouterLink to="/Card-List-by-Series">Card List by Series</RouterLink>
   </nav>
-
   <RouterView />
 </template>
 
 <style scoped>
+/* body{
+  width: 100vw;
+} */
+
 a,
 .green {
   text-decoration: none;

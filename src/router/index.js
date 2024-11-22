@@ -12,7 +12,7 @@ import Faq from "../views/Faq.vue";
 import FaqInfo from "../views/FaqInfo.vue";
 import Login from "../views/Login.vue";
 import Signup from "../views/Signup.vue";
-
+import LoginHomePageView from "@/views/LoginHomepage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -55,7 +55,7 @@ const router = createRouter({
     },
     {
       path: '/faq-info',
-      name: 'faq',
+      name: 'faq-info',
       component: FaqInfo
     },
     {
@@ -77,7 +77,12 @@ const router = createRouter({
       path: '/signup',
       name: 'signup',
       component: Signup
-    }
+    },
+    {
+      path: "/login-homepage",
+      name: "login-homepage",
+      component: LoginHomePageView,
+    },
   ],
 });
 

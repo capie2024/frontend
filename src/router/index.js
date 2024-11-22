@@ -13,6 +13,7 @@ import FaqInfo from "../views/FaqInfo.vue";
 import Login from "../views/Login.vue";
 import Signup from "../views/Signup.vue";
 import LoginHomePageView from "@/views/LoginHomepage.vue";
+import CardSeries from "@/views/CardSeries.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -83,6 +84,11 @@ const router = createRouter({
       name: "login-homepage",
       component: LoginHomePageView,
     },
+    {
+      path: "/card-series",
+      name: "card-series",
+      component: CardSeries
+    }
   ],
 });
 

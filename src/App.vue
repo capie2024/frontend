@@ -3,6 +3,7 @@ import { RouterLink, RouterView } from "vue-router";
 </script>
 
 <template>
+<<<<<<< HEAD
   <!-- <h1 class="text-3xl font-bold underline">Hello world!</h1>
   <nav>
     <RouterLink to="/card-info">Card Info</RouterLink>
@@ -11,6 +12,8 @@ import { RouterLink, RouterView } from "vue-router";
     <RouterLink to="/main-page">MainPage</RouterLink>
   </nav> 
  -->
+=======
+>>>>>>> layout/account-page#21
   <RouterView />
 </template>
 

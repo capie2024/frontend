@@ -4,6 +4,7 @@ import CardInfo from "../views/CardInfo.vue";
 import WorkShopView from "@/views/WorkShopView.vue";
 import HeroMemberView from "@/views/HeroMemberView.vue";
 import MainPage from "@/views/MainPage.vue";
+import AccountPage from "@/views/AccountPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +38,12 @@ const router = createRouter({
       path: "/main-page",
       name: "main-page",
       component: MainPage,
+    },
+    }
+    {
+      path: "/account-page",
+      name: "account-page",
+      component: AccountPage,
     },
   ],
 });

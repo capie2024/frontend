@@ -3,8 +3,11 @@ import HomeView from "../views/HomeView.vue";
 import CardInfo from "../views/CardInfo.vue";
 import WorkShopView from "@/views/WorkShopView.vue";
 import HeroMemberView from "@/views/HeroMemberView.vue";
+import OfficialProductList from "@/views/OfficialProductList.vue";
+import CardListbySeries from "@/views/Card List by Series.vue";
 import MainPage from "@/views/MainPage.vue";
 import AccountPage from "@/views/AccountPage.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,6 +28,17 @@ const router = createRouter({
       component: HeroMemberView,
     },
     {
+
+      path: "/OfficialProductList",
+      name: "OfficialProductList",
+      component: OfficialProductList,
+    },
+    {
+      path: "/Card-List-by-Series",
+      name: "CardListbySeries",
+      component: CardListbySeries,
+    },
+
       path: '/daily-card',
       name: 'daily-info',
       component: () => import('../views/DailyCard.vue')
@@ -36,7 +50,6 @@ const router = createRouter({
     },
     {
       path: '/faq-info',
-<<<<<<< HEAD
       name: 'faq',
       component: () => import('../views/FaqInfo.vue')
     },
@@ -50,7 +63,7 @@ const router = createRouter({
       name: "account-page",
       component: AccountPage,
     },
-=======
+
       name: 'faq-info',
       component: () => import('../views/FaqInfo.vue')
     },
@@ -59,7 +72,7 @@ const router = createRouter({
       name: 'login',
       component: () => import('../views/Login.vue')
     }
->>>>>>> 15c7315 (add faq-info.vue)
+
   ],
 });
 

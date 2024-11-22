@@ -32,7 +32,7 @@ const router = createRouter({
       path: '/faq',
       name: 'faq',
       component: () => import('../views/Faq.vue')
-    }
+    },
     {
       path: "/main-page",
       name: "main-page",

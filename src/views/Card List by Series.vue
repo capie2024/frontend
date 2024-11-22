@@ -822,6 +822,8 @@ nav{
     font-size: 18px;
     cursor: pointer;
     color: white;
+    width: 30px;
+    height: 30px;
 }
 
 .icons .login {

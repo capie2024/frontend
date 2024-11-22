@@ -7,6 +7,11 @@ import OfficialProductList from "@/views/OfficialProductList.vue";
 import CardListbySeries from "@/views/Card List by Series.vue";
 import MainPage from "@/views/MainPage.vue";
 import AccountPage from "@/views/AccountPage.vue";
+import DailyCard from "../views/DailyCard.vue";
+import Faq from "../views/Faq.vue";
+import FaqInfo from "../views/FaqInfo.vue";
+import Login from "../views/Login.vue";
+import Signup from "../views/Signup.vue";
 
 
 const router = createRouter({
@@ -38,20 +43,20 @@ const router = createRouter({
       name: "CardListbySeries",
       component: CardListbySeries,
     },
-
+    {
       path: '/daily-card',
       name: 'daily-info',
-      component: () => import('../views/DailyCard.vue')
+      component: DailyCard
     },
     {
       path: '/faq',
       name: 'faq',
-      component: () => import('../views/Faq.vue')
+      component: Faq
     },
     {
       path: '/faq-info',
       name: 'faq',
-      component: () => import('../views/FaqInfo.vue')
+      component: FaqInfo
     },
     {
       path: "/main-page",
@@ -63,16 +68,16 @@ const router = createRouter({
       name: "account-page",
       component: AccountPage,
     },
-
-      name: 'faq-info',
-      component: () => import('../views/FaqInfo.vue')
-    },
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/Login.vue')
+      component: Login
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: Signup
     }
-
   ],
 });
 

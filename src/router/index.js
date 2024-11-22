@@ -26,6 +26,11 @@ const router = createRouter({
       path: '/daily-card',
       name: 'daily-info',
       component: () => import('../views/DailyCard.vue')
+    },
+    {
+      path: '/faq',
+      name: 'faq',
+      component: () => import('../views/Faq.vue')
     }
   ],
 });

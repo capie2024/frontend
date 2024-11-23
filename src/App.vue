@@ -13,6 +13,7 @@ import { RouterLink, RouterView } from "vue-router";
     <RouterLink to="/daily-card">Daily Card</RouterLink>
     <RouterLink to="/login-homepage">login homepage</RouterLink>
     <RouterLink to="/add-article">Add Article</RouterLink>
+    <RouterLink to="/social">Social</RouterLink>
   </nav> -->
 
   <RouterView />

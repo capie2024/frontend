@@ -15,6 +15,7 @@ import Signup from "../views/Signup.vue";
 import LoginHomePageView from "@/views/LoginHomepage.vue";
 import CardSeries from "@/views/CardSeries.vue";
 import AddArticle from "../views/AddArticle.vue";
+import Social from "../views/Social.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -94,7 +95,12 @@ const router = createRouter({
       path: "/add-article",
       name: "add-article",
       component: AddArticle
-    }
+    },
+    {
+      path: "/social",
+      name: "social",
+      component: Social
+    },
   ],
 });
 

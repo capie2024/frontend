@@ -1,5 +1,12 @@
 <script setup>
-  import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, onBeforeMount } from "vue";
+import { useCardSeriesStore } from "@/stores/card-series";
+import { storeToRefs } from "pinia";
+
+const cardSeriesStore = useCardSeriesStore();
+
+const { currentSeriesData, serieslastReleaseTime, seriesCode, seriesCardList } =
+  storeToRefs(cardSeriesStore);
   
   const currentSidebar = ref('');
   const sidebarFilterWidth = ref(490);
@@ -65,9 +72,10 @@
     }
   }
   
-  
-  onMounted(() => {
+  // Lifecycle hooks
+  onMounted(async() => {
     window.addEventListener('resize', updateScreenSize);
+    await cardSeriesStore.getLastViewSeries();
   });
   
   onBeforeUnmount(() => {
@@ -510,14 +518,14 @@
         <section class="info-container">
           <img src="https://jasonxddd.me:9000/series-cover/rikoriko.jpg">
           <div flex-col class="inner-info-container">
-            <span><i class="fa-regular fa-clone"></i> LRC</span>
-            <h1>リコリス・リコイル</h1>
+            <span><i class="fa-regular fa-clone"></i> {{ seriesCode }}</span>
+            <h1>{{ currentSeriesData.name }}</h1>
             <div>
               <div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布2024-11-15</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ serieslastReleaseTime }}</span>
               </div>
               <div>
-                <i class="fa-regular fa-clone"></i><span>總數208張</span>
+                <i class="fa-regular fa-clone"></i><span>總數{{ seriesCardList.length }}張</span>
               </div>
               <div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16" aria-hidden="true" data-slot="icon" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"></path></svg><span>篩選出208張</span>
@@ -540,72 +548,12 @@
           </div>
           <div v-if="view === 'card-sheet'" class="card-sheet">
             <div class="row">
-              <div class="col-Sheet">
+              <div class="col-Sheet" v-for="(card, index) in seriesCardList" :key="card.id">
                 <div class="card-image">
                   <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
                   <div>
-                    <p>LRC/W105-001</p>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                  </div>
-                  <button data-v-69cfbdbc="" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                </div>
-              </div>
-              <div class="col-Sheet">
-                <div class="card-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div>
-                    <p>LRC/W105-001</p>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                  </div>
-                  <button data-v-69cfbdbc="" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                </div>
-              </div>
-              <div class="col-Sheet">
-                <div class="card-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div>
-                    <p>LRC/W105-001</p>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                  </div>
-                  <button data-v-69cfbdbc="" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                </div>
-              </div>
-              <div class="col-Sheet">
-                <div class="card-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div>
-                    <p>LRC/W105-001</p>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                  </div>
-                  <button data-v-69cfbdbc="" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                </div>
-              </div>
-              <div class="col-Sheet">
-                <div class="card-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div>
-                    <p>LRC/W105-001</p>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                  </div>
-                  <button data-v-69cfbdbc="" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                </div>
-              </div>
-              <div class="col-Sheet">
-                <div class="card-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div>
-                    <p>LRC/W105-001</p>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                  </div>
-                  <button data-v-69cfbdbc="" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                </div>
-              </div>
-              <div class="col-Sheet">
-                <div class="card-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div>
-                    <p>LRC/W105-001</p>
-                    <h3>酔いどれ？店員 ミズキ</h3>
+                    <p>{{ card.id }}</p>
+                    <h3>{{ card.title }}</h3>
                   </div>
                   <button data-v-69cfbdbc="" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
                 </div>
@@ -615,139 +563,24 @@
     
           <div v-if="view === 'card-info'" class="card-info">
             <div class="row">
-              <div class="col-Info">
+              <div class="col-Info" v-for="(card, index) in seriesCardList" :key="card.id">
                 <div class="card-info-image">
                   <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
                   <div class="card-inner-info">
                     <div class="card-inner-info-header">
-                      <p>LRC/W105-001</p>
-                      <p>RR</p>
+                      <p>{{ card.id }}</p>
+                      <p>{{ card.rare }}</p>
                     </div>
-                    <h3>酔いどれ？店員 ミズキ</h3>
+                    <h3>{{ card.title }}</h3>
                     <div class="details">
-                      <div><span>類型</span>角色</div>
-                      <div><span>魂傷</span>1</div>
-                      <div><span>等級</span>0</div>
-                      <div><span>攻擊</span>500</div>
-                      <div><span>費用</span>0</div>
+                      <div><span>類型</span>{{ card.typeTranslate }}</div>
+                      <div><span>魂傷</span>{{ card.soul }}</div>
+                      <div><span>等級</span>{{ card.level }}</div>
+                      <div><span>攻擊</span>{{ card.attack }}</div>
+                      <div><span>費用</span>{{ card.cost }}</div>
                     </div>
                     <div class="price-download">
-                      <p>$420</p>
-                      <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-Info">
-                <div class="card-info-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div class="card-inner-info">
-                    <div class="card-inner-info-header">
-                      <p>LRC/W105-001</p>
-                      <p>RR</p>
-                    </div>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                    <div class="details">
-                      <div><span>類型</span>角色</div>
-                      <div><span>魂傷</span>1</div>
-                      <div><span>等級</span>0</div>
-                      <div><span>攻擊</span>500</div>
-                      <div><span>費用</span>0</div>
-                    </div>
-                    <div class="price-download">
-                      <p>$420</p>
-                      <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-Info">
-                <div class="card-info-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div class="card-inner-info">
-                    <div class="card-inner-info-header">
-                      <p>LRC/W105-001</p>
-                      <p>RR</p>
-                    </div>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                    <div class="details">
-                      <div><span>類型</span>角色</div>
-                      <div><span>魂傷</span>1</div>
-                      <div><span>等級</span>0</div>
-                      <div><span>攻擊</span>500</div>
-                      <div><span>費用</span>0</div>
-                    </div>
-                    <div class="price-download">
-                      <p>$420</p>
-                      <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-Info">
-                <div class="card-info-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div class="card-inner-info">
-                    <div class="card-inner-info-header">
-                      <p>LRC/W105-001</p>
-                      <p>RR</p>
-                    </div>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                    <div class="details">
-                      <div><span>類型</span>角色</div>
-                      <div><span>魂傷</span>1</div>
-                      <div><span>等級</span>0</div>
-                      <div><span>攻擊</span>500</div>
-                      <div><span>費用</span>0</div>
-                    </div>
-                    <div class="price-download">
-                      <p>$420</p>
-                      <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-Info">
-                <div class="card-info-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div class="card-inner-info">
-                    <div class="card-inner-info-header">
-                      <p>LRC/W105-001</p>
-                      <p>RR</p>
-                    </div>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                    <div class="details">
-                      <div><span>類型</span>角色</div>
-                      <div><span>魂傷</span>1</div>
-                      <div><span>等級</span>0</div>
-                      <div><span>攻擊</span>500</div>
-                      <div><span>費用</span>0</div>
-                    </div>
-                    <div class="price-download">
-                      <p>$420</p>
-                      <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-Info">
-                <div class="card-info-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div class="card-inner-info">
-                    <div class="card-inner-info-header">
-                      <p>LRC/W105-001</p>
-                      <p>RR</p>
-                    </div>
-                    <h3>酔いどれ？店員 ミズキ</h3>
-                    <div class="details">
-                      <div><span>類型</span>角色</div>
-                      <div><span>魂傷</span>1</div>
-                      <div><span>等級</span>0</div>
-                      <div><span>攻擊</span>500</div>
-                      <div><span>費用</span>0</div>
-                    </div>
-                    <div class="price-download">
-                      <p>$420</p>
+                      <p>${{ card.price.number }}</p>
                       <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
                     </div>
                   </div>

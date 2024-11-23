@@ -15,4 +15,15 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  // 處理api跨域請求，設定代理伺服器
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://bottleneko.app',
+        changeOrigin: true,
+      },
+    },
+  }
+  // 處理api跨域請求，設定代理伺服器
+
 })

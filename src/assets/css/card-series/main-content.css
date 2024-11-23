@@ -452,7 +452,7 @@ input[type="checkbox"] {
 }
 
 .change-sheet {
-  background-color: #06b6d4;
+  /* background-color: #06b6d4; */
   position: relative;
 }
 
@@ -471,6 +471,7 @@ input[type="checkbox"] {
 }
 
 .change-info {
+  /* background-color: #06b6d4; */
   position: relative;
 }
 
@@ -486,6 +487,10 @@ input[type="checkbox"] {
   left:50%;
   transform: translateX(-50%);
   border-radius: 9999px;
+}
+
+.active {
+  background-color: #06b6d4;
 }
 
 .card-sheet {

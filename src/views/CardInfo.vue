@@ -209,7 +209,7 @@
     </section>
 </template>
 
-<style>
+<style scoped>
 *, :after, :before {
     border: 0 solid #e5e7eb;
     box-sizing: border-box;

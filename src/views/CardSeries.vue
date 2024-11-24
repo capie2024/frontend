@@ -1,7 +1,6 @@
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
   
-  // Data
   const currentSidebar = ref('');
   const sidebarFilterWidth = ref(490);
   const sidebarDeckWidth = ref(490);
@@ -25,7 +24,7 @@
     { name: '商品', checked: false, icon: 'fa-solid fa-filter', checkButton: true }
   ]);
   
-  // Computed
+  
   const sidebarMarginLeft = computed(() => {
     if (!isLargeScreen.value) return 0;
     if (currentSidebar.value === 'open-filter') {
@@ -36,7 +35,7 @@
     return 0;
   });
   
-  // Methods
+  
   function toggleSidebar(sidebar) {
     currentSidebar.value = currentSidebar.value === sidebar ? '' : sidebar;
   }
@@ -66,7 +65,7 @@
     }
   }
   
-  // Lifecycle hooks
+  
   onMounted(() => {
     window.addEventListener('resize', updateScreenSize);
   });
@@ -230,7 +229,6 @@
                   <button>黃色</button>
                   <button>紅色</button>
                   <button>藍色</button>
-                  <!-- <button>綠色</button> -->
                 </div>
               </div>
               <div v-else-if="filter.name === '費用'">
@@ -238,7 +236,6 @@
                   <button>0</button>
                   <button>1</button>
                   <button>2</button>
-                  <!-- <button>3</button> -->
                 </div>
               </div>
               <div v-else-if="filter.name === '魂傷'">
@@ -246,7 +243,6 @@
                   <button>0</button>
                   <button>1</button>
                   <button>2</button>
-                  <!-- <button>3</button> -->
                 </div>
               </div>
               <div v-else-if="filter.name === '攻擊力'">
@@ -839,7 +835,6 @@
                   <button>黃色</button>
                   <button>紅色</button>
                   <button>藍色</button>
-                  <!-- <button>綠色</button> -->
                 </div>
               </div>
               <div v-else-if="filter.name === '費用'">
@@ -847,7 +842,6 @@
                   <button>0</button>
                   <button>1</button>
                   <button>2</button>
-                  <!-- <button>3</button> -->
                 </div>
               </div>
               <div v-else-if="filter.name === '魂傷'">
@@ -855,7 +849,6 @@
                   <button>0</button>
                   <button>1</button>
                   <button>2</button>
-                  <!-- <button>3</button> -->
                 </div>
               </div>
               <div v-else-if="filter.name === '攻擊力'">
@@ -949,7 +942,7 @@
 
 </div>
 </template>
-
+<style src="@/assets/base.css" scoped></style>
 <style src="@/assets/css/card-series/main-content.css" scoped></style>
 <style src="@/assets/css/card-series/homeside.css" scoped></style>
 <style src="@/assets/css/card-series/sidebar-filter.css" scoped></style>

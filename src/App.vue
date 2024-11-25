@@ -11,6 +11,7 @@ import { RouterLink, RouterView } from "vue-router";
   width: 100vw;
 } */
 
+
 a,
 .green {
   text-decoration: none;

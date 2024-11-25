@@ -241,9 +241,9 @@
                             <span class="font-size75rem color-a1">一共有{{}}結果</span>
                         </h2>
                         <section class="grid-card">
-                            <a href="#" class="url transition-colors">
+                            <RouterLink to="/card-series" class="url transition-colors" @click="handleSeries(this.seriesTestData.id)">
                                 <div>
-                                    <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
+                                    <img :src="seriesTestData.cover" alt="">
                                 </div>
                                 <div class="card-text">
                                     <div class="flex">
@@ -253,12 +253,12 @@
                                             <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
                                             </path>
                                         </svg>
-                                        <p class="color-a1">OSK</p>
+                                        <p class="color-a1">{{ 123 }}</p>
                                     </div>
-                                    <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                                    <p class="color-a1">2023-12-08</p>
+                                    <p class="font-size20 color-white padding-bottom" >跳轉頁面測試用</p>
+                                    <p class="color-a1">{{ 123 }}</p>
                                 </div>
-                            </a>
+                            </RouterLink>
                             <a href="#" class="url transition-colors">
                                 <div>
                                     <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
@@ -558,8 +558,28 @@
 </template>
 
 <script>
+import { useCardSeriesStore } from "@/stores/card-series";
+import { storeToRefs } from "pinia";
+
 export default {
-  methods: {
+    data(){
+        const cardSeriesStore = useCardSeriesStore();
+        const { seriesTestData } = storeToRefs(cardSeriesStore);
+        
+        return{
+            seriesTestData,
+            getTestSeriesData: cardSeriesStore.getTestSeriesData,
+            getCardSeriesCompleteInfo: cardSeriesStore.getCardSeriesCompleteInfo,
+            saveLastViewSeries: cardSeriesStore.saveLastViewSeries,
+        }
+    },
+    methods: {
+    async handleSeries(seriesId){
+        await this.getCardSeriesCompleteInfo(seriesId);
+        // console.log("成功獲取資料，執行跳轉至CardSeriesPage");
+        this.saveLastViewSeries();
+        // 點擊系列後獲取該系列ID，作為參數調用card-series store裡獲取指定系列資料的function拿到資料，然後順便跳轉到CardSeriesPage，並將現在瀏覽的系列ID存在localstorage
+    },
     toggleArrow(event) {
       const button = event.currentTarget;
       if (!button) return; // 防止按鈕為 null 的情況
@@ -594,8 +614,11 @@ export default {
     },
     clearInput() {
       document.getElementById("searchInput").value = ""; // 清空輸入框的文字
+      },
     },
-  },
+    async created() {
+        await this.getTestSeriesData();        
+    },
 };
 </script>
 <style scoped>

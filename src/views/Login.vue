@@ -1,7 +1,6 @@
 <script setup>
-import { onBeforeMount, ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-// import{ login } from '../api/login'
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
@@ -21,31 +20,25 @@ const password = ref("")
 const API_URL = 'http://localhost:7890/api'
 
 const submit = async () => {
+    console.log(email.value, password.value);
   try {
     const res = await axios.post(`${API_URL}/users`, {
       email: email.value,
       password: password.value
     })
 
-    if (res.status === 200) {
-      localStorage.setItem('token', res.data.token)
-      router.push({ name: 'account-page' })
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: '登入失敗',
-        text: res.message || '請檢查信箱密碼是否正確'
-      })
-    }
+    localStorage.setItem('token', res.data.token)
+    // router.push({ name: 'account-page' })
   } catch (error) {
     console.error('API Error:', error)
     Swal.fire({
       icon: 'error',
       title: '登入失敗',
-      text: '發生未知錯誤，請稍後再試'
+      text: error.response.data.message || '請檢查信箱密碼是否正確'
     })
   }
 }
+console.log(email.value, password.value)
 </script>
 
 <template>
@@ -187,7 +180,7 @@ const submit = async () => {
                             <input id="password" type="password" placeholder="密碼" v-model.trim="password" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500">
                         </div>
                         <div class="flex flex-col w-full gap-2">
-                            <button type="submit" class="flex items-center justify-center w-full gap-2 p-2 text-white rounded-2xl ring ring-white/50 hover:bg-white/90 hover:text-zinc-900 cursor-pointer" disabled>登入</button>
+                            <button type="submit" :disabled="!email || !password" class="flex items-center justify-center w-full gap-2 p-2 text-white rounded-2xl ring ring-white/50 hover:bg-white/90 hover:text-zinc-900 cursor-pointer">登入</button>
                             <button class="flex items-center justify-center w-full gap-2 p-2 rounded-2xl text-cyan-500/50 hover:text-cyan-500" @click="goSignup">還沒有帳號？前往註冊</button>
                         </div>
                         <hr class="w-full my-4 border border-zinc-700/50">

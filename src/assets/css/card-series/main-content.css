@@ -451,8 +451,12 @@ input[type="checkbox"] {
   font-size: 20px; 
 }
 
+.active {
+  background-color: #06B6D4;
+}
+
 .change-sheet {
-  background-color: #06b6d4;
+  /* background-color: #06b6d4; */
   position: relative;
 }
 

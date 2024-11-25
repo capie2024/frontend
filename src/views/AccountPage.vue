@@ -539,6 +539,8 @@
 </template>
 
 <style scoped>
+@import '@/assets/base.css';
+
 .root-container {
     display: grid;
     grid-template-areas:
@@ -1604,5 +1606,6 @@ a {
     .md\:mr-2 {
         margin-right: 0;
     }
+
 }
 </style>

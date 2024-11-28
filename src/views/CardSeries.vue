@@ -1,13 +1,110 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, onBeforeMount } from "vue";
-import { useCardSeriesStore } from "@/stores/card-series";
+import router from '../router/index'
 import { storeToRefs } from "pinia";
+import { useCardSeriesStore } from "@/stores/card-series";
+import { useDeckMakeStore } from "@/stores/deck-make";
+import Swal from 'sweetalert2'
 
 const cardSeriesStore = useCardSeriesStore();
 
-const { currentSeriesData, serieslastReleaseTime, seriesCode, seriesCardList } =
-  storeToRefs(cardSeriesStore);
+const { currentSeriesData, serieslastReleaseTime, seriesCode, seriesCardList } = storeToRefs(cardSeriesStore);
+const getLastViewSeries = cardSeriesStore.getLastViewSeries
+
+const deckMakeStore = useDeckMakeStore();
+
+const { selectedCards, countDeck, editType, showCardPrice, sortedDeck, sortedTitle, sortStatus } = storeToRefs(deckMakeStore);
+const clearSelectedCards = deckMakeStore.clearSelectedCards;
+const getLastDeckEdit = deckMakeStore.getLastDeckEdit;
+const removeCard = deckMakeStore.removeCard;
+const changeTypeToAdd = deckMakeStore.changeTypeToAdd;
+const changeTypeToDelete = deckMakeStore.changeTypeToDelete;
+const checkTypeAndRunFunction = deckMakeStore.checkTypeAndRunFunction
+const switchSortMode = deckMakeStore.switchSortMode
+const handleSwitchBtnClick = deckMakeStore.handleSwitchBtnClick
+const sendDeckToDatabase = deckMakeStore.sendDeckToDatabase
+
+const sidebarSelectedStatus = ref(true)
+const chooseCoverCard = ref('')
+const deckName = ref('LL牌組')
+const deckDescription = ref('這是測試牌組')
+const settingDeckStatus = ref(false)
+const clearDeckAndBacktoFirstStep = async() => {
+  const res = await Swal.fire({
+    icon: 'question',
+    title: '清除牌組',
+    text: '確定要清除牌組嗎?',
+    confirmButtonText: '確定',
+    showCancelButton: true,
+    cancelButtonText: '取消',
+  })
+  if(res.isConfirmed){
+    clearSelectedCards()
+    settingDeckStatus.value = false
+    sidebarSelectedStatus.value = true
+  }
   
+}
+const nextStep = () => {
+  sidebarSelectedStatus.value = false
+  settingDeckStatus.value = true
+}
+const finalStep = async() => {
+  if(deckName.value.trim() != '' && deckDescription.value.trim() != '' && chooseCoverCard.value.trim() != '') {
+    const deckData = {
+      deckName: deckName.value,
+      deckDescription: deckDescription.value,
+      deck: selectedCards.value,
+      deckCover: chooseCoverCard.value
+    }
+    const res = await sendDeckToDatabase(deckData);
+    console.log(res);
+    
+    if(res.status == 200) {        
+      console.log("已傳送給後端存入資料庫");
+      settingDeckStatus.value = false
+      sidebarSelectedStatus.value = true
+      deckName.value = ''
+      deckDescription.value = ''
+      chooseCoverCard.value = ''
+      clearSelectedCards()
+      await Swal.fire({
+                icon: 'success',
+                title: '成功',
+                text: '成功創建牌組'
+              })
+      router.push('/carddeck')
+      console.log("完成創建牌組並跳轉");
+    }else{
+      Swal.fire({
+                icon: 'error',
+                title: '錯誤',
+                text: '創建牌組失敗'
+              })
+    }
+  }else{
+    if(deckName.value.trim() == '') {
+      Swal.fire({
+                  icon: 'error',
+                  title: '錯誤',
+                  text: '需填寫牌組名'
+              })
+    }else if(deckDescription.value.trim() == '') {
+      Swal.fire({
+                  icon: 'error',
+                  title: '錯誤',
+                  text: '需填寫牌組描述'
+              })
+    }else if(chooseCoverCard.value.trim() == '') {
+      Swal.fire({
+                  icon: 'error',
+                  title: '錯誤',
+                  text: '未選擇封面卡'
+              })
+    }
+  }
+}
+
   const currentSidebar = ref('');
   const sidebarFilterWidth = ref(490);
   const sidebarDeckWidth = ref(490);
@@ -76,6 +173,8 @@ const { currentSeriesData, serieslastReleaseTime, seriesCode, seriesCardList } =
   onMounted(async() => {
     window.addEventListener('resize', updateScreenSize);
     await cardSeriesStore.getLastViewSeries();
+    getLastDeckEdit();
+    switchSortMode();
   });
   
   onBeforeUnmount(() => {
@@ -345,104 +444,114 @@ const { currentSeriesData, serieslastReleaseTime, seriesCode, seriesCardList } =
         <header class="sidebar-header">
           <div>
             <p>牌組製作</p>
-            <p>已選擇 0 張卡片，總價 ¥0</p>
+            <p>已選擇 {{ selectedCards.length }} 張卡片，總價 ¥{{ countDeck }}</p>
           </div>
           <div>
-            <button class="icon del-btn"><i class="fa-solid fa-trash"></i></button>
+            <button class="icon del-btn" @click="clearDeckAndBacktoFirstStep" ><i class="fa-solid fa-trash"></i></button>
             <button @click="closeSidebar" class="icon xmark-btn"><i class="fa-solid fa-xmark"></i></button>
           </div>
         </header>
     
-          <div class="sidebar-deck-choice">
-            <button>
+          <div class="sidebar-deck-choice" v-if="sidebarSelectedStatus === true" >
+            <button id="type-btn-active" v-if="sortStatus === 'TYPE'" >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               類型
             </button>
-            <button>
+            <button @click="handleSwitchBtnClick('TYPE')" v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              類型
+            </button>
+            <button id="color-btn-active" v-if="sortStatus === 'COLOR'" >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               顏色
             </button>
-            <button>
+            <button @click="handleSwitchBtnClick('COLOR')" v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              顏色
+            </button>
+            <button id="level-btn-active" v-if="sortStatus === 'LEVEL'" >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               等級
             </button>
-            <button>
+            <button @click="handleSwitchBtnClick('LEVEL')" v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              等級
+            </button>
+            <button id="rare-btn-active" v-if="sortStatus === 'RARE'" >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               稀有度
             </button>
-            <button>
+            <button @click="handleSwitchBtnClick('RARE')" v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              稀有度
+            </button>
+            <button id="product-btn-active" v-if="sortStatus === 'PRODUCT'" >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              商品
+            </button>
+            <button @click="handleSwitchBtnClick('PRODUCT')" v-else>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               商品
             </button>
           </div>
-          <div class="sidebar-deck-control">
-            <button class="cash"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg></button>
+          <div class="sidebar-deck-control" v-if="sidebarSelectedStatus === true" >
+            <button class="cash" @click="showCardPrice = !showCardPrice" ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg></button>
             <span class="divder font-mono flex-none text-zinc-500/50"> | </span>
-            <button class="plus"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg></button>
-            <button class="minus"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"></path></svg></button>
+            
+            <button id="plus-active" @click="changeTypeToAdd" v-if="editType === 'ADD_CARD'" ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg></button>
+            <button class="plus" @click="changeTypeToAdd" v-else="editType === 'CHECK_INFO'"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg></button>
+
+            <button id="minus-active" @click="changeTypeToDelete" v-if="editType === 'DELETE_CARD'"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"></path></svg></button>
+            <button class="minus" @click="changeTypeToDelete" v-else ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"></path></svg></button>
+
           </div>
-          <div class="card-content">
-            <h3>角色 - 5</h3>
-            <div class="card-choiced">
-              <div class="row">
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  </div>
-                </div>
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  </div>
-                </div>
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  </div>
-                </div>
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  </div>
-                </div>
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
+          <div class="card-content" v-if="sidebarSelectedStatus === true" >
+            <div class="card-section" v-for="(title, sortedTitleIndex) in sortedTitle" :key="sortedTitleIndex" >
+              <h3>{{ title }} - {{ sortedDeck[sortedTitleIndex].length }}</h3>
+              <div class="card-choiced">
+                <div class="row">
+                  <div class="col-choice" v-for="(card, index) in sortedDeck[sortedTitleIndex]" :key="index" @click="checkTypeAndRunFunction(card, index, sortedTitleIndex)" >
+                    <div class="card-price" v-if="showCardPrice">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
+                      <span>{{ card.price.number }}</span>
+                      <span>{{ card.rare }}</span>
+                    </div>
+                    <div class="card-image">
+                      <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
+                    </div>
+                    <div :class="{'card-count': true,'card-count-white': editType === 'CHECK_INFO', 'card-count-green': editType === 'ADD_CARD', 'card-count-red': editType === 'DELETE_CARD',}">1</div>
                   </div>
                 </div>
               </div>
             </div>
-            <h3>名場 - 6</h3>
-            <div class="card-choiced">
-              <div class="row">
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/JKq9V6OPDBK-LXk3Ylj4q8RTxEbGWoG_i_2FqogzsyM/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0xSQ19XMTA1XzAyOVIucG5n.png">
-                  </div>
-                </div>
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/JKq9V6OPDBK-LXk3Ylj4q8RTxEbGWoG_i_2FqogzsyM/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0xSQ19XMTA1XzAyOVIucG5n.png">
-                  </div>
-                </div>
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/JKq9V6OPDBK-LXk3Ylj4q8RTxEbGWoG_i_2FqogzsyM/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0xSQ19XMTA1XzAyOVIucG5n.png">
-                  </div>
-                </div>
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/JKq9V6OPDBK-LXk3Ylj4q8RTxEbGWoG_i_2FqogzsyM/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0xSQ19XMTA1XzAyOVIucG5n.png">
-                  </div>
-                </div>
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/JKq9V6OPDBK-LXk3Ylj4q8RTxEbGWoG_i_2FqogzsyM/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0xSQ19XMTA1XzAyOVIucG5n.png">
-                  </div>
-                </div>
-                <div class="col-choice">
-                  <div class="card-image">
-                    <img src="https://jasonxddd.me:7001/imgproxy/JKq9V6OPDBK-LXk3Ylj4q8RTxEbGWoG_i_2FqogzsyM/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0xSQ19XMTA1XzAyOVIucG5n.png">
+          </div>
+          <div class="deck-save" v-if="settingDeckStatus === true">
+            <div class="deck-save-title-section">
+              <div class="deck-save-title-section-top">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
+                <h2>標題：</h2>
+              </div>
+              <input type="text" placeholder="輸入牌組名稱" name="deckName" id="deckName" v-model="deckName">
+              <p>設定預設牌組名稱，前往<a href="#">偏好設定</a></p>
+            </div>
+            <div class="deck-save-content-section">
+              <div class="deck-save-content-section-top">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
+                <h2>內容：</h2>
+              </div>
+              <textarea name="" id="" cols="30" rows="4" placeholder="用一段話介紹一下你的牌組" v-model="deckDescription" ></textarea>
+            </div>
+            <div class="deck-save-covercard-section" v-if="selectedCards.length > 0" >
+              <div class="deck-save-covercard-section-top">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
+                <h2>封面卡：</h2>
+              </div>
+              <div class="deck-save-covercard-section-content">
+                <div :class="{'deck-save-covercard-section-content-card': true, 'cover-card-selected': card.id === chooseCoverCard }" v-for="card in selectedCards" :key="card.id" @click="chooseCoverCard = card.id">
+                  <img src="https://fakeimg.pl/64x64/200">
+                  <div class="deck-save-covercard-section-content-card-info">
+                    <h3>{{ card.title }}</h3>
+                    <p>{{ card.id}}</p>
                   </div>
                 </div>
               </div>
@@ -451,8 +560,14 @@ const { currentSeriesData, serieslastReleaseTime, seriesCode, seriesCardList } =
     
     
         <footer class="sidebar-footer">
-          <button>
-            <span>下一步<svg data-v-49703284="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
+          <button id="sidebar-footer-active" v-if="selectedCards.length > 0 && settingDeckStatus === false" @click="nextStep">
+            <span>下一步<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
+          </button>
+          <button id="sidebar-footer-active" v-else-if="settingDeckStatus === true" @click="finalStep">
+            <span>完成<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
+          </button>
+          <button v-else>
+            <span>下一步<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
           </button>
         </footer>
       </section>
@@ -548,7 +663,7 @@ const { currentSeriesData, serieslastReleaseTime, seriesCode, seriesCardList } =
           </div>
           <div v-if="view === 'card-sheet'" class="card-sheet">
             <div class="row">
-              <div class="col-Sheet" v-for="(card, index) in seriesCardList" :key="card.id">
+              <div class="col-Sheet" v-for="(card, index) in seriesCardList" :key="card.id" @click="deckMakeStore.addCard(card)">
                 <div class="card-image">
                   <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
                   <div>

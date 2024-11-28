@@ -18,7 +18,7 @@ const goLogin = () => {
 const email = ref("")
 const password = ref("") 
 
-const API_URL = 'http://localhost:7890/api'
+const API_URL = 'http://localhost:3000/api'
 
 const submit = async () => {
     console.log(email.value, password.value);
@@ -29,7 +29,6 @@ const submit = async () => {
     })
 
     localStorage.setItem('token', res.data.token)
-    // router.push({ name: 'account-page' })
   } catch (error) {
     console.error('API Error:', error)
     Swal.fire({

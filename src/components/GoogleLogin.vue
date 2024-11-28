@@ -2,6 +2,8 @@
 import { onMounted } from 'vue';
 import axios from 'axios';
 
+const API_URL = 'http://localhost:3000/api'
+
 const loadGoogleScript = () => {
   return new Promise((resolve, reject) => {
     if (document.getElementById('google-client-script')) {
@@ -39,19 +41,21 @@ const handleCredentialResponse = (response) => {
   console.log('response:', response);
   console.log('Google 使用者資料：', data);
   // 處理登入資料，發送到後端進行驗證
-  const user = axios.post('/api/auth/google', { token: response.credential })
+  const user = axios.post(`${API_URL}/auth/google`, { token: response.credential })
         .then(res => {
           console.log('用户已認證');
         })
         .catch(err => {
           console.error('認證失敗', err);
         });
+  
+  return user;
 };
 
 onMounted(async () => {
     try {
         await loadGoogleScript();
-        // 初始化 Google 身份验证
+        // 初始化 Google 身份驗證
         window.google.accounts.id.initialize({
           client_id: '1056158717143-bkprq0lqqml2fjegt3offmbtqhgutu6s.apps.googleusercontent.com', // YOUR_GOOGLE_CLIENT_ID
           callback: handleCredentialResponse,
@@ -61,10 +65,10 @@ onMounted(async () => {
         document
             .getElementById('custom-google-button')
             .addEventListener('click', () => {
-              window.google.accounts.id.prompt(); // 显示 One Tap 提示框或进行登入操作
+              window.google.accounts.id.prompt(); // 顯示 One Tap 提示框或进行登入操作
             });
     } catch (error) {
-      console.error('加载 Google 脚本失败：', error);
+      console.error('加載 Google 腳本失敗', error);
     }
 
     // 可選：自動提示
@@ -73,7 +77,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <button id="custom-google-button" class="flex items-center w-full gap-2 p-2 bg-white border shadow rounded-2xl">
+    <button type="button" id="custom-google-button" class="flex items-center w-full gap-2 p-2 bg-white border shadow rounded-2xl">
         <img src="../img/google-icon.png" class="flex-none size-7">
         <span class="block w-full text-center"> Sign in with Google</span>
     </button>

@@ -241,7 +241,7 @@
                             <span class="font-size75rem color-a1">一共有{{}}結果</span>
                         </h2>
                         <section class="grid-card">
-                            <RouterLink to="/card-series" class="url transition-colors" @click="handleSeries(this.seriesTestData.id)">
+                            <RouterLink to="/card-series" class="url transition-colors" @click="handleSeries(2976541)">
                                 <div>
                                     <img :src="seriesTestData.cover" alt="">
                                 </div>
@@ -253,10 +253,10 @@
                                             <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
                                             </path>
                                         </svg>
-                                        <p class="color-a1">{{ 123 }}</p>
+                                        <p class="color-a1">{{ seriesTestData.code }}</p>
                                     </div>
                                     <p class="font-size20 color-white padding-bottom" >跳轉頁面測試用</p>
-                                    <p class="color-a1">{{ 123 }}</p>
+                                    <p class="color-a1">{{ seriesTestData.sellAt }}</p>
                                 </div>
                             </RouterLink>
                             <a href="#" class="url transition-colors">
@@ -565,19 +565,18 @@ export default {
     data(){
         const cardSeriesStore = useCardSeriesStore();
         const { seriesTestData } = storeToRefs(cardSeriesStore);
-        
         return{
-            seriesTestData,
-            getTestSeriesData: cardSeriesStore.getTestSeriesData,
-            getCardSeriesCompleteInfo: cardSeriesStore.getCardSeriesCompleteInfo,
+            getSeriesCards: cardSeriesStore.getSeriesCards,
             saveLastViewSeries: cardSeriesStore.saveLastViewSeries,
+            seriesTestData,
+            getTestSeries: cardSeriesStore.getTestSeries
         }
     },
     methods: {
     async handleSeries(seriesId){
-        await this.getCardSeriesCompleteInfo(seriesId);
+        await this.getSeriesCards(seriesId);
         // console.log("成功獲取資料，執行跳轉至CardSeriesPage");
-        this.saveLastViewSeries();
+        this.saveLastViewSeries(seriesId);
         // 點擊系列後獲取該系列ID，作為參數調用card-series store裡獲取指定系列資料的function拿到資料，然後順便跳轉到CardSeriesPage，並將現在瀏覽的系列ID存在localstorage
     },
     toggleArrow(event) {
@@ -616,8 +615,8 @@ export default {
       document.getElementById("searchInput").value = ""; // 清空輸入框的文字
       },
     },
-    async created() {
-        await this.getTestSeriesData();        
+    async mounted() {
+        await this.getTestSeries(1559042);
     },
 };
 </script>

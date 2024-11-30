@@ -314,7 +314,22 @@ input[type="checkbox"] {
   z-index: 2;
 }
 
-.toggle-deck::before {
+/* 修改成定位方式 */
+.toggle-deck-content{
+  position: relative;
+}
+
+.toggle-deck-content p {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  font-weight: 700;
+  color: rgb(17, 94, 89);
+}
+
+/* .toggle-deck::before {
   content: "0";
   font-weight: 700;
   font-size: 1.25rem;
@@ -328,7 +343,7 @@ input[type="checkbox"] {
   top: 8px; 
   left: 20px; 
   z-index: 2; 
-}
+} */
 
 .toggle-deck:hover {
   background-color:#14B8A6;
@@ -346,10 +361,10 @@ input[type="checkbox"] {
   height: 40px;
 }
 
-.toggle-deck:hover::before {
+/* .toggle-deck:hover::before {
   transform: translateX(8px);
   transition-duration: 0.3s;
-}
+} */
 
 .info-container {
   margin-top: 70px;
@@ -657,9 +672,29 @@ input[type="checkbox"] {
 
 .details span{
   margin-right: 5px;
-  background-color: #CA8A04;
+  /* background-color: #CA8A04; */
   border-radius: 7px;
   padding: 2px;
+}
+
+.bg-red {
+  background-color: #ef4444;
+}
+
+.bg-blue {
+  background-color: #3b82f6;
+}
+
+.bg-green {
+  background-color: #22c55e;
+}
+
+.bg-yellow {
+  background-color: #eab308;
+}
+
+.bg-purple {
+  background-color: #a855f7;
 }
 
 .price-download {

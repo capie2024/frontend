@@ -1,22 +1,23 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, onBeforeMount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, onBeforeMount, watch, nextTick } from "vue";
 import router from '../router/index'
 import { storeToRefs } from "pinia";
 import { useCardSeriesStore } from "@/stores/card-series";
 import { useDeckMakeStore } from "@/stores/deck-make";
+import { useCardInfoStore } from "@/stores/card-info";
 import Swal from 'sweetalert2'
 
+// 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore();
-
-const { currentSeriesData, serieslastReleaseTime, seriesCode, seriesCardList } = storeToRefs(cardSeriesStore);
+const { seriesCardList } = storeToRefs(cardSeriesStore);
 const getLastViewSeries = cardSeriesStore.getLastViewSeries
 
+// 引入DeckMakeStore並使用
 const deckMakeStore = useDeckMakeStore();
-
 const { selectedCards, countDeck, editType, showCardPrice, sortedDeck, sortedTitle, sortStatus } = storeToRefs(deckMakeStore);
+const addCard = deckMakeStore.addCard
 const clearSelectedCards = deckMakeStore.clearSelectedCards;
 const getLastDeckEdit = deckMakeStore.getLastDeckEdit;
-const removeCard = deckMakeStore.removeCard;
 const changeTypeToAdd = deckMakeStore.changeTypeToAdd;
 const changeTypeToDelete = deckMakeStore.changeTypeToDelete;
 const checkTypeAndRunFunction = deckMakeStore.checkTypeAndRunFunction
@@ -24,11 +25,18 @@ const switchSortMode = deckMakeStore.switchSortMode
 const handleSwitchBtnClick = deckMakeStore.handleSwitchBtnClick
 const sendDeckToDatabase = deckMakeStore.sendDeckToDatabase
 
+// 引入CardInfoStore並使用
+const cardInfoStore = useCardInfoStore();
+const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow;
+
+// 定義一些狀態
 const sidebarSelectedStatus = ref(true)
 const chooseCoverCard = ref('')
 const deckName = ref('LL牌組')
 const deckDescription = ref('這是測試牌組')
 const settingDeckStatus = ref(false)
+
+// 清除牌組並回到第一步編輯牌組的狀態
 const clearDeckAndBacktoFirstStep = async() => {
   const res = await Swal.fire({
     icon: 'question',
@@ -45,10 +53,14 @@ const clearDeckAndBacktoFirstStep = async() => {
   }
   
 }
+
+// 新增刪除完牌組後前往下一步
 const nextStep = () => {
   sidebarSelectedStatus.value = false
   settingDeckStatus.value = true
 }
+
+// 結束編輯牌組，新增牌組到牌組資料庫，跳轉至新製作的牌組頁面
 const finalStep = async() => {
   if(deckName.value.trim() != '' && deckDescription.value.trim() != '' && chooseCoverCard.value.trim() != '') {
     const deckData = {
@@ -110,7 +122,7 @@ const finalStep = async() => {
   const sidebarDeckWidth = ref(490);
   const extraOffset = ref(262);
   const isLargeScreen = ref(window.innerWidth > 1200);
-  const view = ref('card-sheet');
+  const view = ref('card-info');
   const currentMain = ref(null);
   const filters = ref([
     { name: '常用', checked: false, icon: 'fa-solid fa-star' },
@@ -138,8 +150,7 @@ const finalStep = async() => {
     }
     return 0;
   });
-  
-  
+    
   function toggleSidebar(sidebar) {
     currentSidebar.value = currentSidebar.value === sidebar ? '' : sidebar;
   }
@@ -158,6 +169,12 @@ const finalStep = async() => {
   function closeSidebar() {
     currentSidebar.value = '';
     currentMain.value = '';
+
+    settingDeckStatus.value = false
+    sidebarSelectedStatus.value = true
+    deckName.value = ''
+    deckDescription.value = ''
+    chooseCoverCard.value = ''
   }
   
   function updateScreenSize() {
@@ -172,7 +189,7 @@ const finalStep = async() => {
   // Lifecycle hooks
   onMounted(async() => {
     window.addEventListener('resize', updateScreenSize);
-    await cardSeriesStore.getLastViewSeries();
+    await getLastViewSeries();
     getLastDeckEdit();
     switchSortMode();
   });
@@ -517,9 +534,9 @@ const finalStep = async() => {
                       <span>{{ card.rare }}</span>
                     </div>
                     <div class="card-image">
-                      <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
+                      <img :src="card.cover">
                     </div>
-                    <div :class="{'card-count': true,'card-count-white': editType === 'CHECK_INFO', 'card-count-green': editType === 'ADD_CARD', 'card-count-red': editType === 'DELETE_CARD',}">1</div>
+                    <!-- <div :class="{'card-count': true,'card-count-white': editType === 'CHECK_INFO', 'card-count-green': editType === 'ADD_CARD', 'card-count-red': editType === 'DELETE_CARD',}">1</div> -->
                   </div>
                 </div>
               </div>
@@ -548,7 +565,7 @@ const finalStep = async() => {
               </div>
               <div class="deck-save-covercard-section-content">
                 <div :class="{'deck-save-covercard-section-content-card': true, 'cover-card-selected': card.id === chooseCoverCard }" v-for="card in selectedCards" :key="card.id" @click="chooseCoverCard = card.id">
-                  <img src="https://fakeimg.pl/64x64/200">
+                  <img :src="card.cover">
                   <div class="deck-save-covercard-section-content-card-info">
                     <h3>{{ card.title }}</h3>
                     <p>{{ card.id}}</p>
@@ -628,16 +645,19 @@ const finalStep = async() => {
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#155E75" aria-hidden="true" data-slot="icon" ><path fill-rule="evenodd" d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z" clip-rule="evenodd"></path></svg>
         </button>
         <button @click="toggleSidebar('open-deck')" class="toggle-deck">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#C3D7D5" aria-hidden="true" data-slot="icon" ><path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"></path><path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"></path></svg>
+          <div class="toggle-deck-content">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#C3D7D5" aria-hidden="true" data-slot="icon" ><path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"></path><path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"></path></svg>
+            <p>{{ selectedCards.length }}</p>
+          </div>
         </button>
         <section class="info-container">
           <img src="https://jasonxddd.me:9000/series-cover/rikoriko.jpg">
           <div flex-col class="inner-info-container">
-            <span><i class="fa-regular fa-clone"></i> {{ seriesCode }}</span>
-            <h1>{{ currentSeriesData.name }}</h1>
+            <span><i class="fa-regular fa-clone"></i> {{ "這邊等系列卡表好再修改" }}</span>
+            <h1>{{ "這邊等系列卡表好再修改" }}</h1>
             <div>
               <div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ serieslastReleaseTime }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ " 這邊等系列卡表好再修改" }}</span>
               </div>
               <div>
                 <i class="fa-regular fa-clone"></i><span>總數{{ seriesCardList.length }}張</span>
@@ -663,14 +683,14 @@ const finalStep = async() => {
           </div>
           <div v-if="view === 'card-sheet'" class="card-sheet">
             <div class="row">
-              <div class="col-Sheet" v-for="(card, index) in seriesCardList" :key="card.id" @click="deckMakeStore.addCard(card)">
+              <div class="col-Sheet" v-for="(card, index) in seriesCardList" :key="card.id" @click.stop="getCardInfoAndShow(card)">
                 <div class="card-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
+                  <img :src="card.cover">
                   <div>
                     <p>{{ card.id }}</p>
                     <h3>{{ card.title }}</h3>
                   </div>
-                  <button data-v-69cfbdbc="" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
+                  <button @click.stop="addCard(card)" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
                 </div>
               </div>
             </div>
@@ -678,25 +698,25 @@ const finalStep = async() => {
     
           <div v-if="view === 'card-info'" class="card-info">
             <div class="row">
-              <div class="col-Info" v-for="(card, index) in seriesCardList" :key="card.id">
+              <div class="col-Info" v-for="(card, index) in seriesCardList" :key="card.id" @click.stop="addCard(card)" >
                 <div class="card-info-image">
-                  <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
-                  <div class="card-inner-info">
+                  <img :src="card.cover">
+                  <div class="card-inner-info" @click.stop="getCardInfoAndShow(card)" >
                     <div class="card-inner-info-header">
                       <p>{{ card.id }}</p>
                       <p>{{ card.rare }}</p>
                     </div>
                     <h3>{{ card.title }}</h3>
                     <div class="details">
-                      <div><span>類型</span>{{ card.typeTranslate }}</div>
-                      <div><span>魂傷</span>{{ card.soul }}</div>
-                      <div><span>等級</span>{{ card.level }}</div>
-                      <div><span>攻擊</span>{{ card.attack }}</div>
-                      <div><span>費用</span>{{ card.cost }}</div>
+                      <div><span :class="`bg-${card.color}`" >類型</span>{{ card.typeTranslate }}</div>
+                      <div><span :class="`bg-${card.color}`" >魂傷</span>{{ card.soul }}</div>
+                      <div><span :class="`bg-${card.color}`" >等級</span>{{ card.level }}</div>
+                      <div><span :class="`bg-${card.color}`" >攻擊</span>{{ card.attack }}</div>
+                      <div><span :class="`bg-${card.color}`" >費用</span>{{ card.cost }}</div>
                     </div>
                     <div class="price-download">
                       <p>${{ card.price.number }}</p>
-                      <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
+                      <button @click.stop="addCard(card)" ><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
                     </div>
                   </div>
                 </div>

@@ -1,3 +1,8 @@
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .sidebar-deck {
   width: 490px;
   display: flex;
@@ -463,9 +468,10 @@
 }
 
 .deck-save-covercard-section-content-card img{
-  max-width: 64px;
+  min-width: 64px;
   max-height: 64px;
   object-fit: cover;
+  object-position: top;
   border-radius: 8px;
 }
 

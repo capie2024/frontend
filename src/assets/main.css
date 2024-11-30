@@ -48,5 +48,9 @@ table {
 body {
     width: 100%;
     background-color: #000;
+	&::-webkit-scrollbar {
+        height: 0;
+        width: 0;
+    }
 }
 

@@ -1,9 +1,12 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
-import Swal from 'sweetalert2'
+import { useCardInfoStore } from "./card-info";
 
 export const useDeckMakeStore = defineStore("deck-make", () => {
+  const cardInfoStore = useCardInfoStore();
+  const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow;
+
   const selectedCards = ref([]);
   const editType = ref("CHECK_INFO");
   const showCardPrice = ref(false);
@@ -36,7 +39,7 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
 
     selectedCards.value.splice(cardIndex, 1);
     saveLastDeckEdit();
-    // switchSortMode();
+    switchSortMode();
   };
 
   // 清空製作牌組內的卡牌和重置最後編輯狀態
@@ -99,6 +102,7 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         "卡片索引值:" + cardIndex,
         "牌組索引值:" + deckIndex
       );
+      getCardInfoAndShow(card)
     } else if (editType.value === "ADD_CARD") {
       addCard(card);
       switchSortMode();
@@ -190,7 +194,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         });
         sortedDeck.value.push(cardArr);
       });
-
     } else if (sortStatus.value === "RARE") {
       const typeArr = [];
       // console.log(selectedCards.value);
@@ -225,7 +228,9 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         if (typeArr.length <= 0) {
           typeArr.push(card.productName);
         }
-        const ishave = typeArr.find((productName) => productName === card.productName);
+        const ishave = typeArr.find(
+          (productName) => productName === card.productName
+        );
         if (ishave === undefined) {
           typeArr.push(card.productName);
           // console.log(card.productName);
@@ -251,16 +256,25 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
   const handleSwitchBtnClick = (switchType) => {
     sortStatus.value = switchType;
     switchSortMode();
-  }
+  };
 
   // 傳送給後端存入資料庫
-  const sendDeckToDatabase = async(deckData) => {
-    const userToken = localStorage.getItem('token');
-    const res = await axios.post('http://localhost:3000/api/add-deck', 
-      { userToken, deckData });
+  const sendDeckToDatabase = async (deckData) => {
+    const userToken = localStorage.getItem("token");
+    const res = await axios.post("http://localhost:3000/api/add-deck", {
+      userToken,
+      deckData,
+    });
     console.log(res.data);
-    return res
-  }
+    return res;
+  };
+
+  // 獲取卡片在牌組中的數量
+  const countCards = (card) => {
+    return selectedCards.value.filter((selectedCard) => {
+      return selectedCard.id === card.id;
+    }).length;
+  };
 
   return {
     addCard,
@@ -279,6 +293,7 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
     sortStatus,
     switchSortMode,
     handleSwitchBtnClick,
-    sendDeckToDatabase
+    sendDeckToDatabase,
+    countCards
   };
 });

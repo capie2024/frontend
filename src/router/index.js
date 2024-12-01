@@ -17,6 +17,7 @@ import CardSeries from "@/views/CardSeries.vue";
 import Carddeck from "../views/Carddeck.vue";
 import AddArticle from "../views/AddArticle.vue";
 import Social from "../views/Social.vue";
+import AuthSuccess from "../views/AuthSuccess.vue";
 
 
 const router = createRouter({
@@ -108,6 +109,11 @@ const router = createRouter({
       name: "social",
       component: Social
     },
+    {
+      path: '/auth-success',
+      name: 'auth-success',
+      component: AuthSuccess
+    }
   ],
 });
 

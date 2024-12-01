@@ -1596,6 +1596,10 @@ a {
 
     .main-grid {
         margin-right: 0;
+        &::-webkit-scrollbar {
+            height: 0;
+            width: 0;
+        }
     }
 }
 

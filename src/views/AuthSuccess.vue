@@ -10,7 +10,7 @@ if (token) {
   localStorage.setItem('token', token);
   router.push({ name: 'account-page' });
 } else {
-  router.push({ name: 'Login' });
+  router.push({ name: 'login' });
 }
 </script>
 

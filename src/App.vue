@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
-import CardInfo from "@/views/CardInfo.vue";
+// import CardInfo from "@/views/CardInfo.vue";
 import { storeToRefs } from "pinia";
 import { useCardInfoStore } from "@/stores/card-info";
 

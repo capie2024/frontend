@@ -151,6 +151,7 @@ nav {
   top: 0px;
   left: 270px;
   z-index: 50;
+  box-sizing: border-box;
 }
 
 .search-bar-logo {

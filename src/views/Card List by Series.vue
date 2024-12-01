@@ -241,7 +241,7 @@
                             <span class="font-size75rem color-a1">一共有{{}}結果</span>
                         </h2>
                         <section class="grid-card">
-                            <RouterLink to="/card-series" class="url transition-colors" @click="handleSeries(2976541)">
+                            <RouterLink to="/card-series" class="url transition-colors" @click="handleSeries(1559042)">
                                 <div>
                                     <img :src="seriesTestData.cover" alt="">
                                 </div>

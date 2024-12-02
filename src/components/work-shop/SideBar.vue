@@ -180,7 +180,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .sidebar {
   min-width: 270px;
   height: 100vh;

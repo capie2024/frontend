@@ -6,6 +6,8 @@ import Swal from 'sweetalert2';
 
 const name = ref('')
 const email = ref('')
+const picture = ref('')
+const fileInput = ref(null)
 
 const getAccount = async () => {
   const token = localStorage.getItem('token');
@@ -31,6 +33,7 @@ const getAccount = async () => {
 
     name.value = res.data.username;
     email.value = res.data.email;
+    picture.value = res.data.picture;
   } catch (error) {
     console.error('獲取用戶資料失敗：', error);
     
@@ -42,6 +45,57 @@ const getAccount = async () => {
         });
         router.push({ name: 'login' });
     }
+  }
+};
+
+// 點擊上傳頭像
+const uploadPic = () => {
+  fileInput.value.click();
+};
+
+// 處理上傳圖片檔案
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    Swal.fire({
+      icon: 'error',
+      title: '沒有 token',
+      text: '請重新登入',
+    });
+    router.push({ name: 'login' });
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('picture', file);
+
+  try {
+    const res = await axios.put('http://localhost:3000/api/users', formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    // 更新圖片網址，顯示新的頭像
+    picture.value = res.data.picture;
+
+    Swal.fire({
+      icon: 'success',
+      title: '圖片上傳成功',
+      showConfirmButton: false,
+      timer: 1500,
+    });
+  } catch (error) {
+    console.error('圖片上傳失敗：', error);
+    Swal.fire({
+      icon: 'error',
+      title: '圖片上傳失敗',
+      text: error.response.data.message || '請稍後重試',
+    });
   }
 };
 
@@ -190,14 +244,16 @@ onMounted(() => {
     <main class="main-grid">
         <div class="account-info">
             <div class="account-info-inside">
-                <button class="download">
-                    <div class="rounded-full relative h-full w-full shadow-[0_4px_60px_rgba(0,0,0,.5)]" style="background-color: rgb(50, 201, 255);">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="p-1 w-full text-zinc-200"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path></svg>
+                <label class="download cursor-pointer group" @click="uploadPic">
+                    <input type="file" ref="fileInput" @change="handleFileChange" accept="image/*" class="hidden" />
+                    <div class="rounded-full relative h-full w-full shadow-[0_4px_60px_rgba(0,0,0,.5)] overflow-hidden" style="background-color: rgb(50, 201, 255);">
+                        <img v-if="picture" :src="picture" alt="使用者頭像" class="w-full h-full object-cover">
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="p-1 w-full text-zinc-200"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path></svg>
                     </div>
                     <div class="group-hover:opacity-100 opacity-0 default-transition absolute inset-0 text-white bg-black/50 grid place-content-center rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-20 w-20"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
                     </div>
-                </button>
+                </label>
                 <div class="account-info-right-area">
                     <div class="e-mail">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path></svg>

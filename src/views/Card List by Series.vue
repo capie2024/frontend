@@ -759,7 +759,7 @@ nav{
     border-radius: 5px;
     justify-content: space-between;
     position: fixed;
-    width: calc(100% - 270px);
+    width: calc(100% - 320px);
     top:0px;
     left: 270px;
 }
@@ -844,8 +844,6 @@ nav{
     font-size: 18px;
     cursor: pointer;
     color: white;
-    width: 30px;
-    height: 30px;
 }
 
 .icons .login {

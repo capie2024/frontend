@@ -557,7 +557,7 @@ nav{
     border-radius: 5px;
     justify-content: space-between;
     position: fixed;
-    width: calc(99.6% - 270px);
+    width: calc(100% - 339px);
     top:0px;
     left: 270px;
 }
@@ -660,7 +660,7 @@ nav{
 .left-icon button{
     background-color:rgba(0,0,0,.5);
     border-radius: 50%;
-    padding: 5px 12px;
+    padding: 6px 10px;
     color: rgb(148, 147, 147);
     border: 1px solid transparent;
     cursor: not-allowed;
@@ -754,6 +754,7 @@ nav{
     padding: 16px;
     background-color: #18181b;
     border-radius: 5%;
+    box-sizing: border-box;
 }
 .url img{
     border-radius: 10%;

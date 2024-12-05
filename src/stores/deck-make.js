@@ -2,6 +2,7 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import { useCardInfoStore } from "./card-info";
+import Login from "../views/Login.vue";
 
 export const useDeckMakeStore = defineStore("deck-make", () => {
   const cardInfoStore = useCardInfoStore();
@@ -260,7 +261,10 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
 
   // 傳送給後端存入資料庫
   const sendDeckToDatabase = async (deckData) => {
+    
+    console.log(deckData);
     const userToken = localStorage.getItem("token");
+    
     const res = await axios.post("http://localhost:3000/api/add-deck", {
       userToken,
       deckData,

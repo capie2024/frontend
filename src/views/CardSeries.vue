@@ -6,11 +6,19 @@ import { useCardSeriesStore } from "@/stores/card-series";
 import { useDeckMakeStore } from "@/stores/deck-make";
 import { useCardInfoStore } from "@/stores/card-info";
 import Swal from 'sweetalert2'
+import { useCardFilterStore } from "@/stores/card-filter"
+
+// 引入CardFilterStore並使用
+const cardFilterStore = useCardFilterStore();
+const { applyBtnStatus } = storeToRefs(cardFilterStore);
+const useFilters = cardFilterStore.useFilters;
+const changeReplaceKeyWord = cardFilterStore.changeReplaceKeyWord
+
 
 // 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore();
 const { seriesCardList } = storeToRefs(cardSeriesStore);
-const getLastViewSeries = cardSeriesStore.getLastViewSeries
+const getLastViewSeries = cardSeriesStore.getLastViewSeries;
 
 // 引入DeckMakeStore並使用
 const deckMakeStore = useDeckMakeStore();
@@ -62,12 +70,17 @@ const nextStep = () => {
 
 // 結束編輯牌組，新增牌組到牌組資料庫，跳轉至新製作的牌組頁面
 const finalStep = async() => {
+  const coverCard = selectedCards.value.find((card)=> {
+    return card.id == chooseCoverCard.value
+  })
+  console.log(coverCard);
+  
   if(deckName.value.trim() != '' && deckDescription.value.trim() != '' && chooseCoverCard.value.trim() != '') {
     const deckData = {
       deckName: deckName.value,
       deckDescription: deckDescription.value,
       deck: selectedCards.value,
-      deckCover: chooseCoverCard.value
+      deckCover: coverCard.cover
     }
     const res = await sendDeckToDatabase(deckData);
     console.log(res);
@@ -117,6 +130,28 @@ const finalStep = async() => {
   }
 }
 
+
+// 關鍵字篩選的值
+const keyWord = ref('');
+
+// 關鍵字篩選的狀態
+const handleKeyWord = () => {
+  if(keyWord.value.trim() != ''){
+    applyBtnStatus.value = true
+    console.log("已經改變");
+  }else{
+    applyBtnStatus.value = false
+    console.log("目前關鍵字為空");
+  }
+}
+
+// 按下apply按鈕後執行篩選功能
+const handleApplyStatus = () => {
+  if(applyBtnStatus.value === true){
+    useFilters(keyWord.value.trim());
+  }
+}
+
   const currentSidebar = ref('');
   const sidebarFilterWidth = ref(490);
   const sidebarDeckWidth = ref(490);
@@ -125,21 +160,20 @@ const finalStep = async() => {
   const view = ref('card-info');
   const currentMain = ref(null);
   const filters = ref([
-    { name: '常用', checked: false, icon: 'fa-solid fa-star' },
-    { name: '關鍵字', checked: false, icon: 'fa-solid fa-magnifying-glass', delButton: true },
-    { name: '排序', checked: false, icon: 'fa-solid fa-sliders', delButton: true },
-    { name: '類型', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '等級', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '顏色', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '費用', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '魂傷', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '攻擊力', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '稀有度', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '判定', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '特徵', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '商品', checked: false, icon: 'fa-solid fa-filter', checkButton: true }
+    { name: '常用', checked: true, icon: 'fa-solid fa-star' },
+    { name: '關鍵字', checked: true, icon: 'fa-solid fa-magnifying-glass', delButton: true },
+    { name: '排序', checked: true, icon: 'fa-solid fa-sliders', delButton: true },
+    { name: '類型', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '等級', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '顏色', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '費用', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '魂傷', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '攻擊力', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '稀有度', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '判定', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '特徵', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '商品', checked: true, icon: 'fa-solid fa-filter', checkButton: true }
   ]);
-  
   
   const sidebarMarginLeft = computed(() => {
     if (!isLargeScreen.value) return 0;
@@ -310,13 +344,13 @@ const finalStep = async() => {
               </div>
               <div v-else-if="filter.name === '關鍵字'">
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
-                  <br>當前搜尋內容： ""
+                  <br>當前搜尋內容： {{ keyWord }}
                 </span>
-                <div class="input-keyword">
+                <div class="input-keyword" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
-                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋">
+                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="keyWord" @input="handleKeyWord" >
                   <div>
-                    <button><span>AND</span></button>
+                    <button @click="changeReplaceKeyWord" ><span>AND</span></button>
                     <!-- <button><span>OR</span></button> -->
                     <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
                   </div>
@@ -453,7 +487,7 @@ const finalStep = async() => {
         </div>
     
         <footer class="sidebar-filter-footer">
-          <button><span>Apply</span></button>
+          <button :class="{ 'apply-btn' : !applyBtnStatus, 'apply-btn-active' : applyBtnStatus}" @click="handleApplyStatus" ><span>Apply</span></button>
         </footer>
       </section>
       
@@ -762,11 +796,11 @@ const finalStep = async() => {
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
                   <br>當前搜尋內容： ""
                 </span>
-                <div class="input-keyword">
+                <div class="input-keyword" :class="{ 'input-keyword-haveValue': keyWord !== '' }" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
                   <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋">
-                  <div>
-                    <button><span>AND</span></button>
+                  <div class="input-keyword-btn" >
+                    <button ><span>AND</span></button>
                     <!-- <button><span>OR</span></button> -->
                     <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
                   </div>

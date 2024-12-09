@@ -130,7 +130,7 @@
                             </a>
                         </section>
                         <h2 class="font-size30 color-white">系列<br>
-                            <span class="font-size75rem color-a1">一共有{{}}結果</span>
+                            <span class="font-size75rem color-a1">一共有152結果</span>
                         </h2>
                         <section class="grid-card">
                             <!-- <RouterLink to="/card-series" class="url transition-colors" @click="handleSeries(1559042)">
@@ -367,54 +367,6 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter(); 
 
-//     export default {
-//     data(){
-//         
-//     },
-//     methods: {
-//     
-//     },
-//     toggleArrow(event) {
-//       const button = event.currentTarget;
-//       if (!button) return; // 防止按鈕為 null 的情況
-//       const icon = button.querySelector("i");
-//       if (!icon) return; // 防止圖標為 null 的情況
-
-//       const allButtons = document.querySelectorAll(".sort-button button");
-//       allButtons.forEach((btn) => {
-//         if (btn !== button) {
-//           btn.classList.remove("active");
-//           const otherIcon = btn.querySelector("i");
-//           if (otherIcon) {
-//             otherIcon.classList.remove("fa-arrow-down");
-//             otherIcon.classList.add("fa-arrow-up");
-//           }
-//         }
-//       });
-
-//       if (button.classList.contains("active")) {
-//         if (icon.classList.contains("fa-arrow-up")) {
-//           icon.classList.remove("fa-arrow-up");
-//           icon.classList.add("fa-arrow-down");
-//         } else {
-//           icon.classList.remove("fa-arrow-down");
-//           icon.classList.add("fa-arrow-up");
-//         }
-//       } else {
-//         button.classList.add("active");
-//         icon.classList.remove("fa-arrow-up");
-//         icon.classList.add("fa-arrow-down");
-//       }
-//     },
-//     clearInput() {
-//       document.getElementById("searchInput").value = ""; // 清空輸入框的文字
-//       },
-//     },
-//     async mounted() {
-//         await this.getTestSeries(1559042);
-//     },
-// }; 
-
 const cardSeries = ref([])
 const error = ref('')
 const API_URL = 'https://bottleneko.app/api/series'
@@ -456,7 +408,7 @@ onMounted(() => {
     grid-area: sidebar;
     min-height: 0;
     padding: 1rem;
-    background-color: #090909;
+    
 }
 .sidebar-head{
     text-decoration: none;
@@ -569,10 +521,10 @@ nav{
     left: 270px;
     background-color: #121212;
     padding: 10px;
-    width: 100%;
     box-sizing: border-box;
     margin: 8px 8px 8px 0;
     border-radius: 10px;
+    width: calc(100% - 280px);
 }
 .top-container {
     display: flex;
@@ -583,7 +535,7 @@ nav{
     border-radius: 5px;
     justify-content: space-between;
     position: fixed;
-    width: calc(100% - 320px);
+    width: calc(99% - 320px);
     top:0px;
     left: 270px;
 }
@@ -697,14 +649,15 @@ nav{
     display: flex;
     gap: 1.5rem;
     padding: 20px 40px;
-    width: 85%;
+    width: 100%;
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
+    box-sizing: border-box;
 }
 .show-card >*{
-    width: calc(14.28571% - 1.28571rem);
+    width: calc(20% - 2rem);
 }
 .show-card > *:nth-child(n+8) {
     display: none;
@@ -717,7 +670,7 @@ nav{
     margin: 20px 0;
     padding:  0 40px;
     box-sizing: border-box;
-    width:85%
+    /* width:100% */
 }
 .flex{
     display: flex;
@@ -796,10 +749,13 @@ a{
         grid-template-columns: repeat(7, minmax(0, 1fr));
         
     }
+    .show-card >*{
+        width: calc(14.28571% - 1.28571rem);
+    }
 }
 @media (width < 1199px) {
     .top-container {
-        width: 100% ;
+        width: calc(100% - 48px); ;
         top:0;
         left: 0;    
     }
@@ -826,9 +782,9 @@ a{
     .show-card{
         padding: 0px;
         margin: 0;
-        width: 100%;
+        
     }
-    .show-card >*{
+    .show-card > *{
         width: calc(20% - 2rem);
         flex: none;
     }
@@ -836,7 +792,7 @@ a{
         padding: 0;
         margin: 0;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        width: 100%;
+        
     }
     .url{
         background-color: transparent;
@@ -902,12 +858,10 @@ a{
       }
       .aa{
         left: 0;
+        width: 100%;
       }
 }
 @media (width < 1023px) {
-    .top-container {
-        width: 100% ;
-    }
     .grid-card{
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -938,7 +892,7 @@ a{
         padding: 0px;
         margin: 0;
     }
-    .show-card >*{
+    .show-card > *{
         width: calc(20% - 2rem);
         flex: none;
     }
@@ -953,14 +907,11 @@ a{
     .all-card{
         width: 100%;
     }
-      body{
+    body{
         background-color:#121212;
-      }
+    }
 }
 @media (width <767px) {
-    .top-container {
-        width: 100% ;
-    }
     .grid-card{
         grid-template-columns: repeat(2,minmax(0,1fr));
     }
@@ -991,7 +942,7 @@ a{
         padding: 0px;
         margin: 0;
     }
-    .show-card >*{
+    .show-card > *{
         width: calc(50% - 2rem);
         flex: none;
     }
@@ -1005,7 +956,6 @@ a{
     }
 }
 .work-shop-footer {
-    max-width: 85%;
     padding: 80px 32px 64px;
     box-sizing: border-box;
     background-color: #121212;
@@ -1171,7 +1121,7 @@ a{
     color: red;
   }
   
-  @media screen and (width < 1200px) {
+  @media screen and (width < 1199px) {
     .work-shop-footer {
       padding: 80px 16px 176px;
       max-width:100%;

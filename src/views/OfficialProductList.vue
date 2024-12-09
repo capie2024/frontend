@@ -432,7 +432,6 @@
     grid-area: sidebar;
     min-height: 0;
     padding: 1rem;
-    background-color: #090909;
 }
 .sidebar-head{
     text-decoration: none;
@@ -794,6 +793,7 @@ a{
     .grid-card{
         grid-template-columns: repeat(5, minmax(0, 1fr));
         width: 100%;
+        padding: 0px;
     }
     .top-container {
         width: 100% ;
@@ -865,6 +865,7 @@ a{
       }
       .aa{
         left: 0;
+        margin: 0px;
       }
       .url{
         background-color: transparent;

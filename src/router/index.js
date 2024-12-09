@@ -17,7 +17,10 @@ import CardSeries from "@/views/CardSeries.vue";
 import Carddeck from "../views/Carddeck.vue";
 import AddArticle from "../views/AddArticle.vue";
 import Social from "../views/Social.vue";
-
+import MyCard from "../views/MyCardView.vue";
+import Findcard from "../components/Mycard/find-card.vue";
+import Remitcard from "../components/Mycard/remit-card.vue";
+import RemitCardNf from "../components/Mycard/remit-cardnf.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -107,6 +110,26 @@ const router = createRouter({
       path: "/social",
       name: "social",
       component: Social
+    },
+    {
+      path: "/mycard",
+      name: "mycard",
+      component: MyCard
+    },
+    {
+      path: "/findcard",
+      name: "findcard",
+      component: Findcard,
+    },
+    {
+      path: "/remitcard",
+      name: "remitcard",
+      component: Remitcard,
+    },
+    {
+      path: "/remitcardnf",
+      name: "remitcardnf",
+      component: RemitCardNf,
     },
   ],
 });

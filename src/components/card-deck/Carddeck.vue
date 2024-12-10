@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import dayjs from 'dayjs';
 
 function getUserIdFromToken(token) {
     try {
@@ -28,6 +29,7 @@ export default {
         hated: false,
         loggedInUserId: null,
         token: localStorage.getItem('token'),
+        created_at: null,
         };
     },
     mounted() {
@@ -41,7 +43,13 @@ export default {
     computed: {
         isLoggedIn() {
             return localStorage.getItem('token') !== null;
-        }
+        },
+        formattedTime() {
+            return (createdAt) => {
+                if (!createdAt) return "未知時間";
+                return dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss");
+            };
+        },    
     },
     methods: {
         async fetchCurrentUser() {
@@ -93,9 +101,8 @@ export default {
                 const response = await axios.get(
                     `http://localhost:3000/api/comments?postCode=${this.articleId}`
                 );
-
-                // 更新 messages 並設置 liked 和 hated 狀態
-                this.messages = response.data;
+                // 按創建時間降序排序
+                this.messages = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 // 假設返回的每條留言中包含 userLiked 和 userHated 字段
                 this.messages.forEach((message) => {
                     message.liked = message.liked || false;  // 根據返回的字段設置 liked
@@ -162,7 +169,7 @@ export default {
         },        
         toggleEdit(message) {
             message.isEditing = true;
-            message.showMenu = false;
+            message.showMenu = !message.showMenu;
             message.editContent = message.message; // 初始化編輯內容
         },
          // 送出編輯
@@ -485,7 +492,7 @@ export default {
                                                     <h4>{{ message.users.username}}</h4>
                                                     <div>
                                                         發佈於
-                                                        <span>{{ message.created_at }}</span>
+                                                        <span>{{ formattedTime(message.created_at) }}</span>
                                                     </div>
                                                 </div>
                                                 <div class="dot">
@@ -494,8 +501,8 @@ export default {
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"></path>
                                                         </svg>
                                                     </button>
-                                                    <div class="dot-menu" @click="toggleMenu(message.id)" v-if="message.showMenu">
-                                                        <a class="edit" @click="toggleEdit(message)">
+                                                    <div class="dot-menu" @click.stop="toggleMenu(message.id)" v-if="message.showMenu">
+                                                        <a class="edit" @click.stop="toggleEdit(message)">
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
                                                             </svg>
@@ -569,7 +576,7 @@ export default {
                                                     <div class="message-user-name">
                                                         <h4>{{ message.users.username }}</h4>
                                                         <div>發佈於 
-                                                            <span>{{ message.created_at }}</span>
+                                                            <span>{{ formattedTime(message.created_at) }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="dot">
@@ -578,7 +585,7 @@ export default {
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"></path>
                                                             </svg>
                                                         </button>
-                                                        <div class="dot-menu" v-if="isLoggedIn && message.showMenu">
+                                                        <div class="dot-menu" @click.stop="toggleMenu(message.id)" v-if="message.showMenu">
                                                             <a class="edit" @click="toggleEdit(message)">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
@@ -879,7 +886,7 @@ export default {
         top: 0;
         --tw-ring-opacity: 0.05;
         overflow-y: auto;
-        z-index: 10 !important;
+        /* z-index: 10 !important; */
         min-width: 100% ;
         padding: .2rem;
     }

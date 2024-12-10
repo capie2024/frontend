@@ -1,35 +1,36 @@
-import { ref, computed } from "vue";
+import { ref, computed, reactive } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 
 export const useCardSeriesStore = defineStore("card-series", () => {
-  const currentSeriesData = ref("");
+  
   const serieslastReleaseTime = ref("");
   const seriesCode = ref("");
+  const seriesInfo = ref("");
   const seriesCardList = ref([]);
 
   // リコリス測試用資料
   const seriesTestData = ref("");
 
   // 獲取指定系列資訊;
-  const getCurrentSeries = async (seriesId = 1559042) => {
+  const getTestSeries = async (seriesId) => {
     try {
-      const res = await axios.get("/api/series");
+      const res = await axios.get(`/api/series`);
       // console.log(res.data);
       res.data.find((series) => {
         if (series.id === seriesId) {
-          currentSeriesData.value = series;
+          seriesTestData.value = series;
         }
       });
-      //   console.log(currentSeriesData.value.sellAt);
-      if (currentSeriesData.value.sellAt == undefined) {
-        getCardSeriesCompleteInfo();
+      if (seriesTestData.value.sellAt == undefined) {
+        console.log("重新獲取");
+        getTestSeries(seriesId);
       } else {
         serieslastReleaseTime.value =
-          currentSeriesData.value.sellAt[
-            currentSeriesData.value.sellAt.length - 1
+          seriesTestData.value.sellAt[
+            seriesTestData.value.sellAt.length - 1
           ];
-        seriesCode.value = currentSeriesData.value.code.join(",");
+        seriesCode.value = seriesTestData.value.code.join(",");
       }
     } catch (err) {
       console.log(err, "系列獲取失敗");
@@ -37,10 +38,18 @@ export const useCardSeriesStore = defineStore("card-series", () => {
   };
 
   // 獲取指定系列所有卡牌資訊;
-  const getSeriesCards = async (seriesId = 1559042) => {
+  const getSeriesCards = async (seriesId) => {
     try {
-      const res = await axios.get(`/api/card/${seriesId}`);
-      //   console.log(res.data);
+      const seriesRes = await axios.get(`http://localhost:3000/api/serise`);
+      const selectedSeries = seriesRes.data.find((series) => {
+        return series.id == seriesId;
+      })
+      console.log(selectedSeries);
+      seriesInfo.value = selectedSeries;
+      console.log(seriesInfo.value);
+      
+      const res = await axios.get(`http://localhost:3000/api/serise/${seriesId}`);
+        // console.log(res.data);
       res.data.forEach((card) => {
         if (card.type === "キャラ") {
           card.typeTranslate = "角色";
@@ -51,57 +60,40 @@ export const useCardSeriesStore = defineStore("card-series", () => {
         }
       });
       seriesCardList.value = res.data;
+      console.log(seriesCardList.value);
+      
     } catch (err) {
       console.log(err);
     }
   };
 
-  // 獲取指定系列的完整卡牌資訊，把getCurrentSeries、getSeriesCards放在一起調用
-  const getCardSeriesCompleteInfo = async (seriesId) => {
-      await getCurrentSeries(seriesId);
-      await getSeriesCards(seriesId);
-  };
-
-  // 拿取測試用資料
-  const getTestSeriesData = async () => {
-    try {
-      const res = await axios.get("/api/series");
-      //   console.log(res.data);
-      res.data.find((series) => {
-        if (series.id === 1559042) {
-          seriesTestData.value = series;
-        }
-      });
-    } catch (err) {
-      console.log(err);
+  // 存取最後瀏覽的系列
+  const saveLastViewSeries = (seriesId) => {
+    if (seriesCardList.value) {
+      localStorage.setItem("lastViewSeriesId", seriesId);
     }
   };
 
-  const saveLastViewSeries = () => {
-    if (currentSeriesData.value || seriesCardList.value) {
-      localStorage.setItem("lastViewSeriesId", currentSeriesData.value.id);
-    }
-  };
-
+  // 獲取最後瀏覽的系列
   const getLastViewSeries = async () => {
-    if (currentSeriesData.value == "" || seriesCardList.value == "") {
+    if (seriesCardList.value == "") {
       const lastViewSeriesId = localStorage.getItem("lastViewSeriesId");
       if (lastViewSeriesId) {
         // console.log("開始重新獲取");
-        await getCardSeriesCompleteInfo(lastViewSeriesId);
+        await getSeriesCards(lastViewSeriesId);
       }
     }
   };
 
   return {
-    currentSeriesData,
     serieslastReleaseTime,
     seriesCode,
     seriesCardList,
-    seriesTestData,
-    getTestSeriesData,
-    getCardSeriesCompleteInfo,
+    getSeriesCards,
     saveLastViewSeries,
     getLastViewSeries,
+    seriesTestData,
+    getTestSeries,
+    seriesInfo,
   };
 });

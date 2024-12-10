@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import GoogleLogin from '../components/GoogleLogin.vue';
 
 const router = useRouter()
 
@@ -17,18 +18,17 @@ const goLogin = () => {
 const email = ref("")
 const password = ref("") 
 
-const API_URL = 'http://localhost:7890/api'
+const API_URL = 'http://localhost:3000/api'
 
 const submit = async () => {
     console.log(email.value, password.value);
   try {
-    const res = await axios.post(`${API_URL}/users`, {
+    const res = await axios.post(`${API_URL}/login`, {
       email: email.value,
       password: password.value
     })
 
     localStorage.setItem('token', res.data.token)
-    // router.push({ name: 'account-page' })
   } catch (error) {
     console.error('API Error:', error)
     Swal.fire({
@@ -184,10 +184,7 @@ console.log(email.value, password.value)
                             <button class="flex items-center justify-center w-full gap-2 p-2 rounded-2xl text-cyan-500/50 hover:text-cyan-500" @click="goSignup">還沒有帳號？前往註冊</button>
                         </div>
                         <hr class="w-full my-4 border border-zinc-700/50">
-                        <button class="flex items-center w-full gap-2 p-2 bg-white border shadow rounded-2xl">
-                            <img src="../img/google-icon.png" class="flex-none size-7">
-                            <span class="block w-full text-center"> Sign in with Google</span>
-                        </button>
+                        <GoogleLogin />
                     </form>
                 </section>
             </div>

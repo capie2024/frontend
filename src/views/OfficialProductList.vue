@@ -432,7 +432,6 @@
     grid-area: sidebar;
     min-height: 0;
     padding: 1rem;
-    background-color: #090909;
 }
 .sidebar-head{
     text-decoration: none;
@@ -557,7 +556,7 @@ nav{
     border-radius: 5px;
     justify-content: space-between;
     position: fixed;
-    width: calc(99.6% - 270px);
+    width: calc(100% - 339px);
     top:0px;
     left: 270px;
 }
@@ -660,7 +659,7 @@ nav{
 .left-icon button{
     background-color:rgba(0,0,0,.5);
     border-radius: 50%;
-    padding: 5px 12px;
+    padding: 6px 10px;
     color: rgb(148, 147, 147);
     border: 1px solid transparent;
     cursor: not-allowed;
@@ -754,6 +753,7 @@ nav{
     padding: 16px;
     background-color: #18181b;
     border-radius: 5%;
+    box-sizing: border-box;
 }
 .url img{
     border-radius: 10%;
@@ -793,6 +793,7 @@ a{
     .grid-card{
         grid-template-columns: repeat(5, minmax(0, 1fr));
         width: 100%;
+        padding: 0px;
     }
     .top-container {
         width: 100% ;
@@ -864,6 +865,7 @@ a{
       }
       .aa{
         left: 0;
+        margin: 0px;
       }
       .url{
         background-color: transparent;

@@ -21,6 +21,8 @@ import MyCard from "../views/MyCardView.vue";
 import Findcard from "../components/Mycard/find-card.vue";
 import Remitcard from "../components/Mycard/remit-card.vue";
 import RemitCardNf from "../components/Mycard/remit-cardnf.vue";
+import AuthSuccess from "../views/AuthSuccess.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -131,6 +133,12 @@ const router = createRouter({
       name: "remitcardnf",
       component: RemitCardNf,
     },
+    {
+      path: '/auth-success',
+      name: 'auth-success',
+      component: AuthSuccess
+    }
+
   ],
 });
 

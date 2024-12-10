@@ -1,9 +1,16 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
+// import CardInfo from "@/views/CardInfo.vue";
+import { storeToRefs } from "pinia";
+import { useCardInfoStore } from "@/stores/card-info";
+
+const cardInfoStore = useCardInfoStore();
+const { cardInfoDisplay } = storeToRefs(cardInfoStore);
 </script>
 
 <template>
   <RouterView />
+  <!-- <CardInfo v-if="cardInfoDisplay" /> -->
 </template>
 
 <style scoped>

@@ -1,3 +1,306 @@
+<script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
+function getUserIdFromToken(token) {
+    try {
+        const payload = token.split(".")[1];
+        const decodedPayload = JSON.parse(atob(payload));
+        console.log("Decoded Payload:", decodedPayload);
+        return decodedPayload.userId || null; // 檢查是否有 userId
+    } catch (error) {
+        console.error("無法解析 token:", error);
+        return null;
+    }
+}
+
+export default {
+    data() {
+        return {
+        newMessage: "",  // 儲存輸入的留言內容
+        messages: [],    // 儲存所有留言
+        username: "",    // 用戶名稱
+        showAllMessages: false,
+        showMenu: false,
+        isEditing: false,
+        likeCount: 0 || 0,
+        liked: false,
+        hated: false,
+        loggedInUserId: null,
+        token: localStorage.getItem('token'),
+        };
+    },
+    mounted() {
+        this.fetchArticleId();
+        this.fetchCurrentUser();
+    },
+    created() {
+        this.loggedInUserId = getUserIdFromToken(this.token);
+        console.log("Logged in user ID:", this.loggedInUserId);
+    },
+    computed: {
+        isLoggedIn() {
+            return localStorage.getItem('token') !== null;
+        }
+    },
+    methods: {
+        async fetchCurrentUser() {
+            try {
+                const userToken = localStorage.getItem("token");
+
+                if (!userToken) {
+                    console.error("User token not found.");
+                    return;
+                }
+
+                const response = await axios.get('http://localhost:3000/api/currentUser', {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                    },
+                });
+
+                console.log("Fetched user data:", response.data);
+                this.currentUser = response.data;            
+            } catch (error) {
+                console.error('Failed to fetch current user:', error);
+            }
+        },
+        async fetchArticleId() {
+            const postCode = this.$route.params.post_code;  // 使用 post_code 從路由中獲取參數
+            if (!postCode) {
+                console.error("Error: postCode is not available in route params");
+                return;
+            }
+            console.log("Post code:", postCode);
+            try {
+                // 根據 post_code 查詢對應的 article_id
+                const response = await axios.get(`http://localhost:3000/api/article-id/${postCode}`);
+                this.articleId = response.data.article_id;  // 從後端獲取 article_id
+                console.log("Fetched article ID:", this.articleId);
+
+                // 確保在獲取 articleId 後再獲取其他資料
+                await this.fetchMessages();  
+            } catch (error) {
+                console.error("Error fetching article_id:", error);
+            }
+        },
+        async fetchMessages() {
+            if (!this.articleId) {
+                console.log("articleId is not available for fetching messages");
+                return;
+            }
+            try {
+                const response = await axios.get(
+                    `http://localhost:3000/api/comments?postCode=${this.articleId}`
+                );
+
+                // 更新 messages 並設置 liked 和 hated 狀態
+                this.messages = response.data;
+                // 假設返回的每條留言中包含 userLiked 和 userHated 字段
+                this.messages.forEach((message) => {
+                    message.liked = message.liked || false;  // 根據返回的字段設置 liked
+                    message.hated = message.hated || false;  // 根據返回的字段設置 hated
+                    message.likeCount = message.like_count || 0;  // 設置 likeCount（如果返回的有這個字段）
+
+                    // 設置大頭貼圖片的 URL
+                    message.pictureUrl = message.users.picture || '/default-avatar.png';  // 如果沒有圖片則使用預設圖片
+                });
+                console.log("Fetched messages:", this.messages);
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+            }
+        },      
+        async sendMessage() {
+            console.log('sendMessage called');
+
+            if (!this.articleId) {
+                console.log(' articleId is not available');
+                return;  // 防止未設置 post_id 時發送留言
+            }
+
+            if (this.newMessage.trim() !== "" && this.articleId) {
+                const userToken = localStorage.getItem('token');
+
+                if (!userToken) {
+                    console.error('User token is missing');
+                    return;
+                }
+
+                const newMessage = {
+                    article_id: this.articleId,
+                    message: this.newMessage.trim(),
+                    like_count: 0,
+                    created_at: new Date().toISOString(),
+                }
+                try {
+                    const response = await axios.post('http://localhost:3000/api/send-message', {newMessage},{
+                        headers:{
+                            Authorization: `Bearer ${userToken}`,
+                        },
+                    });
+                    console.log('Message sent:', response.data);
+                    this.messages.unshift(response.data);  
+                    this.newMessage = ""; 
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                }
+            } else {
+                console.log('Invalid message or post_id');
+            }
+        },
+        toggleMenu(messageId) {
+            const message = this.messages.find((message) => message.id === messageId);
+            if (message) {
+                if (message.user_id === this.loggedInUserId) {
+                    message.showMenu = !message.showMenu;
+                } else {
+                    console.log("無權限編輯此留言");
+                }
+            } else {
+                console.log("Message not found");
+            }
+        },        
+        toggleEdit(message) {
+            message.isEditing = true;
+            message.showMenu = false;
+            message.editContent = message.message; // 初始化編輯內容
+        },
+         // 送出編輯
+        async submitEdit(message) {
+            console.log('submitEdit called');
+            const userToken = localStorage.getItem('token');
+
+            if (!userToken) {
+                console.error('User token is missing');
+                return;
+            }
+
+            try {
+                const response = await axios.put(`http://localhost:3000/api/comments/${message.id}`, {
+                    message: message.editContent, 
+                },
+            {
+                headers: {
+                    Authorization: `Bearer ${userToken}`,
+                }
+            });
+                if (response.status === 200) {
+                    // 後端返回的更新資料
+                    const updatedComment = response.data    
+                    // 更新前端顯示的留言
+                    message.message = updatedComment.message;
+                    message.created_at = updatedComment.created_at;
+                    message.isEditing = false; // 結束編輯模式
+                } else {
+                    console.error('更新失敗', response);
+                    alert('更新失敗，請稍後再試！');
+                }
+            } catch (error) {
+                console.error('更新失敗', error);
+                alert('無法連接到伺服器，請稍後再試！');
+            }
+        },        
+        // 取消編輯
+        cancelEdit(message) {
+            message.isEditing = false; // 結束編輯模式
+        },
+        async deleteMessage(messageId) {
+            console.log("Attempting to delete message with ID:", messageId);         
+            Swal.fire({
+                title: "刪除留言",
+                text: "確定要刪除留言嗎？將會清除目前編輯的所有資訊。",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "OK"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const userToken = localStorage.getItem("token");
+
+                        if (!userToken) {
+                            console.error("User token not found.");
+                            return;
+                        }
+
+                        const response = await axios.delete(`http://localhost:3000/api/comments/${messageId}`,{
+                            headers: {
+                                Authorization: `Bearer ${userToken}`,
+                            }
+                        });
+                        console.log("Response from server:", response.data);
+                        if (response.status === 200) {
+                            Swal.fire("刪除成功!", "你的留言已被刪除", "success");
+                            this.messages = this.messages.filter((message) => message.id !== messageId);
+                        }
+                    } catch (error) {
+                        console.error("Delete request failed:", error.response?.data || error.message);
+                        Swal.fire("刪除失敗", error.response?.data?.error || "Failed to delete the comment.", "error");
+                    }
+                }
+            });
+        },
+        toggleMessages(){
+            this.showAllMessages = !this.showAllMessages
+        },
+        async toggleLike(message) {
+            try {
+                const userToken = localStorage.getItem("token");
+                if (!userToken) {
+                    console.error("User token not found.");
+                    return;
+                }
+
+                const response = await axios.post(
+                    `http://localhost:3000/api/comments/${message.id}/toggleLike`, {},
+                    { 
+                        headers: {
+                            Authorization: `Bearer ${userToken}`,
+                        }
+                    }
+                );
+
+                const { isLiked, isHated, likeCount } = response.data;
+
+                // 確保互斥狀態和 Like 數更新
+                message.liked = isLiked;
+                message.hated = isHated;
+                message.likeCount = likeCount; // 確保畫面同步更新 Like 數
+            } catch (error) {
+                console.error("Error toggling like:", error.response || error.message);
+            }
+        },
+        async toggleHate(message) {
+            try {
+                const userToken = localStorage.getItem("token");
+                if (!userToken) {
+                    console.error("User token not found.");
+                    return;
+                }
+
+                const response = await axios.post(
+                    `http://localhost:3000/api/comments/${message.id}/toggleHate`, {},
+                    { 
+                        headers: {
+                            Authorization: `Bearer ${userToken}`,
+                    }
+                });
+
+                const { isHated, isLiked, likeCount } = response.data;
+
+                // 確保互斥狀態和 Like 數更新
+                message.hated = isHated;
+                message.liked = isLiked;
+                message.likeCount = likeCount; // 確保畫面同步更新 Like 數
+            } catch (error) {
+                console.error("Error toggling hate:", error.response || error.message);
+            }
+        }
+    }
+}  
+</script>
+
 <template>
     <div class="container">
         <nav class="sidebar-container">
@@ -191,7 +494,7 @@
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"></path>
                                                         </svg>
                                                     </button>
-                                                    <div class="dot-menu" v-if="isLoggedIn && message.showMenu">
+                                                    <div class="dot-menu" @click="toggleMenu(message.id)" v-if="message.showMenu">
                                                         <a class="edit" @click="toggleEdit(message)">
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
@@ -438,290 +741,6 @@
     </div>
 </template>
 
-<script>
-import axios from 'axios';
-import Swal from 'sweetalert2';
-
-export default {
-    data() {
-        return {
-        newMessage: "",  // 儲存輸入的留言內容
-        messages: [],    // 儲存所有留言
-        username: "",    // 用戶名稱
-        showAllMessages: false,
-        showMenu: false,
-        isEditing: false,
-        likeCount: 0 || 0,
-        liked: false,
-        hated: false,
-        };
-    },
-    mounted() {
-        this.fetchArticleId();
-        this.fetchCurrentUser();
-        this.currentUserToken = localStorage.getItem('token');
-    },
-    computed: {
-        isLoggedIn() {
-            return localStorage.getItem('token') !== null;
-        }
-    },
-    methods: {
-        async fetchCurrentUser() {
-            try {
-                const userToken = localStorage.getItem("token");
-
-                if (!userToken) {
-                    console.error("User token not found.");
-                    return;
-                }
-
-                const response = await axios.get('http://localhost:3000/api/currentUser', {
-                    headers: {
-                        Authorization: `Bearer ${userToken}`,
-                    },
-                });
-
-                console.log("Fetched user data:", response.data);
-                this.currentUser = response.data;            
-            } catch (error) {
-                console.error('Failed to fetch current user:', error);
-            }
-        },
-        async fetchArticleId() {
-            const postCode = this.$route.params.post_code;  // 使用 post_code 從路由中獲取參數
-            if (!postCode) {
-                console.error("Error: postCode is not available in route params");
-                return;
-            }
-            console.log("Post code:", postCode);
-            try {
-                // 根據 post_code 查詢對應的 article_id
-                const response = await axios.get(`http://localhost:3000/api/article-id/${postCode}`);
-                this.articleId = response.data.article_id;  // 從後端獲取 article_id
-                console.log("Fetched article ID:", this.articleId);
-
-                // 確保在獲取 articleId 後再獲取其他資料
-                await this.fetchMessages();  
-            } catch (error) {
-                console.error("Error fetching article_id:", error);
-            }
-        },
-        async fetchMessages() {
-            if (!this.articleId) {
-                console.log("articleId is not available for fetching messages");
-                return;
-            }
-            try {
-                const response = await axios.get(
-                    `http://localhost:3000/api/comments?postCode=${this.articleId}`
-                );
-
-                // 更新 messages 並設置 liked 和 hated 狀態
-                this.messages = response.data;
-                // 假設返回的每條留言中包含 userLiked 和 userHated 字段
-                this.messages.forEach((message) => {
-                    message.liked = message.liked || false;  // 根據返回的字段設置 liked
-                    message.hated = message.hated || false;  // 根據返回的字段設置 hated
-                    message.likeCount = message.like_count || 0;  // 設置 likeCount（如果返回的有這個字段）
-
-                    // 設置大頭貼圖片的 URL
-                    message.pictureUrl = message.users.picture || '/default-avatar.png';  // 如果沒有圖片則使用預設圖片
-                });
-                console.log("Fetched messages:", this.messages);
-            } catch (error) {
-                console.error("Error fetching messages:", error);
-            }
-        },      
-        async sendMessage() {
-            console.log('sendMessage called');
-
-            if (!this.articleId) {
-                console.log(' articleId is not available');
-                return;  // 防止未設置 post_id 時發送留言
-            }
-
-            if (this.newMessage.trim() !== "" && this.articleId) {
-                const userToken = localStorage.getItem('token');
-
-                if (!userToken) {
-                    console.error('User token is missing');
-                    return;
-                }
-
-                const newMessage = {
-                    article_id: this.articleId,
-                    message: this.newMessage.trim(),
-                    like_count: 0,
-                    created_at: new Date().toISOString(),
-                }
-                try {
-                    const response = await axios.post('http://localhost:3000/api/send-message', {newMessage},{
-                        headers:{
-                            Authorization: `Bearer ${userToken}`,
-                        },
-                    });
-                    console.log('Message sent:', response.data);
-                    this.messages.unshift(response.data);  
-                    this.newMessage = ""; 
-                } catch (error) {
-                    console.error('Error sending message:', error);
-                }
-            } else {
-                console.log('Invalid message or post_id');
-            }
-        },
-        toggleMenu(messageId) {
-             // console.log('toggleMenu called');
-            const message = this.messages.find((message) => message.id === messageId);
-            if (message) {
-                message.showMenu = !message.showMenu;
-            }else{
-                console.log('Message not found');
-            }
-        },
-        toggleEdit(message) {
-            message.isEditing = true;
-            message.showMenu = false;
-            message.editContent = message.message; // 初始化編輯內容
-        },
-         // 送出編輯
-        async submitEdit(message) {
-            console.log('submitEdit called');
-            const userToken = localStorage.getItem('token');
-
-            if (!userToken) {
-                console.error('User token is missing');
-                return;
-            }
-
-            try {
-                const response = await axios.put(`http://localhost:3000/api/comments/${message.id}`, {
-                    message: message.editContent, 
-                },
-            {
-                headers: {
-                    Authorization: `Bearer ${userToken}`,
-                }
-            });
-                if (response.status === 200) {
-                    // 後端返回的更新資料
-                    const updatedComment = response.data    
-                    // 更新前端顯示的留言
-                    message.message = updatedComment.message;
-                    message.created_at = updatedComment.created_at;
-                    message.isEditing = false; // 結束編輯模式
-                } else {
-                    console.error('更新失敗', response);
-                    alert('更新失敗，請稍後再試！');
-                }
-            } catch (error) {
-                console.error('更新失敗', error);
-                alert('無法連接到伺服器，請稍後再試！');
-            }
-        },        
-        // 取消編輯
-        cancelEdit(message) {
-            message.isEditing = false; // 結束編輯模式
-        },
-        async deleteMessage(messageId) {
-            console.log("Attempting to delete message with ID:", messageId);         
-            Swal.fire({
-                title: "刪除留言",
-                text: "確定要刪除留言嗎？將會清除目前編輯的所有資訊。",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "OK"
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        const userToken = localStorage.getItem("token");
-
-                        if (!userToken) {
-                            console.error("User token not found.");
-                            return;
-                        }
-
-                        const response = await axios.delete(`http://localhost:3000/api/comments/${messageId}`,{
-                            headers: {
-                                Authorization: `Bearer ${userToken}`,
-                            }
-                        });
-                        console.log("Response from server:", response.data);
-                        if (response.status === 200) {
-                            Swal.fire("刪除成功!", "你的留言已被刪除", "success");
-                            this.messages = this.messages.filter((message) => message.id !== messageId);
-                        }
-                    } catch (error) {
-                        console.error("Delete request failed:", error.response?.data || error.message);
-                        Swal.fire("刪除失敗", error.response?.data?.error || "Failed to delete the comment.", "error");
-                    }
-                }
-            });
-        },
-        toggleMessages(){
-            this.showAllMessages = !this.showAllMessages
-        },
-        async toggleLike(message) {
-            try {
-                const userToken = localStorage.getItem("token");
-                if (!userToken) {
-                    console.error("User token not found.");
-                    return;
-                }
-
-                const response = await axios.post(
-                    `http://localhost:3000/api/comments/${message.id}/toggleLike`, {},
-                    { 
-                        headers: {
-                            Authorization: `Bearer ${userToken}`,
-                        }
-                    }
-                );
-
-                const { isLiked, isHated, likeCount } = response.data;
-
-                // 確保互斥狀態和 Like 數更新
-                message.liked = isLiked;
-                message.hated = isHated;
-                message.likeCount = likeCount; // 確保畫面同步更新 Like 數
-            } catch (error) {
-                console.error("Error toggling like:", error.response || error.message);
-            }
-        },
-        async toggleHate(message) {
-            try {
-                const userToken = localStorage.getItem("token");
-                if (!userToken) {
-                    console.error("User token not found.");
-                    return;
-                }
-
-                const response = await axios.post(
-                    `http://localhost:3000/api/comments/${message.id}/toggleHate`, {},
-                    { 
-                        headers: {
-                            Authorization: `Bearer ${userToken}`,
-                    }
-                });
-
-                const { isHated, isLiked, likeCount } = response.data;
-
-                // 確保互斥狀態和 Like 數更新
-                message.hated = isHated;
-                message.liked = isLiked;
-                message.likeCount = likeCount; // 確保畫面同步更新 Like 數
-            } catch (error) {
-                console.error("Error toggling hate:", error.response || error.message);
-            }
-        }
-    }
-}  
-
-</script>
-
 <style scoped>
     .send-btn span
     .cancel-btn span{
@@ -878,7 +897,7 @@ export default {
 
     .message-section{
         width: 95%;
-        height: 50vh;
+        height: 80vh;
     }
 
     .message-scroll{

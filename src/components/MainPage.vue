@@ -1,210 +1,78 @@
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
+
+const isScrolled = ref(false); // 是否滾動
+
+const handleScroll = () => {
+  const scrollTop = mainElement.value.scrollTop;
+  isScrolled.value = scrollTop > 64;
+};
+
+let mainElement = ref(null);
+
+const main = () => {
+    mainElement.value = document.querySelector('.content-container');
+  if (mainElement.value) {
+    mainElement.value.addEventListener('scroll', handleScroll);
+  }
+};
+
+onMounted(() => {
+  main();
+});
+
+onBeforeUnmount(() => {
+  if (mainElement.value) {
+    mainElement.value.removeEventListener('scroll', handleScroll);
+  }
+});
+</script>
+
 <template>
-    <div id="app">
-        <nav>
-        <div class="sidebar">
-            <a href="https://bottleneko.app/" class="sidebar-head">
-            <img src="../img/bottleneko-icon.png" alt="" class="icon" />
-            <img src="../img/bottleneko-icon-text.png" alt="" class="icon-text" />
-            </a>
-            <ul class="sidebar-menu">
-            <li>
-                <a href="">
-                <svg
-                    data-v-11825b1c=""
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    stroke="#a1a1aa"
-                    fill="currentColor"
-                    data-slot="icon"
-                    class="flex-none w-7 h-7"
-                >
-                    <path
-                    d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z"
-                    ></path>
-                    <path
-                    d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z"
-                    ></path>
-                </svg>
-                <h2>首頁</h2>
-                </a>
-            </li>
-            <li>
-                <a href="">
-                <svg
-                    data-v-11825b1c=""
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="#a1a1aa"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    s
-                    data-slot="icon"
-                    class="flex-none w-7 h-7"
-                >
-                    <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-                    ></path>
-                </svg>
-                <h2>系列卡表</h2>
-                </a>
-            </li>
-            <li>
-                <a href="">
-                <svg
-                    data-v-11825b1c=""
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="#a1a1aa"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    s
-                    data-slot="icon"
-                    class="flex-none w-7 h-7"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
-                    ></path>
-                </svg>
-                <h2>我的牌組</h2>
-                </a>
-            </li>
-            <li>
-                <a href="">
-                <svg
-                    data-v-11825b1c=""
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="#a1a1aa"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    s
-                    data-slot="icon"
-                    class="flex-none w-7 h-7"
-                >
-                    <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"
-                    ></path>
-                </svg>
-                <h2>社群</h2>
-                </a>
-            </li>
-            <li>
-                <a href="">
-                <svg
-                    data-v-11825b1c=""
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="#a1a1aa"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    s
-                    data-slot="icon"
-                    class="flex-none w-7 h-7"
-                >
-                    <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
-                    ></path>
-                </svg>
-                <h2>工作坊</h2>
-                </a>
-            </li>
-            </ul>
-            <button class="translate-btn">
-            <svg
-                data-v-11825b1c=""
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                data-slot="icon"
-                class="flex-none w-7 h-7"
-            >
-                <path
-                d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"
-                ></path>
-            </svg>
-            <h2>原文翻譯</h2>
-            </button>
-            <p>沒東西</p>
-        </div>
+    <header class="z-10 h-16 header-bg overflow-hidden">
+        <nav class="header-container w-full h-full px-4 py-6 flex items-center gap-2 relative default-transition" :class="{ 'scrolled': isScrolled }">
+            <div class="notice">
+                <input type="checkbox" id="notice-jump">
+                <label for="notice-jump" class="flex-none p-1 rounded-full default-transition hover:bg-zinc-800/50 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
+                </label>
+                <div class="z-10 notice-grid">
+                    <div class="notice-grid-up">
+                        <h2>通知(0)</h2>
+                    </div>
+                    <div class="notice-grid-down">
+                        <img src="https://bottleneko.app/images/status/empty.png" alt="no-data">
+                        <h2>沒東西</h2>
+                        <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
+                    </div>
+                </div>
+            </div>
+            <div class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50">
+                <div class="flex flex-col items-center gap-1 p-1 rounded-full">
+                    <div class="flex-none rounded-full size-6 bg-black/70">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="m-1 text-zinc-200">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <span class="text-sm flex-none max-w-[8rem] truncate">登入</span>
+                <div class="p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
+                    </svg>
+                </div>
+            </div>
         </nav>
-    
-        <header class="header">
-        <div class="notice">
-            <input type="checkbox" id="notice-jump" />
-            <label for="notice-jump" class="notice-jump">
-            <svg
-                class="notice-icon stroke-2"
-                data-v-3e737e76=""
-                xmlns="http://www.w3.org/2000/svg"
-                stroke="white"
-                fill="none"
-                viewBox="0 0 24 24"
-                data-slot="icon"
-            >
-                <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                ></path>
-            </svg>
-            </label>
-            <p class="notice-txt">通知</p>
-            <div class="notice-grid">
-            <div class="notice-grid-up">
-                <h2>通知(0)</h2>
-            </div>
-            <div class="notice-grid-down">
-                <img src="https://bottleneko.app/images/status/empty.png" alt="" />
-                <h2>沒東西</h2>
-                <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
-            </div>
-            </div>
-        </div>
-        <button class="login-btn">
-            <svg
-            xmlns="http://www.w3.org/2000/svg"
-            stroke="white"
-            fill="none"
-            viewBox="0 0 24 24"
-            data-slot="icon"
-            class="m-1 text-zinc-200"
-            >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-            ></path>
-            </svg>
-            <p>登入</p>
-            <svg
-            data-v-3e737e76=""
-            xmlns="http://www.w3.org/2000/svg"
-            stroke="white"
-            fill="none"
-            viewBox="0 0 24 24"
-            data-slot="icon"
-            class="h-4 w-4 flex-none"
-            >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m19.5 8.25-7.5 7.5-7.5-7.5"
-            ></path>
-            </svg>
-        </button>
-        </header>
-    
-        <main class="content-container">
-            <div class="content-flex-col">
+    </header>
+
+    <main class="relative content-container flex flex-col pt-[10px] rounded-b-2xl bg-base scroll-smooth scrollbar z-1">
+        <div class="content px-4 md:px-6 h-full">
             <section class="bottleneko-section">
                 <div>
                 <img src="https://bottleneko.app/icon.png" alt="" />
                 </div>
-                <h1>貓罐子</h1>
-                <p>- 最優質的卡片牌組工具 -</p>
+                <h1>Capie</h1>
+                <p>- 輕鬆開啟你的卡牌派對 -</p>
             </section>
     
             <section class="author-section">
@@ -1074,11 +942,10 @@
                 <p>疑？你還不是會員嗎？ 趕快來加入我們吧！</p>
                 </a>
             </section>
-            </div>
             <footer>
-            <div class="work-shop-footer">
-                <div class="work-shop-footer-flexbox">
-                <div class="work-shop-footer-flexbox-left">
+                <div class="work-shop-footer">
+                    <div class="work-shop-footer-flexbox">
+                    <div class="work-shop-footer-flexbox-left">
                     <ul class="work-shop-footer-flexbox-left-item">
                     <li class="work-shop-footer-flexbox-left-item-title">簡介</li>
                     <li class="work-shop-footer-flexbox-left-item-link">
@@ -1192,8 +1059,8 @@
                         </a>
                     </li>
                     </ul>
-                </div>
-                <div class="work-shop-footer-flexbox-right">
+                    </div>
+                    <div class="work-shop-footer-flexbox-right">
                     <div class="work-shop-footer-flexbox-right-group">
                     <a class="work-shop-footer-flexbox-right-item" href="#">
                         <span class="work-shop-footer-flexbox-right-item-icon">
@@ -1230,11 +1097,11 @@
                         </a>
                     </div>
                     </div>
-                </div>
-                </div>
-                <hr class="work-shop-footer-hr" />
-                <div class="work-shop-footer-copyright">
-                <ul class="work-shop-footer-copyright-left">
+                    </div>
+                    </div>
+                    <hr class="work-shop-footer-hr" />
+                    <div class="work-shop-footer-copyright">
+                    <ul class="work-shop-footer-copyright-left">
                     <li class="work-shop-footer-copyright-left-item">
                     <a href="https://bottleneko.app/policy" target="_blank">
                         隱私權政策
@@ -1250,127 +1117,48 @@
                         商業合作
                     </a>
                     </li>
-                </ul>
-                <div class="work-shop-footer-copyright-right">
-                    <span>卡片資料來源 Weiβ Schwarz.</span>
-                    <span>Copyright @ 2023 BottleNeko</span>
+                    </ul>
+                    <div class="work-shop-footer-copyright-right">
+                        <span>卡片資料來源 Weiβ Schwarz.</span>
+                        <span>Copyright @ 2023 BottleNeko</span>
+                    </div>
+                    </div>
                 </div>
-                </div>
-            </div>
             </footer>
-        </main>
-    </div>
-    </template>
+        </div>
+        
+    </main>
+</template>
     
-    <style scoped>
-.sidebar {
-    width: 238px;
-    height: 100vh;
-    background-color: black;
-    padding: 16px;
-}
-
-.sidebar-head {
-    text-decoration: none;
-    color: black;
-    cursor: pointer;
-}
-
-.icon {
-    width: 40px;
-    height: 40px;
-}
-
-.icon-text {
-    width: 85px;
-    height: 35px;
-}
-
-.sidebar-menu {
-    margin-top: 20px;
-}
-
-.sidebar-menu > li {
-    display: flex;
-    align-items: center;
-    width: 238px;
-    height: 40px;
-    margin-bottom: 5px;
-}
-
-.w-7 {
-    width: 1.75rem;
-}
-
-.h-7 {
-    height: 1.75rem;
-}
-
-.sidebar-menu li h2 {
-    color: #a1a1aa;
-    font-weight: 700;
-    font-size: 16px;
-}
-
-.sidebar-menu a {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: #a1a1aa;
-    gap: 10px;
-}
-
-.sidebar-menu a:hover h2 {
-    color: white;
-}
-
-.sidebar-menu a:hover svg {
-    stroke: white;
-}
-
-.translate-btn {
-    display: flex;
-    align-items: center;
-    width: 238px;
-    height: 40px;
-    gap: 8px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(45deg, #a855f7, #ec4899);
-    color: white;
-    margin-top: 20px;
-    cursor: pointer;
-    position: relative;
-}
-
-.translate-btn::after {
-    content: "";
-    position: absolute;
-    border-top: 1px solid #3f3f46;
-    top: 50px;
-    left: 0;
-    right: 0;
-    width: 100%;
-}
-
-.sidebar p {
-    color: #a1a1aa;
-    font-size: 16px;
-    margin-top: 30px;
-}
+<style scoped>
+@import '@/assets/base.css';
 
 nav {
     position: fixed;
+    width: calc(100vw - 270px);
 }
 
 header {
-    background-color: #6a6a6a;
-    padding: 16px 24px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    margin: .5rem .5rem 0 0;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.header-container {
+    /* grid-area: navbar; */
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    background-color: rgba(18, 18, 18, 1);
+}
+
+.header-container.scrolled {
+    background-color: rgba(18, 18, 18, 1);
+}
+
+.default-transition {
+    transition-duration: .3s;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
 }
 
 .notice-icon {
@@ -1515,9 +1303,18 @@ header {
 }
 
 .content-container {
+    height: calc(100vh - 64px - .5rem);
+    width: calc(100vw - 270px - .5rem);
+    /* grid-area: main-view; */
     background-color: #121212;
-    margin-left: 270px;
-    padding: 0px 24px;
+    overflow: scroll;
+}
+
+.scrollbar {
+    &::-webkit-scrollbar {
+        height: 0;
+        width: 0;
+    }
 }
 
 .bottleneko-section {
@@ -2603,23 +2400,19 @@ link-area3 a svg {
 
 @media screen and (max-width: 1199px) {
     .sidebar {
-    display: none;
+        display: none;
     }
 
-    .header {
-    display: none;
+    header {
+      margin: 0;
+      border-radius: 0;
     }
-
     .content-container {
-    margin-left: 0px !important;
-    }
-
-    .content-container {
-    margin-left: 0 !important;
+        width: 100%;
     }
 
     .bottleneko-section h1 {
-    font-size: 30px !important;
+        font-size: 30px !important;
     }
 
     .card1 {
@@ -2628,19 +2421,19 @@ link-area3 a svg {
     }
 
     .card2 {
-    flex-direction: column;
-    justify-content: center;
-    overflow: hidden !important;
-    margin-left: 0px !important;
-    margin-right: 0px !important;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden !important;
+        margin-left: 0px !important;
+        margin-right: 0px !important;
     }
 
     .card2-left,
     .card2-right {
-    width: 100% !important;
-    margin-left: 0px !important;
-    margin-right: 0px !important;
-    overflow: hidden;
+        width: 100% !important;
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+        overflow: hidden;
     }
 
     .card2-left-img img {

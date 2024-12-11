@@ -6,10 +6,11 @@ const route = useRoute();
 const router = useRouter();
 
 const token = route.query.token;
+console.log(token)
 
 if (token) {
   localStorage.setItem('token', token);
-  router.push({ name: 'account-page' });
+  router.push({ name: 'user' });
 } else {
   router.push({ name: 'login' });
 }

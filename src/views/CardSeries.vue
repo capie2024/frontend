@@ -87,7 +87,7 @@ const finalStep = async() => {
     const res = await sendDeckToDatabase(deckData);
     console.log(res);
     
-    if(res.status == 200) {        
+    if(res.status == 200){        
       console.log("已傳送給後端存入資料庫");
       settingDeckStatus.value = false
       sidebarSelectedStatus.value = true
@@ -102,6 +102,13 @@ const finalStep = async() => {
               })
       router.push('/carddeck')
       console.log("完成創建牌組並跳轉");
+    }else if(res.status == 403){
+      awaitSwal.fire({
+                icon: 'error',
+                title: '錯誤',
+                text: '驗證過期請重新登入'
+              })
+      router.push('/login')
     }else{
       Swal.fire({
                 icon: 'error',

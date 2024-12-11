@@ -260,16 +260,30 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
 
   // 傳送給後端存入資料庫
   const sendDeckToDatabase = async (deckData) => {
-    console.log(deckData);
-    const userToken = localStorage.getItem("token");
-
-    const res = await axios.post("http://localhost:3000/api/add-deck", {
-      userToken,
-      deckData,
-    });
-    console.log(res.data);
-    return res;
-  };
+    try {
+      const userToken = localStorage.getItem("token");
+      // console.log(userToken);
+  
+      const res = await axios.post("http://localhost:3000/api/add-deck", 
+      {
+        deckData
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        }
+      }
+      );
+      console.log(res.data);
+      console.log("已傳送");
+      
+      return res;
+    } catch (error) {
+     console.log(error);
+      
+    }
+  }
+  
 
   // 獲取卡片在牌組中的數量
   const countCards = (card) => {

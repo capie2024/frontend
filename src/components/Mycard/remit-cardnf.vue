@@ -337,12 +337,12 @@
     
     @media  (max-width:767px ) {
         .input-button { 
-        display: grid;
-        align-items: flex-start;
+        /* display: grid; */
+        /* align-items: flex-start; */
         gap: .5rem;
         box-sizing: content-box;
-        padding: 1rem;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* padding: 1rem; */
+        /* grid-template-columns: repeat(2, minmax(0, 1fr)); */
         }
         .modal-dialog {
             height: 100%;

@@ -106,7 +106,7 @@
 
 
                     <div data-v-c3ac02c2="" class="seeting">
-                                <button  class="item md:!w-[20rem] justify-center default-transition gray setting-text">
+                                <button  class="item  justify-center default-transition gray setting-text">
                                     <svg data-v-c3ac02c2="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path></svg>
                                     <span class="text-sm font-mono input-text"> 設定完成 </span>
                                 </button>
@@ -116,7 +116,7 @@
             </div>
             
     </section>
-    </template>
+</template>
     
     <style scoped>
     @import '@/assets/base.css';
@@ -181,7 +181,7 @@
     width: 24px;
     position: absolute;
     stroke: currentcolor;
-    top: 1px;
+    top: -2px;
     right: 2px;
     }
 
@@ -206,7 +206,7 @@
     }
     
     .modal-body {
-        padding: 1rem;
+        padding:0.5rem 1rem 0rem 1rem;
     }
     .btn-close {
         flex: none;
@@ -216,7 +216,7 @@
         gap: 0.5rem;
         height: 1.5rem;
         width: 1.5rem;
-        padding: 0.25rem;
+        
         border: 0 solid #e5e7eb;
         box-sizing: border-box;
         
@@ -258,7 +258,7 @@
         align-items: flex-start;
         gap: .5rem;
         box-sizing: content-box;
-        padding: 1rem;
+        padding: 0.5rem 1rem 0 1rem;
         align-items: center;
     }
     
@@ -374,7 +374,6 @@
         display: flex;
         justify-content: center;
         border-radius: 12px;
-        width: 320px;
         margin-bottom: 8px;
     }
     

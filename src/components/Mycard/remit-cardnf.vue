@@ -1,12 +1,7 @@
 
 
 <script setup>
-// import { ref } from "vue";
 
-// const isSecondButtonVisible = ref(true);
-// const toggleButtons = () => {
-//   isSecondButtonVisible.value = !isSecondButtonVisible.value;
-// };
 
 
 
@@ -42,20 +37,7 @@
                             </svg>
                             <span data-v-41768621="" class="text-sm font-mono">匯出牌組</span>
                         </button>
-                        <!-- <div data-v-41768621="" class="relative  z-20  max-h-[50vh] md:max-h-[20rem] overflow-y-auto flex flex-col rounded-md bg-zinc-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-w-[80vw] md:max-w-[20rem] w-max" style="margin-top: 48px; left: 0px; top: 0px;">
-                            <a class="text-sm cursor-pointer flex items-center gap-2 py-2 px-4 text-zinc-300 hover:text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path>
-                                </svg><span>{{ isSecondButtonVisible}}匯出牌組</span>
-                            </a>
-                            <a class=" text-sm cursor-pointer flex items-center gap-2 py-2 px-4 text-zinc-300 hover:text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25">
-
-                                        </path>
-                                    </svg><span>{{ isSecondButtonVisible}}匯出文章</span>
-                                </a>
-                            </div> -->
+                       
 
                         <div data-v-41768621="" class="input-item-2 ">
                             <input data-v-41768621="" class="input-text" type="text" placeholder="代碼">
@@ -81,7 +63,7 @@
     </div>      
                     
     </section>
-    </template>
+</template>
     
     <style scoped>
     @import '@/assets/base.css';
@@ -123,6 +105,7 @@
         background-color:transparent;
         color: #e5e7eb;
         border-style: none;
+        position: relative;
     }
     
     .input-button-2  {
@@ -145,8 +128,8 @@
         width: 24px;
         position: absolute;
         stroke: currentcolor;
-        top: 1px;
-        right: 2px;
+        bottom: -35px;
+        right: 185px;
     }
 
     .default-transition {
@@ -170,7 +153,7 @@
     }
     
     .modal-body {
-        padding: 1rem;
+        padding: 0.5rem 1rem 0 1rem;
     }
     .btn-close {
         flex: none;
@@ -180,7 +163,7 @@
         gap: 0.5rem;
         height: 1.5rem;
         width: 1.5rem;
-        padding: 0.25rem;
+        
         border: 0 solid #e5e7eb;
         box-sizing: border-box;
         
@@ -219,10 +202,11 @@
     
     .input-button {
         display: flex;
-        align-items: flex-start;
+        
         gap: .5rem;
         box-sizing: content-box;
-        padding: 1rem;
+        padding: 0rem 1rem 0.5rem 1rem;
+        align-items: center;
     }
     
     .input-item button svg {
@@ -291,12 +275,11 @@
     }
     
     .input-item-2 {
-        align-items: center;
         border-radius: .75rem;
         gap: 0.5rem ;
         align-items: center;
         margin: 8px;
-        
+        display: flex;
     }
     
     .show-text-green {
@@ -337,7 +320,6 @@
         display: flex;
         justify-content: center;
         border-radius: 12px;
-        width: 320px;
         margin-bottom: 8px;
     }
     
@@ -349,13 +331,11 @@
     .item{
         align-items: center;
         border-radius: .75rem;
-        display: flex;
+        /* display: flex; */
         gap: .5rem;
         padding: .5rem;
-        border: 1px solid #27272a;
-        background-color: #151516;
         cursor: pointer;
-        
+        /* position: absolute; */
     }
     
     

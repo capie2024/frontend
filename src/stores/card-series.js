@@ -44,9 +44,9 @@ export const useCardSeriesStore = defineStore("card-series", () => {
       const selectedSeries = seriesRes.data.find((series) => {
         return series.id == seriesId;
       })
-      console.log(selectedSeries);
+      // console.log(selectedSeries);
       seriesInfo.value = selectedSeries;
-      console.log(seriesInfo.value);
+      // console.log(seriesInfo.value);
       
       const res = await axios.get(`http://localhost:3000/api/serise/${seriesId}`);
         // console.log(res.data);
@@ -60,7 +60,7 @@ export const useCardSeriesStore = defineStore("card-series", () => {
         }
       });
       seriesCardList.value = res.data;
-      console.log(seriesCardList.value);
+      // console.log(seriesCardList.value);
       
     } catch (err) {
       console.log(err);

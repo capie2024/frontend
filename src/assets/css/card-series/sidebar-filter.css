@@ -293,10 +293,29 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
-  background-color: #27272a;
   padding: 4px 8px;
   gap: 4px;
   border-radius: 7px;
+}
+
+.btn-default-bg {
+  background-color: #27272a;
+  color: white;
+  transition: all .2s ease-in-out;
+}
+
+.btn-default-bg:hover {
+  background-color: #3F3F46;
+  transition: all .2s ease-in-out;
+}
+
+.btn-active-bg {
+  background-color: rgb(186, 230, 253);
+  color: rgb(12, 74, 110);
+}
+
+.btn-active-bg:hover {
+  background-color: rgb(125 211 252);
 }
 
 .slider-btn {
@@ -307,6 +326,7 @@
   background-color: #3F3F46;
 }
 
+
 .menu-inner-btn {
   display: flex;
   gap: 5px;
@@ -315,7 +335,6 @@
 
 .menu-inner-btn button {
   width:calc((100% - 20px)/5);
-  background-color: #27272a;
   padding: 4px 8px;
   gap: 4px;
   border-radius: 7px;

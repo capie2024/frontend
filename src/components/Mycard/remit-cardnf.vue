@@ -108,16 +108,7 @@
      outline: none;
 }
     
-    .input-button-2  {
-        /* height: 24px;
-        width: 24px;
-        background-color: transparent;
-        color: #e5e7eb;
-        position: relative;
-        bottom:35px;
-        border-radius: 9999px;
-        right: -150px; */
-    }
+    
     
     .icon-input {
         color: #e5e7eb;

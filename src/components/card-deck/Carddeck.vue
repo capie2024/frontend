@@ -904,7 +904,7 @@ export default {
 
     .message-section{
         width: 95%;
-        height: 80vh;
+        height: 60vh;
     }
 
     .message-scroll{
@@ -1667,16 +1667,16 @@ export default {
         width: 100%;
         display: flex;
         margin-left: 24px;
-        position: absolute;
-        top: 450px;
-        display: none;
+        position: absolute; 
+        top: 450px;  
+        /* display: none; */
     }
 
     .toolbar-area1 {
         width: 50%;
         display: flex;
         gap: 20px;
-        display: none;
+        /* display: none; */
     }
 
     .tool-btn1 {
@@ -1754,7 +1754,7 @@ export default {
         gap: 20px;
         position: absolute;
         right: 50px;
-        display: none;
+        /* display: none; */
     }
 
 
@@ -2167,19 +2167,19 @@ export default {
         .toolbar {
             width: 50%;
             flex-direction: column;
-            display: none;
+            /* display: none; */
         }
         
         .toolbar-area1 {
             width: 50%;
             gap: 8px;
-            display: none;
+            /* display: none; */
         }
         
         .toolbar-area2 {
             width: 50%;
             position: static;
-            display: none;
+            /* display: none; */
         } 
     }
 

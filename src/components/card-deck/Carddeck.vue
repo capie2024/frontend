@@ -643,6 +643,34 @@ export default {
                             </section>
                         </div>
                     </div>
+                    <div class="card-info">
+                        <div class="row">
+                        <div class="col-Info" v-for="(card, index) in seriesCardList" :key="card.id" @click.stop="addCard(card)" >
+                            <div class="card-info-image">
+                            <img :src="card.cover">
+                            <div class="card-inner-info" @click.stop="getCardInfoAndShow(card)" >
+                                <div class="card-inner-info-header">
+                                <p>{{ card.id }}</p>
+                                <p>{{ card.rare }}</p>
+                                </div>
+                                <h3>{{ card.title }}</h3>
+                                <div class="details">
+                                <div><span :class="`bg-${card.color}`" >類型</span>{{ card.typeTranslate }}</div>
+                                <div><span :class="`bg-${card.color}`" >魂傷</span>{{ card.soul }}</div>
+                                <div><span :class="`bg-${card.color}`" >等級</span>{{ card.level }}</div>
+                                <div><span :class="`bg-${card.color}`" >攻擊</span>{{ card.attack }}</div>
+                                <div><span :class="`bg-${card.color}`" >費用</span>{{ card.cost }}</div>
+                                </div>
+                                <div class="price-download">
+                                <p>${{ card.price.number }}</p>
+                                <button @click.stop="addCard(card)" ><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
                     <nav class="toolbar">
                         <div class="toolbar-area1">
                             <button class="tool-btn1">
@@ -694,6 +722,38 @@ export default {
                         </div>
                     </nav>
                 </section>
+                <div v-if="view === 'card-info'" class="card-info">
+                    <div class="row">
+                        <div class="col-Info" v-for="(card, index) in seriesCardList" :key="card.id" @click.stop="addCard(card)" >
+                            <div class="card-info-image">
+                                <img :src="card.cover">
+                                <div class="card-inner-info" @click.stop="getCardInfoAndShow(card)" >
+                                    <div class="card-inner-info-header">
+                                        <p>{{ card.id }}</p>
+                                        <p>{{ card.rare }}</p>
+                                    </div>
+                                    <h3>{{ card.title }}</h3>
+                                    <div class="details">
+                                        <div><span :class="`bg-${card.color}`" >類型</span>{{ card.typeTranslate }}</div>
+                                        <div><span :class="`bg-${card.color}`" >魂傷</span>{{ card.soul }}</div>
+                                        <div><span :class="`bg-${card.color}`" >等級</span>{{ card.level }}</div>
+                                        <div><span :class="`bg-${card.color}`" >攻擊</span>{{ card.attack }}</div>
+                                        <div><span :class="`bg-${card.color}`" >費用</span>{{ card.cost }}</div>
+                                    </div>
+                                    <div class="price-download">
+                                            <p>${{ card.price.number }}</p>
+                                        <button @click.stop="addCard(card)" >
+                                            <svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <nav class="footer-nav">
                     <a class="nav-link" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
@@ -749,6 +809,220 @@ export default {
 </template>
 
 <style scoped>
+    .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -5px;
+    box-sizing: border-box;
+    }
+
+    .card-image {
+    display: flex;
+    position: relative;
+    object-fit: cover;
+    border-radius:10px ;
+    overflow: hidden;
+    margin: 5px;
+    box-sizing: border-box;
+    cursor: pointer;
+    }
+
+    .col-Sheet, .col-Info {
+    width:20%;
+    }
+
+    .card-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    }
+
+    .card-image div {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    gap:5px;
+    padding: 20px 5px 10px 10px;
+    box-sizing: border-box;
+    color: white;
+    background-image: linear-gradient(transparent, #0009 40%, #000000bf);
+    }
+
+    .card-image div p {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    }
+
+    .card-image div h3 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 18px;
+    white-space: nowrap; 
+    max-width: calc(100% - 40px); 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+    .card-image button {
+    position: absolute;
+    background: transparent;
+    bottom: 10px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    cursor: pointer;
+    }
+
+    .card-image:hover div {
+    display: none;
+    }
+
+    .card-image:hover button {
+    border: none;
+    background: rgba(0, 0, 0, 0.697);
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    }
+    
+    
+    /* card-info */
+
+    .card-info {
+    padding: 20px;
+    box-sizing: border-box;
+    }
+
+    .card-info-image {
+    display:flex;
+    flex-direction: column;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 5px;
+    background-color: #121212;
+    cursor: pointer;
+    }
+
+    .card-info-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    }
+
+    .card-inner-info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+    }
+
+    .card-inner-info-header,.price-download {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    text-align: center;
+    }
+
+    .card-inner-info-header p,.price-download p {
+    color:#71717A;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    margin: 0;
+    }
+
+    .card-inner-info-header p:last-child {
+    color: #63DDEE;
+    }
+
+    .card-inner-info h3 {
+    margin:0;
+    color: white;
+    font-weight: bold;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+    .details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: #121212;
+    color: white;
+    gap:10px;
+    }
+
+    .details div {
+    width: calc((100% - 10px)/2);
+    }
+
+    .details span{
+    margin-right: 5px;
+    /* background-color: #CA8A04; */
+    border-radius: 7px;
+    padding: 2px;
+    }
+
+    .bg-red {
+    background-color: #ef4444;
+    }
+
+    .bg-blue {
+    background-color: #3b82f6;
+    }
+
+    .bg-green {
+    background-color: #22c55e;
+    }
+
+    .bg-yellow {
+    background-color: #eab308;
+    }
+
+    .bg-purple {
+    background-color: #a855f7;
+    }
+
+    .price-download {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    }
+
+    .price-download p {
+    color: #F59E0B;
+    }
+
+    .price-download button {
+    width: 35px;
+    height:35px;
+    background-color: #ffffff34;
+    border-radius: 50%;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .price-download button:hover {
+    background-color: #000000;
+    }
+
+
     .send-btn span
     .cancel-btn span{
         font-size: .75rem;

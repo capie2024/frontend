@@ -230,13 +230,13 @@ const handleApplyStatus = () => {
     }
   }
   onBeforeMount(async()=> {
+  })
+  // Lifecycle hooks
+  onMounted(async() => {
     await getLastViewSeries();
     getLastDeckEdit();
     switchSortMode();
     thisSeriesCardLength.value = seriesCardList.value.length
-  })
-  // Lifecycle hooks
-  onMounted(async() => {
     window.addEventListener('resize', updateScreenSize);
   });
   

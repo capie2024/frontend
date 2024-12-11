@@ -18,7 +18,7 @@ const goLogin = () => {
 const email = ref("")
 const password = ref("") 
 
-const API_URL = 'http://localhost:3000/api'
+const API_URL = 'http://localhost:3000/auth/login'
 
 const submit = async () => {
     console.log(email.value, password.value);

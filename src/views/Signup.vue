@@ -72,7 +72,7 @@ export default {
         } else {
             try {
         const response = await axios.post(
-            "http://localhost:3000/register",
+            "http://localhost:3000/auth/register",
             {
             username: "User", 
             email: this.email,

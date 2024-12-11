@@ -259,6 +259,7 @@
         gap: .5rem;
         box-sizing: content-box;
         padding: 1rem;
+        align-items: center;
     }
     
     .input-item button svg {

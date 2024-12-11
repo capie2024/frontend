@@ -1,30 +1,8 @@
 <script setup>
-// import '@fortawesome/fontawesome-free/css/all.css'
-// import '@fortawesome/fontawesome-free/js/all.js'
 import MainFooter from "@/components/MainFooter.vue";
 import HeaderInput from "../components/work-shop/HeaderInput.vue";
 import SideBar from "@/components/work-shop/SideBar.vue";
-
-
 import router from '@/router'
-
-
-// const workShopData = [
-  
-//   {
-//     imgUrl: 'https://bottleneko.app/images/workshop/find.png',
-//     title: '尋找牌組',
-//     icon: 'fa-solid fa-cube',
-//   },
-//   {
-//     imgUrl: 'https://bottleneko.app/images/workshop/report.png',
-//     title: '匯出牌組',
-//     icon: 'fa-solid fa-cube',
-//   },
-// ]
-
-
-
 </script>
 
 <template>
@@ -86,61 +64,6 @@ import router from '@/router'
                         </div>
                     </div>
                 </a>
-
-                <!-- <div class="modal fade" id="looking" tabindex="-1" aria-labelledby="remitLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                
-                <div class="modal-header">
-                    <h2 class="modal-title" id="remitLabel">尋找牌組</h2>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        </button>
-                </div>
-                
-                <div class="modal-body">
-                    <h3 data-v-41768621="" class="topic my-4"> 選擇來源
-                        <span data-v-41768621="" class="subtitle">選擇你的牌組來源</span>
-                    </h3>
-                </div>
-                <section class="mb-4">
-                    <div class="input-button">
-                        <button data-v-41768621="" class="button-remit"><svg data-v-41768621=""
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z">
-                                </path>
-                            </svg>
-                            <span data-v-41768621="" class="text-sm font-mono">牌組</span>
-                        </button>
-                        <button data-v-41768621="" class="button-remit"><svg data-v-41768621=""
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z">
-                                </path>
-                            </svg>
-                            <span data-v-41768621="" class="text-sm font-mono">社群</span>
-                        </button>
-                    </div>
-                </section>
-                <section class="mb-4">
-                    <div class="enter-code">
-                        <h3 data-v-41768621="" class="topic my-4"> 輸入代碼
-                            <div data-v-41768621="" class="input-item">
-                                <input data-v-41768621="" class="input-remit" type="text" placeholder="代碼">
-                            </div>
-                        </h3>
-                    </div>
-                    
-                </section>
-            </div>
-        </div>
-
-    </div> -->
-
-                
-
                 
                 <a href="#" class="button a-button" type="button" data-bs-toggle="modal" data-bs-target="#remit">
                     <div class="out-div shadow" style="background-image:url(https://bottleneko.app/images/workshop/report.png);" >
@@ -159,50 +82,6 @@ import router from '@/router'
                         </div>
                     </div>
                 </a>
-
-                
-    <!-- <div class="modal fade" id="remit" tabindex="-1" aria-labelledby="remitLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                
-                <div class="modal-header">
-                    <h2 class="modal-title" id="remitLabel">匯出牌組</h2>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        </button>
-                </div>
-                
-                <div class="modal-body">
-                    <h3 data-v-41768621="" class="topic my-4"> 選擇牌組
-                        <span data-v-41768621="" class="subtitle">選擇你的牌組來源</span>
-                    </h3>
-                </div>
-                <div class="input-button">
-                    <button data-v-41768621="" class="button-remit"><svg data-v-41768621=""
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z">
-                            </path>
-                        </svg>
-                        <span data-v-41768621="" class="text-sm font-mono">匯出牌組</span>
-                    </button>
-                    <div data-v-41768621="" class="input-item-2">
-                        <input data-v-41768621="" class="input-text" type="text" placeholder="代碼">
-                        <button data-v-41768621="" class="input-button-2">
-                            <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div> -->
-
             </section>
         
           
@@ -452,12 +331,6 @@ import router from '@/router'
   box-sizing: border-box;
 }
 
-/* .user-nav {
-  max-width: 100%;
-  display: flex;
-  gap: 24px;
-} */
-
 
 .work-shop-title {
   width: 100%;
@@ -473,7 +346,7 @@ import router from '@/router'
 .work-shop-title p {
   font-size: 14px;
   line-height: 20px;
-  color: #81a19c;
+  color: #e6e6e6;
 }
 
 .button {

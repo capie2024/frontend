@@ -1,10 +1,6 @@
 
 
 <script setup>
-
-
-
-
 </script>
 
 
@@ -107,29 +103,33 @@
         border-style: none;
         position: relative;
     }
+    .input-text:focus-visible {
+    border-color: transparent !important;
+     outline: none;
+}
     
     .input-button-2  {
-        height: 24px;
+        /* height: 24px;
         width: 24px;
         background-color: transparent;
         color: #e5e7eb;
         position: relative;
         bottom:35px;
         border-radius: 9999px;
-        right: -150px;
+        right: -150px; */
     }
     
     .icon-input {
         color: #e5e7eb;
-        background-color: transparent;
+        /* background-color: transparent;
         cursor:pointer;
         background-image: none;
         border: 0 solid #e5e7eb;
         width: 24px;
         position: absolute;
         stroke: currentcolor;
-        bottom: -35px;
-        right: 185px;
+        bottom: -39px;
+        right: 150px; */
     }
 
     .default-transition {
@@ -227,6 +227,7 @@
         color: rgb(255, 255, 255);
         background-color: #18181b80;
         align-items: center;
+        border: 1px solid #a1a1aa;
     }
     
     .button-remit:focus {
@@ -243,6 +244,7 @@
         border-radius: 20px;
         white-space:nowrap;
         gap: .5rem;
+        padding: 0.5rem;
     }
 
 
@@ -280,6 +282,8 @@
         align-items: center;
         margin: 8px;
         display: flex;
+        border: 1px solid #a1a1aa;
+        padding: 10px;
     }
     
     .show-text-green {
@@ -333,7 +337,7 @@
         border-radius: .75rem;
         /* display: flex; */
         gap: .5rem;
-        padding: .5rem;
+        /* padding: .5rem; */
         cursor: pointer;
         /* position: absolute; */
     }

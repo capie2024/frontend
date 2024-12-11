@@ -1,15 +1,6 @@
 
 
 <script setup>
-// import { ref } from "vue";
-
-// const isSecondButtonVisible = ref(true);
-// const toggleButtons = () => {
-//   isSecondButtonVisible.value = !isSecondButtonVisible.value;
-// };
-
-
-
 </script>
 
 
@@ -93,12 +84,6 @@
                                 </svg>
                                 <span class="text-sm font-mono">A4</span>
                             </button>
-                            <!-- <button  class="item default-transition active button-remit-div">
-                                <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path>
-                                </svg>
-                                <span class="text-sm font-mono">A4 (7-11 ibon)</span>
-                            </button> -->
                         </div>
                         
                     </div>
@@ -138,6 +123,7 @@
     
     .modal-content {
         background-color: rgb(18,18,18);
+        border-radius:10px ;
     }
     
     .modal-title {
@@ -159,9 +145,13 @@
         color: #e5e7eb;
         border-style: none;
     }
+    .input-text:focus-visible {
+        border-color: transparent !important;
+        outline: none;
+    }
     
     .input-button-2  {
-        height: 24px;
+        /* height: 24px;
         width: 24px;
         background-color: transparent;
         color: #e5e7eb;
@@ -169,20 +159,21 @@
         bottom:35px;
         border-radius: 9999px;
         right: 35px;
-        top: 2px;
+        top: 2px; */
+        border: 1px solid transparent !important;
     }
     
     .icon-input {
     color: #e5e7eb;
-    background-color: transparent;
+    /* background-color: transparent;
     cursor: pointer;
     background-image: none;
     border: 0 solid #e5e7eb;
     width: 24px;
     position: absolute;
     stroke: currentcolor;
-    top: -2px;
-    right: 2px;
+    right: -20px;
+    top: -5px; */
     }
 
     .default-transition {
@@ -280,6 +271,7 @@
         color: rgb(255, 255, 255);
         background-color: #18181b80;
         align-items: center;
+        border:1px solid #a1a1aa ;
     }
     
     .button-remit:focus {
@@ -296,6 +288,7 @@
         border-radius: 20px;
         white-space:nowrap;
         gap: .5rem;
+        padding: 0.5rem;
     }
 
 
@@ -304,7 +297,7 @@
         border-radius:20px;
         display: flex;
         gap: .5rem;
-        padding: .5rem;
+        padding: 0.5rem 0.5rem !important;
         white-space:nowrap;
         height: 64px;
         color: rgb(255, 255, 255);
@@ -325,6 +318,7 @@
         border-radius: 20px;
         white-space:nowrap;
         gap: .5rem;
+       
     }
     
     .input-item-2 {
@@ -334,6 +328,8 @@
         align-items: center;
         margin: 8px;
         display: flex;
+        border: 1px solid #a1a1aa;
+        padding: 10px 0;
     }
     
     .show-text-green {
@@ -375,6 +371,10 @@
         justify-content: center;
         border-radius: 12px;
         margin-bottom: 8px;
+        margin-top: 10px;
+        padding: 0.3rem !important  ;
+        align-items: center;
+        gap: 0.5rem;
     }
     
     .setting:hover {
@@ -383,12 +383,8 @@
     
     
     .item{
-        align-items: center;
-        border-radius: .75rem;
-        display: flex;
-        gap: .5rem;
-        padding: .5rem;
-        cursor: pointer;
+        padding: 0 0.5rem 0 0;
+        border: 1px solid #a1a1aa;
     }
     
     

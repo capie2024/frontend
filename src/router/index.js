@@ -23,6 +23,8 @@ import Remitcard from "../components/Mycard/remit-card.vue";
 import RemitCardNf from "../components/Mycard/remit-cardnf.vue";
 import AuthSuccess from "../views/AuthSuccess.vue";
 import MyArticle from "../views/MyArticle.vue";
+import Warning from "../components/Mycard/warning.vue";
+import Delete from "../components/Mycard/delete.vue";
 
 
 const router = createRouter({
@@ -142,8 +144,17 @@ const router = createRouter({
       path: "/social/my",
       name: "my-article",
       component: MyArticle
-    }
-
+    },
+    {
+      path: "/warning",
+      name: "warning",
+      component: Warning
+    },
+    {
+      path: "/delete",
+      name: "delete",
+      component: Delete
+    },
   ],
 });
 

@@ -893,7 +893,7 @@ import router from '@/router'
 }
 
 
-@media (width < 1199px) {
+@media (width < 1200px) {
     .show-card{
         padding: 0px;
         margin: 0;
@@ -917,7 +917,7 @@ import router from '@/router'
     
 }
 
-@media (width < 1023px) {
+@media (width < 1024px) {
     .grid-card{
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -925,7 +925,7 @@ import router from '@/router'
 
 
 
-    @media (width < 767px) {
+    @media (width < 768px) {
   
     
     .grid-card{

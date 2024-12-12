@@ -10,26 +10,20 @@ import { useCardFilterStore } from "@/stores/card-filter"
 
 // 引入CardFilterStore並使用
 const cardFilterStore = useCardFilterStore();
-const { applyBtnStatus } = storeToRefs(cardFilterStore);
+const { 
+  applyBtnStatus
+} = storeToRefs(cardFilterStore);
+const filterVaribleSet = cardFilterStore.filterVaribleSet
 const useFilters = cardFilterStore.useFilters;
 const changeReplaceKeyWord = cardFilterStore.changeReplaceKeyWord
+const changeFilterStatus = cardFilterStore.changeFilterStatus
 
 
 // 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore();
 const { 
     seriesCardList,
-    seriesInfo, 
-    levelSortStatus,
-    colorSortStatus,
-    priceSortStatus,
-    typeSortStatus,
-    levelFilterStatus,
-    colorFilterStatus,
-    costFilterStatus,
-    soulFilterStatus,
-    attackFilterStatus,
-    rareFilterStatus 
+    seriesInfo 
   } = storeToRefs(cardSeriesStore);
 const getLastViewSeries = cardSeriesStore.getLastViewSeries;
 
@@ -175,7 +169,7 @@ const handleApplyStatus = () => {
 }
 
 
-  const currentSidebar = ref('');
+  const currentSidebar = ref('open-filter');
   const sidebarFilterWidth = ref(490);
   const sidebarDeckWidth = ref(490);
   const extraOffset = ref(262);
@@ -387,99 +381,99 @@ const handleApplyStatus = () => {
               </div>
               <div v-else-if="filter.name === '排序'">
                 <div class="menu-inner-slider-btn">
-                  <button :class="{'btn-default-bg': !levelSortStatus }" >
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelDownSort || !filterVaribleSet.levelUpSort, 'btn-active-bg': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" >
                     <div class="slider-btn" ></div>等級 <i class="fa-solid fa-arrow-up"></i>
                   </button>
-                  <button :class="{'btn-default-bg': !colorSortStatus }" >
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorDownSort || !filterVaribleSet.colorUpSort, 'btn-active-bg': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" >
                     <div class="slider-btn"></div>顏色 <i class="fa-solid fa-arrow-up"></i>
                   </button>
-                  <button :class="{'btn-default-bg': !priceSortStatus }" >
+                  <button :class="{'btn-default-bg': !filterVaribleSet.priceDownSort || !filterVaribleSet.priceUpSort, 'btn-active-bg': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" >
                     <div class="slider-btn"></div>價格 <i class="fa-solid fa-arrow-up"></i>
                   </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '類型'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !typeSortStatus, 'btn-active-bg': typeSortStatus }" >角色</button>
-                  <button :class="{'btn-default-bg': !typeSortStatus, 'btn-active-bg': typeSortStatus }" >事件</button>
-                  <button :class="{'btn-default-bg': !typeSortStatus, 'btn-active-bg': typeSortStatus }" >名場</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeCharacter, 'btn-active-bg': filterVaribleSet.typeCharacter }" @click="changeFilterStatus('typeCharacter')" >角色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeScene, 'btn-active-bg': filterVaribleSet.typeScene }" @click="changeFilterStatus('typeScene')" >事件</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeEvent, 'btn-active-bg': filterVaribleSet.typeEvent }" @click="changeFilterStatus('typeEvent')" >名場</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '等級'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !levelFilterStatus, 'btn-active-bg': levelFilterStatus }" >0</button>
-                  <button :class="{'btn-default-bg': !levelFilterStatus, 'btn-active-bg': levelFilterStatus }" >1</button>
-                  <button :class="{'btn-default-bg': !levelFilterStatus, 'btn-active-bg': levelFilterStatus }" >2</button>
-                  <button :class="{'btn-default-bg': !levelFilterStatus, 'btn-active-bg': levelFilterStatus }" >3</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter0, 'btn-active-bg': filterVaribleSet.levelFilter0 }" @click="changeFilterStatus('levelFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter1, 'btn-active-bg': filterVaribleSet.levelFilter1 }" @click="changeFilterStatus('levelFilter1')" >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter2, 'btn-active-bg': filterVaribleSet.levelFilter2 }" @click="changeFilterStatus('levelFilter2')" >2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter3, 'btn-active-bg': filterVaribleSet.levelFilter3 }" @click="changeFilterStatus('levelFilter3')" >3</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '顏色'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !colorFilterStatus, 'btn-active-bg': colorFilterStatus }" >黃色</button>
-                  <button :class="{'btn-default-bg': !colorFilterStatus, 'btn-active-bg': colorFilterStatus }" >紅色</button>
-                  <button :class="{'btn-default-bg': !colorFilterStatus, 'btn-active-bg': colorFilterStatus }" >藍色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterYellow, 'btn-active-bg': filterVaribleSet.colorFilterYellow }"@click="changeFilterStatus('colorFilterYellow')" >黃色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterRed, 'btn-active-bg': filterVaribleSet.colorFilterRed }"@click="changeFilterStatus('colorFilterRed')" >紅色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterBlue, 'btn-active-bg': filterVaribleSet.colorFilterBlue }"@click="changeFilterStatus('colorFilterBlue')" >藍色</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '費用'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !costFilterStatus, 'btn-active-bg': costFilterStatus }" >0</button>
-                  <button :class="{'btn-default-bg': !costFilterStatus, 'btn-active-bg': costFilterStatus }" >1</button>
-                  <button :class="{'btn-default-bg': !costFilterStatus, 'btn-active-bg': costFilterStatus }" >2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter0, 'btn-active-bg': filterVaribleSet.costFilter0 }"@click="changeFilterStatus('costFilter0')"  >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter1, 'btn-active-bg': filterVaribleSet.costFilter1 }"@click="changeFilterStatus('costFilter1')"  >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter2, 'btn-active-bg': filterVaribleSet.costFilter2 }"@click="changeFilterStatus('costFilter2')"  >2</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '魂傷'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !soulFilterStatus, 'btn-active-bg': soulFilterStatus }" >0</button>
-                  <button :class="{'btn-default-bg': !soulFilterStatus, 'btn-active-bg': soulFilterStatus }" >1</button>
-                  <button :class="{'btn-default-bg': !soulFilterStatus, 'btn-active-bg': soulFilterStatus }" >2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter0, 'btn-active-bg': filterVaribleSet.soulFilter0 }"@click="changeFilterStatus('soulFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter1, 'btn-active-bg': filterVaribleSet.soulFilter1 }"@click="changeFilterStatus('soulFilter1')" >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter2, 'btn-active-bg': filterVaribleSet.soulFilter2 }"@click="changeFilterStatus('soulFilter2')" >2</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '攻擊力'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus == true }" >0</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >1000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >1500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >2000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >2500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >3000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >3500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >4000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >4500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >5000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >5500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >6000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >6500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >7000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >7500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >8000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >8500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >9000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >9500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >10000</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >10500</button>
-                  <button :class="{'btn-default-bg': !attackFilterStatus, 'btn-active-bg': attackFilterStatus }" >11000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter0, 'btn-active-bg': filterVaribleSet.attackFilter0 }"@click="changeFilterStatus('attackFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter500, 'btn-active-bg': filterVaribleSet.attackFilter500 }"@click="changeFilterStatus('attackFilter500')" >500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1000, 'btn-active-bg': filterVaribleSet.attackFilter1000 }"@click="changeFilterStatus('attackFilter1000')" >1000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1500, 'btn-active-bg': filterVaribleSet.attackFilter1500 }"@click="changeFilterStatus('attackFilter1500')" >1500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2000, 'btn-active-bg': filterVaribleSet.attackFilter2000 }"@click="changeFilterStatus('attackFilter2000')" >2000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2500, 'btn-active-bg': filterVaribleSet.attackFilter2500 }"@click="changeFilterStatus('attackFilter2500')" >2500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3000, 'btn-active-bg': filterVaribleSet.attackFilter3000 }"@click="changeFilterStatus('attackFilter3000')" >3000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3500, 'btn-active-bg': filterVaribleSet.attackFilter3500 }"@click="changeFilterStatus('attackFilter3500')" >3500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4000, 'btn-active-bg': filterVaribleSet.attackFilter4000 }"@click="changeFilterStatus('attackFilter4000')" >4000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4500, 'btn-active-bg': filterVaribleSet.attackFilter4500 }"@click="changeFilterStatus('attackFilter4500')" >4500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5000, 'btn-active-bg': filterVaribleSet.attackFilter5000 }"@click="changeFilterStatus('attackFilter5000')" >5000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5500, 'btn-active-bg': filterVaribleSet.attackFilter5500 }"@click="changeFilterStatus('attackFilter5500')" >5500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6000, 'btn-active-bg': filterVaribleSet.attackFilter6000 }"@click="changeFilterStatus('attackFilter6000')" >6000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6500, 'btn-active-bg': filterVaribleSet.attackFilter6500 }"@click="changeFilterStatus('attacckFilter6500')" >6500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7000, 'btn-active-bg': filterVaribleSet.attackFilter7000 }"@click="changeFilterStatus('attackFilter7000')" >7000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7500, 'btn-active-bg': filterVaribleSet.attackFilter7500 }"@click="changeFilterStatus('attackFilter7500')" >7500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8000, 'btn-active-bg': filterVaribleSet.attackFilter8000 }"@click="changeFilterStatus('attackFilter8000')" >8000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8500, 'btn-active-bg': filterVaribleSet.attackFilter8500 }"@click="changeFilterStatus('attackFilter8500')" >8500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9000, 'btn-active-bg': filterVaribleSet.attackFilter9000 }"@click="changeFilterStatus('attackFilter9000')" >9000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9500, 'btn-active-bg': filterVaribleSet.attackFilter9500 }"@click="changeFilterStatus('attackFilter9500')" >9500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10000, 'btn-active-bg': filterVaribleSet.attackFilter10000 }"@click="changeFilterStatus('attackFilter10000')" >10000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10500, 'btn-active-bg': filterVaribleSet.attackFilter10500 }"@click="changeFilterStatus('attackFilter10500')" >10500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter11000, 'btn-active-bg': filterVaribleSet.attackFilter11000 }"@click="changeFilterStatus('attackFilter11000')" >11000</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '稀有度'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >RR</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >SSP</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >LRR</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >R</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >SR</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >OFR</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >U</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >C</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >CR</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >RRR</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >CC</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >PR</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >TD</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >SP</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >N</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >LRP</button>
-                  <button :class="{'btn-default-bg': !rareFilterStatus, 'btn-active-bg': rareFilterStatus }" >SIR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRR, 'btn-active-bg': filterVaribleSet.rareFilterRR }"@click="changeFilterStatus('rareFilterRR')" >RR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSSP, 'btn-active-bg': filterVaribleSet.rareFilterSSP }"@click="changeFilterStatus('rareFilterSSP')" >SSP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRR, 'btn-active-bg': filterVaribleSet.rareFilterLRR }"@click="changeFilterStatus('rareFilterLRR')" >LRR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilteR, 'btn-active-bg': filterVaribleSet.rareFilterR}"@click="changeFilterStatus('rareFilterR')" >R</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSR, 'btn-active-bg': filterVaribleSet.rareFilterSR }"@click="changeFilterStatus('rareFilterSR')" >SR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterOFR, 'btn-active-bg': filterVaribleSet.rareFilterOFR }"@click="changeFilterStatus('rareFilterOFR')" >OFR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterU, 'btn-active-bg': filterVaribleSet.rareFilterU }"@click="changeFilterStatus('rareFilterU')" >U</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterC, 'btn-active-bg': filterVaribleSet.rareFilterC }"@click="changeFilterStatus('rareFilterC')" >C</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCR, 'btn-active-bg': filterVaribleSet.rareFilterCR }"@click="changeFilterStatus('rareFilterCR')" >CR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRRR, 'btn-active-bg': filterVaribleSet.rareFilterRRR }"@click="changeFilterStatus('rareFilterRRR')" >RRR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCC, 'btn-active-bg': filterVaribleSet.rareFilterCC }"@click="changeFilterStatus('rareFilterCC')" >CC</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterPR, 'btn-active-bg': filterVaribleSet.rareFilterPR }"@click="changeFilterStatus('rareFilterPR')" >PR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterTD, 'btn-active-bg': filterVaribleSet.rareFilterTD }"@click="changeFilterStatus('rareFilterTD')" >TD</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSP, 'btn-active-bg': filterVaribleSet.rareFilterSP }"@click="changeFilterStatus('rareFilterSP')" >SP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterN, 'btn-active-bg': filterVaribleSet.rareFilterN }"@click="changeFilterStatus('rareFilterN')" >N</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRP, 'btn-active-bg': filterVaribleSet.rareFilterLRP }"@click="changeFilterStatus('rareFilterLRP')" >LRP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSIR, 'btn-active-bg': filterVaribleSet.rareFilterSIR }"@click="changeFilterStatus('rareFilterSIR')" >SIR</button>
                 </div>
               </div>
               <!-- <div v-else-if="filter.name === '判定'">

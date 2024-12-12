@@ -35,7 +35,7 @@
                         </button>
 
                         <div data-v-41768621="" class="input-item-2 ">
-                            <input data-v-41768621="" class="input-text" type="text" placeholder="代碼">
+                            <input data-v-41768621="" class="input-text" type="text" placeholder="代碼" v-model="deckId">
                             <button  class="input-button-2 item default-transition">
                                 <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon-input size-6">
@@ -91,7 +91,7 @@
 
 
                     <div data-v-c3ac02c2="" class="seeting">
-                                <button  class="item  justify-center default-transition gray setting-text">
+                                <button  class="item  justify-center default-transition gray setting-text" @click="exportToPDF">
                                     <svg data-v-c3ac02c2="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path></svg>
                                     <span class="text-sm font-mono input-text"> 設定完成 </span>
                                 </button>
@@ -103,7 +103,7 @@
     </section>
 </template>
     
-    <style scoped>
+<style scoped>
     @import '@/assets/base.css';
     
     *, :after, :before {
@@ -151,29 +151,13 @@
     }
     
     .input-button-2  {
-        /* height: 24px;
-        width: 24px;
-        background-color: transparent;
-        color: #e5e7eb;
-        position: relative;
-        bottom:35px;
-        border-radius: 9999px;
-        right: 35px;
-        top: 2px; */
+        
         border: 1px solid transparent !important;
     }
     
     .icon-input {
     color: #e5e7eb;
-    /* background-color: transparent;
-    cursor: pointer;
-    background-image: none;
-    border: 0 solid #e5e7eb;
-    width: 24px;
-    position: absolute;
-    stroke: currentcolor;
-    right: -20px;
-    top: -5px; */
+   
     }
 
     .default-transition {
@@ -408,10 +392,140 @@
         }
     }
     
-    </style>
+</style>
     
-    <script>
+<script>
+    import jsPDF from "jspdf";
     
-    </script>
     
+    export default {
+      data() {
+        return {
+          deckId: '', // 用來儲存用戶輸入的 Deck ID
+        };
+      },
+        methods:{
+      async exportToPDF() {
+        console.log("開始執行匯出 PDF");
+        if (!this.deckId) {
+            alert("請輸入 Deck ID");
+            return;
+          }
+    
+        const fontResponse = await fetch("http://localhost:3000/api/font");
+        if (!fontResponse.ok) {
+          throw new Error("無法獲取字型資料");
+        }
+    
+        const base64msyh = await fontResponse.text(); // 確保後端返回的是 text 格式
+    
+        if (!base64msyh) {
+        throw new Error("字型 Base64 資料為空");
+        }
+    
+        try {
+          const response = await fetch(`http://localhost:3000/api/cardPDF?deckId=${this.deckId}`);
+          
+          if (!response.ok) {
+            console.error("API 回應非 OK:", response.status, response.statusText);
+            const errorData = await response.json();
+            console.error("API 回應錯誤內容:", errorData);
+            throw new Error(errorData.error || "未知的錯誤");
+          }
+    
+          const { covers, deck_name } = await response.json();
+    
+          console.log("Deck 名稱:", deck_name);
+    
+          // 確認有取得 deck_name 和 covers
+        if (!deck_name) {
+          throw new Error("沒有找到 Deck 名稱");
+        }
+    
+        if (!covers || covers.length === 0) {
+          throw new Error("沒有找到任何 Deck Cover");
+        }
+    
+          const pdf = new jsPDF();
+          // 載入字型
+          pdf.addFileToVFS("GenSenRounded2PJP-R.ttf", base64msyh );  //  Base64 字串
+          pdf.addFont("GenSenRounded2PJP-R.ttf", "GenSenRounded2PJP-R", "normal");  // 設定字型
+          pdf.setFont("GenSenRounded2PJP-R", "normal");  // 設定使用的字型
+    
+    
+          pdf.text(deck_name, 10, 10);
+            const pageWidth = 210; // A4 頁面寬度 (mm)
+            const pageHeight = 297; // A4 頁面高度 (mm)
+            const columns = 3; // 每行顯示 3 張圖片
+            const rows = 3; // 每頁顯示 3 行圖片
+            const marginX = 15; // 左右邊距
+            const marginY = 25; // 上下邊距
+            const maxImageWidth = (pageWidth - (columns + 1) * marginX) / columns; // 每張圖片的最大寬度
+            const maxImageHeight = (pageHeight - (rows + 1) * marginY) / rows; // 每張圖片的最大高度
+    
+            let xPosition = marginX; // 初始 X 位置
+            let yPosition = marginY + 5; // 初始 Y 位置，略下移以避免與標題重疊
+            let imageCount = 0;
+    
+          // 使用 Promise.all 確保所有圖片都載入完成
+          const imagePromises = covers.map((coverUrl, index) => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = coverUrl;
+    
+              img.onload = () => {
+              // 計算圖片的自適應大小
+              const aspectRatio = img.width / img.height;
+              let imageWidth = maxImageWidth;
+              let imageHeight = maxImageHeight;
+    
+              // 根據寬高比縮放圖片
+              if (img.width > img.height) {
+                imageHeight = imageWidth / aspectRatio;
+              } else {
+                imageWidth = imageHeight * aspectRatio;
+              }
+    
+              // 插入圖片到 PDF
+              pdf.addImage(img, "JPEG", xPosition, yPosition, imageWidth, imageHeight);
+    
+              // 計算下一張圖片的位置
+              imageCount++;
+              xPosition += imageWidth + marginX;
+    
+              // 換行
+              if (imageCount % columns === 0) {
+                xPosition = marginX; // 重置 X 位置
+                yPosition += imageHeight + marginY; // 換行
+              }
+    
+              // 如果一頁滿了，則換頁
+              if (imageCount % (columns * rows) === 0 && imageCount < covers.length) {
+                pdf.addPage();
+                xPosition = marginX;
+                yPosition = marginY + 10;
+              }
+    
+              resolve(); // 圖片載入完成
+            };
+    
+              img.onerror = () => {
+                reject(new Error(`圖片載入失敗: ${coverUrl}`));
+              };
+            });
+          });
+    
+          // 等待所有圖片載入完畢
+          await Promise.all(imagePromises);
+    
+         // 所有圖片載入完畢後才保存 PDF
+          pdf.save(`${deck_name}_deck.pdf`);
+        } catch (error) {
+          console.error("匯出 PDF 時發生錯誤:", error.message);
+          alert("匯出 PDF 時發生錯誤：" + error.message);
+        }
+      }
+    }
+    };
+</script>
     

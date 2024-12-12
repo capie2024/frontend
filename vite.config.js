@@ -17,10 +17,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
+      '/api': { 
         target: 'https://bottleneko.app',
         changeOrigin: true,
       },
-    }, // 處理api跨域請求，設定代理伺服器
+    }, 
   }, 
 })

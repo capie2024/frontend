@@ -29,12 +29,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <header class="z-10 h-16 header-bg overflow-hidden">
-        <nav class="header-container w-full h-full px-4 py-6 flex items-center gap-2 relative default-transition" :class="{ 'scrolled': isScrolled }">
+    <header class="z-10 h-16 overflow-hidden header-bg">
+        <nav class="relative flex items-center w-full h-full gap-2 px-4 py-6 header-container default-transition" :class="{ 'scrolled': isScrolled }">
             <div class="notice">
                 <input type="checkbox" id="notice-jump">
-                <label for="notice-jump" class="flex-none p-1 rounded-full default-transition hover:bg-zinc-800/50 text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
+                <label for="notice-jump" class="flex-none p-1 text-white rounded-full default-transition hover:bg-zinc-800/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
                 </label>
                 <div class="z-10 notice-grid">
                     <div class="notice-grid-up">
@@ -66,8 +66,26 @@ onBeforeUnmount(() => {
     </header>
 
     <main class="relative content-container flex flex-col pt-[10px] rounded-b-2xl bg-base scroll-smooth scrollbar z-1">
-        <div class="content px-4 md:px-6 h-full">
-            <section class="bottleneko-section">
+        <div class="h-full px-4 content md:px-6">
+            <section class="h-[75vh] relative overflow-hidden -mx-4 md:-mx-6">
+                <div class="container flex gap-4 md:gap-8 default-transition">
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid1 md:gap-8">
+                        <div class="relative item">
+                            <img src="" alt="" class="opacity-80 h-[10rem] sm:h-[15rem] md:h-[20rem] rounded-xl">
+                        </div>
+                        <div class="relative item"></div>
+                        <div class="relative item"></div>
+                        <div class="relative item"></div>
+                        <div class="relative item"></div>
+                        <div class="relative item"></div>
+                        <div class="relative item"></div>
+                        <div class="relative item"></div>
+                        <div class="relative item"></div>
+                        <div class="relative item"></div>
+                    </div>
+                </div>
+            </section>
+            <section class="logo-banner">
                 <div>
                 <img src="https://bottleneko.app/icon.png" alt="" />
                 </div>
@@ -1317,9 +1335,23 @@ header {
     }
 }
 
-.bottleneko-section {
+.item::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: -1;
+    background: linear-gradient(to bottom left, rgba(252, 243, 125, 0.6), rgba(229, 160, 70, 0.5));
+    transform: translate(5px) translateY(5px);
+}
+
+.logo-banner {
     height: 30rem;
-    background-color: #121212;
+    background: linear-gradient(to top,var(--tw-gradient-stops));
+    --tw-gradient-from: #121212 var(--tw-gradient-from-position);
+    --tw-gradient-stops: var(--tw-gradient-from),hsla(0,0%,7%,.9) var(--tw-gradient-via-position),var(--tw-gradient-to);
+    --tw-gradient-to: transparent var(--tw-gradient-to-position);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;

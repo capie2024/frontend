@@ -7,7 +7,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   const cardSeriesStore = useCardSeriesStore();
   // seriesCardList是目前的系列所有的卡片，定義在CardSeriesStore裡
   const { seriesCardList } = storeToRefs(cardSeriesStore);
-
+  const getLastViewSeries = cardSeriesStore.getLastViewSeries;
   //APPLY按鈕變數
   const applyBtnStatus = ref(true);
 
@@ -20,12 +20,12 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   // 升降排序變數集合
   const filterVaribleSet = reactive({
     replaceKeyWord: false,
-    levelDownSort: false,
     levelUpSort: false,
-    colorDownSort: false,
+    levelDownSort: false,
     colorUpSort: false,
-    priceDownSort: false,
+    colorDownSort: false,
     priceUpSort: false,
+    priceDownSort: false,
     typeCharacter: false,
     typeScene: false,
     typeEvent: false,
@@ -129,8 +129,67 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     filterVaribleSet[filterName] = !filterVaribleSet[filterName];
   }
 
+  // 升降排序篩選狀態切換
+  const changeSortStatus = (sortName) => {
+    if(sortName == 'level'){
+      if(filterVaribleSet.levelUpSort === false){
+        filterVaribleSet.levelUpSort = true;
+        filterVaribleSet.levelDownSort = false;
+      }else if(filterVaribleSet.levelDownSort === false){
+        filterVaribleSet.levelDownSort = true;
+        filterVaribleSet.levelUpSort = false;
+      }
+      console.log("levelUpSort:" + filterVaribleSet.levelUpSort);
+      console.log("levelDownSort:" + filterVaribleSet.levelDownSort);
+      
+    }else if(sortName == 'color'){
+      if(filterVaribleSet.colorUpSort === false){
+        filterVaribleSet.colorUpSort = true;
+        filterVaribleSet.colorDownSort = false;
+      }else if(filterVaribleSet.colorDownSort === false){
+        filterVaribleSet.colorDownSort = true;
+        filterVaribleSet.colorUpSort = false;
+      }
+      console.log("colorUpSort:" + filterVaribleSet.colorUpSort);
+      console.log("colorDownSort:" + filterVaribleSet.colorDownSort);
+      
+    }else if(sortName == 'price'){
+      if(filterVaribleSet.priceUpSort === false){
+        filterVaribleSet.priceUpSort = true;
+        filterVaribleSet.priceDownSort = false;
+      }else if(filterVaribleSet.priceDownSort === false){
+        filterVaribleSet.priceDownSort = true;
+        filterVaribleSet.priceUpSort = false;
+      }
+      console.log("priceUpSort:" + filterVaribleSet.priceUpSort);
+      console.log("priceDownSort:" + filterVaribleSet.priceDownSort);
+    }
+  }
+
+  // 重置部分篩選
+  const resetFilter = (filterArr) => {
+    console.log(filterArr);
+    filterArr.forEach((item) => {
+      filterVaribleSet[item] = false;
+    })
+    console.log("已重置該部分篩選");
+  };
+
+  // 重置全部篩選
+  const resetAllFilter = async() => {
+    Object.keys(filterVaribleSet).forEach((item) => {
+      filterVaribleSet[item] = false;
+    })
+    await getLastViewSeries()
+    console.log("已重置所有篩選");
+  }
+
   // 篩選功能
-  const useFilters = (keyWord) => {
+  const useFilters = async(keyWord) => {
+    newSeriesCardList.value = [];
+    seriesCardList.value = [];
+    await getLastViewSeries()
+
     // seriesCardList是目前的系列所有的卡片，newSeriesCardList是篩選後的卡片
     newSeriesCardList.value = seriesCardList.value;
     // console.log("舊陣列：" + seriesCardList.value + "新陣列：" + newSeriesCardList.value);
@@ -142,13 +201,13 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     // levelSort();
     // colorSort();
     // priceSort();
-    // typeSort();
-    // colorFilter();
-    // levelFilter();
-    // costFilter();
-    // soulFilter();
-    // attackFilter();
-    // rareFilter();
+    typeSort();
+    colorFilter();
+    levelFilter();
+    costFilter();
+    soulFilter();
+    attackFilter();
+    rareFilter();
 
 
     // console.log(filterVaribleSet.attackFilter0,"測試");
@@ -1054,6 +1113,9 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     applyBtnStatus,
     changeReplaceKeyWord,
     filterVaribleSet,
-    changeFilterStatus
+    changeFilterStatus,
+    resetFilter,
+    changeSortStatus,
+    resetAllFilter
   };
 });

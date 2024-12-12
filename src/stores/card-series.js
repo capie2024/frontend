@@ -60,8 +60,8 @@ export const useCardSeriesStore = defineStore("card-series", () => {
         }
       });
       seriesCardList.value = res.data;
-      // console.log(seriesCardList.value);
-      
+      console.log(seriesCardList.value);
+      console.log("獲取完卡片");
     } catch (err) {
       console.log(err);
     }

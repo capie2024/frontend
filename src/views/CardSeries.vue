@@ -17,7 +17,9 @@ const filterVaribleSet = cardFilterStore.filterVaribleSet
 const useFilters = cardFilterStore.useFilters;
 const changeReplaceKeyWord = cardFilterStore.changeReplaceKeyWord
 const changeFilterStatus = cardFilterStore.changeFilterStatus
-
+const resetFilter = cardFilterStore.resetFilter
+const changeSortStatus = cardFilterStore.changeSortStatus
+const resetAllFilter = cardFilterStore.resetAllFilter
 
 // 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore();
@@ -26,7 +28,6 @@ const {
     seriesInfo 
   } = storeToRefs(cardSeriesStore);
 const getLastViewSeries = cardSeriesStore.getLastViewSeries;
-
 
 // 引入DeckMakeStore並使用
 const deckMakeStore = useDeckMakeStore();
@@ -162,9 +163,9 @@ const handleKeyWord = () => {
 }
 
 // 按下apply按鈕後執行篩選功能
-const handleApplyStatus = () => {
+const handleApplyStatus = async() => {
   if(applyBtnStatus.value === true){
-    useFilters(keyWord.value.trim());
+    await useFilters(keyWord.value.trim());
   }
 }
 
@@ -177,16 +178,156 @@ const handleApplyStatus = () => {
   const view = ref('card-info');
   const currentMain = ref(null);
   const filters = ref([
-    { name: '常用', checked: true, icon: 'fa-solid fa-star' },
-    { name: '關鍵字', checked: true, icon: 'fa-solid fa-magnifying-glass', delButton: true },
-    { name: '排序', checked: true, icon: 'fa-solid fa-sliders', delButton: true },
-    { name: '類型', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '等級', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '顏色', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '費用', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '魂傷', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '攻擊力', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '稀有度', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { 
+      name: '常用',
+      checked: true,
+      icon: 'fa-solid fa-star',
+      checkButton: false,
+      delButton: true,
+      filterTag: ['']
+    },
+    { 
+      name: '關鍵字',
+      checked: true,
+      icon: 'fa-solid fa-magnifying-glass',
+      checkButton: false,
+      delButton: true,
+      filterTag: ['']
+    },
+    { 
+      name: '排序',
+      checked: true,
+      icon: 'fa-solid fa-sliders',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'levelDownSort',
+        'levelUpSort',
+        'colorDownSort',
+        'colorUpSort',
+        'priceDownSort',
+        'priceUpSort'
+      ]
+    },
+    { 
+      name: '類型',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'typeCharacter',
+        'typeScene',
+        'typeEvent'
+      ]
+    },
+    { 
+      name: '等級',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'levelFilter0',
+        'levelFilter1',
+        'levelFilter2',
+        'levelFilter3'
+      ]
+    },
+    { 
+      name: '顏色',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'colorFilterRed',
+        'colorFilterBlue',
+        'colorFilterYellow'
+      ]
+    },
+    { 
+      name: '費用',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'costFilter0',
+        'costFilter1',
+        'costFilter2'
+      ]
+    },
+    { 
+      name: '魂傷',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'soulFilter0',
+        'soulFilter1',
+        'soulFilter2'
+      ]
+    },
+    { 
+      name: '攻擊力',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'attackFilter0',
+        'attackFilter500',
+        'attackFilter1000',
+        'attackFilter1500',
+        'attackFilter2000',
+        'attackFilter2500',
+        'attackFilter3000',
+        'attackFilter3500',
+        'attackFilter4000',
+        'attackFilter4500',
+        'attackFilter5000',
+        'attackFilter5500',
+        'attackFilter6000',
+        'attackFilter6500',
+        'attackFilter7000',
+        'attackFilter7500',
+        'attackFilter8000',
+        'attackFilter8500',
+        'attackFilter9000',
+        'attackFilter9500',
+        'attackFilter10000',
+        'attackFilter10500',
+        'attackFilter11000'
+      ]
+    },
+    { 
+      name: '稀有度',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'rareFilterRR',
+        'rareFilterSSP',
+        'rareFilterLRR',
+        'rareFilterR',
+        'rareFilterSR',
+        'rareFilterOFR',
+        'rareFilterU',
+        'rareFilterC',
+        'rareFilterCR',
+        'rareFilterRRR',
+        'rareFilterCC',
+        'rareFilterPR',
+        'rareFilterTD',
+        'rareFilterSP',
+        'rareFilterN',
+        'rareFilterLRP',
+        'rareFilterSIR'
+      ]
+    },
     // { name: '判定', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
     // { name: '特徵', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
     // { name: '商品', checked: true, icon: 'fa-solid fa-filter', checkButton: true }
@@ -335,7 +476,7 @@ const handleApplyStatus = () => {
             <p>0 篩選、0 排序、關鍵字 : ""</p>
           </div>
           <div>
-            <button class="icon del-btn"><i class="fa-solid fa-trash"></i></button>
+            <button class="icon del-btn" @click="resetAllFilter" ><i class="fa-solid fa-trash"></i></button>
             <button class="icon open-btn"><i class="fa-solid fa-chevron-down"></i></button>
             <button @click="closeSidebar" class="icon xmark-btn"><i class="fa-solid fa-xmark"></i></button>
           </div>
@@ -346,7 +487,7 @@ const handleApplyStatus = () => {
             <div class="menu" @click="MenuFilter(index)">
               <i :class="[filter.icon]"></i>
               <p>{{ filter.name }}</p>
-              <button class="icon del" v-if="filter.delButton" >
+              <button class="icon del" v-if="filter.delButton" @click.stop="resetFilter(filter.filterTag)" >
                 <i class="fa-solid fa-trash"></i>
               </button>
               <button class="icon check" v-if="filter.checkButton" >
@@ -381,14 +522,20 @@ const handleApplyStatus = () => {
               </div>
               <div v-else-if="filter.name === '排序'">
                 <div class="menu-inner-slider-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelDownSort || !filterVaribleSet.levelUpSort, 'btn-active-bg': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" >
-                    <div class="slider-btn" ></div>等級 <i class="fa-solid fa-arrow-up"></i>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelDownSort || !filterVaribleSet.levelUpSort, 'btn-active-bg': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" @click="changeSortStatus('level')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" ></div>
+                    等級
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.levelUpSort ,'arrow-down': filterVaribleSet.levelUpSort}" ></i>
                   </button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.colorDownSort || !filterVaribleSet.colorUpSort, 'btn-active-bg': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" >
-                    <div class="slider-btn"></div>顏色 <i class="fa-solid fa-arrow-up"></i>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorDownSort || !filterVaribleSet.colorUpSort, 'btn-active-bg': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" @click="changeSortStatus('color')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" ></div>
+                    顏色
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.colorUpSort ,'arrow-down': filterVaribleSet.colorUpSort}" ></i>
                   </button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.priceDownSort || !filterVaribleSet.priceUpSort, 'btn-active-bg': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" >
-                    <div class="slider-btn"></div>價格 <i class="fa-solid fa-arrow-up"></i>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.priceDownSort || !filterVaribleSet.priceUpSort, 'btn-active-bg': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" @click="changeSortStatus('price')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" ></div>
+                    價格
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.priceUpSort ,'arrow-down': filterVaribleSet.priceUpSort}" ></i>
                   </button>
                 </div>
               </div>
@@ -443,7 +590,7 @@ const handleApplyStatus = () => {
                   <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5000, 'btn-active-bg': filterVaribleSet.attackFilter5000 }"@click="changeFilterStatus('attackFilter5000')" >5000</button>
                   <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5500, 'btn-active-bg': filterVaribleSet.attackFilter5500 }"@click="changeFilterStatus('attackFilter5500')" >5500</button>
                   <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6000, 'btn-active-bg': filterVaribleSet.attackFilter6000 }"@click="changeFilterStatus('attackFilter6000')" >6000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6500, 'btn-active-bg': filterVaribleSet.attackFilter6500 }"@click="changeFilterStatus('attacckFilter6500')" >6500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6500, 'btn-active-bg': filterVaribleSet.attackFilter6500 }"@click="changeFilterStatus('attackFilter6500')" >6500</button>
                   <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7000, 'btn-active-bg': filterVaribleSet.attackFilter7000 }"@click="changeFilterStatus('attackFilter7000')" >7000</button>
                   <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7500, 'btn-active-bg': filterVaribleSet.attackFilter7500 }"@click="changeFilterStatus('attackFilter7500')" >7500</button>
                   <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8000, 'btn-active-bg': filterVaribleSet.attackFilter8000 }"@click="changeFilterStatus('attackFilter8000')" >8000</button>

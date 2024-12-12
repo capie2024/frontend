@@ -156,6 +156,14 @@
   box-sizing: border-box;
 }
 
+.input-keyword-haveValue {
+  background-color:  rgb(186, 230, 253);
+}
+
+.input-keyword-haveValue:hover{
+  
+}
+
 .input-keyword div {
   display: flex;
   gap:5px;
@@ -191,6 +199,11 @@
 .input-keyword div button:first-of-type:hover span {
   color:#B43412;
 }
+
+
+/* #and-btn {
+  background-color: #FED7AA;
+} */
 
 .plus-btn {
   background-color:#bbf7d079 ;
@@ -357,15 +370,23 @@
 
 .sidebar-filter-footer button {
   width: 100%; 
-  background-color: #274A84; 
-  color: white; 
   border: none; 
   padding: 10px 0; 
   font-size: 18px; 
   border-radius: 17px; 
   text-align: center;
   box-sizing: border-box; 
+  background-color: #274A84; 
+  color: white; 
+}
+
+.apply-btn {
   opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.apply-btn-active {
+  opacity: 1;
 }
 
 .filter-tag {

@@ -1,5 +1,315 @@
+<script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import dayjs from 'dayjs';
+
+function getUserIdFromToken(token) {
+    try {
+        const payload = token.split(".")[1];
+        const decodedPayload = JSON.parse(atob(payload));
+        console.log("Decoded Payload:", decodedPayload);
+        return decodedPayload.userId || null; // 檢查是否有 userId
+    } catch (error) {
+        console.error("無法解析 token:", error);
+        return null;
+    }
+}
+
+export default {
+    data() {
+        return {
+        newMessage: "",  // 儲存輸入的留言內容
+        messages: [],    // 儲存所有留言
+        username: "",    // 用戶名稱
+        showAllMessages: false,
+        showMenu: false,
+        isEditing: false,
+        likeCount: 0 || 0,
+        liked: false,
+        hated: false,
+        loggedInUserId: null,
+        token: localStorage.getItem('token'),
+        created_at: null,
+        };
+    },
+    mounted() {
+        this.fetchArticleId();
+        this.fetchCurrentUser();
+    },
+    created() {
+        this.loggedInUserId = getUserIdFromToken(this.token);
+        console.log("Logged in user ID:", this.loggedInUserId);
+    },
+    computed: {
+        isLoggedIn() {
+            return localStorage.getItem('token') !== null;
+        },
+        formattedTime() {
+            return (createdAt) => {
+                if (!createdAt) return "未知時間";
+                return dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss");
+            };
+        },    
+    },
+    methods: {
+        async fetchCurrentUser() {
+            try {
+                const userToken = localStorage.getItem("token");
+
+                if (!userToken) {
+                    console.error("User token not found.");
+                    return;
+                }
+
+                const response = await axios.get('http://localhost:3000/api/currentUser', {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                    },
+                });
+
+                console.log("Fetched user data:", response.data);
+                this.currentUser = response.data;            
+            } catch (error) {
+                console.error('Failed to fetch current user:', error);
+            }
+        },
+        async fetchArticleId() {
+            const postCode = this.$route.params.post_code;  // 使用 post_code 從路由中獲取參數
+            if (!postCode) {
+                console.error("Error: postCode is not available in route params");
+                return;
+            }
+            console.log("Post code:", postCode);
+            try {
+                // 根據 post_code 查詢對應的 article_id
+                const response = await axios.get(`http://localhost:3000/api/article-id/${postCode}`);
+                this.articleId = response.data.article_id;  // 從後端獲取 article_id
+                console.log("Fetched article ID:", this.articleId);
+
+                // 確保在獲取 articleId 後再獲取其他資料
+                await this.fetchMessages();  
+            } catch (error) {
+                console.error("Error fetching article_id:", error);
+            }
+        },
+        async fetchMessages() {
+            if (!this.articleId) {
+                console.log("articleId is not available for fetching messages");
+                return;
+            }
+            try {
+                const response = await axios.get(
+                    `http://localhost:3000/api/comments?postCode=${this.articleId}`
+                );
+                // 按創建時間降序排序
+                this.messages = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                // 假設返回的每條留言中包含 userLiked 和 userHated 字段
+                this.messages.forEach((message) => {
+                    message.liked = message.liked || false;  // 根據返回的字段設置 liked
+                    message.hated = message.hated || false;  // 根據返回的字段設置 hated
+                    message.likeCount = message.like_count || 0;  // 設置 likeCount（如果返回的有這個字段）
+
+                    // 設置大頭貼圖片的 URL
+                    message.pictureUrl = message.users.picture || '/default-avatar.png';  // 如果沒有圖片則使用預設圖片
+                });
+                console.log("Fetched messages:", this.messages);
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+            }
+        },      
+        async sendMessage() {
+            console.log('sendMessage called');
+
+            if (!this.articleId) {
+                console.log(' articleId is not available');
+                return;  // 防止未設置 post_id 時發送留言
+            }
+
+            if (this.newMessage.trim() !== "" && this.articleId) {
+                const userToken = localStorage.getItem('token');
+
+                if (!userToken) {
+                    console.error('User token is missing');
+                    return;
+                }
+
+                const newMessage = {
+                    article_id: this.articleId,
+                    message: this.newMessage.trim(),
+                    like_count: 0,
+                    created_at: new Date().toISOString(),
+                }
+                try {
+                    const response = await axios.post('http://localhost:3000/api/send-message', {newMessage},{
+                        headers:{
+                            Authorization: `Bearer ${userToken}`,
+                        },
+                    });
+                    console.log('Message sent:', response.data);
+                    this.messages.unshift(response.data);  
+                    this.newMessage = ""; 
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                }
+            } else {
+                console.log('Invalid message or post_id');
+            }
+        },
+        toggleMenu(messageId) {
+            const message = this.messages.find((message) => message.id === messageId);
+            if (message) {
+                if (message.user_id === this.loggedInUserId) {
+                    message.showMenu = !message.showMenu;
+                } else {
+                    console.log("無權限編輯此留言");
+                }
+            } else {
+                console.log("Message not found");
+            }
+        },        
+        toggleEdit(message) {
+            message.isEditing = true;
+            message.showMenu = !message.showMenu;
+            message.editContent = message.message; // 初始化編輯內容
+        },
+         // 送出編輯
+        async submitEdit(message) {
+            console.log('submitEdit called');
+            const userToken = localStorage.getItem('token');
+
+            if (!userToken) {
+                console.error('User token is missing');
+                return;
+            }
+
+            try {
+                const response = await axios.put(`http://localhost:3000/api/comments/${message.id}`, {
+                    message: message.editContent, 
+                },
+            {
+                headers: {
+                    Authorization: `Bearer ${userToken}`,
+                }
+            });
+                if (response.status === 200) {
+                    // 後端返回的更新資料
+                    const updatedComment = response.data    
+                    // 更新前端顯示的留言
+                    message.message = updatedComment.message;
+                    message.created_at = updatedComment.created_at;
+                    message.isEditing = false; // 結束編輯模式
+                } else {
+                    console.error('更新失敗', response);
+                    alert('更新失敗，請稍後再試！');
+                }
+            } catch (error) {
+                console.error('更新失敗', error);
+                alert('無法連接到伺服器，請稍後再試！');
+            }
+        },        
+        // 取消編輯
+        cancelEdit(message) {
+            message.isEditing = false; // 結束編輯模式
+        },
+        async deleteMessage(messageId) {
+            console.log("Attempting to delete message with ID:", messageId);         
+            Swal.fire({
+                title: "刪除留言",
+                text: "確定要刪除留言嗎？將會清除目前編輯的所有資訊。",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "OK"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const userToken = localStorage.getItem("token");
+
+                        if (!userToken) {
+                            console.error("User token not found.");
+                            return;
+                        }
+
+                        const response = await axios.delete(`http://localhost:3000/api/comments/${messageId}`,{
+                            headers: {
+                                Authorization: `Bearer ${userToken}`,
+                            }
+                        });
+                        console.log("Response from server:", response.data);
+                        if (response.status === 200) {
+                            Swal.fire("刪除成功!", "你的留言已被刪除", "success");
+                            this.messages = this.messages.filter((message) => message.id !== messageId);
+                        }
+                    } catch (error) {
+                        console.error("Delete request failed:", error.response?.data || error.message);
+                        Swal.fire("刪除失敗", error.response?.data?.error || "Failed to delete the comment.", "error");
+                    }
+                }
+            });
+        },
+        toggleMessages(){
+            this.showAllMessages = !this.showAllMessages
+        },
+        async toggleLike(message) {
+            try {
+                const userToken = localStorage.getItem("token");
+                if (!userToken) {
+                    console.error("User token not found.");
+                    return;
+                }
+
+                const response = await axios.post(
+                    `http://localhost:3000/api/comments/${message.id}/toggleLike`, {},
+                    { 
+                        headers: {
+                            Authorization: `Bearer ${userToken}`,
+                        }
+                    }
+                );
+
+                const { isLiked, isHated, likeCount } = response.data;
+
+                // 確保互斥狀態和 Like 數更新
+                message.liked = isLiked;
+                message.hated = isHated;
+                message.likeCount = likeCount; // 確保畫面同步更新 Like 數
+            } catch (error) {
+                console.error("Error toggling like:", error.response || error.message);
+            }
+        },
+        async toggleHate(message) {
+            try {
+                const userToken = localStorage.getItem("token");
+                if (!userToken) {
+                    console.error("User token not found.");
+                    return;
+                }
+
+                const response = await axios.post(
+                    `http://localhost:3000/api/comments/${message.id}/toggleHate`, {},
+                    { 
+                        headers: {
+                            Authorization: `Bearer ${userToken}`,
+                    }
+                });
+
+                const { isHated, isLiked, likeCount } = response.data;
+
+                // 確保互斥狀態和 Like 數更新
+                message.hated = isHated;
+                message.liked = isLiked;
+                message.likeCount = likeCount; // 確保畫面同步更新 Like 數
+            } catch (error) {
+                console.error("Error toggling hate:", error.response || error.message);
+            }
+        }
+    }
+}  
+</script>
+
 <template>
-     <div class="container">
+    <div class="container">
         <nav class="sidebar-container">
             <div class="sidebar">
                 <a href="https://bottleneko.app/" class="sidebar-head">
@@ -130,6 +440,7 @@
                     </div>
                 </section>
                 <section class="main-container">
+                    <div class="main-container-bg"></div>
                     <div class="article-area">
                         <div class="text-container">
                             <div class="article-title">
@@ -140,20 +451,196 @@
                                 <p>123</p>
                             </div>
                         </div>
+                        <!-- 留言區域 -->
                         <div class="message-area">
+                            <!-- 留言輸入 -->
                             <div class="user-message">
                                 <div class="message-user-img">
-                                    <img src="/src/img/麻衣.png" alt="">
+                                    <img :src="currentUser?.picture" alt="">
                                 </div>
                                 <div class="message">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 default-transition text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"></path></svg>
-                                    <input class="enter-message" type="text" placeholder="留言...">
-                                    <button>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"></path></svg>
+                                    <input 
+                                    class="enter-message" 
+                                    type="text" 
+                                    placeholder="留言..."
+                                    v-model="newMessage"
+                                    >
+                                    <button @click="sendMessage">
+                                        <svg class="send-message" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"></path>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
-                            <span class="message-count">0則留言</span>
+                            <h3 class="message-count">{{ messages.length }}則留言</h3>
+                            <!-- 留言列表 -->
+                            <section class="message-section">
+                                <div class="message-list message-scroll" v-if="messages.length > 0" >
+                                    <!-- 顯示前兩條留言 -->
+                                    <div class="message-list-info"
+                                    v-for="(message,id) in messages.slice(0,2)"
+                                    :key="message.id">                                   
+                                        <section>
+                                            <div class="message-user-img">
+                                                <img :src="message.users.picture" alt="">
+                                            </div>
+                                        </section>
+                                        <div class="message-body">
+                                            <div class="message-header">
+                                                <div class="message-user-name">
+                                                    <h4>{{ message.users.username}}</h4>
+                                                    <div>
+                                                        發佈於
+                                                        <span>{{ formattedTime(message.created_at) }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="dot">
+                                                    <button @click="toggleMenu(message.id)">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 dot">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"></path>
+                                                        </svg>
+                                                    </button>
+                                                    <div class="dot-menu" @click.stop="toggleMenu(message.id)" v-if="message.showMenu">
+                                                        <a class="edit" @click.stop="toggleEdit(message)">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
+                                                            </svg>
+                                                            <span>編輯</span>
+                                                        </a>
+                                                        <a class="delete" @click="deleteMessage(message.id)">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
+                                                            </svg>
+                                                            <span>刪除</span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- 非編輯模式：顯示文字 -->
+                                            <p class="text-white" v-if="!message.isEditing">{{ message.message }}</p>
+                                            <!-- 編輯模式：顯示 textarea -->
+                                            <div class="bg-black/30 p-1 rounded-xl" v-if="message.isEditing">
+                                                <textarea v-model="message.editContent" rows="3" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500 text-white" placeholder=""></textarea>
+                                            </div>
+                                            <!-- 按鈕區域 -->                                         
+                                            <div class="message-btn-area">
+                                                <button v-if="message.isEditing" @click="submitEdit(message)" class="flex-none rounded-full py-1 pl-1 pr-2 flex items-center bg-white text-zinc-800 send-btn">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5">
+                                                        </path>
+                                                    </svg>
+                                                    <span class="text-xs text-mono leading-none font-bold">送出</span>
+                                                </button>
+                                                <button v-if="message.isEditing" @click="cancelEdit(message)" class="flex-none rounded-full py-1 pl-1 pr-2 flex items-center bg-amber-600 text-white cancel-btn">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                                                    </svg>
+                                                    <span class="text-xs text-mono leading-none font-bold">取消</span>
+                                                </button>
+                                                <button class="message-like" @click="toggleLike(message)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5" 
+                                                    :class="{'fill-red-500': message.liked || message.likeCount > 0}">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"></path>
+                                                    </svg>
+                                                    <span class="text-xs text-mono leading-none font-bold">{{ message.likeCount }}</span>
+                                                </button>
+                                                <button class="message-bad-like" @click="toggleHate(message)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"
+                                                    :class="{'bg-gray': message.hated }">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 顯示更多留言按鈕，當 messages 超過 2 條且 showAllMessages 為 false 時顯示 -->
+                                    <button class="read-more" v-if="messages.length > 2 && !showAllMessages" @click="toggleMessages">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"></path>
+                                        </svg>
+                                        <span>閱讀更多</span>
+                                    </button>
+                                    <!-- 顯示所有留言，當 showAllMessages 為 true 時顯示 -->
+                                    <div v-if="showAllMessages" class="message-list">
+                                        <div class=" message-list-info" 
+                                        v-for="(message,id) in messages.slice(2)" 
+                                        :key="message.id">
+                                            <section>
+                                                <div class="message-user-img">
+                                                    <img :src="message.users.picture" alt="">
+                                                </div>
+                                            </section>
+                                            <div class="message-body">
+                                                <div class="message-header">
+                                                    <div class="message-user-name">
+                                                        <h4>{{ message.users.username }}</h4>
+                                                        <div>發佈於 
+                                                            <span>{{ formattedTime(message.created_at) }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="dot">
+                                                        <button @click="toggleMenu(message.id)">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 dot">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"></path>
+                                                            </svg>
+                                                        </button>
+                                                        <div class="dot-menu" @click.stop="toggleMenu(message.id)" v-if="message.showMenu">
+                                                            <a class="edit" @click="toggleEdit(message)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
+                                                                </svg>
+                                                                <span>編輯</span>
+                                                            </a>
+                                                            <a class="delete" @click="deleteMessage(message.id)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
+                                                                </svg>
+                                                                <span>刪除</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <!-- 非編輯模式：顯示文字 -->
+                                            <p class="text-white" v-if="!message.isEditing">{{ message.message }}</p>
+                                            <!-- 編輯模式：顯示 textarea -->
+                                            <div class="bg-black/30 p-1 rounded-xl" v-if="message.isEditing">
+                                                <textarea v-model="message.editContent" rows="3" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500 text-white" placeholder=""></textarea>
+                                            </div>
+                                            <!-- 按鈕區域 -->                                         
+                                            <div class="message-btn-area">
+                                                <button v-if="message.isEditing" @click="submitEdit(message)" class="flex-none rounded-full py-1 pl-1 pr-2 flex items-center bg-white text-zinc-800 send-btn">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5">
+                                                        </path>
+                                                    </svg>
+                                                    <span class="text-xs text-mono leading-none font-bold">送出</span>
+                                                </button>
+                                                <button v-if="message.isEditing" @click="cancelEdit(message)" class="flex-none rounded-full py-1 pl-1 pr-2 flex items-center bg-amber-600 text-white cancel-btn">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                                                    </svg>
+                                                    <span class="text-xs text-mono leading-none font-bold">取消</span>
+                                                </button>
+                                                <button class="message-like" @click="toggleLike(message)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"
+                                                    :class="{'fill-red-500': message.liked || message.likeCount > 0}">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"></path>
+                                                    </svg>
+                                                    <span class="text-xs text-mono leading-none font-bold">{{ message.likeCount }}</span>
+                                                </button>
+                                                <button class="message-bad-like" @click="toggleHate(message)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"
+                                                    :class="{'bg-gray': message.hated }">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </div>
                     <nav class="toolbar">
@@ -262,6 +749,331 @@
 </template>
 
 <style scoped>
+    .send-btn span
+    .cancel-btn span{
+        font-size: .75rem;
+        font-weight: 700;
+        line-height: 1;
+        width: 32px;
+        height: 16px;
+    }
+
+    .send-btn svg,
+    .cancel-btn svg{
+        width: 16px;
+        height: 16px;
+    }
+
+    .cancel-btn{
+        background-color: rgb(217 119 6);
+    }
+
+    .send-btn, .cancel-btn{
+        cursor: pointer;
+        /* width: 60px; */
+        height: 24px;
+        border: none;
+    }
+
+    .items-center {
+        align-items: center;
+    }
+
+    .flex {
+        display: flex;
+    }
+
+    .rounded-full {
+        border-radius: 10px;
+    }
+
+    .bg-white {
+        --tw-bg-opacity: 1;
+        background-color: #fff;
+        background-color: rgb(255 255 255);
+    }
+
+    .py-1 {
+        padding-bottom: .25rem;
+        padding-top: .25rem;
+    }
+
+    pl-1 {
+        padding-left: .25rem;
+    }
+
+    .pr-2{
+        padding-right: 0.5rem;
+    }
+
+    .text-zinc-800{
+        color: rgb(39 39 42);
+    }
+
+    textarea {
+        color: white !important;
+        text-align: left !important;
+        border-color: #6b7280;
+        border-radius: 0;
+        border-width: 1px;
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    .w-full {
+        width: 100%;
+    }
+
+    .border-none {
+        border-style: none;
+    }   
+
+    .bg-transparent {
+        background-color: transparent;
+    }
+
+    .p-0{
+        padding: 0;
+    }
+
+    .rounded-xl{
+        border-radius: .75rem;
+    }
+
+    .bg-black\/30 {
+    background-color: rgba(0, 0, 0, .3);
+    }
+
+    .p-1 {
+        padding: 0.25rem;
+    }
+    .delete svg{
+        stroke: red;
+    }
+
+    .delete span{
+        color: red;
+    }
+
+    .edit span{
+        color: rgb(212 212 216);
+    }
+
+    .dot-menu a{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .875rem;
+        line-height: 1.25rem;
+        padding-bottom: .5rem;
+        padding-top: .5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        width: 100%;
+    }
+
+    .dot-menu{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background-color: rgb(63, 63, 63);
+        border-radius: .375rem;
+        position: absolute;
+        margin-top: 24px;
+        right: 0;
+        top: 0;
+        --tw-ring-opacity: 0.05;
+        overflow-y: auto;
+        /* z-index: 10 !important; */
+        min-width: 100% ;
+        padding: .2rem;
+    }
+
+    .bg-gray{
+        padding: .08rem;
+        background-color: rgb(113 113 122);
+        border-radius: 100%;
+    }    
+
+    .fill-red-500{
+        fill:rgb(249, 101, 101);
+        stroke:rgb(249, 101, 101);
+    }
+
+    .message-section{
+        width: 95%;
+        height: 80vh;
+    }
+
+    .message-scroll{
+        overflow-y: scroll;
+        height: 100%;
+    }
+
+    .message-scroll::-webkit-scrollbar {
+        display: none; 
+    }
+
+    .message-count{
+        color: white;
+        font-weight: 700;
+        text-align: right !important;
+        margin-top: .5rem;
+        margin-bottom: .5rem;
+        display: block;
+        width: 95%;
+    }
+
+    .read-more span{
+        color: white;
+        font-size: 16px;
+    }
+
+    .read-more svg{
+        height: 1.5rem;
+        min-height: 1.5rem;
+        min-width: 1.5rem;
+        width: 1.5rem;
+        color: white;
+    }
+
+    .read-more{
+        padding-bottom: .5rem;
+        padding-top: .5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        background-image: linear-gradient(to right, #3b82f6, #06b6d4);
+        border-radius: .75rem;
+        gap: .5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 1rem;
+        margin-left: auto;
+        margin-right: auto;
+        border: none;
+
+    }
+
+    .message-bad-like svg{
+        height: 1.25rem;
+        min-height: 1.25rem;
+        min-width: 1.25rem;
+        width: 1.25rem;
+        color: white;
+    }
+
+    .message-bad-like{
+        padding: .25rem;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        background-color: transparent;
+        border: none
+
+    }
+
+    .message-like svg{
+        height: 1.25rem;
+        min-height: 1.25rem;
+        min-width: 1.25rem;
+        width: 1.25rem;
+    }
+
+    .message-like{
+        color: white;
+        padding: .25rem;
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        cursor: pointer;
+        background-color: transparent;
+        border: none;
+    }
+
+    .message-btn-area{
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: .25rem;
+    }
+
+    .text-white{
+        color: white;
+    }
+
+    .dot button{
+        background-color: transparent;
+        border: none;
+        color: hsla(0, 0%, 100%, .5)
+    }
+
+    .dot svg{
+        height: 1.25rem;
+        min-height: 1.25rem;
+        min-width: 1.25rem;
+        width: 1.25rem;
+    }
+    .dot{
+        margin-left: auto;
+        position: relative;
+    }
+
+    .message-header{
+        display: flex;
+        gap: .5rem;
+        align-items: flex-start;
+    }
+
+    .message-user-name div{
+        color: rgb(161 161 170);
+        font-size: 12px;
+        line-height: 1rem;
+    }
+
+    .message-user-name h4{
+        color: #32c9ff;
+        font-weight: 700;
+        font-size: .875rem;
+        line-height: 1.25rem;
+    }
+
+    .message-user-name{
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .5rem;
+    }
+
+    .message-body{
+        display: flex;
+        flex-direction: column;
+        background-color: rgba(24, 24, 27, .5);
+        background-color: #1E2E48;
+        border-radius: 10px;
+        gap: .5rem;
+        padding: .5rem;
+        width: 95%;
+        box-sizing: border-box;
+    }
+
+    .message-list-info{
+        display: flex;
+        min-width: 100%;
+        margin: auto;
+        gap: 8px;
+    }
+
+    .message-list{
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        
+    }
+
+
     a {
         text-decoration: none;
         color: #FFFFFF;
@@ -581,7 +1393,7 @@
     .bg-container {
         margin-left: 270px;
         width: calc(100% - 270px);
-        padding-bottom: 1rem;
+        padding-bottom: 1rem; 
     }
 
     main {
@@ -706,17 +1518,25 @@
 
     .main-container {
         width: 100%;
-        height: 500px;
+        height: 100vh;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         overflow: visible;
-        background:linear-gradient(to bottom, #224275, #161E2C);
         position: relative;
     }
 
-    .article-area {
+    .main-container-bg{
+        background: linear-gradient(rgba(59, 130, 246, 0.44) 100px, transparent 500px);
         width: 100%;
+        height: 500px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .article-area {
         display: flex;
     }
 
@@ -764,11 +1584,12 @@
         width: 40%;
         height: 40px;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 8px;
         position: relative;
         margin-top: 36px;
         margin-left: 16px;
+        flex-direction: column;
     }
 
     .user-message {
@@ -842,26 +1663,20 @@
         height: 24px;
     }
 
-    .message-count {
-        color: white;
-        position: absolute;
-        top:56px;
-        right: 40px;
-        font-weight: bold;
-    }
-
     .toolbar {
         width: 100%;
         display: flex;
         margin-left: 24px;
         position: absolute;
         top: 450px;
+        display: none;
     }
 
     .toolbar-area1 {
         width: 50%;
         display: flex;
         gap: 20px;
+        display: none;
     }
 
     .tool-btn1 {
@@ -939,6 +1754,7 @@
         gap: 20px;
         position: absolute;
         right: 50px;
+        display: none;
     }
 
 
@@ -1052,6 +1868,7 @@
         width: 56px;
         height: 56px;
         object-fit: cover;
+        display: none;
     }
 
 
@@ -1064,6 +1881,7 @@
         border-radius: 0 10px 10px 0;
         align-items: center;
         position: relative;
+        display: none;
     }
 
     .line {
@@ -1149,7 +1967,16 @@
         margin-left: 5px;
     }
 
-    @media screen and (max-width: 1190px) {
+    @media screen and (max-width: 1199px) {
+        textarea {
+            color: white !important;
+            text-align: left !important;
+        }
+
+        .message-area{
+            align-items: center !important;
+        }
+
         .sidebar-container {
             display: none;
         }
@@ -1157,13 +1984,16 @@
         .bg-container {
             margin-left: 0;
             width: 100%;
-            padding-bottom: 1rem;
+            padding-bottom: 0px !important;
+            
         }
         
         main {
             margin-top: 0;
             width: 100%;
-            scroll-behavior: smooth;
+            /* scroll-behavior: smooth; */
+            height: 100vh;
+            overflow-y: auto;
             
         }
 
@@ -1263,8 +2093,8 @@
         }
 
         .main-container {
-            top: 623px;
-            height: 500px;
+            /* top: 623px; */
+            height: 100%;
         }
         
         .article-area {
@@ -1286,6 +2116,9 @@
             width: 100%;
             height: 40px;
             margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .user-message {
@@ -1310,14 +2143,15 @@
 
         .message-count {
             color: white;
-            position: absolute;
-            top:56px;
-            right: 30px;
             font-weight: bold;
+            display: block;
+            width: 90%;
+            text-align: right;
         }
 
         .footer-nav {
-            display: flex;    
+            /* display: flex; */
+            display: none;    
         }
 
         .deck-container {
@@ -1333,17 +2167,20 @@
         .toolbar {
             width: 50%;
             flex-direction: column;
+            display: none;
         }
         
         .toolbar-area1 {
             width: 50%;
             gap: 8px;
+            display: none;
         }
         
         .toolbar-area2 {
             width: 50%;
             position: static;
-        }
+            display: none;
+        } 
     }
 
     @media screen and (max-width: 410px) {

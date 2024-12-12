@@ -111,6 +111,7 @@
                         <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
                         <section class="show-card">
                             <a v-for="card in originalSeries" :key="card.id" href="#" class="url transition-colors" @click.prevent="handleSeries(card.id)" >
+
                                     <div>
                                         <img :src ="card.cover || '/src/img/cover.png'" alt="">
                                     </div>
@@ -410,6 +411,7 @@ const handleSeries = async(seriesId) => {
     saveLastViewSeries(seriesId);
 }
 
+
 // A-Z>50音排序
 const nameSort = (a, b) => {
   const nameA = a.name
@@ -541,9 +543,6 @@ const toggleDateSort = () => {
             nameIsSelected.value = false;
     }
 }
-
-
-
 
 onMounted(() => {
     fetchCardseries();

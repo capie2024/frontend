@@ -6,11 +6,20 @@ import { useCardSeriesStore } from "@/stores/card-series";
 import { useDeckMakeStore } from "@/stores/deck-make";
 import { useCardInfoStore } from "@/stores/card-info";
 import Swal from 'sweetalert2'
+import { useCardFilterStore } from "@/stores/card-filter"
+
+// 引入CardFilterStore並使用
+const cardFilterStore = useCardFilterStore();
+const { applyBtnStatus } = storeToRefs(cardFilterStore);
+const useFilters = cardFilterStore.useFilters;
+const changeReplaceKeyWord = cardFilterStore.changeReplaceKeyWord
+
 
 // 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore();
-const { seriesCardList } = storeToRefs(cardSeriesStore);
-const getLastViewSeries = cardSeriesStore.getLastViewSeries
+const { seriesCardList, seriesInfo } = storeToRefs(cardSeriesStore);
+const getLastViewSeries = cardSeriesStore.getLastViewSeries;
+
 
 // 引入DeckMakeStore並使用
 const deckMakeStore = useDeckMakeStore();
@@ -35,6 +44,7 @@ const chooseCoverCard = ref('')
 const deckName = ref('LL牌組')
 const deckDescription = ref('這是測試牌組')
 const settingDeckStatus = ref(false)
+const thisSeriesCardLength = ref(0)
 
 // 清除牌組並回到第一步編輯牌組的狀態
 const clearDeckAndBacktoFirstStep = async() => {
@@ -62,17 +72,22 @@ const nextStep = () => {
 
 // 結束編輯牌組，新增牌組到牌組資料庫，跳轉至新製作的牌組頁面
 const finalStep = async() => {
+  const coverCard = selectedCards.value.find((card)=> {
+    return card.id == chooseCoverCard.value
+  })
+  console.log(coverCard);
+  
   if(deckName.value.trim() != '' && deckDescription.value.trim() != '' && chooseCoverCard.value.trim() != '') {
     const deckData = {
       deckName: deckName.value,
       deckDescription: deckDescription.value,
       deck: selectedCards.value,
-      deckCover: chooseCoverCard.value
+      deckCover: coverCard.cover
     }
     const res = await sendDeckToDatabase(deckData);
     console.log(res);
     
-    if(res.status == 200) {        
+    if(res.status == 200){        
       console.log("已傳送給後端存入資料庫");
       settingDeckStatus.value = false
       sidebarSelectedStatus.value = true
@@ -87,6 +102,13 @@ const finalStep = async() => {
               })
       router.push('/carddeck')
       console.log("完成創建牌組並跳轉");
+    }else if(res.status == 403){
+      awaitSwal.fire({
+                icon: 'error',
+                title: '錯誤',
+                text: '驗證過期請重新登入'
+              })
+      router.push('/login')
     }else{
       Swal.fire({
                 icon: 'error',
@@ -117,6 +139,29 @@ const finalStep = async() => {
   }
 }
 
+
+// 關鍵字篩選的值
+const keyWord = ref('');
+
+// 關鍵字篩選的狀態
+const handleKeyWord = () => {
+  if(keyWord.value.trim() != ''){
+    applyBtnStatus.value = true
+    console.log("已經改變");
+  }else{
+    applyBtnStatus.value = false
+    console.log("目前關鍵字為空");
+  }
+}
+
+// 按下apply按鈕後執行篩選功能
+const handleApplyStatus = () => {
+  if(applyBtnStatus.value === true){
+    useFilters(keyWord.value.trim());
+  }
+}
+
+
   const currentSidebar = ref('');
   const sidebarFilterWidth = ref(490);
   const sidebarDeckWidth = ref(490);
@@ -125,21 +170,20 @@ const finalStep = async() => {
   const view = ref('card-info');
   const currentMain = ref(null);
   const filters = ref([
-    { name: '常用', checked: false, icon: 'fa-solid fa-star' },
-    { name: '關鍵字', checked: false, icon: 'fa-solid fa-magnifying-glass', delButton: true },
-    { name: '排序', checked: false, icon: 'fa-solid fa-sliders', delButton: true },
-    { name: '類型', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '等級', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '顏色', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '費用', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '魂傷', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '攻擊力', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '稀有度', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '判定', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '特徵', checked: false, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '商品', checked: false, icon: 'fa-solid fa-filter', checkButton: true }
+    { name: '常用', checked: true, icon: 'fa-solid fa-star' },
+    { name: '關鍵字', checked: true, icon: 'fa-solid fa-magnifying-glass', delButton: true },
+    { name: '排序', checked: true, icon: 'fa-solid fa-sliders', delButton: true },
+    { name: '類型', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '等級', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '顏色', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '費用', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '魂傷', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '攻擊力', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '稀有度', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '判定', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '特徵', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    { name: '商品', checked: true, icon: 'fa-solid fa-filter', checkButton: true }
   ]);
-  
   
   const sidebarMarginLeft = computed(() => {
     if (!isLargeScreen.value) return 0;
@@ -185,13 +229,15 @@ const finalStep = async() => {
       currentMain.value = '';
     }
   }
-  
-  // Lifecycle hooks
-  onMounted(async() => {
-    window.addEventListener('resize', updateScreenSize);
+  onBeforeMount(async()=> {
     await getLastViewSeries();
     getLastDeckEdit();
     switchSortMode();
+    thisSeriesCardLength.value = seriesCardList.value.length
+  })
+  // Lifecycle hooks
+  onMounted(async() => {
+    window.addEventListener('resize', updateScreenSize);
   });
   
   onBeforeUnmount(() => {
@@ -310,13 +356,13 @@ const finalStep = async() => {
               </div>
               <div v-else-if="filter.name === '關鍵字'">
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
-                  <br>當前搜尋內容： ""
+                  <br>當前搜尋內容： {{ keyWord }}
                 </span>
-                <div class="input-keyword">
+                <div class="input-keyword" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
-                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋">
+                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="keyWord" @input="handleKeyWord" >
                   <div>
-                    <button><span>AND</span></button>
+                    <button @click="changeReplaceKeyWord" ><span>AND</span></button>
                     <!-- <button><span>OR</span></button> -->
                     <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
                   </div>
@@ -453,7 +499,7 @@ const finalStep = async() => {
         </div>
     
         <footer class="sidebar-filter-footer">
-          <button><span>Apply</span></button>
+          <button :class="{ 'apply-btn' : !applyBtnStatus, 'apply-btn-active' : applyBtnStatus}" @click="handleApplyStatus" ><span>Apply</span></button>
         </footer>
       </section>
       
@@ -606,7 +652,7 @@ const finalStep = async() => {
           </button>
           <div data-v-3e737e76="" class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
             <!-- <div data-v-57e635bc="" class="flex items-center gap-4"> -->
-                <h2 class="truncate text-2xl font-bold">リコリス・リコイル</h2>
+                <h2 class="truncate text-2xl font-bold">{{ seriesInfo.name }}</h2>
             <!-- </div> -->
           </div>
           <div class="notice z-10">
@@ -651,19 +697,19 @@ const finalStep = async() => {
           </div>
         </button>
         <section class="info-container">
-          <img src="https://jasonxddd.me:9000/series-cover/rikoriko.jpg">
+          <img :src="seriesInfo.cover">
           <div flex-col class="inner-info-container">
-            <span><i class="fa-regular fa-clone"></i> {{ "這邊等系列卡表好再修改" }}</span>
-            <h1>{{ "這邊等系列卡表好再修改" }}</h1>
+            <span><i class="fa-regular fa-clone"></i> <span v-for="(code, index) in seriesInfo.code" :key="index" >{{ code }}{{ index == seriesInfo.code.length - 1 ? '' : ', '  }}</span></span>
+            <h1>{{ seriesInfo.name }}</h1>
             <div>
               <div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ " 這邊等系列卡表好再修改" }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ seriesInfo.sellAt[0] }}</span>
               </div>
               <div>
-                <i class="fa-regular fa-clone"></i><span>總數{{ seriesCardList.length }}張</span>
+                <i class="fa-regular fa-clone"></i><span>總數{{ thisSeriesCardLength }}張</span>
               </div>
               <div>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16" aria-hidden="true" data-slot="icon" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"></path></svg><span>篩選出208張</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16" aria-hidden="true" data-slot="icon" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"></path></svg><span>篩選出{{ seriesCardList.length }}張</span>
               </div>
             </div>
           </div>
@@ -762,11 +808,11 @@ const finalStep = async() => {
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
                   <br>當前搜尋內容： ""
                 </span>
-                <div class="input-keyword">
+                <div class="input-keyword" :class="{ 'input-keyword-haveValue': keyWord !== '' }" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
                   <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋">
-                  <div>
-                    <button><span>AND</span></button>
+                  <div class="input-keyword-btn" >
+                    <button ><span>AND</span></button>
                     <!-- <button><span>OR</span></button> -->
                     <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
                   </div>

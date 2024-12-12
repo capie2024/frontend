@@ -1,48 +1,9 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import GoogleLogin from '../components/GoogleLogin.vue';
-
-const router = useRouter()
-
-const goSignup = () => {
-    router.push({ name: 'signup' })
-}
-
-const goLogin = () => {
-    router.push({ name: 'login' })
-}
-
-const email = ref("")
-const password = ref("") 
-
-const API_URL = 'http://localhost:3000/auth/login'
-
-const submit = async () => {
-    console.log(email.value, password.value);
-  try {
-    const res = await axios.post(`${API_URL}/login`, {
-      email: email.value,
-      password: password.value
-    })
-
-    localStorage.setItem('token', res.data.token)
-  } catch (error) {
-    console.error('API Error:', error)
-    Swal.fire({
-      icon: 'error',
-      title: '登入失敗',
-      text: error.response.data.message || '請檢查信箱密碼是否正確'
-    })
-  }
-}
-console.log(email.value, password.value)
+import MainFooter from "@/components/MainFooter.vue";
 </script>
 
 <template>
-    <body class="overflow-hidden root-container">
+    <body class="overflow-hidden bg-black root-container">
         <header class="z-10 h-16 md:mt-2 md:mr-2 header-bg md:rounded-t-2xl">
             <nav class="header-container">
                 <button class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50">
@@ -56,7 +17,9 @@ console.log(email.value, password.value)
                     </svg>
                 </button>
                 <div class="w-full min-w-0 text-lg font-bold text-white md:text-2xl">
-                    <h2 class="invisible text-2xl font-bold truncate">每日卡歷史回顧</h2>
+                    <!-- <div data-v-57e635bc="" class="flex items-center gap-4"> -->
+                        <h2 class="text-2xl font-bold truncate">我的文章</h2>
+                    <!-- </div> -->
                 </div>
                 <div class="z-10 notice">
                     <input type="checkbox" id="notice-jump">
@@ -82,7 +45,7 @@ console.log(email.value, password.value)
                             </svg>
                         </div>
                     </div>
-                    <span class="text-sm flex-none max-w-[8rem] truncate" @click="goLogin">登入</span>
+                    <span class="text-sm flex-none max-w-[8rem] truncate">登入</span>
                     <div class="p-1 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
@@ -95,7 +58,7 @@ console.log(email.value, password.value)
             <a href="https://bottleneko.app/" class="sidebar-head">
                 <img src="../img/bottleneko-icon.png" alt="" class="icon">
                 <img src="../img/bottleneko-icon-text.png" alt="" class="icon-text">
-                <h1 class="hidden">Capie</h1>
+                <h1 class="hidden">BottleNeko</h1>
             </a>
             <ul class="sidebar-menu">
                 <li>
@@ -163,31 +126,107 @@ console.log(email.value, password.value)
             </button>
         </nav>
         <div class="background"></div>
-        <main class="relative content-container bg-base md:my-2 md:mr-2 z-1">
-            <div class="h-full px-4 content scroll-smooth scrollbar md:px-6">
-                <section class="w-full md:grid md:place-content-center">
-                    <form @submit.prevent="submit" class="flex flex-col items-center justify-center gap-4 p-4 shadow-lg rounded-xl">
-                        <div class="flex items-center gap-2">
-                            <img src="../img/bottleneko-icon.png" alt="" class="h-[5rem] w-[5rem] rounded-full">
+        <main class="relative content-container bg-base md:my-2 z-1">
+            <div class="h-full  content ">
+                <section class="main-container px-4 md:px-6">
+                    <h2 class="title">
+                        我的文章<br>
+                    <span class="subtitle">
+                        一共有XXXX結果
+                    </span>
+                    </h2>
+                    <section class="card-area">
+                <a href="#" class="card-link">
+                    <div class="card-img">
+                        <img src="/src/img/麻衣.png" alt="">
+                    </div>
+                    <div class="card-user">
+                        <div class="card-user-flex">
+                            <div class="card-user-img">
+                                <img src="/src/img/麻衣.png" alt="">
+                            </div>
+                            <div class="card-user-p">
+                                <p>XXX</p>
+                                <div class="date-container">
+                                    <p class="date">Date</p>
+                                    <i class="fa-solid fa-globe"></i>
+                                    <p class="card-code">postcode</p>
+                                    <div class="chat">
+                                        <i class="fa-regular fa-comment"></i>
+                                        <p>1</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-2xl font-bold text-white">會員登入</h3>
-                        <div class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path></svg>
-                            <input id="email" type="email" placeholder="信箱" v-model.trim="email" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500">
+                        <div class="card-name">
+                            <h2>Title</h2>
+                            <p>Content</p>
                         </div>
-                        <div class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-                            <input id="password" type="password" placeholder="密碼" v-model.trim="password" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500">
+                    </div>
+                </a>     
+                <a href="#" class="card-link">
+                    <div class="card-img">
+                        <img src="/src/img/麻衣.png" alt="">
+                    </div>
+                    <div class="card-user">
+                        <div class="card-user-flex">
+                            <div class="card-user-img">
+                                <img src="/src/img/麻衣.png" alt="">
+                            </div>
+                            <div class="card-user-p">
+                                <p>XXX</p>
+                                <div class="date-container">
+                                    <p class="date">Date</p>
+                                    <i class="fa-solid fa-globe"></i>
+                                    <p class="card-code">postcode</p>
+                                    <div class="chat">
+                                        <i class="fa-regular fa-comment"></i>
+                                        <p>1</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex flex-col w-full gap-2">
-                            <button type="submit" :disabled="!email || !password" class="flex items-center justify-center w-full gap-2 p-2 text-white rounded-2xl ring ring-white/50 hover:bg-white/90 hover:text-zinc-900 cursor-pointer">登入</button>
-                            <button class="flex items-center justify-center w-full gap-2 p-2 rounded-2xl text-cyan-500/50 hover:text-cyan-500" @click="goSignup">還沒有帳號？前往註冊</button>
+                        <div class="card-name">
+                            <h2>Title</h2>
+                            <p>Content</p>
                         </div>
-                        <hr class="w-full my-4 border border-zinc-700/50">
-                        <GoogleLogin />
-                    </form>
+                    </div>
+                </a>
+                <a href="#" class="card-link">
+                    <div class="card-img">
+                        <img src="/src/img/麻衣.png" alt="">
+                    </div>
+                    <div class="card-user">
+                        <div class="card-user-flex">
+                            <div class="card-user-img">
+                                <img src="/src/img/麻衣.png" alt="">
+                            </div>
+                            <div class="card-user-p">
+                                <p>XXX</p>
+                                <div class="date-container">
+                                    <p class="date">Date</p>
+                                    <i class="fa-solid fa-globe"></i>
+                                    <p class="card-code">postcode</p>
+                                    <div class="chat">
+                                        <i class="fa-regular fa-comment"></i>
+                                        <p>1</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-name">
+                            <h2>Title</h2>
+                            <p>Content</p>
+                        </div>
+                    </div>
+                </a>
+            </section>
                 </section>
+                <footer class="footer">
+                    <MainFooter />
+                </footer>
             </div>
+            
         </main>
     </body>
 </template>
@@ -195,19 +234,11 @@ console.log(email.value, password.value)
 <style scoped>
 @import '@/assets/base.css';
 
-body {
-    background-color: #000;
-}
-
-input:focus {
-    outline: 2px solid transparent;
-}
-
 .root-container {
     display: grid;
     grid-template-areas:
-        "sidebar navbar navbar"
-        "sidebar main-view date-list";
+        "sidebar navbar "
+        "sidebar main-view ";
     grid-template-columns: 270px 1fr;
     grid-template-rows: 4rem 1fr;
     height: 100vh;
@@ -255,7 +286,7 @@ input:focus {
     width: 238px;
     height: 40px;
     margin-bottom: 5px;
-    cursor: pointer; /* 加上鼠標可點擊樣式 */
+    cursor: pointer; 
 }
 
 .sidebar-menu > .md-menu {
@@ -344,6 +375,10 @@ header {
     background-color: #2a2727; 
     opacity: 0.8;
 }
+
+/* .notice:hover .notice-txt {
+    opacity: 1;
+} */
 
 .notice-grid-up h2{
     color: white;
@@ -440,39 +475,165 @@ header {
     flex-direction: column;
     grid-area: main-view;
     padding-top: 10px;
-    /* overflow: hidden; */
+    border-radius: 1rem;
+    overflow: hidden;
 }
 
 .content {
-    overflow: auto;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    /* overflow: hidden; */
 }
 
-.scrollbar {
-    &::-webkit-scrollbar {
-        height: 0;
-        width: 0;
-    }
+.main-container {
+    min-height: 340px;
+    position: relative;
+    z-index: 1;
 }
 
-section {
-    height: 100%;
-}
-
-section > form {
-    width: 500px;
-    background-color: rgb(24, 24, 27);
-}
-
-.bg-input {
-    background-color: rgb(39, 39, 42);
+.title {
+    padding:1.5rem 0 .5rem;
+    font-size: 25px;
+    font-weight: 900;
+    line-height: 1.75rem;
     color: #fff;
 }
 
-.bg-input:focus-within {
-    background-color: rgb(63, 63, 70);
+.subtitle {
+    color: #D4D4D8;
+    font-weight: 100;
+    font-size: 15px;
+}
+
+
+.card-area {
+        padding: 20px 0;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(198px, 1fr));
+        grid-gap: 24px;
+        box-sizing: border-box;
+    }
+
+    .card-link {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        background-color: #18181B;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-link:hover {
+        background-color:#2b2b2c;
+    }
+
+    .card-img {
+        min-width: 169px;
+        display: flex;
+        overflow: hidden;
+        aspect-ratio: 1 / 1;
+        border-radius: 10px;
+        position: relative;
+    }
+
+    .card-img img{
+        width: 100%;
+        object-fit: cover;
+        position: absolute;
+    }
+
+    .card-user-flex {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .card-user-img {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+    }
+
+    .card-user-img img {
+        object-fit: cover;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+
+    .card-user-p {
+        position: relative;
+        width: 100%;
+    }
+
+    .card-user-p p {
+        font-size: 18px;
+        color:white
+    }
+
+    .date-container {
+        display: flex;
+        gap: 4px;
+        color: rgb(170, 168, 168);
+    }
+
+    .date {
+        width: 62px;
+    }
+
+    .date-container i {
+        display: flex;
+        font-size: 14px;
+        margin: 0 2px;
+    }
+
+    .chat {
+        min-width: 30px;
+        display: flex;
+        position: absolute;
+        left: 185px;
+    }
+
+
+    .date-container p{
+        font-size: 12px;
+    }
+
+
+    .card-name {
+        margin-top: 10px;
+    }
+
+    .card-name p {
+        font-size: 10px;
+        color: rgb(170, 168, 168);
+    }
+
+    .card-name h2 {
+        font-weight: 900;
+        color:white
+    }
+
+    .card-name p {
+        margin-top: 8px;
+        font-size: 16px;
+    }
+    .footer{
+        margin-right:8px;
+        overflow: hidden;
+    }
+
+@media screen and (min-width: 1440px) {
+    .card-area {
+        grid-template-columns: repeat(5, minmax(198px, 1fr));
+    }
 }
 
 @media screen and (width < 1200px) {
+    body {
+        background-color: #121212;
+    }
     .root-container {
         display: grid;
         grid-template-areas:
@@ -499,13 +660,13 @@ section > form {
     }
 
     .sidebar-container {
-        width: 100%;
-        max-height: 65.5px;
-        position: fixed;
-        bottom: 0;
-        z-index: 999;
-        display: unset;
-        padding: 0;
+      width: 100%;
+      max-height: 65.5px;
+      position: fixed;
+      bottom: 0;
+      z-index: 999;
+      display: unset;
+      padding: 0;
     }
     
     .sidebar-container::before {
@@ -518,25 +679,24 @@ section > form {
         right: 0;
         background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
     }
-    
     .sidebar-head {
-        display: none;
+      display: none;
     }
 
     .sidebar-menu {
-        display: flex;
-        width: 100%;
-        margin: 0px;
-        top: 2.5rem;
+      display: flex;
+      width: 100%;
+      margin: 0px;
+      top: 2.5rem;
     }
-
+  
     .sidebar-menu > li {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
     }
 
     .sidebar-menu > .md-menu {
@@ -544,21 +704,21 @@ section > form {
     }
 
     .sidebar-menu li h2 {
-        font-size: 9px;
+      font-size: 9px;
     }
-
+  
     .sidebar-menu a {
-        width: 100%;
-        height: 100%;
-        flex-direction: column;
-        gap: .25rem;
-        justify-content: space-between;
-        padding: 8px 12px 12px;
-        box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      gap: .25rem;
+      justify-content: space-between;
+      padding: 8px 12px 12px;
+      box-sizing: border-box;
     }
-
+  
     .translate-btn {
-        display: none;
+      display: none;
     }
 
     .translate-btn + p {
@@ -571,20 +731,21 @@ section > form {
 
     .content-container {
         border-radius: 0;
+        scrollbar-width: none;
+    }
+    .card-area {
+        grid-template-columns: repeat(3, minmax(198px, 1fr));
+    }
+    .footer{
+        margin-right:0px;
     }
 
-    section {
-        height: fit-content;
-    }
+}
+@media screen and (max-width: 768px) {
+    .card-area {
+            grid-template-columns: repeat(1, minmax(198px, 1fr));
+        }
 }
 
-@media screen and (width < 768px) {
-    body {
-        background-color: #121212;
-    }
-    section > form {
-        width: 100%;
-        background-color: #121212;
-    }
-}
+
 </style>

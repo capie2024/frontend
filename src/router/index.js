@@ -14,10 +14,15 @@ import Login from "../views/Login.vue";
 import Signup from "../views/Signup.vue";
 import LoginHomePageView from "@/views/LoginHomepage.vue";
 import CardSeries from "@/views/CardSeries.vue";
-import Carddeck from "../views/Carddeck.vue";
+import Carddeck from "../components/card-deck/Carddeck.vue";
 import AddArticle from "../views/AddArticle.vue";
 import Social from "../views/Social.vue";
+import MyCard from "../views/MyCardView.vue";
+import Findcard from "../components/Mycard/find-card.vue";
+import Remitcard from "../components/Mycard/remit-card.vue";
+import RemitCardNf from "../components/Mycard/remit-cardnf.vue";
 import AuthSuccess from "../views/AuthSuccess.vue";
+import MyArticle from "../views/MyArticle.vue";
 
 
 const router = createRouter({
@@ -95,9 +100,8 @@ const router = createRouter({
       component: CardSeries
     },
     {
-      path: "/carddeck",
-      name: "carddeck",
-      component: Carddeck
+      path: '/social/:post_code', 
+      component: Carddeck,        
     },
     {
       path: "/add-article",
@@ -110,10 +114,36 @@ const router = createRouter({
       component: Social
     },
     {
+      path: "/mycard",
+      name: "mycard",
+      component: MyCard
+    },
+    {
+      path: "/findcard",
+      name: "findcard",
+      component: Findcard,
+    },
+    {
+      path: "/remitcard",
+      name: "remitcard",
+      component: Remitcard,
+    },
+    {
+      path: "/remitcardnf",
+      name: "remitcardnf",
+      component: RemitCardNf,
+    },
+    {
       path: '/auth-success',
       name: 'auth-success',
       component: AuthSuccess
+    },
+    {
+      path: "/social/my",
+      name: "my-article",
+      component: MyArticle
     }
+
   ],
 });
 

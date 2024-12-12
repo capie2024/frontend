@@ -1,11 +1,11 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
-import { useCardInfoStore } from "./card-info";
+import { useCardInfoStore } from "@/stores/card-info";
 
 export const useDeckMakeStore = defineStore("deck-make", () => {
   const cardInfoStore = useCardInfoStore();
-  const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow;
+  // const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow;
 
   const selectedCards = ref([]);
   const editType = ref("CHECK_INFO");
@@ -97,12 +97,12 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
   const checkTypeAndRunFunction = (card, cardIndex, deckIndex) => {
     if (editType.value === "CHECK_INFO") {
       console.log("查看卡片資訊");
-      console.log(
-        "卡片資訊:" + card,
-        "卡片索引值:" + cardIndex,
-        "牌組索引值:" + deckIndex
-      );
-      getCardInfoAndShow(card)
+      // console.log(
+        //   "卡片資訊:" + card.name,
+        //   "卡片索引值:" + cardIndex,
+      //   "牌組索引值:" + deckIndex
+      // );
+      cardInfoStore.getCardInfoAndShow(card);
     } else if (editType.value === "ADD_CARD") {
       addCard(card);
       switchSortMode();
@@ -260,14 +260,30 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
 
   // 傳送給後端存入資料庫
   const sendDeckToDatabase = async (deckData) => {
-    const userToken = localStorage.getItem("token");
-    const res = await axios.post("http://localhost:3000/api/add-deck", {
-      userToken,
-      deckData,
-    });
-    console.log(res.data);
-    return res;
-  };
+    try {
+      const userToken = localStorage.getItem("token");
+      // console.log(userToken);
+  
+      const res = await axios.post("http://localhost:3000/api/add-deck", 
+      {
+        deckData
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        }
+      }
+      );
+      console.log(res.data);
+      console.log("已傳送");
+      
+      return res;
+    } catch (error) {
+     console.log(error);
+      
+    }
+  }
+  
 
   // 獲取卡片在牌組中的數量
   const countCards = (card) => {
@@ -294,6 +310,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
     switchSortMode,
     handleSwitchBtnClick,
     sendDeckToDatabase,
-    countCards
+    countCards,
   };
 });

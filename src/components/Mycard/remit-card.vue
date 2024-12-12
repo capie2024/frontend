@@ -35,8 +35,8 @@
                         </button>
 
                         <div data-v-41768621="" class="input-item-2 ">
-                            <input data-v-41768621="" class="input-text" type="text" placeholder="代碼" v-model="deckId">
-                            <button  class="input-button-2 item default-transition">
+                            <input data-v-41768621="" class="input-text" id="input-text" type="text" placeholder="代碼" v-model="deckId">
+                            <button  class="input-button-2 item default-transition" id="input-button-2">
                                 <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon-input size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -78,7 +78,7 @@
                     <div class="modal-body">
                         <h3 data-v-41768621="" class="topic my-4"> 選擇紙張大小</h3>
                         <div data-v-41768621="" class="grid grid-cols-2 gap-2">
-                            <button  class="item default-transition active button-remit-div ">
+                            <button  class="item default-transition active button-remit-div " id="button-remit-div">
                                 <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path>
                                 </svg>
@@ -91,9 +91,9 @@
 
 
                     <div data-v-c3ac02c2="" class="seeting">
-                                <button  class="item  justify-center default-transition gray setting-text" @click="exportToPDF">
+                                <button  class="item  justify-center default-transition gray setting-text" id="setting-text" @click="exportToPDF">
                                     <svg data-v-c3ac02c2="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path></svg>
-                                    <span class="text-sm font-mono input-text"> 設定完成 </span>
+                                    <span class="text-sm font-mono input-text" id="input-text"> 設定完成 </span>
                                 </button>
                             </div>
                     </div>
@@ -145,15 +145,15 @@
         color: #e5e7eb;
         border-style: none;
     }
-    .input-text:focus-visible {
-        border-color: transparent !important;
+    #input-text:focus-visible {
+        border-color: transparent ;
         outline: none;
     }
     
-    .input-button-2  {
-        
-        border: 1px solid transparent !important;
+    #input-button-2  {
+        border: 1px solid transparent ;
     }
+
     
     .icon-input {
     color: #e5e7eb;
@@ -281,12 +281,14 @@
         border-radius:20px;
         display: flex;
         gap: .5rem;
-        padding: 0.5rem 0.5rem !important;
         white-space:nowrap;
         height: 64px;
         color: rgb(255, 255, 255);
         background-color: #18181b80;
         align-items: center;
+    }
+    #button-remit-div{
+        padding: 0.5rem 0.5rem ;
     }
 
     .button-remit-div:focus {
@@ -356,11 +358,12 @@
         border-radius: 12px;
         margin-bottom: 8px;
         margin-top: 10px;
-        padding: 0.3rem !important  ;
         align-items: center;
         gap: 0.5rem;
     }
-    
+    #setting-text{
+        padding: 0.3rem   ;
+    }
     .setting:hover {
         background-color: #27272a;
     }
@@ -408,7 +411,7 @@
       async exportToPDF() {
         console.log("開始執行匯出 PDF");
         if (!this.deckId) {
-            alert("請輸入 Deck ID");
+            alert("請輸入牌組代碼");
             return;
           }
     

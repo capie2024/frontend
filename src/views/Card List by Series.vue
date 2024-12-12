@@ -88,12 +88,12 @@
                                 </div>
                                 <!-- 排序按鈕 -->
                                 <div class="sort-button">
-                                    <button class="active" @click="toggleArrow">
-                                        <i class="fa-solid fa-arrow-up"></i>
+                                    <button class="active1" :class="{ 'selected' : nameIsSelected }" :style="{ background: nameIsSelected ? 'linear-gradient(to right, #5eead4, #93c5fd)' : 'white' }" @click="toggleNameSort" >
+                                        <i class="fa-solid fa-arrow-up" :class="{ 'rotate180' : nameIsSorted }"></i>
                                         名稱
                                     </button>
-                                    <button class="active" @click="toggleArrow">
-                                        <i class="fa-solid fa-arrow-up "></i>
+                                    <button class="active2"  :class="{ 'selected' : dateIsSelected }" :style="{ background: dateIsSelected ? 'linear-gradient(to right, #5eead4, #93c5fd)' : 'white' }" @click="toggleDateSort">
+                                        <i class="fa-solid fa-arrow-up " :class="{ 'rotate180' : dateIsSorted }"></i>
                                         日期
                                     </button>
                                 </div>
@@ -110,7 +110,8 @@
                         </div>
                         <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
                         <section class="show-card">
-                            <a v-for="card in cardSeries" :key="card.id" href="#" class="url transition-colors" @click.prevent="handleSeries(card.id)" >
+                            <a v-for="card in originalSeries" :key="card.id" href="#" class="url transition-colors" @click.prevent="handleSeries(card.id)" >
+
                                     <div>
                                         <img :src ="card.cover || '/src/img/cover.png'" alt="">
                                     </div>
@@ -125,7 +126,7 @@
                                             <p class="color-a1">{{ card.code.join(', ') }}</p>
                                         </div>
                                         <p class="font-size20 color-white padding-bottom" >{{ card.name }}</p>
-                                        <p class="color-a1">{{ card.sellAt[0] }}</p>
+                                        <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
                                     </div>
                             </a>
                         </section>
@@ -166,7 +167,7 @@
                                             <p class="color-a1">{{ card.code.join(', ') }}</p>
                                         </div>
                                         <p class="font-size20 color-white padding-bottom" >{{ card.name }}</p>
-                                        <p class="color-a1">{{ card.sellAt[0] }}</p>
+                                        <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
                                     </div>
                             </a>   
                         </section>
@@ -368,13 +369,31 @@ import { useRouter } from 'vue-router'
 const router = useRouter(); 
 
 const cardSeries = ref([])
+const originalSeries = ref([])
 const error = ref('')
 const API_URL = 'https://bottleneko.app/api/series'
+const sortState = ref(0)
 
+// 獲取系列卡表資料
 const fetchCardseries = async () => {
     try {
         const response = await axios.get('/api/series');
-        cardSeries.value = response.data
+        originalSeries.value = response.data
+        cardSeries.value = [...originalSeries.value].sort((a, b) => {
+            const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;
+            const dateB = b.sellAt[0] ? new Date(b.sellAt[0]) : null;
+
+            if (!dateA && !dateB) return 0; 
+            if (!dateA) return 1;           
+            if (!dateB) return -1;
+
+            return dateB - dateA;
+            });
+            sortState.value = 0;
+            dateIsSorted.value = false;
+            dateIsSelected.value = true;
+            nameIsSorted.value = false;
+            nameIsSelected.value = false;
     }
     catch (err) {
         error.value = '獲取系列卡表資料失敗' + err.message
@@ -390,6 +409,139 @@ const handleSeries = async(seriesId) => {
     router.push('/card-series');
     await getSeriesCards(seriesId);
     saveLastViewSeries(seriesId);
+}
+
+
+// A-Z>50音排序
+const nameSort = (a, b) => {
+  const nameA = a.name
+  const nameB = b.name
+
+  
+  const len = Math.min(nameA.length, nameB.length)
+  for (let i = 0; i < len; i++) {
+    const charA = nameA[i]
+    const charB = nameB[i]
+
+
+    if (/[A-Z]/.test(charA) && !/[A-Z]/.test(charB)) return -1
+    if (!/[A-Z]/.test(charA) && /[A-Z]/.test(charB)) return 1
+
+  
+    if (/[a-z]/.test(charA) && !/[a-z]/.test(charB)) return -1
+    if (!/[a-z]/.test(charA) && /[a-z]/.test(charB)) return 1
+
+
+    const EnglishCompare = charA.localeCompare(charB)
+    if (EnglishCompare !== 0) return EnglishCompare
+
+    
+    const japaneseOrder = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'
+    const aJapaneseIndex = japaneseOrder.indexOf(charA)
+    const bJapaneseIndex = japaneseOrder.indexOf(charB)
+    if (aJapaneseIndex !== -1 && bJapaneseIndex !== -1) {
+      const japaneseCompare = aJapaneseIndex - bJapaneseIndex
+      if (japaneseCompare !== 0) return japaneseCompare
+    }
+  }
+
+  
+  return nameA.length - nameB.length
+}
+
+// 名稱排序規則2
+const nameSortReverse = (a, b) => {
+  const nameA = a.name;
+  const nameB = b.name;
+
+  const len = Math.min(nameA.length, nameB.length);
+  for (let i = 0; i < len; i++) {
+    const charA = nameA[i];
+    const charB = nameB[i];
+
+    if (/[A-Z]/.test(charA) && !/[A-Z]/.test(charB)) return 1;
+    if (!/[A-Z]/.test(charA) && /[A-Z]/.test(charB)) return -1;
+
+    if (/[a-z]/.test(charA) && !/[a-z]/.test(charB)) return 1;
+    if (!/[a-z]/.test(charA) && /[a-z]/.test(charB)) return -1;
+
+    const EnglishCompare = charA.localeCompare(charB);
+    if (EnglishCompare !== 0) return -EnglishCompare; 
+
+    
+    const japaneseOrder = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん';
+    const aJapaneseIndex = japaneseOrder.indexOf(charA);
+    const bJapaneseIndex = japaneseOrder.indexOf(charB);
+    if (aJapaneseIndex !== -1 && bJapaneseIndex !== -1) {
+      const japaneseCompare = bJapaneseIndex - aJapaneseIndex; 
+      if (japaneseCompare !== 0) return japaneseCompare;
+    }
+  }
+
+  return nameB.length - nameA.length; 
+};
+
+
+
+// 名稱排序切換
+const dateIsSorted = ref(false)
+const dateIsSelected = ref(true)
+const nameIsSorted = ref(false)
+const nameIsSelected = ref(false)
+
+const toggleNameSort = () => {
+  if (nameIsSorted.value) {
+    cardSeries.value = [...originalSeries.value].sort(nameSortReverse)
+    nameIsSorted.value = false;
+    nameIsSelected.value = true;
+    dateIsSorted.value = false;
+    dateIsSelected.value = false;
+  } else {
+    cardSeries.value = [...originalSeries.value].sort(nameSort)
+    nameIsSorted.value = true;
+    nameIsSelected.value = true;
+    dateIsSorted.value = false;
+    dateIsSelected.value = false;
+    sortState.value = 0;
+  }
+}
+
+//日期排序切換
+
+const toggleDateSort = () => {
+  if (sortState.value === 0) {
+    cardSeries.value = [...originalSeries.value].sort((a, b) => {
+        const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;
+        const dateB = b.sellAt[0] ? new Date(b.sellAt[0]) : null;
+
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return -1;
+        if (!dateB) return 1;
+
+        return dateA - dateB;
+        });
+        sortState.value = 1; 
+        dateIsSorted.value = true;
+        dateIsSelected.value = true;
+        nameIsSorted.value = false;
+        nameIsSelected.value = false;
+  } else {
+        cardSeries.value = [...originalSeries.value].sort((a, b) => {
+            const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;
+            const dateB = b.sellAt[0] ? new Date(b.sellAt[0]) : null;
+
+            if (!dateA && !dateB) return 0; 
+            if (!dateA) return 1;           
+            if (!dateB) return -1;
+
+            return dateB - dateA;
+            });
+            sortState.value = 0;
+            dateIsSorted.value = false;
+            dateIsSelected.value = true;
+            nameIsSorted.value = false;
+            nameIsSelected.value = false;
+    }
 }
 
 onMounted(() => {
@@ -590,25 +742,36 @@ nav{
     font-size: 14px;
     cursor: pointer;
     color:black;
-    background-color: white;
     font-weight: 700;
     padding: 8px 15px;
     white-space: nowrap;
     font-size: .875rem;
-    transition: background-color 0.3s ease;
     background-size: 200% 100%; /* 設定背景大小以便反轉 */
     background-position: 0% 0%; /* 初始位置 */
 }
 
 .sort-button button i {
-    transition: transform 0.3s ease;  /* 圖標旋轉平滑過渡 */
+    transition: 0.3s ease; 
 }
-.sort-button button.active {
+
+.active1 {
+    background:white;
+}
+
+.active2 {
     background: linear-gradient(to right, #5eead4, #93c5fd  );
 }
-.sort-button button.active i {
-    transform: rotate(180deg); 
+
+.selected {
+  background: linear-gradient(to right, #5eead4, #93c5fd);
 }
+
+
+.rotate180 {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-in;
+}
+
 /* 通知和登入按鈕 */
 .icons {
     display: flex;

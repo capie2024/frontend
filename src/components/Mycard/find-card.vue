@@ -41,7 +41,7 @@ const changeBtn = () => {
                         <h3 data-v-c3ac02c2="" class="topic my-4"> 輸入代碼 </h3>
                         <div data-v-c3ac02c2="" class="grid grid-cols-1 gap-2">
                             <div data-v-c3ac02c2="" class="item default-transition ">
-                                <input data-v-c3ac02c2="" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500" type="text" placeholder="代碼">
+                                <input class="custom-input w-full p-0 bg-transparent placeholder:text-zinc-500" type="text" placeholder="代碼">
                             </div>
                         </div>
                         <div data-v-c3ac02c2="" class="mt-8 flex justify-center">
@@ -81,6 +81,11 @@ const changeBtn = () => {
     line-height: 1rem;
     margin-top: 5px;
 }
+.custom-input:focus-visible {
+  border-color: transparent !important;
+  outline: none;
+}
+
 
 .item{
     align-items: center;
@@ -92,9 +97,6 @@ const changeBtn = () => {
     border: 2px solid #27272a;
     background-color: #151516;
 }
-
-
-
 
 .gray:hover{
     background-color: #27272a;

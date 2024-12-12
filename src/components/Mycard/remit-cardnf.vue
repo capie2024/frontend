@@ -1,18 +1,3 @@
-
-
-<script setup>
-// import { ref } from "vue";
-
-// const isSecondButtonVisible = ref(true);
-// const toggleButtons = () => {
-//   isSecondButtonVisible.value = !isSecondButtonVisible.value;
-// };
-
-
-
-</script>
-
-
 <template>
     <section  class="modal fade" id="remit" tabindex="-1" aria-labelledby="remitLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -33,7 +18,8 @@
                         </h3>
                     </div>
                     <div class="input-button  ">
-                        <button   class="button-remit item z-20 "><svg data-v-41768621=""
+                        <button   class="button-remit item z-20 ">
+                        <svg data-v-41768621=""
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -42,24 +28,11 @@
                             </svg>
                             <span data-v-41768621="" class="text-sm font-mono">匯出牌組</span>
                         </button>
-                        <!-- <div data-v-41768621="" class="relative  z-20  max-h-[50vh] md:max-h-[20rem] overflow-y-auto flex flex-col rounded-md bg-zinc-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-w-[80vw] md:max-w-[20rem] w-max" style="margin-top: 48px; left: 0px; top: 0px;">
-                            <a class="text-sm cursor-pointer flex items-center gap-2 py-2 px-4 text-zinc-300 hover:text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path>
-                                </svg><span>{{ isSecondButtonVisible}}匯出牌組</span>
-                            </a>
-                            <a class=" text-sm cursor-pointer flex items-center gap-2 py-2 px-4 text-zinc-300 hover:text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25">
-
-                                        </path>
-                                    </svg><span>{{ isSecondButtonVisible}}匯出文章</span>
-                                </a>
-                            </div> -->
+                       
 
                         <div data-v-41768621="" class="input-item-2 ">
-                            <input data-v-41768621="" class="input-text" type="text" placeholder="代碼">
-                            <button  class="input-button-2 item default-transition">
+                            <input data-v-41768621="" class="input-text" type="text" placeholder="代碼" v-model="deckId">
+                            <button  class="input-button-2 item default-transition" @click="exportToPDF">
                                 <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon-input size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -81,9 +54,147 @@
     </div>      
                     
     </section>
-    </template>
-    
-    <style scoped>
+</template>
+
+<script>
+import jsPDF from "jspdf";
+
+
+export default {
+  data() {
+    return {
+      deckId: '', // 用來儲存用戶輸入的 Deck ID
+    };
+  },
+    methods:{
+  async exportToPDF() {
+    console.log("開始執行匯出 PDF");
+    if (!this.deckId) {
+        alert("請輸入 Deck ID");
+        return;
+      }
+
+    const fontResponse = await fetch("http://localhost:3000/api/font");
+    if (!fontResponse.ok) {
+      throw new Error("無法獲取字型資料");
+    }
+
+    const base64msyh = await fontResponse.text(); // 確保後端返回的是 text 格式
+
+    if (!base64msyh) {
+    throw new Error("字型 Base64 資料為空");
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/cardPDF?deckId=${this.deckId}`);
+      
+      if (!response.ok) {
+        console.error("API 回應非 OK:", response.status, response.statusText);
+        const errorData = await response.json();
+        console.error("API 回應錯誤內容:", errorData);
+        throw new Error(errorData.error || "未知的錯誤");
+      }
+
+      const { covers, deck_name } = await response.json();
+
+      console.log("Deck 名稱:", deck_name);
+
+      // 確認有取得 deck_name 和 covers
+    if (!deck_name) {
+      throw new Error("沒有找到 Deck 名稱");
+    }
+
+    if (!covers || covers.length === 0) {
+      throw new Error("沒有找到任何 Deck Cover");
+    }
+
+      const pdf = new jsPDF();
+      // 載入字型
+      pdf.addFileToVFS("GenSenRounded2PJP-R.ttf", base64msyh );  //  Base64 字串
+      pdf.addFont("GenSenRounded2PJP-R.ttf", "GenSenRounded2PJP-R", "normal");  // 設定字型
+      pdf.setFont("GenSenRounded2PJP-R", "normal");  // 設定使用的字型
+
+
+      pdf.text(deck_name, 10, 10);
+        const pageWidth = 210; // A4 頁面寬度 (mm)
+        const pageHeight = 297; // A4 頁面高度 (mm)
+        const columns = 3; // 每行顯示 3 張圖片
+        const rows = 3; // 每頁顯示 3 行圖片
+        const marginX = 15; // 左右邊距
+        const marginY = 25; // 上下邊距
+        const maxImageWidth = (pageWidth - (columns + 1) * marginX) / columns; // 每張圖片的最大寬度
+        const maxImageHeight = (pageHeight - (rows + 1) * marginY) / rows; // 每張圖片的最大高度
+
+        let xPosition = marginX; // 初始 X 位置
+        let yPosition = marginY + 5; // 初始 Y 位置，略下移以避免與標題重疊
+        let imageCount = 0;
+
+      // 使用 Promise.all 確保所有圖片都載入完成
+      const imagePromises = covers.map((coverUrl, index) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = coverUrl;
+
+          img.onload = () => {
+          // 計算圖片的自適應大小
+          const aspectRatio = img.width / img.height;
+          let imageWidth = maxImageWidth;
+          let imageHeight = maxImageHeight;
+
+          // 根據寬高比縮放圖片
+          if (img.width > img.height) {
+            imageHeight = imageWidth / aspectRatio;
+          } else {
+            imageWidth = imageHeight * aspectRatio;
+          }
+
+          // 插入圖片到 PDF
+          pdf.addImage(img, "JPEG", xPosition, yPosition, imageWidth, imageHeight);
+
+          // 計算下一張圖片的位置
+          imageCount++;
+          xPosition += imageWidth + marginX;
+
+          // 換行
+          if (imageCount % columns === 0) {
+            xPosition = marginX; // 重置 X 位置
+            yPosition += imageHeight + marginY; // 換行
+          }
+
+          // 如果一頁滿了，則換頁
+          if (imageCount % (columns * rows) === 0 && imageCount < covers.length) {
+            pdf.addPage();
+            xPosition = marginX;
+            yPosition = marginY + 10;
+          }
+
+          resolve(); // 圖片載入完成
+        };
+
+          img.onerror = () => {
+            reject(new Error(`圖片載入失敗: ${coverUrl}`));
+          };
+        });
+      });
+
+      // 等待所有圖片載入完畢
+      await Promise.all(imagePromises);
+
+     // 所有圖片載入完畢後才保存 PDF
+      pdf.save(`${deck_name}_deck.pdf`);
+    } catch (error) {
+      console.error("匯出 PDF 時發生錯誤:", error.message);
+      alert("匯出 PDF 時發生錯誤：" + error.message);
+    }
+  }
+}
+};
+</script>
+
+
+
+
+<style scoped>
     @import '@/assets/base.css';
     
     *, :after, :before {
@@ -123,32 +234,16 @@
         background-color:transparent;
         color: #e5e7eb;
         border-style: none;
-    }
-    
-    .input-button-2  {
-        height: 24px;
-        width: 24px;
-        background-color: transparent;
-        color: #e5e7eb;
         position: relative;
-        bottom:35px;
-        border-radius: 9999px;
-        right: -150px;
     }
-    
+    .input-text:focus-visible {
+    border-color: transparent !important;
+     outline: none;
+    }
     .icon-input {
         color: #e5e7eb;
-        background-color: transparent;
-        cursor:pointer;
-        background-image: none;
-        border: 0 solid #e5e7eb;
-        width: 24px;
-        position: absolute;
-        stroke: currentcolor;
-        top: 1px;
-        right: 2px;
+       
     }
-
     .default-transition {
         transition-duration: .3s;
         transition-property: all;
@@ -170,7 +265,7 @@
     }
     
     .modal-body {
-        padding: 1rem;
+        padding: 0.5rem 1rem 0 1rem;
     }
     .btn-close {
         flex: none;
@@ -180,7 +275,7 @@
         gap: 0.5rem;
         height: 1.5rem;
         width: 1.5rem;
-        padding: 0.25rem;
+        
         border: 0 solid #e5e7eb;
         box-sizing: border-box;
         
@@ -219,10 +314,11 @@
     
     .input-button {
         display: flex;
-        align-items: flex-start;
+        
         gap: .5rem;
         box-sizing: content-box;
-        padding: 1rem;
+        padding: 0rem 1rem 0.5rem 1rem;
+        align-items: center;
     }
     
     .input-item button svg {
@@ -243,6 +339,7 @@
         color: rgb(255, 255, 255);
         background-color: #18181b80;
         align-items: center;
+        border: 1px solid #a1a1aa;
     }
     
     .button-remit:focus {
@@ -250,7 +347,6 @@
         --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
         color: rgb(255 255 255 / var(--tw-text-opacity));
         --tw-shadow-color: rgba(14, 165, 233, .5);
-        /* --tw-shadow: var(--tw-shadow-colored); */
         color: white;
         width: 142px;
         height: 64px;
@@ -259,6 +355,7 @@
         border-radius: 20px;
         white-space:nowrap;
         gap: .5rem;
+        padding: 0.5rem;
     }
 
 
@@ -280,7 +377,6 @@
         --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
         color: rgb(255 255 255 / var(--tw-text-opacity));
         --tw-shadow-color: rgba(14, 165, 233, .5);
-        /* --tw-shadow: var(--tw-shadow-colored); */
         color: white;
         height: 64px;
         display: flex;
@@ -291,12 +387,13 @@
     }
     
     .input-item-2 {
-        align-items: center;
         border-radius: .75rem;
         gap: 0.5rem ;
         align-items: center;
         margin: 8px;
-        
+        display: flex;
+        border: 1px solid #a1a1aa;
+        padding: 10px;
     }
     
     .show-text-green {
@@ -337,7 +434,6 @@
         display: flex;
         justify-content: center;
         border-radius: 12px;
-        width: 320px;
         margin-bottom: 8px;
     }
     
@@ -349,25 +445,17 @@
     .item{
         align-items: center;
         border-radius: .75rem;
-        display: flex;
         gap: .5rem;
-        padding: .5rem;
-        border: 1px solid #27272a;
-        background-color: #151516;
         cursor: pointer;
-        
     }
     
     
     
     @media  (max-width:767px ) {
         .input-button { 
-        display: grid;
-        align-items: flex-start;
         gap: .5rem;
         box-sizing: content-box;
-        padding: 1rem;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        
         }
         .modal-dialog {
             height: 100%;
@@ -380,9 +468,5 @@
     }
     
     </style>
-    
-    <script>
-    
-    </script>
     
     

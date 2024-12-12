@@ -134,24 +134,7 @@
                             <span class="font-size75rem color-a1">一共有152結果</span>
                         </h2>
                         <section class="grid-card">
-                            <!-- <RouterLink to="/card-series" class="url transition-colors" @click="handleSeries(1559042)">
-                                <div>
-                                    <img :src="seriesTestData.cover" alt="">
-                                </div>
-                                <div class="card-text">
-                                    <div class="flex">
-                                        <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
-                                            <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                                            </path>
-                                            <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                                            </path>
-                                        </svg>
-                                        <p class="color-a1">{{ seriesTestData.code }}</p>
-                                    </div>
-                                    <p class="font-size20 color-white padding-bottom" >跳轉頁面測試用</p>
-                                    <p class="color-a1">{{ seriesTestData.sellAt }}</p>
-                                </div>
-                            </RouterLink> -->
+                           
                             <a v-for="card in cardSeries" :key="card.id" href="#" class="url transition-colors" @click.prevent="handleSeries(card.id)" >
                                     <div>
                                         <img :src ="card.cover || '/src/img/cover.png'" alt="">

@@ -88,12 +88,12 @@
                                 </div>
                                 <!-- 排序按鈕 -->
                                 <div class="sort-button">
-                                    <button class="active" @click="toggleArrow">
-                                        <i class="fa-solid fa-arrow-up"></i>
+                                    <button class="active1" :class="{ 'selected' : nameIsSelected }" :style="{ background: nameIsSelected ? 'linear-gradient(to right, #5eead4, #93c5fd)' : 'white' }" @click="toggleNameSort" >
+                                        <i class="fa-solid fa-arrow-up" :class="{ 'rotate180' : nameIsSorted }"></i>
                                         名稱
                                     </button>
-                                    <button class="active" @click="toggleArrow">
-                                        <i class="fa-solid fa-arrow-up "></i>
+                                    <button class="active2"  :class="{ 'selected' : dateIsSelected }" :style="{ background: dateIsSelected ? 'linear-gradient(to right, #5eead4, #93c5fd)' : 'white' }" @click="toggleDateSort">
+                                        <i class="fa-solid fa-arrow-up " :class="{ 'rotate180' : dateIsSorted }"></i>
                                         日期
                                     </button>
                                 </div>
@@ -110,7 +110,7 @@
                         </div>
                         <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
                         <section class="show-card">
-                            <a v-for="card in cardSeries" :key="card.id" href="#" class="url transition-colors">
+                            <a v-for="card in originalSeries" :key="card.id" href="#" class="url transition-colors" @click.prevent="handleSeries(card.id)" >
                                     <div>
                                         <img :src ="card.cover || '/src/img/cover.png'" alt="">
                                     </div>
@@ -125,12 +125,12 @@
                                             <p class="color-a1">{{ card.code.join(', ') }}</p>
                                         </div>
                                         <p class="font-size20 color-white padding-bottom" >{{ card.name }}</p>
-                                        <p class="color-a1">{{ card.sellAt[0] }}</p>
+                                        <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
                                     </div>
                             </a>
                         </section>
                         <h2 class="font-size30 color-white">系列<br>
-                            <span class="font-size75rem color-a1">一共有{{}}結果</span>
+                            <span class="font-size75rem color-a1">一共有152結果</span>
                         </h2>
                         <section class="grid-card">
                             <!-- <RouterLink to="/card-series" class="url transition-colors" @click="handleSeries(1559042)">
@@ -151,7 +151,7 @@
                                     <p class="color-a1">{{ seriesTestData.sellAt }}</p>
                                 </div>
                             </RouterLink> -->
-                            <a v-for="card in cardSeries" :key="card.id" href="#" class="url transition-colors">
+                            <a v-for="card in cardSeries" :key="card.id" href="#" class="url transition-colors" @click.prevent="handleSeries(card.id)" >
                                     <div>
                                         <img :src ="card.cover || '/src/img/cover.png'" alt="">
                                     </div>
@@ -166,7 +166,7 @@
                                             <p class="color-a1">{{ card.code.join(', ') }}</p>
                                         </div>
                                         <p class="font-size20 color-white padding-bottom" >{{ card.name }}</p>
-                                        <p class="color-a1">{{ card.sellAt[0] }}</p>
+                                        <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
                                     </div>
                             </a>   
                         </section>
@@ -363,79 +363,187 @@ import { ref, onMounted } from 'vue';
 import { useCardSeriesStore } from "@/stores/card-series";
 import { storeToRefs } from "pinia";
 import axios from "axios";
+import { useRouter } from 'vue-router'
 
-//     export default {
-//     data(){
-//         const cardSeriesStore = useCardSeriesStore();
-//         const { seriesTestData } = storeToRefs(cardSeriesStore);
-//         return{
-//             getSeriesCards: cardSeriesStore.getSeriesCards,
-//             saveLastViewSeries: cardSeriesStore.saveLastViewSeries,
-//             seriesTestData,
-//             getTestSeries: cardSeriesStore.getTestSeries
-//         }
-//     },
-//     methods: {
-//     async handleSeries(seriesId){
-//         await this.getSeriesCards(seriesId);
-//         // console.log("成功獲取資料，執行跳轉至CardSeriesPage");
-//         this.saveLastViewSeries(seriesId);
-//         // 點擊系列後獲取該系列ID，作為參數調用card-series store裡獲取指定系列資料的function拿到資料，然後順便跳轉到CardSeriesPage，並將現在瀏覽的系列ID存在localstorage
-//     },
-//     toggleArrow(event) {
-//       const button = event.currentTarget;
-//       if (!button) return; // 防止按鈕為 null 的情況
-//       const icon = button.querySelector("i");
-//       if (!icon) return; // 防止圖標為 null 的情況
-
-//       const allButtons = document.querySelectorAll(".sort-button button");
-//       allButtons.forEach((btn) => {
-//         if (btn !== button) {
-//           btn.classList.remove("active");
-//           const otherIcon = btn.querySelector("i");
-//           if (otherIcon) {
-//             otherIcon.classList.remove("fa-arrow-down");
-//             otherIcon.classList.add("fa-arrow-up");
-//           }
-//         }
-//       });
-
-//       if (button.classList.contains("active")) {
-//         if (icon.classList.contains("fa-arrow-up")) {
-//           icon.classList.remove("fa-arrow-up");
-//           icon.classList.add("fa-arrow-down");
-//         } else {
-//           icon.classList.remove("fa-arrow-down");
-//           icon.classList.add("fa-arrow-up");
-//         }
-//       } else {
-//         button.classList.add("active");
-//         icon.classList.remove("fa-arrow-up");
-//         icon.classList.add("fa-arrow-down");
-//       }
-//     },
-//     clearInput() {
-//       document.getElementById("searchInput").value = ""; // 清空輸入框的文字
-//       },
-//     },
-//     async mounted() {
-//         await this.getTestSeries(1559042);
-//     },
-// }; 
+const router = useRouter(); 
 
 const cardSeries = ref([])
+const originalSeries = ref([])
 const error = ref('')
 const API_URL = 'https://bottleneko.app/api/series'
+const sortState = ref(0)
 
+// 獲取系列卡表資料
 const fetchCardseries = async () => {
     try {
         const response = await axios.get('/api/series');
-        cardSeries.value = response.data
+        originalSeries.value = response.data
+        cardSeries.value = [...originalSeries.value].sort((a, b) => {
+            const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;
+            const dateB = b.sellAt[0] ? new Date(b.sellAt[0]) : null;
+
+            if (!dateA && !dateB) return 0; 
+            if (!dateA) return 1;           
+            if (!dateB) return -1;
+
+            return dateB - dateA;
+            });
+            sortState.value = 0;
+            dateIsSorted.value = false;
+            dateIsSelected.value = true;
+            nameIsSorted.value = false;
+            nameIsSelected.value = false;
     }
     catch (err) {
         error.value = '獲取系列卡表資料失敗' + err.message
     }
 };
+
+const cardSeriesStore = useCardSeriesStore();
+
+const getSeriesCards = cardSeriesStore.getSeriesCards;
+const saveLastViewSeries = cardSeriesStore.saveLastViewSeries;
+    
+const handleSeries = async(seriesId) => {
+    router.push('/card-series');
+    await getSeriesCards(seriesId);
+    saveLastViewSeries(seriesId);
+}
+
+// A-Z>50音排序
+const nameSort = (a, b) => {
+  const nameA = a.name
+  const nameB = b.name
+
+  
+  const len = Math.min(nameA.length, nameB.length)
+  for (let i = 0; i < len; i++) {
+    const charA = nameA[i]
+    const charB = nameB[i]
+
+
+    if (/[A-Z]/.test(charA) && !/[A-Z]/.test(charB)) return -1
+    if (!/[A-Z]/.test(charA) && /[A-Z]/.test(charB)) return 1
+
+  
+    if (/[a-z]/.test(charA) && !/[a-z]/.test(charB)) return -1
+    if (!/[a-z]/.test(charA) && /[a-z]/.test(charB)) return 1
+
+
+    const EnglishCompare = charA.localeCompare(charB)
+    if (EnglishCompare !== 0) return EnglishCompare
+
+    
+    const japaneseOrder = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'
+    const aJapaneseIndex = japaneseOrder.indexOf(charA)
+    const bJapaneseIndex = japaneseOrder.indexOf(charB)
+    if (aJapaneseIndex !== -1 && bJapaneseIndex !== -1) {
+      const japaneseCompare = aJapaneseIndex - bJapaneseIndex
+      if (japaneseCompare !== 0) return japaneseCompare
+    }
+  }
+
+  
+  return nameA.length - nameB.length
+}
+
+// 名稱排序規則2
+const nameSortReverse = (a, b) => {
+  const nameA = a.name;
+  const nameB = b.name;
+
+  const len = Math.min(nameA.length, nameB.length);
+  for (let i = 0; i < len; i++) {
+    const charA = nameA[i];
+    const charB = nameB[i];
+
+    if (/[A-Z]/.test(charA) && !/[A-Z]/.test(charB)) return 1;
+    if (!/[A-Z]/.test(charA) && /[A-Z]/.test(charB)) return -1;
+
+    if (/[a-z]/.test(charA) && !/[a-z]/.test(charB)) return 1;
+    if (!/[a-z]/.test(charA) && /[a-z]/.test(charB)) return -1;
+
+    const EnglishCompare = charA.localeCompare(charB);
+    if (EnglishCompare !== 0) return -EnglishCompare; 
+
+    
+    const japaneseOrder = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん';
+    const aJapaneseIndex = japaneseOrder.indexOf(charA);
+    const bJapaneseIndex = japaneseOrder.indexOf(charB);
+    if (aJapaneseIndex !== -1 && bJapaneseIndex !== -1) {
+      const japaneseCompare = bJapaneseIndex - aJapaneseIndex; 
+      if (japaneseCompare !== 0) return japaneseCompare;
+    }
+  }
+
+  return nameB.length - nameA.length; 
+};
+
+
+
+// 名稱排序切換
+const dateIsSorted = ref(false)
+const dateIsSelected = ref(true)
+const nameIsSorted = ref(false)
+const nameIsSelected = ref(false)
+
+const toggleNameSort = () => {
+  if (nameIsSorted.value) {
+    cardSeries.value = [...originalSeries.value].sort(nameSortReverse)
+    nameIsSorted.value = false;
+    nameIsSelected.value = true;
+    dateIsSorted.value = false;
+    dateIsSelected.value = false;
+  } else {
+    cardSeries.value = [...originalSeries.value].sort(nameSort)
+    nameIsSorted.value = true;
+    nameIsSelected.value = true;
+    dateIsSorted.value = false;
+    dateIsSelected.value = false;
+    sortState.value = 0;
+  }
+}
+
+//日期排序切換
+
+const toggleDateSort = () => {
+  if (sortState.value === 0) {
+    cardSeries.value = [...originalSeries.value].sort((a, b) => {
+        const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;
+        const dateB = b.sellAt[0] ? new Date(b.sellAt[0]) : null;
+
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return -1;
+        if (!dateB) return 1;
+
+        return dateA - dateB;
+        });
+        sortState.value = 1; 
+        dateIsSorted.value = true;
+        dateIsSelected.value = true;
+        nameIsSorted.value = false;
+        nameIsSelected.value = false;
+  } else {
+        cardSeries.value = [...originalSeries.value].sort((a, b) => {
+            const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;
+            const dateB = b.sellAt[0] ? new Date(b.sellAt[0]) : null;
+
+            if (!dateA && !dateB) return 0; 
+            if (!dateA) return 1;           
+            if (!dateB) return -1;
+
+            return dateB - dateA;
+            });
+            sortState.value = 0;
+            dateIsSorted.value = false;
+            dateIsSelected.value = true;
+            nameIsSorted.value = false;
+            nameIsSelected.value = false;
+    }
+}
+
+
+
 
 onMounted(() => {
     fetchCardseries();
@@ -453,7 +561,7 @@ onMounted(() => {
     grid-area: sidebar;
     min-height: 0;
     padding: 1rem;
-    background-color: #090909;
+    
 }
 .sidebar-head{
     text-decoration: none;
@@ -566,10 +674,10 @@ nav{
     left: 270px;
     background-color: #121212;
     padding: 10px;
-    width: 100%;
     box-sizing: border-box;
     margin: 8px 8px 8px 0;
     border-radius: 10px;
+    width: calc(100% - 280px);
 }
 .top-container {
     display: flex;
@@ -580,7 +688,7 @@ nav{
     border-radius: 5px;
     justify-content: space-between;
     position: fixed;
-    width: calc(100% - 320px);
+    width: calc(99% - 320px);
     top:0px;
     left: 270px;
 }
@@ -635,25 +743,36 @@ nav{
     font-size: 14px;
     cursor: pointer;
     color:black;
-    background-color: white;
     font-weight: 700;
     padding: 8px 15px;
     white-space: nowrap;
     font-size: .875rem;
-    transition: background-color 0.3s ease;
     background-size: 200% 100%; /* 設定背景大小以便反轉 */
     background-position: 0% 0%; /* 初始位置 */
 }
 
 .sort-button button i {
-    transition: transform 0.3s ease;  /* 圖標旋轉平滑過渡 */
+    transition: 0.3s ease; 
 }
-.sort-button button.active {
+
+.active1 {
+    background:white;
+}
+
+.active2 {
     background: linear-gradient(to right, #5eead4, #93c5fd  );
 }
-.sort-button button.active i {
-    transform: rotate(180deg); 
+
+.selected {
+  background: linear-gradient(to right, #5eead4, #93c5fd);
 }
+
+
+.rotate180 {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-in;
+}
+
 /* 通知和登入按鈕 */
 .icons {
     display: flex;
@@ -694,14 +813,15 @@ nav{
     display: flex;
     gap: 1.5rem;
     padding: 20px 40px;
-    width: 85%;
+    width: 100%;
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
+    box-sizing: border-box;
 }
 .show-card >*{
-    width: calc(14.28571% - 1.28571rem);
+    width: calc(20% - 2rem);
 }
 .show-card > *:nth-child(n+8) {
     display: none;
@@ -714,7 +834,7 @@ nav{
     margin: 20px 0;
     padding:  0 40px;
     box-sizing: border-box;
-    width:85%
+    /* width:100% */
 }
 .flex{
     display: flex;
@@ -793,10 +913,13 @@ a{
         grid-template-columns: repeat(7, minmax(0, 1fr));
         
     }
+    .show-card >*{
+        width: calc(14.28571% - 1.28571rem);
+    }
 }
 @media (width < 1199px) {
     .top-container {
-        width: 100% ;
+        width: calc(100% - 48px); ;
         top:0;
         left: 0;    
     }
@@ -823,9 +946,9 @@ a{
     .show-card{
         padding: 0px;
         margin: 0;
-        width: 100%;
+        
     }
-    .show-card >*{
+    .show-card > *{
         width: calc(20% - 2rem);
         flex: none;
     }
@@ -833,7 +956,7 @@ a{
         padding: 0;
         margin: 0;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        width: 100%;
+        
     }
     .url{
         background-color: transparent;
@@ -899,12 +1022,10 @@ a{
       }
       .aa{
         left: 0;
+        width: 100%;
       }
 }
 @media (width < 1023px) {
-    .top-container {
-        width: 100% ;
-    }
     .grid-card{
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -935,7 +1056,7 @@ a{
         padding: 0px;
         margin: 0;
     }
-    .show-card >*{
+    .show-card > *{
         width: calc(20% - 2rem);
         flex: none;
     }
@@ -950,14 +1071,11 @@ a{
     .all-card{
         width: 100%;
     }
-      body{
+    body{
         background-color:#121212;
-      }
+    }
 }
 @media (width <767px) {
-    .top-container {
-        width: 100% ;
-    }
     .grid-card{
         grid-template-columns: repeat(2,minmax(0,1fr));
     }
@@ -988,7 +1106,7 @@ a{
         padding: 0px;
         margin: 0;
     }
-    .show-card >*{
+    .show-card > *{
         width: calc(50% - 2rem);
         flex: none;
     }
@@ -1002,7 +1120,6 @@ a{
     }
 }
 .work-shop-footer {
-    max-width: 85%;
     padding: 80px 32px 64px;
     box-sizing: border-box;
     background-color: #121212;
@@ -1168,7 +1285,7 @@ a{
     color: red;
   }
   
-  @media screen and (width < 1200px) {
+  @media screen and (width < 1199px) {
     .work-shop-footer {
       padding: 80px 16px 176px;
       max-width:100%;

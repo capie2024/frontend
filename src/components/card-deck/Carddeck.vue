@@ -30,11 +30,13 @@ export default {
         loggedInUserId: null,
         token: localStorage.getItem('token'),
         created_at: null,
+        cards:[]
         };
     },
     mounted() {
         this.fetchArticleId();
         this.fetchCurrentUser();
+        this.fetchDeck();
     },
     created() {
         this.loggedInUserId = getUserIdFromToken(this.token);
@@ -52,6 +54,22 @@ export default {
         },    
     },
     methods: {
+        async fetchDeck() {
+            try {
+                const postCode = this.$route.params.post_code;  // 获取当前路由的 post_code
+                const response = await axios.get(`http://localhost:3000/api/deck/${postCode}`);
+
+                // 遍历所有 deck_list，获取每个 deck 的信息
+                const deckList = response.data[0].deck_list;
+                this.deckName = deckList.deck_name;  // 获取 deck_name
+                this.cards = deckList.deck;  // 获取所有 deck 中的卡片
+
+                console.log('Deck Name:', this.deckName);
+                console.log('All cards:', this.cards);
+            } catch (error) {
+                console.error('Failed to fetch specific deck:', error);
+            }
+        },
         async fetchCurrentUser() {
             try {
                 const userToken = localStorage.getItem("token");
@@ -643,34 +661,6 @@ export default {
                             </section>
                         </div>
                     </div>
-                    <div class="card-info">
-                        <div class="row">
-                        <div class="col-Info" v-for="(card, index) in seriesCardList" :key="card.id" @click.stop="addCard(card)" >
-                            <div class="card-info-image">
-                            <img :src="card.cover">
-                            <div class="card-inner-info" @click.stop="getCardInfoAndShow(card)" >
-                                <div class="card-inner-info-header">
-                                <p>{{ card.id }}</p>
-                                <p>{{ card.rare }}</p>
-                                </div>
-                                <h3>{{ card.title }}</h3>
-                                <div class="details">
-                                <div><span :class="`bg-${card.color}`" >類型</span>{{ card.typeTranslate }}</div>
-                                <div><span :class="`bg-${card.color}`" >魂傷</span>{{ card.soul }}</div>
-                                <div><span :class="`bg-${card.color}`" >等級</span>{{ card.level }}</div>
-                                <div><span :class="`bg-${card.color}`" >攻擊</span>{{ card.attack }}</div>
-                                <div><span :class="`bg-${card.color}`" >費用</span>{{ card.cost }}</div>
-                                </div>
-                                <div class="price-download">
-                                <p>${{ card.price.number }}</p>
-                                <button @click.stop="addCard(card)" ><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-
                     <nav class="toolbar">
                         <div class="toolbar-area1">
                             <button class="tool-btn1">
@@ -721,39 +711,34 @@ export default {
                             </button>
                         </div>
                     </nav>
-                </section>
-                <div v-if="view === 'card-info'" class="card-info">
-                    <div class="row">
-                        <div class="col-Info" v-for="(card, index) in seriesCardList" :key="card.id" @click.stop="addCard(card)" >
-                            <div class="card-info-image">
-                                <img :src="card.cover">
-                                <div class="card-inner-info" @click.stop="getCardInfoAndShow(card)" >
-                                    <div class="card-inner-info-header">
-                                        <p>{{ card.id }}</p>
-                                        <p>{{ card.rare }}</p>
-                                    </div>
-                                    <h3>{{ card.title }}</h3>
-                                    <div class="details">
-                                        <div><span :class="`bg-${card.color}`" >類型</span>{{ card.typeTranslate }}</div>
-                                        <div><span :class="`bg-${card.color}`" >魂傷</span>{{ card.soul }}</div>
-                                        <div><span :class="`bg-${card.color}`" >等級</span>{{ card.level }}</div>
-                                        <div><span :class="`bg-${card.color}`" >攻擊</span>{{ card.attack }}</div>
-                                        <div><span :class="`bg-${card.color}`" >費用</span>{{ card.cost }}</div>
-                                    </div>
-                                    <div class="price-download">
-                                            <p>${{ card.price.number }}</p>
-                                        <button @click.stop="addCard(card)" >
-                                            <svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path>
-                                            </svg>
-                                        </button>
+                    <div class="card-info">
+                        <div class="row">
+                            <div class="col-Info" v-for="card in cards" :key="card.id">
+                                <div class="card-info-image">
+                                    <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
+                                    <div class="card-inner-info">
+                                        <div class="card-inner-info-header">
+                                            <p>{{ card.id }}</p>
+                                            <p>{{ card.rare }}</p>
+                                        </div>
+                                        <h3>{{ card.title }}</h3>
+                                        <div class="details">
+                                            <div><span>類型</span>{{ card.typeTranslate }}</div>
+                                            <div><span>魂傷</span>{{ card.soul }}</div>
+                                            <div><span>等級</span>{{ card.level }}</div>
+                                            <div><span>攻擊</span>{{ card.attack }}</div>
+                                            <div><span>費用</span>{{ card.cost }}</div>
+                                        </div>
+                                        <div class="price-download">
+                                            <p> ${{ card.price.number }} </p>
+                                        <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
+                </section>
                 <nav class="footer-nav">
                     <a class="nav-link" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
@@ -817,7 +802,7 @@ export default {
     }
 
     .card-image {
-    display: flex;
+    /* display: flex; */
     position: relative;
     object-fit: cover;
     border-radius:10px ;
@@ -828,7 +813,7 @@ export default {
     }
 
     .col-Sheet, .col-Info {
-    width:20%;
+    width: calc((100% - 10px)/4);
     }
 
     .card-image img {
@@ -902,6 +887,8 @@ export default {
     .card-info {
     padding: 20px;
     box-sizing: border-box;
+    position: absolute;
+    top: 580px;
     }
 
     .card-info-image {
@@ -1673,10 +1660,11 @@ export default {
     main {
         margin-top: 8px;
         position: relative;
-        width: calc(100% - 8px);
+        /* width: calc(100% - 8px); 
         /* height: calc(100vh - 1rem); */
         height: auto;
         overflow: hidden;
+        overflow-y: scroll;
         scroll-behavior: smooth;
         border-radius: 20px 20px 0 0;
     }
@@ -1942,7 +1930,7 @@ export default {
         display: flex;
         margin-left: 24px;
         position: absolute; 
-        top: 450px;  
+        top: 550px;  
         /* display: none; */
     }
 
@@ -2241,7 +2229,18 @@ export default {
         margin-left: 5px;
     }
 
+    @media screen and (min-width: 1400px) {
+        .col-Sheet, .col-Info {
+            width: calc((100% - 10px) / 5);
+        }
+
+    }
+
     @media screen and (max-width: 1199px) {
+        .col-Sheet, .col-Info {
+            width: calc((100% - 10px) / 3);
+        }
+
         textarea {
             color: white !important;
             text-align: left !important;
@@ -2455,6 +2454,13 @@ export default {
             position: static;
             /* display: none; */
         } 
+    }
+
+    @media screen and (max-width: 768px) {
+        .col-Sheet, .col-Info {
+            width: calc((100% - 10px) / 2);
+        }
+
     }
 
     @media screen and (max-width: 410px) {

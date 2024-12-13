@@ -194,7 +194,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     newSeriesCardList.value = seriesCardList.value;
     // console.log("舊陣列：" + seriesCardList.value + "新陣列：" + newSeriesCardList.value);
 
-    // 這一列是在測試下面寫的篩選相關function能不能正常用
+    // 測試下面寫的篩選相關function能不能正常使用
     if (keyWord != "") {
       keyWordFilter(keyWord);
     }
@@ -202,16 +202,79 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     // colorSort();
     // priceSort();
     typeSort();
-    colorFilter();
-    levelFilter();
-    costFilter();
-    soulFilter();
-    attackFilter();
-    rareFilter();
-
-
-    // console.log(filterVaribleSet.attackFilter0,"測試");
     
+    if(filterVaribleSet.levelFilter0 || filterVaribleSet.levelFilter1 || filterVaribleSet.levelFilter2 || filterVaribleSet.levelFilter3){
+      levelFilter();
+      console.log("已執行等級篩選");
+    }
+
+    if(filterVaribleSet.colorFilterRed || filterVaribleSet.colorFilterBlue || filterVaribleSet.colorFilterYellow){
+      colorFilter();
+      console.log("已執行顏色篩選");
+    }
+    
+    if(filterVaribleSet.costFilter0 || filterVaribleSet.costFilter1 || filterVaribleSet.costFilter2){
+      costFilter();
+      console.log("已執行花費篩選");
+    }
+
+    if(filterVaribleSet.soulFilter0 || filterVaribleSet.soulFilter1 || filterVaribleSet.soulFilter2){
+      soulFilter();
+      console.log("已執行魂傷篩選");
+    }
+
+    if(
+      filterVaribleSet.attackFilter0 || 
+      filterVaribleSet.attackFilter500 || 
+      filterVaribleSet.attackFilter1000 || 
+      filterVaribleSet.attackFilter1500 || 
+      filterVaribleSet.attackFilter2000 || 
+      filterVaribleSet.attackFilter2500 || 
+      filterVaribleSet.attackFilter3000 || 
+      filterVaribleSet.attackFilter3500 || 
+      filterVaribleSet.attackFilter4000 || 
+      filterVaribleSet.attackFilter4500 ||
+      filterVaribleSet.attackFilter5000 ||
+      filterVaribleSet.attackFilter5500 ||
+      filterVaribleSet.attackFilter6000 ||
+      filterVaribleSet.attackFilter6500 ||
+      filterVaribleSet.attackFilter7000 ||
+      filterVaribleSet.attackFilter7500 ||
+      filterVaribleSet.attackFilter8000 ||
+      filterVaribleSet.attackFilter8500 ||
+      filterVaribleSet.attackFilter9000 ||
+      filterVaribleSet.attackFilter9500 ||
+      filterVaribleSet.attackFilter10000 ||
+      filterVaribleSet.attackFilter10500 ||
+      filterVaribleSet.attackFilter11000
+    ){
+      attackFilter();
+      console.log("已執行攻擊力篩選");
+    }
+
+    if(
+      filterVaribleSet.rareFilterRR ||
+      filterVaribleSet.rareFilterSSP ||
+      filterVaribleSet.rareFilterLRR ||
+      filterVaribleSet.rareFilterR ||
+      filterVaribleSet.rareFilterSR ||
+      filterVaribleSet.rareFilterOFR ||
+      filterVaribleSet.rareFilterU ||
+      filterVaribleSet.rareFilterC ||
+      filterVaribleSet.rareFilterCR ||
+      filterVaribleSet.rareFilterRRR ||
+      filterVaribleSet.rareFilterCC ||
+      filterVaribleSet.rareFilterPR ||
+      filterVaribleSet.rareFilterTD ||
+      filterVaribleSet.rareFilterSP ||
+      filterVaribleSet.rareFilterN ||
+      filterVaribleSet.rareFilterLRP ||
+      filterVaribleSet.rareFilterSIR
+    ){
+      rareFilter();
+      console.log("已執行稀有度篩選");
+    }
+
     // 篩選完後把新的陣列賦值給seriesCardList
     seriesCardList.value = newSeriesCardList.value;
   };
@@ -378,7 +441,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
           const checkHaveCard = typeSortArr.value.find((item) => {
             return item === card;
           });
-          if (checkHaveCard === undefined) {
+          if (!checkHaveCard) {
             typeSortArr.value.push(card);
           }
         }
@@ -390,7 +453,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
           const checkHaveCard = typeSortArr.value.find((item) => {
             return item === card;
           });
-          if (checkHaveCard === undefined) {
+          if (!checkHaveCard) {
             typeSortArr.value.push(card);
           }
         }
@@ -402,7 +465,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
           const checkHaveCard = typeSortArr.value.find((item) => {
             return item === card;
           });
-          if (checkHaveCard === undefined) {
+          if (!checkHaveCard) {
             typeSortArr.value.push(card);
           }
         }
@@ -415,7 +478,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   // 等級篩選排序
   const levelFilter = () => {
     const levelFilterArr = ref([]);
-    if (levelFilter0.value) {
+    if (filterVaribleSet.levelFilter0) {
       newSeriesCardList.value.forEach((card) => {
         if (card.level === 0) {
           const checkHaveCard = levelFilterArr.value.find((item) => {
@@ -427,7 +490,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       });
     }
-    if (levelFilter1.value) {
+    if (filterVaribleSet.levelFilter1) {
       newSeriesCardList.value.forEach((card) => {
         if (card.level === 1) {
           const checkHaveCard = levelFilterArr.value.find((item) => {
@@ -439,7 +502,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       });
     }
-    if (levelFilter2.value) {
+    if (filterVaribleSet.levelFilter2) {
       newSeriesCardList.value.forEach((card) => {
         if (card.level === 2) {
           const checkHaveCard = levelFilterArr.value.find((item) => {
@@ -451,7 +514,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       });
     }
-    if (levelFilter3.value) {
+    if (filterVaribleSet.levelFilter3) {
       newSeriesCardList.value.forEach((card) => {
         if (card.level === 3) {
           const checkHaveCard = levelFilterArr.value.find((item) => {
@@ -461,7 +524,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
             levelFilterArr.value.push(card);
           }
         }
-      });
+      });      
     }
     console.log(levelFilterArr.value);
     newSeriesCardList.value = levelFilterArr.value;
@@ -601,7 +664,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     const attackFilterArr = ref([]);
     if (filterVaribleSet.attackFilter0) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 0) {
+        if (card.attack == 0) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -613,7 +676,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 500) {
+        if (card.attack == 500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -625,7 +688,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter1000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 1000) {
+        if (card.attack == 1000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -637,7 +700,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter1500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 1500) {
+        if (card.attack == 1500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -649,7 +712,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter2000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 2000) {
+        if (card.attack == 2000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -661,7 +724,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter2500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 2500) {
+        if (card.attack == 2500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -673,7 +736,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter3000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 3000) {
+        if (card.attack == 3000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -685,7 +748,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter3500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 3500) {
+        if (card.attack == 3500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -697,7 +760,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter4000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 4000) {
+        if (card.attack == 4000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -709,7 +772,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter4500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 4500) {
+        if (card.attack == 4500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -721,7 +784,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter5000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 5000) {
+        if (card.attack == 5000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -733,7 +796,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter5500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 5500) {
+        if (card.attack == 5500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -745,7 +808,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter6000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 6000) {
+        if (card.attack == 6000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -757,7 +820,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter6500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 6500) {
+        if (card.attack == 6500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -769,7 +832,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter7000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 7000) {
+        if (card.attack == 7000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -781,7 +844,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter7500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 7500) {
+        if (card.attack == 7500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -793,7 +856,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter8000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 8000) {
+        if (card.attack == 8000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -805,7 +868,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter8500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 8500) {
+        if (card.attack == 8500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -817,7 +880,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter9000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 9000) {
+        if (card.attack == 9000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -829,7 +892,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter9500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 9500) {
+        if (card.attack == 9500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -841,7 +904,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter10000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 10000) {
+        if (card.attack == 10000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -853,7 +916,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter10500) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 10500) {
+        if (card.attack == 10500) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });
@@ -865,7 +928,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
     if (filterVaribleSet.attackFilter11000) {
       newSeriesCardList.value.forEach((card) => {
-        if (card.attack <= 11000) {
+        if (card.attack == 11000) {
           const checkHaveCard = attackFilterArr.value.find((item) => {
             return item === card;
           });

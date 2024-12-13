@@ -143,7 +143,7 @@ const router = createRouter({
       component: RemitCardNf,
       path: "/deck",
       name: "deck",
-      component: MyCardView
+      component: MyCard,
     },
     {
       path: '/auth-success',

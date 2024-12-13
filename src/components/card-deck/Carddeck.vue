@@ -30,7 +30,9 @@ export default {
         loggedInUserId: null,
         token: localStorage.getItem('token'),
         created_at: null,
-        cards:[]
+        cards:[],
+        sortBy: '', 
+        sortedCards: [],
         };
     },
     mounted() {
@@ -38,6 +40,7 @@ export default {
         this.fetchCurrentUser();
         this.fetchDeck();
     },
+
     created() {
         this.loggedInUserId = getUserIdFromToken(this.token);
         console.log("Logged in user ID:", this.loggedInUserId);
@@ -51,9 +54,30 @@ export default {
                 if (!createdAt) return "未知時間";
                 return dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss");
             };
-        },    
-    },
+        },
+        // 根據目前選擇的排序屬性返回排序後的卡片
+        sortedCards() {
+                let sortedCards = [...this.cards];  // 複製卡片資料
+                console.log('Before sorting:', sortedCards); 
+                if (this.sortBy === 'level') {
+                    sortedCards.sort((a, b) => a.level - b.level);  // 依照等級升序排列
+                } else if (this.sortBy === 'type') {
+                    sortedCards.sort((a, b) => a.typeTranslate.localeCompare(b.typeTranslate));  // 依照類型字母順序排列
+                } else if (this.sortBy === 'rare') {
+                    sortedCards.sort((a, b) => a.rare.localeCompare(b.rare, 'en'));  // 依照稀有度字母順序排列
+                }
+                console.log('After sorting:', sortedCards);  // 打印排序後的資料
+                return sortedCards;
+            },    
+        },
     methods: {
+         // 設定排序方式
+        sortCards(property) {
+            if (this.sortBy !== property) {
+                this.sortBy = property;
+                console.log('After sorting:', this.sortedCards);
+            }
+        },        
         async fetchDeck() {
             try {
                 const postCode = this.$route.params.post_code;  // 获取当前路由的 post_code
@@ -63,6 +87,7 @@ export default {
                 const deckList = response.data[0].deck_list;
                 this.deckName = deckList.deck_name;  // 获取 deck_name
                 this.cards = deckList.deck;  // 获取所有 deck 中的卡片
+                console.log(this.cards);
 
                 console.log('Deck Name:', this.deckName);
                 console.log('All cards:', this.cards);
@@ -663,7 +688,7 @@ export default {
                     </div>
                     <nav class="toolbar">
                         <div class="toolbar-area1">
-                            <button class="tool-btn1">
+                            <button class="tool-btn1" @click="sortCards('type')">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>類型</span>
                             </button>
@@ -671,11 +696,11 @@ export default {
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>顏色</span>
                             </button>
-                            <button class="tool-btn1">
+                            <button class="tool-btn1" @click="sortCards('level')">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>等級</span>
                             </button>
-                            <button class="tool-btn1" style="min-width: 86px">
+                            <button class="tool-btn1" style="min-width: 86px" @click="sortCards('rare')">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>稀有度</span>
                             </button>
@@ -713,9 +738,9 @@ export default {
                     </nav>
                     <div class="card-info">
                         <div class="row">
-                            <div class="col-Info" v-for="card in cards" :key="card.id">
+                            <div class="col-Info" v-for="card in sortedCards" :key="card.id">
                                 <div class="card-info-image">
-                                    <img src="https://jasonxddd.me:7001/imgproxy/4nZhC0JVu4aRvo6ml6VI37hURt9V19vRRN5Wo54yrqU/g:no/el:1/bG9jYWw6Ly8vL0xSQ19XMTA1XzAwMS5wbmc.png">
+                                    <img :src="card.cover">
                                     <div class="card-inner-info">
                                         <div class="card-inner-info-header">
                                             <p>{{ card.id }}</p>

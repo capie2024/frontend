@@ -1,9 +1,3 @@
-
-
-<script setup>
-</script>
-
-
 <template>
     <section  class="modal fade" id="remit" tabindex="-1" aria-labelledby="remitLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -24,18 +18,21 @@
                         </h3>
                     </div>
                     <div class="input-button  ">
-                        <button   class="button-remit item z-20 "><svg data-v-41768621=""
+                        <button :class="{ active: buttons[0] }" @click="toggleActive(0)" class="button-remit item z-20  focus-button">
+                        <svg data-v-41768621=""
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z">
                                 </path>
                             </svg>
-                            <span data-v-41768621="" class="text-sm font-mono">匯出牌組</span>
+                            <span data-v-41768621="" class="text-sm font-mono">牌組編號</span>
                         </button>
 
                         <div data-v-41768621="" class="input-item-2 ">
-                            <input data-v-41768621="" class="input-text" id="input-text" type="text" placeholder="代碼" v-model="deckId">
+
+                            <input class="input-text" id="input-text" type="text" placeholder="代碼" v-model="deckId" @input="checkDeckId">
+                            
                             <button  class="input-button-2 item default-transition" id="input-button-2">
                                 <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon-input size-6">
@@ -45,13 +42,25 @@
                                 </svg>
                             </button>
                         </div>
-             
-                        <div data-v-41768621="" class="show-text-green">
-                            <div data-v-41768621="" class="">
-                                <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
-                                </svg>
-                            </div>
-                            <span data-v-41768621="" class="font-mono truncate text-green-500">找到：牌組 </span>
+
+                        <!-- 當 deckId 有對應的牌組時顯示綠色提示 -->
+                        <div v-if="deckValid" class="show-text-green">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
+                            </svg>
+                        </div>
+                        <span class="font-mono truncate text-green-500">找到牌組</span>
+                        </div>
+
+                        <!-- 當 deckId 沒有對應的牌組時顯示紅色提示 -->
+                        <div v-if="deckInvalid" class="show-text-red">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                            </svg>
+                        </div>
+                        <span>無效代碼</span>
                         </div>
                     </div>
                     <div class="modal-body">
@@ -62,41 +71,38 @@
                         </h3>
                     </div>
                     
-                        
-                    
                     <div class="input-button  ">
-                        <button  class="button-remit item">
+                        <button  class="button-remit item focus-button"   :class="{ active: buttons[1] }" @click="toggleActive(1)">
                             <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"> 
                             </path>
                             </svg>
                                 <span class="text-sm font-mono">PDF</span>
                         </button>
-                     
                     </div>
     
-                    <div class="modal-body">
+                    <!-- <div class="modal-body">
                         <h3 data-v-41768621="" class="topic my-4"> 選擇紙張大小</h3>
                         <div data-v-41768621="" class="grid grid-cols-2 gap-2">
-                            <button  class="item default-transition active button-remit-div " id="button-remit-div">
+                            <button  class="item default-transition active button-remit-div  focus-button" id="button-remit-div"  :class="{ active: buttons[2] }" @click="toggleActive(2)">
                                 <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path>
                                 </svg>
                                 <span class="text-sm font-mono">A4</span>
                             </button>
                         </div>
-                        
-                    </div>
-                   
-
+                    </div> -->
 
                     <div data-v-c3ac02c2="" class="seeting">
-                                <button  class="item  justify-center default-transition gray setting-text" id="setting-text" @click="exportToPDF">
-                                    <svg data-v-c3ac02c2="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path></svg>
+                                <button  class="item  justify-center default-transition gray setting-text" id="setting-text" @click="exportToPDF" :disabled="!allButtonsActive"
+                                :class="{'black': allButtonsActive, 'gray': !allButtonsActive}">
+                                    <svg data-v-c3ac02c2="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
+                                    </svg>
                                     <span class="text-sm font-mono input-text" id="input-text"> 設定完成 </span>
                                 </button>
-                            </div>
                     </div>
+                </div>
                         
             </div>
             
@@ -110,7 +116,17 @@
         border: 0 solid #e5e7eb;
         box-sizing: border-box;
     }
-    
+    .gray {
+        background-color: gray;
+        color: white;
+        cursor: not-allowed;
+    }
+
+    .black {
+        background-color: #121212;
+        color: black;
+        cursor: pointer;
+    }
     .modal  {
         position: relative;
         top: 0;
@@ -124,6 +140,7 @@
     .modal-content {
         background-color: rgb(18,18,18);
         border-radius:10px ;
+        width: 551px;
     }
     
     .modal-title {
@@ -141,12 +158,12 @@
         padding-left: 5px;
         width: 100%;
         height: 40px;
-        background-color:transparent;
+        background-color:transparent ;
         color: #e5e7eb;
         border-style: none;
     }
     #input-text:focus-visible {
-        border-color: transparent ;
+        border-color: transparent !important ;
         outline: none;
     }
     
@@ -257,13 +274,11 @@
         align-items: center;
         border:1px solid #a1a1aa ;
     }
-    
     .button-remit:focus {
         background:linear-gradient(to right,#3b82f6 ,#06b6d4);
         --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
         color: rgb(255 255 255 / var(--tw-text-opacity));
         --tw-shadow-color: rgba(14, 165, 233, .5);
-        /* --tw-shadow: var(--tw-shadow-colored); */
         color: white;
         width: 142px;
         height: 64px;
@@ -276,7 +291,7 @@
     }
 
 
-    .button-remit-div {
+    #button-remit-div {
         align-items: center;
         border-radius:20px;
         display: flex;
@@ -284,27 +299,28 @@
         white-space:nowrap;
         height: 64px;
         color: rgb(255, 255, 255);
-        background-color: #18181b80;
-        align-items: center;
+        background-color: transparent !important;
+        align-items: center; 
     }
     #button-remit-div{
         padding: 0.5rem 0.5rem ;
     }
 
-    .button-remit-div:focus {
-        background:linear-gradient(to right,#3b82f6 ,#06b6d4);
-        --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
-        color: rgb(255 255 255 / var(--tw-text-opacity));
-        --tw-shadow-color: rgba(14, 165, 233, .5);
-        /* --tw-shadow: var(--tw-shadow-colored); */
-        color: white;
-        height: 64px;
-        display: flex;
-        align-items: center;
-        border-radius: 20px;
-        white-space:nowrap;
-        gap: .5rem;
-       
+
+    .button-remit.active {
+    background: linear-gradient(to right, #3b82f6, #06b6d4);
+    color: white;
+    }
+
+    .button-remit:hover {
+    background-color: #27272a;
+    }
+    .button-remit-div:not(.active):hover {
+    background-color: #27272a; /* 僅對未激活按鈕應用懸停效果 */
+    }
+    .button-remit-div.active{
+    background: linear-gradient(to right, #3b82f6, #06b6d4);
+    color: white;
     }
     
     .input-item-2 {
@@ -397,18 +413,65 @@
     
 </style>
     
-<script>
-    import jsPDF from "jspdf";
-    
-    
-    export default {
-      data() {
-        return {
-          deckId: '', // 用來儲存用戶輸入的 Deck ID
-        };
-      },
-        methods:{
-      async exportToPDF() {
+<script >
+import jsPDF from "jspdf";
+import axios from "axios";
+
+export default {
+    data() {
+    return {
+      deckId: "", // 用來儲存用戶輸入的 Deck ID
+      buttons: [false, false], // 按鈕的狀態分別是 false
+      deckValid: false, // 判斷是否有對應的牌組
+      deckInvalid: false, // 判斷是否為無效代碼
+    };
+  },
+  computed: {
+    // 計算屬性：判斷所有按鈕是否都是 active 狀態
+    allButtonsActive() {
+      return this.buttons.every((isActive) => isActive);
+    },
+  },
+  methods: {
+    // 切換按鈕的 active 狀態
+    toggleActive(index) {
+      // 僅在點擊自身範圍時切換樣式
+      this.buttons[index] = !this.buttons[index];
+    },
+    async checkDeckId() {
+      if (this.deckId && this.deckId.length >= 5) {
+        try {
+        console.log("Checking deck ID:", this.deckId); 
+        // 發送 API 請求檢查 deckId 是否存在
+      const response = await axios.get(`http://localhost:3000/api/cardPDF?deckId=${this.deckId}`);
+      
+      // 假設如果返回資料中包含 deck_name，表示有效
+      if (response.data && response.data.deck_name) {
+        this.deckValid = true;
+        this.deckInvalid = false;
+      } else {
+        this.deckValid = false;
+        this.deckInvalid = true;
+      }
+    } catch (error) {
+      console.error('Error checking deck ID:', error);
+      
+      // 如果是 404 錯誤，顯示無效代碼
+      if (error.response && error.response.status === 404) {
+        this.deckValid = false;
+        this.deckInvalid = true;
+      } else {
+        this.deckValid = false;
+        this.deckInvalid = false;
+      }
+    }
+  } else {
+    // 如果 deckId 少於 5 個字元，不進行檢查
+    this.deckValid = false;
+    this.deckInvalid = false;
+  }
+    },
+async exportToPDF() {
         console.log("開始執行匯出 PDF");
         if (!this.deckId) {
             alert("請輸入牌組代碼");

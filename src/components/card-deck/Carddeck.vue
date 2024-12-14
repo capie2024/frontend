@@ -31,8 +31,9 @@ export default {
         token: localStorage.getItem('token'),
         created_at: null,
         cards:[],
-        sortBy: '', 
         sortedCards: [],
+        sortBy: "typeTranslate",
+        groupedCards: [],
         };
     },
     mounted() {
@@ -55,29 +56,71 @@ export default {
                 return dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss");
             };
         },
-        // 根據目前選擇的排序屬性返回排序後的卡片
-        sortedCards() {
-                let sortedCards = [...this.cards];  // 複製卡片資料
-                console.log('Before sorting:', sortedCards); 
-                if (this.sortBy === 'level') {
-                    sortedCards.sort((a, b) => a.level - b.level);  // 依照等級升序排列
-                } else if (this.sortBy === 'type') {
-                    sortedCards.sort((a, b) => a.typeTranslate.localeCompare(b.typeTranslate));  // 依照類型字母順序排列
-                } else if (this.sortBy === 'rare') {
-                    sortedCards.sort((a, b) => a.rare.localeCompare(b.rare, 'en'));  // 依照稀有度字母順序排列
-                }
-                console.log('After sorting:', sortedCards);  // 打印排序後的資料
-                return sortedCards;
-            },    
-        },
-    methods: {
-         // 設定排序方式
-        sortCards(property) {
-            if (this.sortBy !== property) {
-                this.sortBy = property;
-                console.log('After sorting:', this.sortedCards);
+        groupedCards() {
+            let sorted = [];
+            if (this.sortBy === "level") {
+                sorted = [...this.cards].sort((a, b) => a.level - b.level);
+            } 
+            else if (this.sortBy === "color") {
+                const colorOrder = ["red", "yellow", "green", "blue"];
+                sorted = [...this.cards].sort((a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color));
+            } 
+            else if (this.sortBy === "typeTranslate") {
+                const typeOrder = ["角色", "事件", "名場"];
+                sorted = [...this.cards].sort((a, b) => typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate));
+            } 
+            else if (this.sortBy === "rare") {
+                sorted = [...this.cards].sort((a, b) => {
+                    if (a.rare.length !== b.rare.length) {
+                        return a.rare.length - b.rare.length;
+                    }
+                return a.rare.localeCompare(b.rare, "en");
+                });
+            } 
+            else if (this.sortBy === "seriesCode") {
+                sorted = [...this.cards].sort((a, b) => a.seriesCode.localeCompare(b.seriesCode, "en"));
+            }else{
+                sorted = [...this.cards];
             }
-        },        
+            // 分組邏輯
+            const grouped = sorted.reduce((acc, card) => {
+            const groupKey = card[this.sortBy]; // 根據當前的 sortBy 屬性作為分組依據
+            if (!acc[groupKey]) {
+                acc[groupKey] = [];
+            }
+            acc[groupKey].push(card);
+                return acc;
+            }, {});
+
+            // 定義顏色對應表
+            const colorMap = {
+                    red: "紅色",
+                    yellow: "黃色",
+                    green: "綠色",
+                    blue: "藍色",
+                };
+
+            // 等級轉換為中文格式
+            const levelLabel = (level) => `${level}等`;
+
+            // 根據 sortBy 動態轉換分組鍵值
+            return Object.entries(grouped).map(([key, cards]) => ({
+                group: this.sortBy === "color"
+                    ? colorMap[key] || key // 顏色轉換
+                    : this.sortBy === "level"
+                    ? levelLabel(key)      // 等級轉換
+                    : key,                 // 其他保持原值
+                cards,
+            }));        
+        },    
+    },
+    methods: {
+        countSoulCards(cards) {
+            return cards.filter(card => card.trigger.includes('soul')).length;
+        },
+        setSortBy(property) {
+            this.sortBy = property; // 設定排序條件
+        },
         async fetchDeck() {
             try {
                 const postCode = this.$route.params.post_code;  // 获取当前路由的 post_code
@@ -688,43 +731,36 @@ export default {
                     </div>
                     <nav class="toolbar">
                         <div class="toolbar-area1">
-                            <button class="tool-btn1" @click="sortCards('type')">
+                            <button class="tool-btn1" @click="setSortBy('typeTranslate')"
+                            :class="{'active': sortBy === 'typeTranslate'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>類型</span>
                             </button>
-                            <button class="tool-btn1">
+                            <button class="tool-btn1" @click="setSortBy('color')"
+                            :class="{'active': sortBy === 'color'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>顏色</span>
                             </button>
-                            <button class="tool-btn1" @click="sortCards('level')">
+                            <button class="tool-btn1" @click="setSortBy('level')"
+                            :class="{'active': sortBy === 'level'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>等級</span>
                             </button>
-                            <button class="tool-btn1" style="min-width: 86px" @click="sortCards('rare')">
+                            <button class="tool-btn1" style="min-width: 86px" @click="setSortBy('rare')"
+                            :class="{'active': sortBy === 'rare'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>稀有度</span>
                             </button>
-                            <button class="tool-btn1">
+                            <button class="tool-btn1" @click="setSortBy('seriesCode')"
+                            :class="{'active': sortBy === 'seriesCode'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>商品</span>
                             </button>
-                            <button class="func-btn func-btn1">
-                                <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z"></path></svg>
-                                <div class="func-text func-text1">開啟劇院模式</div>
-                            </button>
                         </div>
                         <div class="toolbar-area2">
-                            <button class="func-btn func-btn2">
-                                <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"></path></svg>
-                                <div class="func-text func-text2">關閉堆疊</div>
-                            </button>
                             <button class="func-btn func-btn3">
                                 <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg>
                                 <div class="func-text func-text3">開啟價格</div>
-                            </button>
-                            <button class="func-btn func-btn4">
-                                <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"></path></svg>
-                                <div class="func-text func-text4">列表清單</div>
                             </button>
                             <button class="func-btn func-btn5">
                                 <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"></path></svg>
@@ -736,27 +772,37 @@ export default {
                             </button>
                         </div>
                     </nav>
+
                     <div class="card-info">
-                        <div class="row">
-                            <div class="col-Info" v-for="card in sortedCards" :key="card.id">
-                                <div class="card-info-image">
-                                    <img :src="card.cover">
-                                    <div class="card-inner-info">
-                                        <div class="card-inner-info-header">
-                                            <p>{{ card.id }}</p>
-                                            <p>{{ card.rare }}</p>
-                                        </div>
-                                        <h3>{{ card.title }}</h3>
-                                        <div class="details">
-                                            <div><span>類型</span>{{ card.typeTranslate }}</div>
-                                            <div><span>魂傷</span>{{ card.soul }}</div>
-                                            <div><span>等級</span>{{ card.level }}</div>
-                                            <div><span>攻擊</span>{{ card.attack }}</div>
-                                            <div><span>費用</span>{{ card.cost }}</div>
-                                        </div>
-                                        <div class="price-download">
-                                            <p> ${{ card.price.number }} </p>
-                                        <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
+                        <div class="row" v-for="group in groupedCards" :key="group.group">
+                            <div class="card-info-header">
+                                <h2 class="group-title">{{ group.group || '未分類'}} - {{ group.cards.length }}</h2>
+                                <div class="group-count" data-v-1d946842="">
+                                    <img data-v-1d946842="" src="https://bottleneko.app/soul.gif" class="size-4">
+                                    <span data-v-1d946842="" class="font-mono flex-none">{{ countSoulCards(group.cards) }}</span>
+                                </div>
+                            </div>
+                            <div class="card-row">
+                                <div class="col-Info" v-for="card in group.cards" :key="card.index">
+                                    <div class="card-info-image">
+                                        <img :src="card.cover">
+                                        <div class="card-inner-info">
+                                            <div class="card-inner-info-header">
+                                                <p>{{ card.id }}</p>
+                                                <p>{{ card.rare }}</p>
+                                            </div>
+                                            <h3>{{ card.title }}</h3>
+                                            <div class="details">
+                                                <div><span>類型</span>{{ card.typeTranslate }}</div>
+                                                <div><span>魂傷</span>{{ card.soul }}</div>
+                                                <div><span>等級</span>{{ card.level }}</div>
+                                                <div><span>攻擊</span>{{ card.attack }}</div>
+                                                <div><span>費用</span>{{ card.cost }}</div>
+                                            </div>
+                                            <div class="price-download">
+                                                <p> ${{ card.price.number }} </p>
+                                            <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -819,11 +865,51 @@ export default {
 </template>
 
 <style scoped>
-    .row {
+    .tool-btn1.active{
+        background: linear-gradient(45deg, #7dca31, #21b8c8);
+    }
+
+    .card-row{
     display: flex;
     flex-wrap: wrap;
     margin: 0 -5px;
     box-sizing: border-box;
+
+    }
+
+    .card-info-header{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+    margin-top: 3rem;
+    }
+
+    .group-count{
+    display: flex;
+    align-items: center;
+    gap: 4px; 
+    background-color: #1e1e1e;
+    border-radius: 9999px;
+    padding: 4px 8px;
+    color: white;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    margin-left: 1rem;
+    }
+
+    .group-title{
+    color: white;
+    display: block;
+    font-weight: 700;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: column;
     }
 
     .card-image {
@@ -914,6 +1000,8 @@ export default {
     box-sizing: border-box;
     position: absolute;
     top: 580px;
+    display: flex;
+    flex-direction: column;
     }
 
     .card-info-image {

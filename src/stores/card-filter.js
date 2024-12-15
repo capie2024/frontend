@@ -11,14 +11,12 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   //APPLY按鈕變數
   const applyBtnStatus = ref(false);
 
-  //AND按鈕變數
-  const replaceKeyWord = ref(false);
-
   // 篩選用空陣列
   const newSeriesCardList = ref([]);
 
   // 升降排序變數集合
   const filterVaribleSet = reactive({
+    keyWord: "",
     replaceKeyWord: false,
     upDownSortArray: [],
     levelUpSort: false,
@@ -122,6 +120,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     } else {
       filterVaribleSet.replaceKeyWord = true;
     }
+    console.log("目前是否使用AND:" + filterVaribleSet.replaceKeyWord);
   };
 
   // 篩選選項狀態切換
@@ -183,6 +182,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       console.log("priceDownSort:" + filterVaribleSet.priceDownSort);
     }
     checkHaveFilterOrSort();
+    console.log(filterVaribleSet.upDownSortArray);
     console.log("已切換升降排序狀態");
   }
 
@@ -266,6 +266,24 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   // 重置部分篩選
   const resetFilter = async(filterArr) => {
     console.log(filterArr);
+    const checkUpDownSort = filterArr.find((item) => {
+      return item === 'upDownSortArray' ||
+      item === 'levelUpSort' ||
+      item === 'levelDownSort' ||
+      item === 'colorUpSort' ||
+      item === 'colorDownSort' ||
+      item === 'priceUpSort' ||
+      item === 'priceDownSort';
+    })
+
+    if(checkUpDownSort){
+      filterVaribleSet.upDownSortArray = [];
+    }
+
+    const checkHaveKeyWord = filterArr.find((item) => {
+      
+    })
+
     filterArr.forEach((item) => {
       filterVaribleSet[item] = false;
     })

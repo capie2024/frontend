@@ -72,6 +72,9 @@ const priceOrder = computed(() => {
   })
   return index + 1
 })
+const replaceWord = computed(()=> {
+  return filterVaribleSet.replaceKeyWord ? 'OR' : 'AND'
+})
 
 // 清除牌組並回到第一步編輯牌組的狀態
 const clearDeckAndBacktoFirstStep = async() => {
@@ -170,15 +173,13 @@ const finalStep = async() => {
 const filterCount = ref(0);
 const sortCount = ref(0);
 
-// 關鍵字篩選的值
-const keyWord = ref('');
 
 // 關鍵字篩選的狀態
 const handleKeyWord = () => {
-  if(keyWord.value.trim() != ''){
+  if(filterVaribleSet.keyWord.trim() != ''){
     applyBtnStatus.value = true
     console.log("更新關鍵字");
-  }else if(keyWord.value.trim() == ''){
+  }else if(filterVaribleSet.keyWord.trim() == ''){
       checkHaveFilterOrSort();
       console.log("目前關鍵字為空");
   }
@@ -187,7 +188,7 @@ const handleKeyWord = () => {
 // 按下apply按鈕後執行篩選功能
 const handleApplyStatus = async() => {
   if(applyBtnStatus.value === true){
-    await useFilters(keyWord.value.trim());
+    await useFilters(filterVaribleSet.keyWord.trim());
   }
 
   filterCount.value = 0;
@@ -534,7 +535,7 @@ const handleApplyStatus = async() => {
         <header class="sidebar-filter-header">
           <div class = "flex-col">
             <p>卡片篩選</p>
-            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ keyWord.trim() }}"</p>
+            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ filterVaribleSet.keyWord.trim() }}"</p>
           </div>
           <div>
             <button class="icon del-btn" @click="resetAllFilter" ><i class="fa-solid fa-trash"></i></button>
@@ -565,13 +566,13 @@ const handleApplyStatus = async() => {
               </div>
               <div v-else-if="filter.name === '關鍵字'">
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
-                  <br>當前搜尋內容： {{ keyWord.trim() }}
+                  <br>當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
                 </span>
                 <div class="input-keyword" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
-                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="keyWord" @input="handleKeyWord" >
+                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="filterVaribleSet.keyWord" @input="handleKeyWord" >
                   <div>
-                    <button @click="changeReplaceKeyWord" ><span>AND</span></button>
+                    <button @click="changeReplaceKeyWord" ><span>{{ replaceWord }}</span></button>
                     <!-- <button><span>OR</span></button> -->
                     <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
                   </div>
@@ -1040,11 +1041,11 @@ const handleApplyStatus = async() => {
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
                   <br>當前搜尋內容： ""
                 </span>
-                <div class="input-keyword" :class="{ 'input-keyword-haveValue': keyWord.trim() != '' }" >
+                <div class="input-keyword" :class="{ 'input-keyword-haveValue': filterVaribleSet.keyWord.trim() != '' }" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
                   <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋">
                   <div class="input-keyword-btn" >
-                    <button ><span>AND</span></button>
+                    <button @click="changeReplaceKeyWord" ><span>AND</span></button>
                     <!-- <button><span>OR</span></button> -->
                     <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
                   </div>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 const route = useRoute()
 const isActive = ref(false)
@@ -7,13 +7,25 @@ const isActive = ref(false)
 const changeStyle = () => {
     isActive.value = !isActive.value
 }
+
+const isLoggedIn = ref(false);
+
+const checkStatus = () => {
+  if (localStorage.getItem("token")) {
+    isLoggedIn.value = true;
+  }
+};
+
+onMounted(() => {
+  checkStatus();
+});
 </script>
 
 <template>
     <nav class="sidebar-container">
         <a href="https://bottleneko.app/" class="sidebar-head">
-            <img src="../img/bottleneko-icon.png" alt="" class="icon">
-            <img src="../img/bottleneko-icon-text.png" alt="" class="icon-text">
+            <img src="../img/capie-icon.png" alt="" class="icon">
+            <img src="../img/capie-text.png" alt="" class="icon-text">
             <h1 class="hidden">Capie</h1>
         </a>
         <ul class="sidebar-menu">
@@ -45,7 +57,7 @@ const changeStyle = () => {
                     <h2>社群</h2>
                 </router-link>
             </li>
-            <li :class="{ 'active': route.path === '/workshop' }">
+            <li class="md-workshop" :class="{ 'active': route.path === '/workshop' }">
                 <router-link to="/workshop">
                     <svg v-if="route.path === '/workshop'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03ZM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 0 0 .372-.648V7.93ZM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 0 0 .372.648l8.628 5.033Z"></path></svg>
                     <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"></path></svg>                        
@@ -59,6 +71,16 @@ const changeStyle = () => {
                     </svg>                        
                     <h2>通知</h2>
                 </a>
+            </li>
+            <li class="md-menu">
+                <router-link to="/login" v-if="!isLoggedIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path></svg>                        
+                    <h2>登入</h2>
+                </router-link>
+                <router-link to="/workshop" v-else>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path></svg>                        
+                    <h2>工作坊</h2>
+                </router-link>
             </li>
         </ul>
         <button @click="changeStyle" class="translate-btn w-full h-10 mt-4 -ml-2 pl-2 flex gap-4 items-center justify-start rounded-lg text-zinc-400 hover:text-white" :class="{ active: isActive }">
@@ -142,22 +164,6 @@ const changeStyle = () => {
     color: white;
 }
 
-/* .sidebar-menu li.active svg {
-  stroke: white;
-} */
-
-.translate-btn {
-    /* display: flex;
-    align-items: center;
-    gap: 8px;
-    border-radius: 10px;
-    border: none;
-    color: #a1a1aa;
-    margin-top: 20px;
-    cursor: pointer;
-    position: relative; */
-}
-
 .translate-btn.active {
     color: white;
     background: linear-gradient(45deg, #a855f7, #ec4899); 
@@ -231,7 +237,11 @@ const changeStyle = () => {
       padding: 8px 12px 12px;
       box-sizing: border-box;
     }
-  
+
+    .sidebar-menu .md-workshop {
+      display: none;
+    }
+
     .translate-btn {
       display: none;
     }

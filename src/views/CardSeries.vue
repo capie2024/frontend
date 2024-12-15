@@ -20,6 +20,7 @@ const changeFilterStatus = cardFilterStore.changeFilterStatus
 const resetFilter = cardFilterStore.resetFilter
 const changeSortStatus = cardFilterStore.changeSortStatus
 const resetAllFilter = cardFilterStore.resetAllFilter
+const checkHaveFilterOrSort = cardFilterStore.checkHaveFilterOrSort
 
 // 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore();
@@ -147,6 +148,9 @@ const finalStep = async() => {
   }
 }
 
+// 篩選、排序數量
+const filterCount = ref(0);
+const sortCount = ref(0);
 
 // 關鍵字篩選的值
 const keyWord = ref('');
@@ -155,10 +159,10 @@ const keyWord = ref('');
 const handleKeyWord = () => {
   if(keyWord.value.trim() != ''){
     applyBtnStatus.value = true
-    console.log("已經改變");
-  }else{
-    applyBtnStatus.value = false
-    console.log("目前關鍵字為空");
+    console.log("更新關鍵字");
+  }else if(keyWord.value.trim() == ''){
+      checkHaveFilterOrSort();
+      console.log("目前關鍵字為空");
   }
 }
 
@@ -167,6 +171,46 @@ const handleApplyStatus = async() => {
   if(applyBtnStatus.value === true){
     await useFilters(keyWord.value.trim());
   }
+
+  filterCount.value = 0;
+  sortCount.value = 0;
+  Object.keys(filterVaribleSet).forEach((item) => {
+    if(
+      item != 'replaceKeyWord' || 
+      item != 'levelUpsort' || 
+      item != 'levelDownSort' ||
+      item != 'colorUpSort' ||
+      item != 'colorDownSort' ||
+      item != 'priceUpSort' ||
+      item != 'priceDownSort' ||
+      item != 'typeCharacter' ||
+      item != 'typeScene' ||
+      item != 'typeEvent'
+    ){
+      if(filterVaribleSet[item] === true){
+        filterCount.value++
+      }
+    }
+
+    if(
+      item == 'replaceKeyWord' || 
+      item == 'levelUpsort' || 
+      item == 'levelDownSort' ||
+      item == 'colorUpSort' ||
+      item == 'colorDownSort' ||
+      item == 'priceUpSort' ||
+      item == 'priceDownSort' ||
+      item == 'typeCharacter' ||
+      item == 'typeScene' ||
+      item == 'typeEvent'
+    ){
+      if(filterVaribleSet[item] === true){
+        sortCount.value++
+      }
+    }
+  })
+
+
 }
 
 
@@ -473,7 +517,7 @@ const handleApplyStatus = async() => {
         <header class="sidebar-filter-header">
           <div class = "flex-col">
             <p>卡片篩選</p>
-            <p>0 篩選、0 排序、關鍵字 : ""</p>
+            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ keyWord.trim() }}"</p>
           </div>
           <div>
             <button class="icon del-btn" @click="resetAllFilter" ><i class="fa-solid fa-trash"></i></button>
@@ -504,7 +548,7 @@ const handleApplyStatus = async() => {
               </div>
               <div v-else-if="filter.name === '關鍵字'">
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
-                  <br>當前搜尋內容： {{ keyWord }}
+                  <br>當前搜尋內容： {{ keyWord.trim() }}
                 </span>
                 <div class="input-keyword" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
@@ -863,10 +907,10 @@ const handleApplyStatus = async() => {
             <h1>{{ seriesInfo.name }}</h1>
             <div>
               <div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ seriesInfo.sellAt[0] }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{  }}</span>
               </div>
               <div>
-                <i class="fa-regular fa-clone"></i><span>總數{{ thisSeriesCardLength }}張</span>
+                <i class="fa-regular fa-clone"></i><span>總數{{  }}張</span>
               </div>
               <div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16" aria-hidden="true" data-slot="icon" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"></path></svg><span>篩選出{{ seriesCardList.length }}張</span>

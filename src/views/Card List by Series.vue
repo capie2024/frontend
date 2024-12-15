@@ -388,8 +388,8 @@ const saveLastViewSeries = cardSeriesStore.saveLastViewSeries;
     
 const handleSeries = async(seriesId) => {
     router.push('/card-series');
-    await getSeriesCards(seriesId);
     saveLastViewSeries(seriesId);
+    await getSeriesCards(seriesId);
 }
 
 onMounted(() => {

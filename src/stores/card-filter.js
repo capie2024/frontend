@@ -9,7 +9,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   const { seriesCardList } = storeToRefs(cardSeriesStore);
   const getLastViewSeries = cardSeriesStore.getLastViewSeries;
   //APPLY按鈕變數
-  const applyBtnStatus = ref(true);
+  const applyBtnStatus = ref(false);
 
   //AND按鈕變數
   const replaceKeyWord = ref(false);
@@ -20,6 +20,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   // 升降排序變數集合
   const filterVaribleSet = reactive({
     replaceKeyWord: false,
+    upDownSortArray: [],
     levelUpSort: false,
     levelDownSort: false,
     colorUpSort: false,
@@ -121,23 +122,36 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     } else {
       filterVaribleSet.replaceKeyWord = true;
     }
-    console.log("目前空格篩選狀態是:" + filterVaribleSet.replaceKeyWord);
   };
 
   // 篩選選項狀態切換
   const changeFilterStatus = (filterName) => {
     filterVaribleSet[filterName] = !filterVaribleSet[filterName];
+    console.log("目前篩選狀態是:" + filterVaribleSet[filterName]);
+    checkHaveFilterOrSort();
   }
-
-  // 升降排序篩選狀態切換
+  
+  // 判斷是否有選擇篩選或排序
+  const checkHaveFilterOrSort = () => {
+    if(Object.keys(filterVaribleSet).find((item) => filterVaribleSet[item] === true)){
+      applyBtnStatus.value = true;
+    }else if(!Object.keys(filterVaribleSet).find((item) => filterVaribleSet[item] === true)){
+      applyBtnStatus.value = false;
+    }
+    console.log("目前是否有選擇篩選或排序:" + applyBtnStatus.value);
+  }
+  
+  // 升降排序狀態切換
   const changeSortStatus = (sortName) => {
     if(sortName == 'level'){
       if(filterVaribleSet.levelUpSort === false){
         filterVaribleSet.levelUpSort = true;
         filterVaribleSet.levelDownSort = false;
+        checkUpDownSortArray('levelUpSort');
       }else if(filterVaribleSet.levelDownSort === false){
         filterVaribleSet.levelDownSort = true;
         filterVaribleSet.levelUpSort = false;
+        checkUpDownSortArray('levelDownSort');
       }
       console.log("levelUpSort:" + filterVaribleSet.levelUpSort);
       console.log("levelDownSort:" + filterVaribleSet.levelDownSort);
@@ -146,9 +160,11 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       if(filterVaribleSet.colorUpSort === false){
         filterVaribleSet.colorUpSort = true;
         filterVaribleSet.colorDownSort = false;
+        checkUpDownSortArray('colorUpSort');
       }else if(filterVaribleSet.colorDownSort === false){
         filterVaribleSet.colorDownSort = true;
         filterVaribleSet.colorUpSort = false;
+        checkUpDownSortArray('colorDownSort');
       }
       console.log("colorUpSort:" + filterVaribleSet.colorUpSort);
       console.log("colorDownSort:" + filterVaribleSet.colorDownSort);
@@ -157,12 +173,93 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       if(filterVaribleSet.priceUpSort === false){
         filterVaribleSet.priceUpSort = true;
         filterVaribleSet.priceDownSort = false;
+        checkUpDownSortArray('priceUpSort');
       }else if(filterVaribleSet.priceDownSort === false){
         filterVaribleSet.priceDownSort = true;
         filterVaribleSet.priceUpSort = false;
+        checkUpDownSortArray('priceDownSort');
       }
       console.log("priceUpSort:" + filterVaribleSet.priceUpSort);
       console.log("priceDownSort:" + filterVaribleSet.priceDownSort);
+    }
+    checkHaveFilterOrSort();
+    console.log("已切換升降排序狀態");
+  }
+
+  // 檢查是否有重複的升降排序
+  const checkUpDownSortArray = (sortName) => {
+    
+    const isHave = filterVaribleSet.upDownSortArray.find((item) => {
+      return item === sortName
+    })
+
+    if(!isHave){
+      console.log("沒有找到");
+      if(sortName == 'levelUpSort'){
+        const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+          return item === 'levelDownSort'
+        })
+        if(index !== -1){
+          filterVaribleSet.upDownSortArray[index] = 'levelUpSort';
+        }else{
+          filterVaribleSet.upDownSortArray.push('levelUpSort');
+        }
+      }
+
+      if(sortName == 'levelDownSort'){
+        const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+          return item === 'levelUpSort'
+        })
+        if(index !== -1){
+          filterVaribleSet.upDownSortArray[index] = 'levelDownSort';
+        }else{
+          filterVaribleSet.upDownSortArray.push('levelDownSort');
+        }
+      }
+
+      if(sortName == 'colorUpSort'){
+        const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+          return item === 'colorDownSort'
+        })
+        if(index !== -1){
+          filterVaribleSet.upDownSortArray[index] = 'colorUpSort';
+        }else{
+          filterVaribleSet.upDownSortArray.push('colorUpSort');
+        }
+      }
+
+      if(sortName == 'colorDownSort'){
+        const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+          return item === 'colorUpSort'
+        })
+        if(index !== -1){
+          filterVaribleSet.upDownSortArray[index] = 'colorDownSort';
+        }else{
+          filterVaribleSet.upDownSortArray.push('colorDownSort');
+        }
+      }
+
+      if(sortName == 'priceUpSort'){
+        const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+          return item === 'priceDownSort'
+        })
+        if(index !== -1){
+          filterVaribleSet.upDownSortArray[index] = 'priceUpSort';
+        }else{
+          filterVaribleSet.upDownSortArray.push('priceUpSort');
+        }
+      }
+
+      if(sortName == 'priceDownSort'){
+        const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+          return item === 'priceUpSort'
+        })
+        if(index !== -1){
+          filterVaribleSet.upDownSortArray[index] = 'priceDownSort';
+        }else{
+          filterVaribleSet.upDownSortArray.push('priceDownSort');
+        }
+      }
     }
   }
 
@@ -172,15 +269,23 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     filterArr.forEach((item) => {
       filterVaribleSet[item] = false;
     })
+    checkHaveFilterOrSort();
     console.log("已重置該部分篩選");
   };
 
   // 重置全部篩選
   const resetAllFilter = async() => {
     Object.keys(filterVaribleSet).forEach((item) => {
-      filterVaribleSet[item] = false;
+      if(item === 'upDownSortArray'){
+        filterVaribleSet[item] = [];
+      }else{
+        filterVaribleSet[item] = false;
+      }
     })
-    await getLastViewSeries()
+    checkHaveFilterOrSort();
+    newSeriesCardList.value = [];
+    seriesCardList.value = [];
+    await getLastViewSeries();
     console.log("已重置所有篩選");
   }
 
@@ -188,7 +293,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   const useFilters = async(keyWord) => {
     newSeriesCardList.value = [];
     seriesCardList.value = [];
-    await getLastViewSeries()
+    await getLastViewSeries();
 
     // seriesCardList是目前的系列所有的卡片，newSeriesCardList是篩選後的卡片
     newSeriesCardList.value = seriesCardList.value;
@@ -198,10 +303,11 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     if (keyWord != "") {
       keyWordFilter(keyWord);
     }
-    // levelSort();
-    // colorSort();
-    // priceSort();
-    typeSort();
+
+    if(filterVaribleSet.typeCharacter || filterVaribleSet.typeScene || filterVaribleSet.typeEvent){
+      typeSort();
+      console.log("已執行類型排序");
+    }
     
     if(filterVaribleSet.levelFilter0 || filterVaribleSet.levelFilter1 || filterVaribleSet.levelFilter2 || filterVaribleSet.levelFilter3){
       levelFilter();
@@ -275,9 +381,302 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       console.log("已執行稀有度篩選");
     }
 
+    useUpDownSort();
+
     // 篩選完後把新的陣列賦值給seriesCardList
     seriesCardList.value = newSeriesCardList.value;
+    checkHaveFilterOrSort();
   };
+  
+  const useUpDownSort = () => {
+    
+    const upDownSortArr = ref([]);
+    
+    // 數組內分組
+    const clusteredArray = ref([]);
+    // 數組內分組的依據
+    const filterArray = ref([]);
+    
+
+    // upDownSortArr.value = newSeriesCardList.value;
+
+    // 第一階段 根據等級、顏色、價格排序
+    if(filterVaribleSet.upDownSortArray[0] == 'levelUpSort' || filterVaribleSet.upDownSortArray[0] == 'levelDownSort'){
+      levelSort();
+      console.log("已執行等級升降排序");
+
+      newSeriesCardList.value.forEach((card) => {
+        filterArray.value.push(card.level);
+      })
+      const uniArray = ref([]);
+      for(let i = 0; i < filterArray.value.length; i ++){
+        const checkHaveLevel = uniArray.value.find((level) => {
+          return level == filterArray.value[i]
+        })
+        if(checkHaveLevel == undefined){
+          uniArray.value.push(filterArray.value[i]);
+        }
+      }
+      filterArray.value = uniArray.value;
+      console.log("這是等級陣列:" + filterArray.value);
+
+      // 根據等級進行各別數組分組
+      for(let i = 0; i < filterArray.value.length; i ++){
+        const filteredArray = newSeriesCardList.value.filter((card) => {
+          return card.level == filterArray.value[i]
+        })
+        clusteredArray.value.push(filteredArray);
+      }
+      // console.log("這是分類後陣列數量:" + clusteredArray.value.length);
+      
+      // 將數組解構成卡片合併成一個數組
+      const unClusteredArray = ref([]);
+      clusteredArray.value.forEach((arr) => {
+        unClusteredArray.value.push(...arr);
+      })
+      newSeriesCardList.value = unClusteredArray.value;
+      
+      
+    }else if(filterVaribleSet.upDownSortArray[0] == 'colorUpSort' || filterVaribleSet.upDownSortArray[0] == 'colorDownSort'){
+      colorSort();
+      console.log("已執行顏色升降排序");
+
+      newSeriesCardList.value.forEach((card) => {
+        filterArray.value.push(card.color);
+      })
+      const uniArray = ref([]);
+      for(let i = 0; i < filterArray.value.length; i ++){
+        const checkHaveColor = uniArray.value.find((color) => {
+          return color == filterArray.value[i]
+        })
+        if(checkHaveColor == undefined){
+          uniArray.value.push(filterArray.value[i]);
+        }
+      }
+      filterArray.value = uniArray.value;
+      console.log("這是顏色陣列:" + filterArray.value);
+
+      // 根據顏色進行各別數組分組
+      for(let i = 0; i < filterArray.value.length; i ++){
+        const filteredArray = newSeriesCardList.value.filter((card) => {
+          return card.color == filterArray.value[i]
+        })
+        clusteredArray.value.push(filteredArray);
+      }
+      // console.log("這是分類後陣列數量:" + clusteredArray.value.length);
+      
+      // 將數組解構成卡片合併成一個數組
+      const unClusteredArray = ref([]);
+      clusteredArray.value.forEach((arr) => {
+        unClusteredArray.value.push(...arr);
+      })
+      newSeriesCardList.value = unClusteredArray.value;
+
+    }else if(filterVaribleSet.upDownSortArray[0] == 'priceUpSort' || filterVaribleSet.upDownSortArray[0] == 'priceDownSort'){
+      priceSort();
+      console.log("已執行價格升降排序");
+
+      newSeriesCardList.value.forEach((card) => {
+        filterArray.value.push(card.price.number);
+      })
+      const uniArray = ref([]);
+      for(let i = 0; i < filterArray.value.length; i ++){
+        const checkHavePrice = uniArray.value.find((price) => {
+          return price == filterArray.value[i]
+        })
+        if(checkHavePrice == undefined){
+          uniArray.value.push(filterArray.value[i]);
+        }
+      }
+      filterArray.value = uniArray.value;
+      console.log("這是價格陣列:" + filterArray.value);
+
+      // 根據價格進行各別數組分組
+      for(let i = 0; i < filterArray.value.length; i ++){
+        const filteredArray = newSeriesCardList.value.filter((card) => {
+          return card.price.number == filterArray.value[i]
+        })
+        clusteredArray.value.push(filteredArray);
+      }
+      // console.log("這是分類後陣列數量:" + clusteredArray.value.length);
+      
+      // 將數組解構成卡片合併成一個數組
+      const unClusteredArray = ref([]);
+      clusteredArray.value.forEach((arr) => {
+        unClusteredArray.value.push(...arr);
+      })
+      newSeriesCardList.value = unClusteredArray.value;
+      
+    }
+
+    console.log("這是分類後陣列數量:" + clusteredArray.value.length);
+    
+    
+
+    // 第二階段 分組排序
+    if(filterVaribleSet.upDownSortArray[1] == 'levelUpSort' || filterVaribleSet.upDownSortArray[1] == 'levelDownSort'){
+
+      const newClusteredArray = ref([]);
+      for(let i = 0; i < clusteredArray.value.length; i ++){
+        const newArr = levelSortV2(clusteredArray.value[i]);
+        console.log("這是第" + i + "組:" + newArr);
+        newClusteredArray.value.push(newArr);
+      }
+      console.log("這是分類後陣列數量:" + newClusteredArray.value.length);
+
+      const unClusteredArray = ref([]);
+      newClusteredArray.value.forEach(arr => {
+        unClusteredArray.value.push(...arr);
+      })
+      // 包含未解構數組的數組
+      clusteredArray.value = newClusteredArray.value;
+      // 將解構成卡片的數組賦值回原數組
+      newSeriesCardList.value = unClusteredArray.value;
+
+      console.log("已執行等級升降排序");
+    }else if(filterVaribleSet.upDownSortArray[1] == 'colorUpSort' || filterVaribleSet.upDownSortArray[1] == 'colorDownSort'){
+
+      const newClusteredArray = ref([]);
+      for(let i = 0; i < clusteredArray.value.length; i ++){
+        const newArr = colorSortV2(clusteredArray.value[i]);
+        console.log("這是第" + i + "組:" + newArr);
+        newClusteredArray.value.push(newArr);
+      }
+      console.log("這是分類後陣列數量:" + newClusteredArray.value.length);
+
+      const unClusteredArray = ref([]);
+      newClusteredArray.value.forEach(arr => {
+        unClusteredArray.value.push(...arr);
+      })
+      // 包含未解構數組的數組
+      clusteredArray.value = newClusteredArray.value;
+      // 將解構成卡片的數組賦值回原數組
+      newSeriesCardList.value = unClusteredArray.value;
+
+      console.log("已執行顏色升降排序");
+    }else if(filterVaribleSet.upDownSortArray[1] == 'priceUpSort' || filterVaribleSet.upDownSortArray[1] == 'priceDownSort'){
+
+      const newClusteredArray = ref([]);
+      for(let i = 0; i < clusteredArray.value.length; i ++){
+        const newArr = priceSortV2(clusteredArray.value[i]);
+        console.log("這是第" + i + "組:" + newArr);
+        newClusteredArray.value.push(newArr);
+      }
+      console.log("這是分類後陣列數量:" + newClusteredArray.value.length);
+
+      const unClusteredArray = ref([]);
+      newClusteredArray.value.forEach(arr => {
+        unClusteredArray.value.push(...arr);
+      })
+      // 包含未解構數組的數組
+      clusteredArray.value = newClusteredArray.value;
+      // 將解構成卡片的數組賦值回原數組
+      newSeriesCardList.value = unClusteredArray.value;
+
+      console.log("已執行價格升降排序");
+    }
+
+    // 第三階段 分組排序
+    if(filterVaribleSet.upDownSortArray[2] == 'levelUpSort' || filterVaribleSet.upDownSortArray[2] == 'levelDownSort'){
+
+      // 判斷第二階段是哪種升降排序
+      if(filterVaribleSet.upDownSortArray[1] == 'priceUpSort' || filterVaribleSet.upDownSortArray[1] == 'priceDownSort'){
+        const newClusteredArray = ref([]);
+  
+        for(let i = 0; i < clusteredArray.value.length; i ++){
+          const secondClusteredArray = ref([]);
+          // 在第一階段分類的基礎上，做第二階段的分類
+          secondClusteredArray.value = priceSortV3(clusteredArray.value[i]);
+          for(let j = 0; j < secondClusteredArray.value.length; j ++){
+            const newArr = colorSortV2(secondClusteredArray.value[j]);
+            newClusteredArray.value.push(...newArr);
+          }
+        }
+        newSeriesCardList.value = newClusteredArray.value;
+
+      }else if(filterVaribleSet.upDownSortArray[1] == 'colorUpSort' || filterVaribleSet.upDownSortArray[1] == 'colorDownSort'){
+        const newClusteredArray = ref([]);
+  
+        for(let i = 0; i < clusteredArray.value.length; i ++){
+          const secondClusteredArray = ref([]);
+          // 在第一階段分類的基礎上，做第二階段的分類
+          secondClusteredArray.value = colorSortV3(clusteredArray.value[i]);
+          for(let j = 0; j < secondClusteredArray.value.length; j ++){
+            const newArr = priceSortV2(secondClusteredArray.value[j]);
+            newClusteredArray.value.push(...newArr);
+          }
+        }
+        newSeriesCardList.value = newClusteredArray.value;
+
+      }
+
+    }else if(filterVaribleSet.upDownSortArray[2] == 'colorUpSort' || filterVaribleSet.upDownSortArray[2] == 'colorDownSort'){
+
+      // 判斷第二階段是哪種升降排序
+      if(filterVaribleSet.upDownSortArray[1] == 'levelUpSort' || filterVaribleSet.upDownSortArray[1] == 'levelDownSort'){
+        const newClusteredArray = ref([]);
+  
+        for(let i = 0; i < clusteredArray.value.length; i ++){
+          const secondClusteredArray = ref([]);
+          // 在第一階段分類的基礎上，做第二階段的分類
+          secondClusteredArray.value = levelSortV3(clusteredArray.value[i]);
+          for(let j = 0; j < secondClusteredArray.value.length; j ++){
+            const newArr = colorSortV2(secondClusteredArray.value[j]);
+            newClusteredArray.value.push(...newArr);
+          }
+        }
+        newSeriesCardList.value = newClusteredArray.value;
+
+      }else if(filterVaribleSet.upDownSortArray[1] == 'priceUpSort' || filterVaribleSet.upDownSortArray[1] == 'priceDownSort'){
+        const newClusteredArray = ref([]);
+  
+        for(let i = 0; i < clusteredArray.value.length; i ++){
+          const secondClusteredArray = ref([]);
+          // 在第一階段分類的基礎上，做第二階段的分類
+          secondClusteredArray.value = priceSortV3(clusteredArray.value[i]);
+          for(let j = 0; j < secondClusteredArray.value.length; j ++){
+            const newArr = colorSortV2(secondClusteredArray.value[j]);
+            newClusteredArray.value.push(...newArr);
+          }
+        }
+        newSeriesCardList.value = newClusteredArray.value;
+
+      }
+
+    }else if(filterVaribleSet.upDownSortArray[2] == 'priceUpSort' || filterVaribleSet.upDownSortArray[2] == 'priceDownSort'){
+
+      // 判斷第二階段是哪種升降排序
+      if(filterVaribleSet.upDownSortArray[1] == 'levelUpSort' || filterVaribleSet.upDownSortArray[1] == 'levelDownSort'){
+        const newClusteredArray = ref([]);
+  
+        for(let i = 0; i < clusteredArray.value.length; i ++){
+          const secondClusteredArray = ref([]);
+          // 在第一階段分類的基礎上，做第二階段的分類
+          secondClusteredArray.value = levelSortV3(clusteredArray.value[i]);
+          for(let j = 0; j < secondClusteredArray.value.length; j ++){
+            const newArr = priceSortV2(secondClusteredArray.value[j]);
+            newClusteredArray.value.push(...newArr);
+          }
+        }
+        newSeriesCardList.value = newClusteredArray.value;
+
+      }else if(filterVaribleSet.upDownSortArray[1] == 'colorUpSort' || filterVaribleSet.upDownSortArray[1] == 'colorDownSort'){
+        const newClusteredArray = ref([]);
+  
+        for(let i = 0; i < clusteredArray.value.length; i ++){
+          const secondClusteredArray = ref([]);
+          // 在第一階段分類的基礎上，做第二階段的分類
+          secondClusteredArray.value = colorSortV3(clusteredArray.value[i]);
+          for(let j = 0; j < secondClusteredArray.value.length; j ++){
+            const newArr = priceSortV2(secondClusteredArray.value[j]);
+            newClusteredArray.value.push(...newArr);
+          }
+        }
+        newSeriesCardList.value = newClusteredArray.value;
+
+      }
+    }
+  }
 
   // 關鍵字搜尋
   const keyWordFilter = (keyWord) => {
@@ -318,7 +717,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     const maxLevel = Math.max(...levelArr);
     // 判斷降序還是升序
     if (filterVaribleSet.levelDownSort === true) {
-      for (let i = maxLevel; i > 0; i--) {
+      for (let i = maxLevel; i >= 0; i--) {
         newSeriesCardList.value.forEach((card) => {
           if (card.level === i) {
             levelSortArr.value.push(card);
@@ -335,6 +734,60 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       }
     }
     newSeriesCardList.value = levelSortArr.value;
+  };
+
+  // 等級升降排序V2(通用修改試驗版) *目前只套用在整合分組第二階段*
+  const levelSortV2 = (arr) => {
+    const levelSortArr = ref([]);
+    const levelArr = arr.map((card) => {
+      return card.level;
+    });
+    const maxLevel = Math.max(...levelArr);
+    // 判斷降序還是升序
+    if (filterVaribleSet.levelDownSort === true) {
+      for (let i = maxLevel; i >= 0; i--) {
+        arr.forEach((card) => {
+          if (card.level === i) {
+            levelSortArr.value.push(card);
+          }
+        });
+      }
+    } else if (filterVaribleSet.levelUpSort === true) {
+      for (let i = maxLevel; i >= 0; i--) {
+        arr.forEach((card) => {
+          if (card.level === i) {
+            levelSortArr.value.unshift(card);
+          }
+        });
+      }
+    }
+    return levelSortArr.value;
+  };
+
+  // 等級升降排序V3 *目前只套用在整合分組第二階段*
+  const levelSortV3 = (arr) => {
+    const levelSortArr = ref([]);
+    const levelArr = arr.map((card) => {
+      return card.level;
+    });
+    const maxLevel = Math.max(...levelArr);
+    // 判斷降序還是升序
+    if (filterVaribleSet.levelDownSort === true) {
+      for (let i = maxLevel; i >= 0; i--) {
+        const filteredArr = arr.filter((card) => {
+          return card.level === i
+        });
+        levelSortArr.value.push(filteredArr);
+      }
+    } else if (filterVaribleSet.levelUpSort === true) {
+      for (let i = maxLevel; i >= 0; i--) {
+        const filteredArr = arr.filter((card) => {
+          return card.level === i
+        });
+        levelSortArr.value.unshift(filteredArr);
+      }
+    }
+    return levelSortArr.value;
   };
 
   // 顏色升降排序
@@ -366,7 +819,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
           colorSortArr.value.push(card);
         }
       });
-    } else if (colorUpSort.value === true) {
+    } else if (filterVaribleSet.colorUpSort === true) {
       newSeriesCardList.value.forEach((card) => {
         if (card.color === "purple") {
           colorSortArr.value.push(card);
@@ -396,6 +849,134 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     newSeriesCardList.value = colorSortArr.value;
   };
 
+  // 顏色升降排序V2(通用修改試驗版) *目前只套用在整合分組第二階段*
+  const colorSortV2 = (arr) => {
+    const colorSortArr = ref([]);
+    if (filterVaribleSet.colorDownSort === true) {
+      arr.forEach((card) => {
+        if (card.color === "red") {
+          colorSortArr.value.push(card);
+        }
+      });
+      arr.forEach((card) => {
+        if (card.color === "yellow") {
+          colorSortArr.value.push(card);
+        }
+      });
+      arr.forEach((card) => {
+        if (card.color === "green") {
+          colorSortArr.value.push(card);
+        }
+      });
+      arr.forEach((card) => {
+        if (card.color === "blue") {
+          colorSortArr.value.push(card);
+        }
+      });
+      arr.forEach((card) => {
+        if (card.color === "purple") {
+          colorSortArr.value.push(card);
+        }
+      });
+    } else if (filterVaribleSet.colorUpSort === true) {
+      arr.forEach((card) => {
+        if (card.color === "purple") {
+          colorSortArr.value.push(card);
+        }
+      });
+      arr.forEach((card) => {
+        if (card.color === "blue") {
+          colorSortArr.value.push(card);
+        }
+      });
+      arr.forEach((card) => {
+        if (card.color === "green") {
+          colorSortArr.value.push(card);
+        }
+      });
+      arr.forEach((card) => {
+        if (card.color === "yellow") {
+          colorSortArr.value.push(card);
+        }
+      });
+      arr.forEach((card) => {
+        if (card.color === "red") {
+          colorSortArr.value.push(card);
+        }
+      });
+    }
+    return colorSortArr.value;
+  };
+
+  // 顏色升降排序V3 *目前只套用在整合分組第三階段*
+  const colorSortV3 = (arr) => {
+    const colorSortArr = ref([]);
+    const newArr = ref([])
+    if (filterVaribleSet.colorDownSort === true) {
+      newArr.value = arr.filter((card) => {
+        return card.color === "red"
+      });
+      colorSortArr.value.push(newArr.value);
+      newArr.value = [];
+
+      newArr.value = arr.filter((card) => {
+        return card.color === "yellow"
+      });
+      colorSortArr.value.push(newArr.value);
+      newArr.value = [];
+
+      newArr.value = arr.filter((card) => {
+        return card.color === "green"
+      });
+      colorSortArr.value.push(newArr.value);
+      newArr.value = [];
+
+      newArr.value = arr.filter((card) => {
+        return card.color === "blue"
+      });
+      colorSortArr.value.push(newArr.value);
+      newArr.value = [];
+
+      newArr.value = arr.filter((card) => {
+        return card.color === "purple"
+      });
+      colorSortArr.value.push(newArr.value);
+      newArr.value = [];
+      
+    } else if (filterVaribleSet.colorUpSort === true) {
+      newArr.value = arr.filter((card) => {
+        return card.color === "purple"
+      });
+      colorSortArr.value.push(newArr.value);
+      newArr.value = [];
+
+      newArr.value = arr.filter((card) => {
+        return card.color === "blue"
+      });
+      colorSortArr.value.push(newArr.value);
+      newArr.value = [];
+
+      newArr.value = arr.filter((card) => {
+        return card.color === "green"
+      });
+      colorSortArr.value.push(newArr.value);
+      newArr.value = [];
+
+      newArr.value = arr.filter((card) => {
+        return card.color === "yellow"
+      });
+      colorSortArr.value.push(newArr.value);
+      newArr.value = [];
+
+      newArr.value = arr.filter((card) => {
+        return card.color === "red"
+      });
+      colorSortArr.value.push(newArr.value);
+
+    }
+    return colorSortArr.value;
+  };
+
   // 價格升降排序
   const priceSort = () => {
     const priceSortArr = ref([]);
@@ -403,33 +984,78 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       return card.price.number;
     });
     const newPriceArr = ref([]);
-    priceArr
-      .sort((a, b) => a - b)
-      .forEach((price) => {
-        const checkHavePrice = newPriceArr.value.find((item) => {
-          return item == price;
-        });
-        if (!checkHavePrice) {
-          newPriceArr.value.push(price);
-        }
-      });
+    newPriceArr.value = Array.from(new Set(priceArr)).sort((a, b) => a - b);
 
     if (filterVaribleSet.priceUpSort === true) {
       for (let i = 0; i < newPriceArr.value.length; i++) {
         const filtedArr = newSeriesCardList.value.filter((card) => {
           return card.price.number === newPriceArr.value[i];
         });
-        priceSortArr.value.unshift(...filtedArr);
+        priceSortArr.value.push(...filtedArr);
       }
     } else if (filterVaribleSet.priceDownSort === true) {
       for (let i = 0; i < newPriceArr.value.length; i++) {
         const filtedArr = newSeriesCardList.value.filter((card) => {
           return card.price.number === newPriceArr.value[i];
         });
-        priceSortArr.value.push(...filtedArr);
+        priceSortArr.value.unshift(...filtedArr);
       }
     }
     newSeriesCardList.value = priceSortArr.value;
+  };
+
+  // 價格升降排序V2(通用修改試驗版) *目前只套用在整合分組第二階段*
+  const priceSortV2 = (arr) => {
+    const priceSortArr = ref([]);
+    const priceArr = arr.map((card) => {
+      return card.price.number;
+    });
+    const newPriceArr = ref([]);
+    newPriceArr.value = Array.from(new Set(priceArr)).sort((a, b) => a - b);
+
+    if (filterVaribleSet.priceUpSort === true) {
+      for (let i = 0; i < newPriceArr.value.length; i++) {
+        const filtedArr = arr.filter((card) => {
+          return card.price.number === newPriceArr.value[i];
+        });
+        priceSortArr.value.push(...filtedArr);
+      }
+    } else if (filterVaribleSet.priceDownSort === true) {
+      for (let i = 0; i < newPriceArr.value.length; i++) {
+        const filtedArr = arr.filter((card) => {
+          return card.price.number === newPriceArr.value[i];
+        });
+        priceSortArr.value.unshift(...filtedArr);
+      }
+    }
+    return priceSortArr.value;
+  };
+
+  // 價格升降排序V3 *目前只套用在整合分組第三階段*
+  const priceSortV3 = (arr) => {
+    const priceSortArr = ref([]);
+    const priceArr = arr.map((card) => {
+      return card.price.number;
+    });
+    const newPriceArr = ref([]);
+    newPriceArr.value = Array.from(new Set(priceArr)).sort((a, b) => a - b);
+
+    if (filterVaribleSet.priceUpSort === true) {
+      for (let i = 0; i < newPriceArr.value.length; i++) {
+        const filtedArr = arr.filter((card) => {
+          return card.price.number === newPriceArr.value[i];
+        });
+        priceSortArr.value.push(filtedArr);
+      }
+    } else if (filterVaribleSet.priceDownSort === true) {
+      for (let i = 0; i < newPriceArr.value.length; i++) {
+        const filtedArr = arr.filter((card) => {
+          return card.price.number === newPriceArr.value[i];
+        });
+        priceSortArr.value.unshift(filtedArr);
+      }
+    }
+    return priceSortArr.value;
   };
 
   // 類型篩選排序
@@ -1179,6 +1805,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     changeFilterStatus,
     resetFilter,
     changeSortStatus,
-    resetAllFilter
+    resetAllFilter,
+    checkHaveFilterOrSort,
   };
 });

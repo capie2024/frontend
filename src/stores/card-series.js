@@ -8,6 +8,7 @@ export const useCardSeriesStore = defineStore("card-series", () => {
   const seriesCode = ref("");
   const seriesInfo = ref("");
   const seriesCardList = ref([]);
+  const seriesCardListLength = ref(0);
 
   // リコリス測試用資料
   const seriesTestData = ref("");
@@ -60,8 +61,9 @@ export const useCardSeriesStore = defineStore("card-series", () => {
         }
       });
       seriesCardList.value = res.data;
-      console.log(seriesCardList.value);
-      console.log("獲取完卡片");
+      seriesCardListLength.value = seriesCardList.value.length;
+      // console.log(seriesCardList.value);
+      // console.log("獲取完卡片");
     } catch (err) {
       console.log(err);
     }
@@ -76,7 +78,8 @@ export const useCardSeriesStore = defineStore("card-series", () => {
 
   // 獲取最後瀏覽的系列
   const getLastViewSeries = async () => {
-    if (seriesCardList.value == "") {
+    // console.log(seriesCardList.value);
+    if (seriesCardList.value.length === 0) {
       const lastViewSeriesId = localStorage.getItem("lastViewSeriesId");
       if (lastViewSeriesId) {
         // console.log("開始重新獲取");
@@ -95,5 +98,6 @@ export const useCardSeriesStore = defineStore("card-series", () => {
     seriesTestData,
     getTestSeries,
     seriesInfo,
+    seriesCardListLength
   };
 });

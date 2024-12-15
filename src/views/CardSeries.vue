@@ -26,7 +26,8 @@ const checkHaveFilterOrSort = cardFilterStore.checkHaveFilterOrSort
 const cardSeriesStore = useCardSeriesStore();
 const { 
     seriesCardList,
-    seriesInfo 
+    seriesInfo,
+    seriesCardListLength
   } = storeToRefs(cardSeriesStore);
 const getLastViewSeries = cardSeriesStore.getLastViewSeries;
 
@@ -53,7 +54,24 @@ const chooseCoverCard = ref('')
 const deckName = ref('LL牌組')
 const deckDescription = ref('這是測試牌組')
 const settingDeckStatus = ref(false)
-const thisSeriesCardLength = ref(0)
+const levelOrder = computed(() => {
+  const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+    return item === 'levelUpSort' || item === 'levelDownSort'
+  })
+  return index + 1
+})
+const colorOrder = computed(() => {
+  const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+    return item === 'colorUpSort' || item === 'colorDownSort'
+  })
+  return index + 1
+})
+const priceOrder = computed(() => {
+  const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+    return item === 'priceUpSort' || item === 'priceDownSort'
+  })
+  return index + 1
+})
 
 // 清除牌組並回到第一步編輯牌組的狀態
 const clearDeckAndBacktoFirstStep = async() => {
@@ -428,7 +446,6 @@ const handleApplyStatus = async() => {
   // Lifecycle hooks
   onMounted(async() => {
     switchSortMode();
-    thisSeriesCardLength.value = seriesCardList.value.length
     window.addEventListener('resize', updateScreenSize);
   });
   
@@ -567,17 +584,23 @@ const handleApplyStatus = async() => {
               <div v-else-if="filter.name === '排序'">
                 <div class="menu-inner-slider-btn">
                   <button :class="{'btn-default-bg': !filterVaribleSet.levelDownSort || !filterVaribleSet.levelUpSort, 'btn-active-bg': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" @click="changeSortStatus('level')" >
-                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" ></div>
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" >
+                      {{ levelOrder > 0 ? levelOrder : '' }}
+                    </div>
                     等級
                     <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.levelUpSort ,'arrow-down': filterVaribleSet.levelUpSort}" ></i>
                   </button>
                   <button :class="{'btn-default-bg': !filterVaribleSet.colorDownSort || !filterVaribleSet.colorUpSort, 'btn-active-bg': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" @click="changeSortStatus('color')" >
-                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" ></div>
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" >
+                      {{ colorOrder > 0 ? colorOrder : '' }}
+                    </div>
                     顏色
                     <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.colorUpSort ,'arrow-down': filterVaribleSet.colorUpSort}" ></i>
                   </button>
                   <button :class="{'btn-default-bg': !filterVaribleSet.priceDownSort || !filterVaribleSet.priceUpSort, 'btn-active-bg': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" @click="changeSortStatus('price')" >
-                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" ></div>
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" >
+                      {{ priceOrder > 0 ? priceOrder : '' }}
+                    </div>
                     價格
                     <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.priceUpSort ,'arrow-down': filterVaribleSet.priceUpSort}" ></i>
                   </button>
@@ -855,7 +878,7 @@ const handleApplyStatus = async() => {
             </svg>
           </button>
           <div data-v-3e737e76="" class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
-            <!-- <div data-v-57e635bc="" class="flex items-center gap-4"> -->
+            <!-- <div class="flex items-center gap-4"> -->
                 <h2 class="truncate text-2xl font-bold">{{ seriesInfo.name }}</h2>
             <!-- </div> -->
           </div>
@@ -906,11 +929,17 @@ const handleApplyStatus = async() => {
             <span><i class="fa-regular fa-clone"></i> <span v-for="(code, index) in seriesInfo.code" :key="index" >{{ code }}{{ index == seriesInfo.code.length - 1 ? '' : ', '  }}</span></span>
             <h1>{{ seriesInfo.name }}</h1>
             <div>
-              <div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{  }}</span>
+              <div v-if="seriesInfo.sellAt" >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ seriesInfo.sellAt[seriesInfo.sellAt.length - 1] }}</span>
               </div>
-              <div>
-                <i class="fa-regular fa-clone"></i><span>總數{{  }}張</span>
+              <div v-else >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布</span>
+              </div>
+              <div v-if="seriesCardListLength > 0" >
+                <i class="fa-regular fa-clone" ></i><span>總數{{ seriesCardListLength }}張</span>
+              </div>
+              <div v-else >
+                <i class="fa-regular fa-clone"></i><span>總數 0 張</span>
               </div>
               <div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16" aria-hidden="true" data-slot="icon" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"></path></svg><span>篩選出{{ seriesCardList.length }}張</span>

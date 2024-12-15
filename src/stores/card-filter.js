@@ -264,7 +264,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   }
 
   // 重置部分篩選
-  const resetFilter = (filterArr) => {
+  const resetFilter = async(filterArr) => {
     console.log(filterArr);
     filterArr.forEach((item) => {
       filterVaribleSet[item] = false;

@@ -324,6 +324,9 @@
   padding: 4px;
   border-radius: 50%;
   background-color: #3F3F46;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .slider-btn-active {

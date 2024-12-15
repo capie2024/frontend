@@ -1,6 +1,6 @@
 <template>
         <div class="All">
-                <nav class="sidebar-container">
+                <!-- <nav class="sidebar-container">
                     <a href="https://bottleneko.app/" class="sidebar-head">
                         <img src="https://bottleneko.app/icon.png" alt="" class="nav-icon">
                         <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3352.25 1012.65" class="h-[1.5rem] default-transition fill-white nav-svg" >
@@ -75,7 +75,7 @@
                         </svg>
                         <h2>原文翻譯</h2>
                     </button>
-                </nav>
+                </nav> -->
                 <div class="aa">
                     <div class="all-card">
                         <div class="top-container">
@@ -83,8 +83,8 @@
                             <div class="Top-bar">
                                 <div class="search-bar">
                                     <span><i class="fa-solid fa-magnifying-glass"></i></span>
-                                    <input type="text" placeholder="想看哪個系列？" id="searchInput">
-                                    <button @click="clearInput">✖</button>
+                                    <input type="text" placeholder="想看哪個系列？" v-model="searchQuery" @keyup="searchSeries">
+                                    <button @click="clearSearch">✖</button>
                                 </div>
                                 <!-- 排序按鈕 -->
                                 <div class="sort-button">
@@ -110,7 +110,7 @@
                         </div>
                         <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
                         <section class="show-card">
-                            <a v-for="card in originalSeries" :key="card.id" href="#" class="url transition-colors" @click.prevent="handleSeries(card.id)" >
+                            <a v-for="card in viewedSeries" :key="card.id" href="#" class="url transition-colors" @click.prevent="handleSeries(card.id)" >
 
                                     <div>
                                         <img :src ="card.cover || '/src/img/cover.png'" alt="">
@@ -131,7 +131,7 @@
                             </a>
                         </section>
                         <h2 class="font-size30 color-white">系列<br>
-                            <span class="font-size75rem color-a1">一共有152結果</span>
+                            <span class="font-size75rem color-a1">一共有  {{ searchResultCount }}  結果</span>
                         </h2>
                         <section class="grid-card">
                            
@@ -343,7 +343,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useCardSeriesStore } from "@/stores/card-series";
 import { storeToRefs } from "pinia";
 import axios from "axios";
@@ -356,6 +356,8 @@ const originalSeries = ref([])
 const error = ref('')
 const API_URL = 'https://bottleneko.app/api/series'
 const sortState = ref(0)
+const searchQuery = ref('');
+const viewedSeries = ref([]);
 
 // 獲取系列卡表資料
 const fetchCardseries = async () => {
@@ -389,10 +391,39 @@ const getSeriesCards = cardSeriesStore.getSeriesCards;
 const saveLastViewSeries = cardSeriesStore.saveLastViewSeries;
     
 const handleSeries = async(seriesId) => {
-    router.push('/card-series');
-    await getSeriesCards(seriesId);
-    saveLastViewSeries(seriesId);
+    try {
+        // 先獲取系列卡片數據
+        await getSeriesCards(seriesId);
+
+        // 保存最後瀏覽的系列
+        saveLastViewSeries(seriesId);
+
+        // 更新已查看的卡片記錄
+        await saveViewedSeries(seriesId);
+
+        // 最後跳轉頁面
+        router.push('/card-series');
+
+    } catch (error) {
+
+        console.error("處理時出現錯誤：", error);
+    }
+    
 }
+
+const saveViewedSeries = async (seriesId) => {
+    try {
+    let viewed = JSON.parse(localStorage.getItem('viewedSeries')) || [];
+    viewed = viewed.filter(id => id !== seriesId);
+
+    viewed.unshift(seriesId);
+    localStorage.setItem('viewedSeries', JSON.stringify(viewed));
+
+    } catch (err) {
+
+      console.log(err);
+    }
+};
 
 
 // A-Z>50音排序
@@ -474,13 +505,13 @@ const nameIsSelected = ref(false)
 
 const toggleNameSort = () => {
   if (nameIsSorted.value) {
-    cardSeries.value = [...originalSeries.value].sort(nameSortReverse)
+    cardSeries.value = [...cardSeries.value].sort(nameSortReverse)
     nameIsSorted.value = false;
     nameIsSelected.value = true;
     dateIsSorted.value = false;
     dateIsSelected.value = false;
   } else {
-    cardSeries.value = [...originalSeries.value].sort(nameSort)
+    cardSeries.value = [...cardSeries.value].sort(nameSort)
     nameIsSorted.value = true;
     nameIsSelected.value = true;
     dateIsSorted.value = false;
@@ -493,7 +524,7 @@ const toggleNameSort = () => {
 
 const toggleDateSort = () => {
   if (sortState.value === 0) {
-    cardSeries.value = [...originalSeries.value].sort((a, b) => {
+    cardSeries.value = [...cardSeries.value].sort((a, b) => {
         const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;
         const dateB = b.sellAt[0] ? new Date(b.sellAt[0]) : null;
 
@@ -509,7 +540,7 @@ const toggleDateSort = () => {
         nameIsSorted.value = false;
         nameIsSelected.value = false;
   } else {
-        cardSeries.value = [...originalSeries.value].sort((a, b) => {
+        cardSeries.value = [...cardSeries.value].sort((a, b) => {
             const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;
             const dateB = b.sellAt[0] ? new Date(b.sellAt[0]) : null;
 
@@ -527,10 +558,61 @@ const toggleDateSort = () => {
     }
 }
 
-onMounted(() => {
-    fetchCardseries();
+const searchResultCount = computed(() => cardSeries.value.length);
+
+const sortByDate = (a, b) => {
+  const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;
+  const dateB = b.sellAt[0] ? new Date(b.sellAt[0]) : null;
+
+  if (!dateA && !dateB) return 0;
+  if (!dateA) return sortState.value === 0 ? 1 : -1; 
+  if (!dateB) return sortState.value === 0 ? -1 : 1; 
+
+  return sortState.value === 0 ? dateB - dateA : dateA - dateB; 
+};
+
+const searchSeries = () => {
+    if (!searchQuery.value.trim()) {
+        cardSeries.value = originalSeries.value;
+    } else {
+        const query = searchQuery.value.toLowerCase();
+        cardSeries.value = originalSeries.value.filter((card) => {
+            const name = card.name?.toLowerCase() || '';
+            const code = card.code?.join(', ').toLowerCase() || '';
+            return name.includes(query) || code.includes(query);
+        });       
+    }
+
+    if (nameIsSorted.value) {
+        cardSeries.value = [...cardSeries.value].sort(nameSort);
+    } else if (dateIsSorted.value) {
+        cardSeries.value = [...cardSeries.value].sort(sortByDate);
+    }      
+};
+
+const clearSearch = () => {
+  searchQuery.value = '';
+  cardSeries.value = originalSeries.value;
+  if (nameIsSorted.value) {
+      cardSeries.value = [...cardSeries.value].sort(nameSort);
+  } else if (dateIsSorted.value) {
+      cardSeries.value = [...cardSeries.value].sort(sortByDate);
+  }
+}
+
+onMounted(async () => {
+  await fetchCardseries(); 
+  
+  const viewed = JSON.parse(localStorage.getItem('viewedSeries')) || [];
+  
+  // 匹配卡片信息並渲染已查看的系列
+  viewedSeries.value = viewed.map((id) => {
+    return originalSeries.value.find((card) => card.id === id);
+  }).filter(Boolean);
 });
+
 </script>
+
 <style scoped>
 .All{
     position: relative;
@@ -653,13 +735,16 @@ nav{
 .aa{
     position: absolute;
     top: 0;
-    left: 270px;
+    /* left: 270px; */
     background-color: #121212;
     padding: 10px;
     box-sizing: border-box;
     margin: 8px 8px 8px 0;
     border-radius: 10px;
-    width: calc(100% - 280px);
+    height: calc(100vh - 16px);
+    overflow-y: scroll;
+    scrollbar-width: none;
+    width: calc(100% - 8px);
 }
 .top-container {
     display: flex;
@@ -670,9 +755,9 @@ nav{
     border-radius: 5px;
     justify-content: space-between;
     position: fixed;
-    width: calc(99% - 320px);
-    top:0px;
-    left: 270px;
+    width: calc(99% - 336px);
+    top:8px;
+    /* left: 270px; */
 }
 .Top-bar{
     display: flex;

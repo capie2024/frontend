@@ -142,6 +142,8 @@ const router = createRouter({
       path: "/remitcardnf",
       name: "remitcardnf",
       component: RemitCardNf,
+    },
+    {
       path: "/deck",
       name: "deck",
       component: MyCardView

@@ -31,9 +31,9 @@
 
                         <div data-v-41768621="" class="input-item-2 ">
 
-                            <input class="input-text" id="input-text" type="text" placeholder="代碼" v-model="deckId" @input="checkDeckId">
+                            <input class="input-text" id="input-text" type="text" placeholder="代碼" v-model="deckId" >
                             
-                            <button  class="input-button-2 item default-transition" id="input-button-2">
+                            <button  class="input-button-2 item default-transition" id="input-button-2" @click="checkDeckId">
                                 <svg data-v-41768621="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="icon-input size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round"

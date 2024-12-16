@@ -264,7 +264,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   }
 
   // 重置部分篩選
-  const resetFilter = async(filterArr) => {
+  const resetFilter = (filterArr) => {
     console.log(filterArr);
     const checkUpDownSort = filterArr.find((item) => {
       return item === 'upDownSortArray' ||
@@ -275,18 +275,22 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       item === 'priceUpSort' ||
       item === 'priceDownSort';
     })
+    
+    const checkHaveKeyWord = filterArr.find((item) => {
+      return item === 'keyWord';
+    })
 
     if(checkUpDownSort){
       filterVaribleSet.upDownSortArray = [];
+    }else if(checkHaveKeyWord){
+      filterVaribleSet.keyWord = '';
+    }else{
+      filterArr.forEach((item) => {
+        filterVaribleSet[item] = false;
+      })
     }
 
-    const checkHaveKeyWord = filterArr.find((item) => {
-      
-    })
 
-    filterArr.forEach((item) => {
-      filterVaribleSet[item] = false;
-    })
     checkHaveFilterOrSort();
     console.log("已重置該部分篩選");
   };
@@ -296,6 +300,8 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     Object.keys(filterVaribleSet).forEach((item) => {
       if(item === 'upDownSortArray'){
         filterVaribleSet[item] = [];
+      }else if(item === 'keyWord'){
+        filterVaribleSet[item] = '';
       }else{
         filterVaribleSet[item] = false;
       }

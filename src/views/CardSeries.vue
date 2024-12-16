@@ -255,7 +255,7 @@ const handleApplyStatus = async() => {
       icon: 'fa-solid fa-magnifying-glass',
       checkButton: false,
       delButton: true,
-      filterTag: ['']
+      filterTag: ['keyWord']
     },
     { 
       name: '排序',
@@ -535,7 +535,7 @@ const handleApplyStatus = async() => {
         <header class="sidebar-filter-header">
           <div class = "flex-col">
             <p>卡片篩選</p>
-            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ filterVaribleSet.keyWord.trim() }}"</p>
+            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ (filterVaribleSet.keyWord.trim()) }}"</p>
           </div>
           <div>
             <button class="icon del-btn" @click="resetAllFilter" ><i class="fa-solid fa-trash"></i></button>
@@ -581,6 +581,9 @@ const handleApplyStatus = async() => {
                   <br>無資料
                   <p>新增預設關鍵字</p>
                 </span>
+                <div class="keyword-button-group">
+                  <button v-for="item in 3" :key="item">日本</button>
+                </div>
               </div>
               <div v-else-if="filter.name === '排序'">
                 <div class="menu-inner-slider-btn">

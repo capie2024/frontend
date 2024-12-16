@@ -69,7 +69,7 @@
   <!-- <div class="page-control-space"></div> -->
 </template>
 
-<style>
+<style scoped>
 .header-container {
     display: flex;
     padding: 16px;

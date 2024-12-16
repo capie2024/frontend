@@ -1,11 +1,11 @@
 <template>
-    <section  class="modal fade" id="remit" tabindex="-1" aria-labelledby="remitLabel" aria-hidden="true">
+    <section  class="modal fade" id="remit" tabindex="-1" aria-labelledby="remitLabel" aria-hidden="true" ref="remitModal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     
                     <div class="modal-header">
                         <h2 class="modal-title topic" id="remitLabel">匯出牌組</h2>
-                            <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="confirmClose">
                                 <svg data-v-502f6c5f="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
                                 </svg>
@@ -208,10 +208,8 @@
         gap: 0.5rem;
         height: 1.5rem;
         width: 1.5rem;
-        
         border: 0 solid #e5e7eb;
         box-sizing: border-box;
-        
     }
     
     .icon {
@@ -416,7 +414,7 @@
 <script >
 import jsPDF from "jspdf";
 import axios from "axios";
-
+import Swal from "sweetalert2";
 export default {
     data() {
     return {
@@ -433,6 +431,32 @@ export default {
     },
   },
   methods: {
+    confirmClose() {
+      Swal.fire({
+        title: '確定要離開嗎？',
+        text: '您的資料尚未完成，確定要離開嗎？',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '離開',
+        cancelButtonText: '取消',
+        reverseButtons: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // 用戶確認離開，隱藏模態框並設置 display: none;
+          this.hideModal();
+        }
+      });
+    },
+    hideModal() {
+      // 隱藏模態框並設置 display: none;
+      const modalElement = this.$refs.remitModal; // 獲取模態框的 DOM 元素
+      if (modalElement) {
+        modalElement.style.display = 'none';
+      }
+    },
+  },
+
+
     // 切換按鈕的 active 狀態
     toggleActive(index) {
       // 僅在點擊自身範圍時切換樣式
@@ -591,7 +615,7 @@ async exportToPDF() {
           alert("匯出 PDF 時發生錯誤：" + error.message);
         }
       }
-    }
     };
+    
 </script>
     

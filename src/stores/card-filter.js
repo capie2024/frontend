@@ -1,13 +1,17 @@
 import { ref, computed, reactive } from "vue";
 import { defineStore, storeToRefs } from "pinia";
 import { useCardSeriesStore } from "./card-series";
+import Swal from 'sweetalert2'
 
 export const useCardFilterStore = defineStore("card-filter", () => {
+
   // 引入CardSeriesStore並使用
   const cardSeriesStore = useCardSeriesStore();
+
   // seriesCardList是目前的系列所有的卡片，定義在CardSeriesStore裡
   const { seriesCardList } = storeToRefs(cardSeriesStore);
   const getLastViewSeries = cardSeriesStore.getLastViewSeries;
+
   //APPLY按鈕變數
   const applyBtnStatus = ref(false);
 
@@ -84,34 +88,139 @@ export const useCardFilterStore = defineStore("card-filter", () => {
   })
 
   // 等級升降變數
-  const levelSortStatus = ref(false);
-
+  // const levelSortStatus = ref(false);
   // 顏色升降變數
-  const colorSortStatus = ref(false);
-
+  // const colorSortStatus = ref(false);
   // 價格升降變數
-  const priceSortStatus = ref(false);
-
+  // const priceSortStatus = ref(false);
   // 類型篩選變數
-  const typeSortStatus = ref(false);
-
+  // const typeSortStatus = ref(false);
   // 等級篩選變數
-  const levelFilterStatus = ref(false);
-
+  // const levelFilterStatus = ref(false);
   // 顏色篩選變數
-  const colorFilterStatus = ref(false);
-
+  // const colorFilterStatus = ref(false);
   // 費用篩選變數
-  const costFilterStatus = ref(false);
-
+  // const costFilterStatus = ref(false);
   // 魂傷篩選變數
-  const soulFilterStatus = ref(false);
-
+  // const soulFilterStatus = ref(false);
   // 攻擊力篩選變數
-  const attackFilterStatus = ref(false);
-
+  // const attackFilterStatus = ref(false);
   // 稀有度篩選變數
-  const rareFilterStatus = ref(false);
+  // const rareFilterStatus = ref(false);
+  
+  // 設定起始刪除計算時間
+  const setStartTime = ref(0)  
+  const countMouseUp = () => {
+    setStartTime.value = Date.now();
+  }
+
+  // 常用篩選群組
+  const myFiltersGroup = ref(JSON.parse(localStorage.getItem("myFiltersGroup")) || []);
+
+  // 儲存常用篩選功能
+  const saveMyFilters = async() => {
+    await Swal.fire({
+      title: '常用',
+      inputLabel: "請輸入常用篩選名稱",
+      input: 'text',
+      confirmButtonText: '確定',
+      showCancelButton: true,
+      cancelButtonText: '取消',
+      color: '#fff',
+      background: '#18181b',
+      inputValidator: (value) => {
+        if (value) {
+          console.log(value);
+          if(!localStorage.getItem("myFiltersGroup")){
+            myFiltersGroup.value.push({
+              name: value,
+              filters: filterVaribleSet
+            });
+            
+          }else{
+            const updatedGroup = JSON.parse(localStorage.getItem("myFiltersGroup"));
+            updatedGroup.push({
+              name: value,
+              filters: {...filterVaribleSet}
+            });
+            myFiltersGroup.value = updatedGroup;
+          }
+        }
+      }
+    })
+    localStorage.setItem("myFiltersGroup", JSON.stringify(myFiltersGroup.value));
+  }
+
+  // 刪除常用篩選功能
+  const deleteMyFilters = async(myFilter) => {
+    const finishedTime = Date.now() - setStartTime.value;
+    if(finishedTime > 300){
+      const index = myFiltersGroup.value.findIndex((item, index) => {
+        item.name === myFilter.name
+      })
+
+      const res = await Swal.fire({
+        icon: 'question',
+        title: '刪除常用篩選',
+        text: '確定要刪除嗎?',
+        confirmButtonText: '確定',
+        showCancelButton: true,
+        cancelButtonText: '取消',
+        color: '#fff',
+        background: '#18181b',
+      })
+      if(res.isConfirmed){
+        myFiltersGroup.value.splice(index, 1);
+        localStorage.setItem("myFiltersGroup", JSON.stringify(myFiltersGroup.value));
+      }
+    }
+    setStartTime.value = 0;
+  }
+
+  // 關鍵字群組
+  const keyWordGroup = ref(JSON.parse(localStorage.getItem("keyWordGroup")) || []);  
+
+  // 儲存關鍵字功能
+  const saveKeyWord = () => {
+    
+    console.log("有執行儲存關鍵字功能");
+    
+    if(!localStorage.getItem("keyWordGroup")){
+      keyWordGroup.value = [filterVaribleSet.keyWord];
+    }else{
+      const updatedGroup = JSON.parse(localStorage.getItem("keyWordGroup"));
+      updatedGroup.push(filterVaribleSet.keyWord);
+      keyWordGroup.value = updatedGroup;
+    }
+    localStorage.setItem("keyWordGroup", JSON.stringify(keyWordGroup.value));
+  }
+
+  // 刪除關鍵字功能
+  const deleteKeyWord = async(keyWord) => {
+    const finishedTime = Date.now() - setStartTime.value;
+    if(finishedTime > 300){
+      const index = keyWordGroup.value.findIndex((item, index) => {
+        item === keyWord
+      })
+
+      const res = await Swal.fire({
+        icon: 'question',
+        title: '刪除儲存關鍵字',
+        text: '確定要刪除嗎?',
+        confirmButtonText: '確定',
+        showCancelButton: true,
+        cancelButtonText: '取消',
+        color: '#fff',
+        background: '#18181b',
+      })
+      if(res.isConfirmed){
+        keyWordGroup.value.splice(index, 1);
+        localStorage.setItem("keyWordGroup", JSON.stringify(keyWordGroup.value));
+        filterVaribleSet.keyWord = "";
+      }
+    }
+    setStartTime.value = 0;
+  }
 
   // AND按鈕切換
   const changeReplaceKeyWord = () => {
@@ -282,6 +391,12 @@ export const useCardFilterStore = defineStore("card-filter", () => {
 
     if(checkUpDownSort){
       filterVaribleSet.upDownSortArray = [];
+      filterVaribleSet.levelUpSort = false;
+      filterVaribleSet.levelDownSort = false;
+      filterVaribleSet.colorUpSort = false;
+      filterVaribleSet.colorDownSort = false;
+      filterVaribleSet.priceUpSort = false;
+      filterVaribleSet.priceDownSort = false;
     }else if(checkHaveKeyWord){
       filterVaribleSet.keyWord = '';
     }else{
@@ -289,7 +404,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         filterVaribleSet[item] = false;
       })
     }
-
 
     checkHaveFilterOrSort();
     console.log("已重置該部分篩選");
@@ -412,9 +526,8 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     checkHaveFilterOrSort();
   };
   
+  // 升降排序功能
   const useUpDownSort = () => {
-    
-    const upDownSortArr = ref([]);
     
     // 數組內分組
     const clusteredArray = ref([]);
@@ -1831,5 +1944,12 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     changeSortStatus,
     resetAllFilter,
     checkHaveFilterOrSort,
+    saveKeyWord,
+    keyWordGroup,
+    countMouseUp,
+    deleteKeyWord,
+    saveMyFilters,
+    myFiltersGroup,
+    deleteMyFilters
   };
 });

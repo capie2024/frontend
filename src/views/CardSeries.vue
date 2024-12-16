@@ -11,7 +11,9 @@ import { useCardFilterStore } from "@/stores/card-filter"
 // 引入CardFilterStore並使用
 const cardFilterStore = useCardFilterStore();
 const { 
-  applyBtnStatus
+  applyBtnStatus,
+  keyWordGroup,
+  myFiltersGroup
 } = storeToRefs(cardFilterStore);
 const filterVaribleSet = cardFilterStore.filterVaribleSet
 const useFilters = cardFilterStore.useFilters;
@@ -21,6 +23,11 @@ const resetFilter = cardFilterStore.resetFilter
 const changeSortStatus = cardFilterStore.changeSortStatus
 const resetAllFilter = cardFilterStore.resetAllFilter
 const checkHaveFilterOrSort = cardFilterStore.checkHaveFilterOrSort
+const saveKeyWord = cardFilterStore.saveKeyWord
+const countMouseUp = cardFilterStore.countMouseUp
+const deleteKeyWord = cardFilterStore.deleteKeyWord
+const saveMyFilters = cardFilterStore.saveMyFilters
+const deleteMyFilters = cardFilterStore.deleteMyFilters
 
 // 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore();
@@ -228,8 +235,18 @@ const handleApplyStatus = async() => {
       }
     }
   })
+}
 
+// 按下關鍵字按鈕
+const handleUseKeyWordBtn = (keyWord) => {
+  filterVaribleSet.keyWord = keyWord
+  handleKeyWord();
+}
 
+// 按下常用篩選按鈕
+const handleUseMyFiltersBtn = (myFilter) => {
+  Object.assign(filterVaribleSet, myFilter.filters)
+  console.log("按下常用篩選按鈕");
 }
 
 
@@ -246,7 +263,7 @@ const handleApplyStatus = async() => {
       checked: true,
       icon: 'fa-solid fa-star',
       checkButton: false,
-      delButton: true,
+      delButton: false,
       filterTag: ['']
     },
     { 
@@ -562,27 +579,29 @@ const handleApplyStatus = async() => {
             <div class="menu-inner" v-show="filter.checked">
               <div v-if="filter.name === '常用'">
                 <span>"+" 按鈕可以儲存當下篩選內容，長按儲存篩選可以進行刪除。</span>
-                <button class="plus-btn-used"><i class="fa-solid fa-plus"></i></button>
+                <div class="myfilter-button-group" >
+                  <button class="plus-btn-used" @click="saveMyFilters" ><i class="fa-solid fa-plus"></i></button>
+                  <button class="myfilter-button-item" v-for="(myfilter, index) in myFiltersGroup" :key="index" @click="handleUseMyFiltersBtn(myfilter)" @mousedown="countMouseUp" @mouseup="deleteMyFilters(myfilter)" >{{ myfilter.name }}</button>
+                </div>
               </div>
               <div v-else-if="filter.name === '關鍵字'">
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
                   <br>當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
                 </span>
-                <div class="input-keyword" >
+                <div class="input-keyword" :class="{ 'input-keyword-haveValue': filterVaribleSet.keyWord.trim() != '' }">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
                   <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="filterVaribleSet.keyWord" @input="handleKeyWord" >
                   <div>
                     <button @click="changeReplaceKeyWord" ><span>{{ replaceWord }}</span></button>
                     <!-- <button><span>OR</span></button> -->
-                    <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
+                    <button class="plus-btn" @click="saveKeyWord" ><i class="fa-solid fa-plus"></i></button>
                   </div>
                 </div>
-                <span class="keyword-below">"+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
-                  <br>無資料
-                  <p>新增預設關鍵字</p>
-                </span>
-                <div class="keyword-button-group">
-                  <button v-for="item in 3" :key="item">日本</button>
+                <p class="keyword-below">"+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
+                </p>
+                <span v-if="keyWordGroup.length === 0" >無資料</span>
+                <div class="keyword-button-group" >
+                  <button class="keyword-button-item" v-for="(keyWord, index) in keyWordGroup" :key="index" @click="handleUseKeyWordBtn(keyWord)" @mousedown="countMouseUp" @mouseup="deleteKeyWord(keyWord)" >{{ keyWord }}</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '排序'">
@@ -978,7 +997,7 @@ const handleApplyStatus = async() => {
               </div>
             </div>
           </div>
-          <div v-if="view === 'card-info'" class="card-info">
+          <div v-if="seriesCardList.length > 0" class="card-info">
             <div class="row">
               <div class="col-Info" v-for="(card, index) in seriesCardList" :key="index" @click.stop="addCard(card)" >
                 <div class="card-info-image">
@@ -1002,6 +1021,15 @@ const handleApplyStatus = async() => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="card-info-empty" >
+            <div class="card-info-empty-content">
+              <div class="card-info-empty-content-box">
+                <img src="https://bottleneko.app/images/status/empty.png" alt="">
+                <h2>沒東西</h2>
+                <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
               </div>
             </div>
           </div>
@@ -1044,7 +1072,7 @@ const handleApplyStatus = async() => {
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
                   <br>當前搜尋內容： ""
                 </span>
-                <div class="input-keyword" :class="{ 'input-keyword-haveValue': filterVaribleSet.keyWord.trim() != '' }" >
+                <div class="input-keyword" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
                   <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋">
                   <div class="input-keyword-btn" >

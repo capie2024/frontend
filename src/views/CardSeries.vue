@@ -124,6 +124,15 @@ const finalStep = async() => {
     const res = await sendDeckToDatabase(deckData);
     console.log(res);
     
+    if(res == undefined){
+      await Swal.fire({
+                icon: 'error',
+                title: '錯誤',
+                text: '請重新登入'
+              })
+      router.push('/login')
+    }
+
     if(res.status == 200){        
       console.log("已傳送給後端存入資料庫");
       settingDeckStatus.value = false
@@ -143,7 +152,7 @@ const finalStep = async() => {
       awaitSwal.fire({
                 icon: 'error',
                 title: '錯誤',
-                text: '驗證過期請重新登入'
+                text: '請重新登入'
               })
       router.push('/login')
     }else{
@@ -247,6 +256,7 @@ const handleUseKeyWordBtn = (keyWord) => {
 const handleUseMyFiltersBtn = (myFilter) => {
   Object.assign(filterVaribleSet, myFilter.filters)
   console.log("按下常用篩選按鈕");
+  applyBtnStatus.value = true
 }
 
 
@@ -459,10 +469,10 @@ const handleUseMyFiltersBtn = (myFilter) => {
   }
   onBeforeMount(async()=> {
     await getLastViewSeries();
-    getLastDeckEdit();
   })
   // Lifecycle hooks
   onMounted(async() => {
+    getLastDeckEdit();
     switchSortMode();
     window.addEventListener('resize', updateScreenSize);
   });
@@ -997,7 +1007,7 @@ const handleUseMyFiltersBtn = (myFilter) => {
               </div>
             </div>
           </div>
-          <div v-if="seriesCardList.length > 0" class="card-info">
+          <div v-if="seriesCardList.length > 0 && view === 'card-info'" class="card-info">
             <div class="row">
               <div class="col-Info" v-for="(card, index) in seriesCardList" :key="index" @click.stop="addCard(card)" >
                 <div class="card-info-image">

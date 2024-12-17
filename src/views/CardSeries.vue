@@ -10,16 +10,33 @@ import { useCardFilterStore } from "@/stores/card-filter"
 
 // 引入CardFilterStore並使用
 const cardFilterStore = useCardFilterStore();
-const { applyBtnStatus } = storeToRefs(cardFilterStore);
+const { 
+  applyBtnStatus,
+  keyWordGroup,
+  myFiltersGroup
+} = storeToRefs(cardFilterStore);
+const filterVaribleSet = cardFilterStore.filterVaribleSet
 const useFilters = cardFilterStore.useFilters;
 const changeReplaceKeyWord = cardFilterStore.changeReplaceKeyWord
-
+const changeFilterStatus = cardFilterStore.changeFilterStatus
+const resetFilter = cardFilterStore.resetFilter
+const changeSortStatus = cardFilterStore.changeSortStatus
+const resetAllFilter = cardFilterStore.resetAllFilter
+const checkHaveFilterOrSort = cardFilterStore.checkHaveFilterOrSort
+const saveKeyWord = cardFilterStore.saveKeyWord
+const countMouseUp = cardFilterStore.countMouseUp
+const deleteKeyWord = cardFilterStore.deleteKeyWord
+const saveMyFilters = cardFilterStore.saveMyFilters
+const deleteMyFilters = cardFilterStore.deleteMyFilters
 
 // 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore();
-const { seriesCardList, seriesInfo } = storeToRefs(cardSeriesStore);
+const { 
+    seriesCardList,
+    seriesInfo,
+    seriesCardListLength
+  } = storeToRefs(cardSeriesStore);
 const getLastViewSeries = cardSeriesStore.getLastViewSeries;
-
 
 // 引入DeckMakeStore並使用
 const deckMakeStore = useDeckMakeStore();
@@ -44,7 +61,27 @@ const chooseCoverCard = ref('')
 const deckName = ref('LL牌組')
 const deckDescription = ref('這是測試牌組')
 const settingDeckStatus = ref(false)
-const thisSeriesCardLength = ref(0)
+const levelOrder = computed(() => {
+  const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+    return item === 'levelUpSort' || item === 'levelDownSort'
+  })
+  return index + 1
+})
+const colorOrder = computed(() => {
+  const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+    return item === 'colorUpSort' || item === 'colorDownSort'
+  })
+  return index + 1
+})
+const priceOrder = computed(() => {
+  const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+    return item === 'priceUpSort' || item === 'priceDownSort'
+  })
+  return index + 1
+})
+const replaceWord = computed(()=> {
+  return filterVaribleSet.replaceKeyWord ? 'OR' : 'AND'
+})
 
 // 清除牌組並回到第一步編輯牌組的狀態
 const clearDeckAndBacktoFirstStep = async() => {
@@ -87,6 +124,15 @@ const finalStep = async() => {
     const res = await sendDeckToDatabase(deckData);
     console.log(res);
     
+    if(res == undefined){
+      await Swal.fire({
+                icon: 'error',
+                title: '錯誤',
+                text: '請重新登入'
+              })
+      router.push('/login')
+    }
+
     if(res.status == 200){        
       console.log("已傳送給後端存入資料庫");
       settingDeckStatus.value = false
@@ -106,7 +152,7 @@ const finalStep = async() => {
       awaitSwal.fire({
                 icon: 'error',
                 title: '錯誤',
-                text: '驗證過期請重新登入'
+                text: '請重新登入'
               })
       router.push('/login')
     }else{
@@ -139,26 +185,78 @@ const finalStep = async() => {
   }
 }
 
+// 篩選、排序數量
+const filterCount = ref(0);
+const sortCount = ref(0);
 
-// 關鍵字篩選的值
-const keyWord = ref('');
 
 // 關鍵字篩選的狀態
 const handleKeyWord = () => {
-  if(keyWord.value.trim() != ''){
+  if(filterVaribleSet.keyWord.trim() != ''){
     applyBtnStatus.value = true
-    console.log("已經改變");
-  }else{
-    applyBtnStatus.value = false
-    console.log("目前關鍵字為空");
+    console.log("更新關鍵字");
+  }else if(filterVaribleSet.keyWord.trim() == ''){
+      checkHaveFilterOrSort();
+      console.log("目前關鍵字為空");
   }
 }
 
 // 按下apply按鈕後執行篩選功能
-const handleApplyStatus = () => {
+const handleApplyStatus = async() => {
   if(applyBtnStatus.value === true){
-    useFilters(keyWord.value.trim());
+    await useFilters(filterVaribleSet.keyWord.trim());
   }
+
+  filterCount.value = 0;
+  sortCount.value = 0;
+  Object.keys(filterVaribleSet).forEach((item) => {
+    if(
+      item != 'replaceKeyWord' || 
+      item != 'levelUpsort' || 
+      item != 'levelDownSort' ||
+      item != 'colorUpSort' ||
+      item != 'colorDownSort' ||
+      item != 'priceUpSort' ||
+      item != 'priceDownSort' ||
+      item != 'typeCharacter' ||
+      item != 'typeScene' ||
+      item != 'typeEvent'
+    ){
+      if(filterVaribleSet[item] === true){
+        filterCount.value++
+      }
+    }
+
+    if(
+      item == 'replaceKeyWord' || 
+      item == 'levelUpsort' || 
+      item == 'levelDownSort' ||
+      item == 'colorUpSort' ||
+      item == 'colorDownSort' ||
+      item == 'priceUpSort' ||
+      item == 'priceDownSort' ||
+      item == 'typeCharacter' ||
+      item == 'typeScene' ||
+      item == 'typeEvent'
+    ){
+      if(filterVaribleSet[item] === true){
+        sortCount.value++
+      }
+    }
+  })
+}
+
+// 按下關鍵字按鈕
+const handleUseKeyWordBtn = (keyWord) => {
+  filterVaribleSet.keyWord = keyWord
+  handleKeyWord();
+}
+
+// 按下常用篩選按鈕
+const handleUseMyFiltersBtn = (myFilter) => {
+  Object.assign(filterVaribleSet, myFilter.filters)
+  console.log("按下常用篩選按鈕");
+  applyBtnStatus.value = true
 }
 
 
@@ -170,19 +268,159 @@ const handleApplyStatus = () => {
   const view = ref('card-info');
   const currentMain = ref(null);
   const filters = ref([
-    { name: '常用', checked: true, icon: 'fa-solid fa-star' },
-    { name: '關鍵字', checked: true, icon: 'fa-solid fa-magnifying-glass', delButton: true },
-    { name: '排序', checked: true, icon: 'fa-solid fa-sliders', delButton: true },
-    { name: '類型', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '等級', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '顏色', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '費用', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '魂傷', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '攻擊力', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '稀有度', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '判定', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '特徵', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    { name: '商品', checked: true, icon: 'fa-solid fa-filter', checkButton: true }
+    { 
+      name: '常用',
+      checked: true,
+      icon: 'fa-solid fa-star',
+      checkButton: false,
+      delButton: false,
+      filterTag: ['']
+    },
+    { 
+      name: '關鍵字',
+      checked: true,
+      icon: 'fa-solid fa-magnifying-glass',
+      checkButton: false,
+      delButton: true,
+      filterTag: ['keyWord']
+    },
+    { 
+      name: '排序',
+      checked: true,
+      icon: 'fa-solid fa-sliders',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'levelDownSort',
+        'levelUpSort',
+        'colorDownSort',
+        'colorUpSort',
+        'priceDownSort',
+        'priceUpSort'
+      ]
+    },
+    { 
+      name: '類型',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'typeCharacter',
+        'typeScene',
+        'typeEvent'
+      ]
+    },
+    { 
+      name: '等級',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'levelFilter0',
+        'levelFilter1',
+        'levelFilter2',
+        'levelFilter3'
+      ]
+    },
+    { 
+      name: '顏色',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'colorFilterRed',
+        'colorFilterBlue',
+        'colorFilterYellow'
+      ]
+    },
+    { 
+      name: '費用',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'costFilter0',
+        'costFilter1',
+        'costFilter2'
+      ]
+    },
+    { 
+      name: '魂傷',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'soulFilter0',
+        'soulFilter1',
+        'soulFilter2'
+      ]
+    },
+    { 
+      name: '攻擊力',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'attackFilter0',
+        'attackFilter500',
+        'attackFilter1000',
+        'attackFilter1500',
+        'attackFilter2000',
+        'attackFilter2500',
+        'attackFilter3000',
+        'attackFilter3500',
+        'attackFilter4000',
+        'attackFilter4500',
+        'attackFilter5000',
+        'attackFilter5500',
+        'attackFilter6000',
+        'attackFilter6500',
+        'attackFilter7000',
+        'attackFilter7500',
+        'attackFilter8000',
+        'attackFilter8500',
+        'attackFilter9000',
+        'attackFilter9500',
+        'attackFilter10000',
+        'attackFilter10500',
+        'attackFilter11000'
+      ]
+    },
+    { 
+      name: '稀有度',
+      checked: true,
+      icon: 'fa-solid fa-filter',
+      checkButton: false,
+      delButton: true,
+      filterTag: [
+        'rareFilterRR',
+        'rareFilterSSP',
+        'rareFilterLRR',
+        'rareFilterR',
+        'rareFilterSR',
+        'rareFilterOFR',
+        'rareFilterU',
+        'rareFilterC',
+        'rareFilterCR',
+        'rareFilterRRR',
+        'rareFilterCC',
+        'rareFilterPR',
+        'rareFilterTD',
+        'rareFilterSP',
+        'rareFilterN',
+        'rareFilterLRP',
+        'rareFilterSIR'
+      ]
+    },
+    // { name: '判定', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    // { name: '特徵', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+    // { name: '商品', checked: true, icon: 'fa-solid fa-filter', checkButton: true }
   ]);
   
   const sidebarMarginLeft = computed(() => {
@@ -231,12 +469,11 @@ const handleApplyStatus = () => {
   }
   onBeforeMount(async()=> {
     await getLastViewSeries();
-    getLastDeckEdit();
-    switchSortMode();
-    thisSeriesCardLength.value = seriesCardList.value.length
   })
   // Lifecycle hooks
   onMounted(async() => {
+    getLastDeckEdit();
+    switchSortMode();
     window.addEventListener('resize', updateScreenSize);
   });
   
@@ -325,10 +562,10 @@ const handleApplyStatus = () => {
         <header class="sidebar-filter-header">
           <div class = "flex-col">
             <p>卡片篩選</p>
-            <p>0 篩選、0 排序、關鍵字 : ""</p>
+            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ (filterVaribleSet.keyWord.trim()) }}"</p>
           </div>
           <div>
-            <button class="icon del-btn"><i class="fa-solid fa-trash"></i></button>
+            <button class="icon del-btn" @click="resetAllFilter" ><i class="fa-solid fa-trash"></i></button>
             <button class="icon open-btn"><i class="fa-solid fa-chevron-down"></i></button>
             <button @click="closeSidebar" class="icon xmark-btn"><i class="fa-solid fa-xmark"></i></button>
           </div>
@@ -339,7 +576,7 @@ const handleApplyStatus = () => {
             <div class="menu" @click="MenuFilter(index)">
               <i :class="[filter.icon]"></i>
               <p>{{ filter.name }}</p>
-              <button class="icon del" v-if="filter.delButton" >
+              <button class="icon del" v-if="filter.delButton" @click.stop="resetFilter(filter.filterTag)" >
                 <i class="fa-solid fa-trash"></i>
               </button>
               <button class="icon check" v-if="filter.checkButton" >
@@ -352,118 +589,141 @@ const handleApplyStatus = () => {
             <div class="menu-inner" v-show="filter.checked">
               <div v-if="filter.name === '常用'">
                 <span>"+" 按鈕可以儲存當下篩選內容，長按儲存篩選可以進行刪除。</span>
-                <button class="plus-btn-used"><i class="fa-solid fa-plus"></i></button>
+                <div class="myfilter-button-group" >
+                  <button class="plus-btn-used" @click="saveMyFilters" ><i class="fa-solid fa-plus"></i></button>
+                  <button class="myfilter-button-item" v-for="(myfilter, index) in myFiltersGroup" :key="index" @click="handleUseMyFiltersBtn(myfilter)" @mousedown="countMouseUp" @mouseup="deleteMyFilters(myfilter)" >{{ myfilter.name }}</button>
+                </div>
               </div>
               <div v-else-if="filter.name === '關鍵字'">
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
-                  <br>當前搜尋內容： {{ keyWord }}
+                  <br>當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
                 </span>
-                <div class="input-keyword" >
+                <div class="input-keyword" :class="{ 'input-keyword-haveValue': filterVaribleSet.keyWord.trim() != '' }">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
-                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="keyWord" @input="handleKeyWord" >
+                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="filterVaribleSet.keyWord" @input="handleKeyWord" >
                   <div>
-                    <button @click="changeReplaceKeyWord" ><span>AND</span></button>
+                    <button @click="changeReplaceKeyWord" ><span>{{ replaceWord }}</span></button>
                     <!-- <button><span>OR</span></button> -->
-                    <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
+                    <button class="plus-btn" @click="saveKeyWord" ><i class="fa-solid fa-plus"></i></button>
                   </div>
                 </div>
-                <span class="keyword-below">"+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
-                  <br>無資料
-                  <p>新增預設關鍵字</p>
-                </span>
+                <p class="keyword-below">"+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
+                </p>
+                <span v-if="keyWordGroup.length === 0" >無資料</span>
+                <div class="keyword-button-group" >
+                  <button class="keyword-button-item" v-for="(keyWord, index) in keyWordGroup" :key="index" @click="handleUseKeyWordBtn(keyWord)" @mousedown="countMouseUp" @mouseup="deleteKeyWord(keyWord)" >{{ keyWord }}</button>
+                </div>
               </div>
               <div v-else-if="filter.name === '排序'">
                 <div class="menu-inner-slider-btn">
-                  <button><div class="slider-btn"></div>等級 <i class="fa-solid fa-arrow-up"></i></button>
-                  <button><div class="slider-btn"></div>顏色 <i class="fa-solid fa-arrow-up"></i></button>
-                  <button><div class="slider-btn"></div>價格 <i class="fa-solid fa-arrow-up"></i></button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelDownSort || !filterVaribleSet.levelUpSort, 'btn-active-bg': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" @click="changeSortStatus('level')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" >
+                      {{ levelOrder > 0 ? levelOrder : '' }}
+                    </div>
+                    等級
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.levelUpSort ,'arrow-down': filterVaribleSet.levelUpSort}" ></i>
+                  </button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorDownSort || !filterVaribleSet.colorUpSort, 'btn-active-bg': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" @click="changeSortStatus('color')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" >
+                      {{ colorOrder > 0 ? colorOrder : '' }}
+                    </div>
+                    顏色
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.colorUpSort ,'arrow-down': filterVaribleSet.colorUpSort}" ></i>
+                  </button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.priceDownSort || !filterVaribleSet.priceUpSort, 'btn-active-bg': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" @click="changeSortStatus('price')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" >
+                      {{ priceOrder > 0 ? priceOrder : '' }}
+                    </div>
+                    價格
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.priceUpSort ,'arrow-down': filterVaribleSet.priceUpSort}" ></i>
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '類型'">
                 <div class="menu-inner-btn">
-                  <button>角色</button>
-                  <button>事件</button>
-                  <button>名場</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeCharacter, 'btn-active-bg': filterVaribleSet.typeCharacter }" @click="changeFilterStatus('typeCharacter')" >角色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeEvent, 'btn-active-bg': filterVaribleSet.typeEvent }" @click="changeFilterStatus('typeEvent')" >事件</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeScene, 'btn-active-bg': filterVaribleSet.typeScene }" @click="changeFilterStatus('typeScene')" >名場</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '等級'">
                 <div class="menu-inner-btn">
-                  <button>0</button>
-                  <button>1</button>
-                  <button>2</button>
-                  <button>3</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter0, 'btn-active-bg': filterVaribleSet.levelFilter0 }" @click="changeFilterStatus('levelFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter1, 'btn-active-bg': filterVaribleSet.levelFilter1 }" @click="changeFilterStatus('levelFilter1')" >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter2, 'btn-active-bg': filterVaribleSet.levelFilter2 }" @click="changeFilterStatus('levelFilter2')" >2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter3, 'btn-active-bg': filterVaribleSet.levelFilter3 }" @click="changeFilterStatus('levelFilter3')" >3</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '顏色'">
                 <div class="menu-inner-btn">
-                  <button>黃色</button>
-                  <button>紅色</button>
-                  <button>藍色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterYellow, 'btn-active-bg': filterVaribleSet.colorFilterYellow }"@click="changeFilterStatus('colorFilterYellow')" >黃色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterRed, 'btn-active-bg': filterVaribleSet.colorFilterRed }"@click="changeFilterStatus('colorFilterRed')" >紅色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterBlue, 'btn-active-bg': filterVaribleSet.colorFilterBlue }"@click="changeFilterStatus('colorFilterBlue')" >藍色</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '費用'">
                 <div class="menu-inner-btn">
-                  <button>0</button>
-                  <button>1</button>
-                  <button>2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter0, 'btn-active-bg': filterVaribleSet.costFilter0 }"@click="changeFilterStatus('costFilter0')"  >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter1, 'btn-active-bg': filterVaribleSet.costFilter1 }"@click="changeFilterStatus('costFilter1')"  >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter2, 'btn-active-bg': filterVaribleSet.costFilter2 }"@click="changeFilterStatus('costFilter2')"  >2</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '魂傷'">
                 <div class="menu-inner-btn">
-                  <button>0</button>
-                  <button>1</button>
-                  <button>2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter0, 'btn-active-bg': filterVaribleSet.soulFilter0 }"@click="changeFilterStatus('soulFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter1, 'btn-active-bg': filterVaribleSet.soulFilter1 }"@click="changeFilterStatus('soulFilter1')" >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter2, 'btn-active-bg': filterVaribleSet.soulFilter2 }"@click="changeFilterStatus('soulFilter2')" >2</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '攻擊力'">
                 <div class="menu-inner-btn">
-                  <button>0</button>
-                  <button>500</button>
-                  <button>1000</button>
-                  <button>1500</button>
-                  <button>2000</button>
-                  <button>2500</button>
-                  <button>3000</button>
-                  <button>3500</button>
-                  <button>4000</button>
-                  <button>4500</button>
-                  <button>5000</button>
-                  <button>5500</button>
-                  <button>6000</button>
-                  <button>6500</button>
-                  <button>7000</button>
-                  <button>7500</button>
-                  <button>8000</button>
-                  <button>8500</button>
-                  <button>9000</button>
-                  <button>9500</button>
-                  <button>10000</button>
-                  <button>10500</button>
-                  <button>11000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter0, 'btn-active-bg': filterVaribleSet.attackFilter0 }"@click="changeFilterStatus('attackFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter500, 'btn-active-bg': filterVaribleSet.attackFilter500 }"@click="changeFilterStatus('attackFilter500')" >500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1000, 'btn-active-bg': filterVaribleSet.attackFilter1000 }"@click="changeFilterStatus('attackFilter1000')" >1000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1500, 'btn-active-bg': filterVaribleSet.attackFilter1500 }"@click="changeFilterStatus('attackFilter1500')" >1500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2000, 'btn-active-bg': filterVaribleSet.attackFilter2000 }"@click="changeFilterStatus('attackFilter2000')" >2000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2500, 'btn-active-bg': filterVaribleSet.attackFilter2500 }"@click="changeFilterStatus('attackFilter2500')" >2500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3000, 'btn-active-bg': filterVaribleSet.attackFilter3000 }"@click="changeFilterStatus('attackFilter3000')" >3000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3500, 'btn-active-bg': filterVaribleSet.attackFilter3500 }"@click="changeFilterStatus('attackFilter3500')" >3500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4000, 'btn-active-bg': filterVaribleSet.attackFilter4000 }"@click="changeFilterStatus('attackFilter4000')" >4000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4500, 'btn-active-bg': filterVaribleSet.attackFilter4500 }"@click="changeFilterStatus('attackFilter4500')" >4500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5000, 'btn-active-bg': filterVaribleSet.attackFilter5000 }"@click="changeFilterStatus('attackFilter5000')" >5000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5500, 'btn-active-bg': filterVaribleSet.attackFilter5500 }"@click="changeFilterStatus('attackFilter5500')" >5500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6000, 'btn-active-bg': filterVaribleSet.attackFilter6000 }"@click="changeFilterStatus('attackFilter6000')" >6000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6500, 'btn-active-bg': filterVaribleSet.attackFilter6500 }"@click="changeFilterStatus('attackFilter6500')" >6500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7000, 'btn-active-bg': filterVaribleSet.attackFilter7000 }"@click="changeFilterStatus('attackFilter7000')" >7000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7500, 'btn-active-bg': filterVaribleSet.attackFilter7500 }"@click="changeFilterStatus('attackFilter7500')" >7500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8000, 'btn-active-bg': filterVaribleSet.attackFilter8000 }"@click="changeFilterStatus('attackFilter8000')" >8000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8500, 'btn-active-bg': filterVaribleSet.attackFilter8500 }"@click="changeFilterStatus('attackFilter8500')" >8500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9000, 'btn-active-bg': filterVaribleSet.attackFilter9000 }"@click="changeFilterStatus('attackFilter9000')" >9000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9500, 'btn-active-bg': filterVaribleSet.attackFilter9500 }"@click="changeFilterStatus('attackFilter9500')" >9500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10000, 'btn-active-bg': filterVaribleSet.attackFilter10000 }"@click="changeFilterStatus('attackFilter10000')" >10000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10500, 'btn-active-bg': filterVaribleSet.attackFilter10500 }"@click="changeFilterStatus('attackFilter10500')" >10500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter11000, 'btn-active-bg': filterVaribleSet.attackFilter11000 }"@click="changeFilterStatus('attackFilter11000')" >11000</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '稀有度'">
                 <div class="menu-inner-btn">
-                  <button>RR</button>
-                  <button>SSP</button>
-                  <button>LRR</button>
-                  <button>R</button>
-                  <button>SR</button>
-                  <button>OFR</button>
-                  <button>U</button>
-                  <button>C</button>
-                  <button>CR</button>
-                  <button>RRR</button>
-                  <button>CC</button>
-                  <button>PR</button>
-                  <button>TD</button>
-                  <button>SP</button>
-                  <button>N</button>
-                  <button>LRP</button>
-                  <button>SIR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRR, 'btn-active-bg': filterVaribleSet.rareFilterRR }"@click="changeFilterStatus('rareFilterRR')" >RR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSSP, 'btn-active-bg': filterVaribleSet.rareFilterSSP }"@click="changeFilterStatus('rareFilterSSP')" >SSP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRR, 'btn-active-bg': filterVaribleSet.rareFilterLRR }"@click="changeFilterStatus('rareFilterLRR')" >LRR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilteR, 'btn-active-bg': filterVaribleSet.rareFilterR}"@click="changeFilterStatus('rareFilterR')" >R</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSR, 'btn-active-bg': filterVaribleSet.rareFilterSR }"@click="changeFilterStatus('rareFilterSR')" >SR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterOFR, 'btn-active-bg': filterVaribleSet.rareFilterOFR }"@click="changeFilterStatus('rareFilterOFR')" >OFR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterU, 'btn-active-bg': filterVaribleSet.rareFilterU }"@click="changeFilterStatus('rareFilterU')" >U</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterC, 'btn-active-bg': filterVaribleSet.rareFilterC }"@click="changeFilterStatus('rareFilterC')" >C</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCR, 'btn-active-bg': filterVaribleSet.rareFilterCR }"@click="changeFilterStatus('rareFilterCR')" >CR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRRR, 'btn-active-bg': filterVaribleSet.rareFilterRRR }"@click="changeFilterStatus('rareFilterRRR')" >RRR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCC, 'btn-active-bg': filterVaribleSet.rareFilterCC }"@click="changeFilterStatus('rareFilterCC')" >CC</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterPR, 'btn-active-bg': filterVaribleSet.rareFilterPR }"@click="changeFilterStatus('rareFilterPR')" >PR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterTD, 'btn-active-bg': filterVaribleSet.rareFilterTD }"@click="changeFilterStatus('rareFilterTD')" >TD</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSP, 'btn-active-bg': filterVaribleSet.rareFilterSP }"@click="changeFilterStatus('rareFilterSP')" >SP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterN, 'btn-active-bg': filterVaribleSet.rareFilterN }"@click="changeFilterStatus('rareFilterN')" >N</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRP, 'btn-active-bg': filterVaribleSet.rareFilterLRP }"@click="changeFilterStatus('rareFilterLRP')" >LRP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSIR, 'btn-active-bg': filterVaribleSet.rareFilterSIR }"@click="changeFilterStatus('rareFilterSIR')" >SIR</button>
                 </div>
               </div>
-              <div v-else-if="filter.name === '判定'">
+              <!-- <div v-else-if="filter.name === '判定'">
                 <div class="menu-inner-btn">
                   <button>無</button>
                   <button>魂</button>
@@ -493,7 +753,7 @@ const handleApplyStatus = () => {
                   <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>PRカード【Wサイド】</button>
                   <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>[TD]リコリス・リコイル</button>
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
@@ -651,7 +911,7 @@ const handleApplyStatus = () => {
             </svg>
           </button>
           <div data-v-3e737e76="" class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
-            <!-- <div data-v-57e635bc="" class="flex items-center gap-4"> -->
+            <!-- <div class="flex items-center gap-4"> -->
                 <h2 class="truncate text-2xl font-bold">{{ seriesInfo.name }}</h2>
             <!-- </div> -->
           </div>
@@ -702,11 +962,17 @@ const handleApplyStatus = () => {
             <span><i class="fa-regular fa-clone"></i> <span v-for="(code, index) in seriesInfo.code" :key="index" >{{ code }}{{ index == seriesInfo.code.length - 1 ? '' : ', '  }}</span></span>
             <h1>{{ seriesInfo.name }}</h1>
             <div>
-              <div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ seriesInfo.sellAt[0] }}</span>
+              <div v-if="seriesInfo.sellAt" >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ seriesInfo.sellAt[seriesInfo.sellAt.length - 1] }}</span>
               </div>
-              <div>
-                <i class="fa-regular fa-clone"></i><span>總數{{ thisSeriesCardLength }}張</span>
+              <div v-else >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布</span>
+              </div>
+              <div v-if="seriesCardListLength > 0" >
+                <i class="fa-regular fa-clone" ></i><span>總數{{ seriesCardListLength }}張</span>
+              </div>
+              <div v-else >
+                <i class="fa-regular fa-clone"></i><span>總數 0 張</span>
               </div>
               <div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16" aria-hidden="true" data-slot="icon" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"></path></svg><span>篩選出{{ seriesCardList.length }}張</span>
@@ -741,10 +1007,9 @@ const handleApplyStatus = () => {
               </div>
             </div>
           </div>
-    
-          <div v-if="view === 'card-info'" class="card-info">
+          <div v-if="seriesCardList.length > 0 && view === 'card-info'" class="card-info">
             <div class="row">
-              <div class="col-Info" v-for="(card, index) in seriesCardList" :key="card.id" @click.stop="addCard(card)" >
+              <div class="col-Info" v-for="(card, index) in seriesCardList" :key="index" @click.stop="addCard(card)" >
                 <div class="card-info-image">
                   <img :src="card.cover">
                   <div class="card-inner-info" @click.stop="getCardInfoAndShow(card)" >
@@ -766,6 +1031,15 @@ const handleApplyStatus = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="card-info-empty" >
+            <div class="card-info-empty-content">
+              <div class="card-info-empty-content-box">
+                <img src="https://bottleneko.app/images/status/empty.png" alt="">
+                <h2>沒東西</h2>
+                <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
               </div>
             </div>
           </div>
@@ -808,11 +1082,11 @@ const handleApplyStatus = () => {
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
                   <br>當前搜尋內容： ""
                 </span>
-                <div class="input-keyword" :class="{ 'input-keyword-haveValue': keyWord !== '' }" >
+                <div class="input-keyword" >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
                   <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋">
                   <div class="input-keyword-btn" >
-                    <button ><span>AND</span></button>
+                    <button @click="changeReplaceKeyWord" ><span>AND</span></button>
                     <!-- <button><span>OR</span></button> -->
                     <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
                   </div>

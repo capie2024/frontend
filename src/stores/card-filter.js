@@ -134,7 +134,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
           if(!localStorage.getItem("myFiltersGroup")){
             myFiltersGroup.value.push({
               name: value,
-              filters: filterVaribleSet
+              filters: {...filterVaribleSet}
             });
             
           }else{

@@ -260,7 +260,7 @@ const handleUseMyFiltersBtn = (myFilter) => {
 }
 
 
-  const currentSidebar = ref('open-filter');
+  const currentSidebar = ref('');
   const sidebarFilterWidth = ref(490);
   const sidebarDeckWidth = ref(490);
   const extraOffset = ref(262);

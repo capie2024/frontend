@@ -1,0 +1,12 @@
+.card-wrapper {
+  perspective: 1000px;
+}
+
+.card {
+  transition: transform 0.1s ease;
+  transform-style: preserve-3d;
+}
+
+.glossy {
+  transition: 0.3s;
+}

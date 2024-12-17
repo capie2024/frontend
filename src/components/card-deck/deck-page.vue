@@ -1982,6 +1982,16 @@ export default {
     }
 
     @media screen and (max-width: 1199px) {
+        .social-btn1:hover .description1,
+        .social-btn2:hover .description2,
+        .social-btn3:hover .description3,
+        .social-btn3:hover .description4,
+        .social-btn3:hover .description5,
+        .social-btn3:hover .description7,
+        .social-btn4:hover .description4{
+        
+        visibility: hidden;
+    }
         .toolbar {
             position: absolute;
             top: 300px;

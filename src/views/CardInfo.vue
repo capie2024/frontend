@@ -110,6 +110,7 @@ onBeforeMount(() => {
 })
 
 onMounted(() => {
+    import ('../assets/js/cardEffect.js')
     cardCount.value = countCards(cardInfo.value)
 })
 
@@ -122,18 +123,20 @@ onMounted(() => {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
                 </svg>
             </button>
-            <div class="card flex-none rounded-2xl relative p-0 w-4/12 overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.1)]">
-                <div class="absolute top-0 left-0 w-full h-full glossy z-2 mix-blend-lighten"></div>
-                <!-- 動態帶入資料的版本 <img class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image" :src="cardInfo.cover" alt="" size="sm:100vw md:50vw lg:600px"> -->
-                <img class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image" src="https://jasonxddd.me:7001/imgproxy/uTz5Qc1RtmVq-UACufPxVQk-G0eFfKvKWXNGEImcyHc/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0hPTF9XMTA0XzEyM1NTUC5wbmc.png" alt="" size="sm:100vw md:50vw lg:600px">
-                <button class="absolute bottom-0 p-4 text-white rounded-full md-arrow left-2 bg-black/50 disabled:bg-black/30 disabled:text-white/20 hover:bg-cyan-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
-                    </svg>
-                </button>
-                <button class="absolute bottom-0 p-4 text-white rounded-full md-arrow right-2 bg-black/50 disabled:bg-black/30 disabled:text-white/20 hover:bg-cyan-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path>
-                    </svg>
-            </button>
+            <div class="card-wrapper flex-none rounded-2xl relative p-0 w-4/12">
+                <div class="card overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.1)]">
+                    <div class="glossy absolute top-0 left-0 w-full h-full rounded-2xl z-2 mix-blend-lighten"></div>
+                    <!-- 動態帶入資料的版本 <img class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image" :src="cardInfo.cover" alt="" size="sm:100vw md:50vw lg:600px"> -->
+                    <img class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image" src="https://jasonxddd.me:7001/imgproxy/uTz5Qc1RtmVq-UACufPxVQk-G0eFfKvKWXNGEImcyHc/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0hPTF9XMTA0XzEyM1NTUC5wbmc.png" alt="" size="sm:100vw md:50vw lg:600px">
+                    <button class="absolute bottom-0 p-4 text-white rounded-full md-arrow left-2 bg-black/50 disabled:bg-black/30 disabled:text-white/20 hover:bg-cyan-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
+                        </svg>
+                    </button>
+                    <button class="absolute bottom-0 p-4 text-white rounded-full md-arrow right-2 bg-black/50 disabled:bg-black/30 disabled:text-white/20 hover:bg-cyan-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <div class="grow-1 w-full rounded-t-2xl rounded-b-none md:rounded-2xl bg-zinc-800 h-[80vh] overflow-auto scroll-smooth scrollbar">
                 <div class="sticky top-0 z-10 px-4 pt-4 shadow-xl rounded-xl bg-zinc-800">
@@ -368,6 +371,7 @@ onMounted(() => {
 
 <style scoped>
 @import '@/assets/base.css';
+@import '@/assets/css/card-effect.css';
 
 *, :after, :before {
     border: 0 solid #e5e7eb;
@@ -378,16 +382,6 @@ onMounted(() => {
 }
 .md-arrow {
     display: none;
-}
-.page {
-    perspective: 1000px;
-}
-.card {
-  transition: transform 0.5s ease-in-out;
-  transform-style: preserve-3d;
-}
-.glossy{
-  transition: 0.3s;
 }
 .btn {
     border-radius: 9999px;

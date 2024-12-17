@@ -116,6 +116,7 @@ onBeforeUnmount(() => {
                     >
                         <div v-for="(imageUrl, index) in grid" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                            <!-- <img v-else :src="placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl"> -->
                         </div>
                     </div>
                     <!-- <div class="grid2 flex flex-col flex-wrap items-center justify-center flex-none gap-4">

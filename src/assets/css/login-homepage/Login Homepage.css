@@ -13,7 +13,7 @@ body {
   display: flex;
   height: 100vh;
   /* fix */
-  width: 100%;
+  width: calc(100vw - 270px);
   /* fix */
 }
 
@@ -228,7 +228,7 @@ nav {
 
 /* new add element */
 .search-bar {
-  width: 36px;
+  /* width: 36px; */
   min-height: 20px;
   padding: 8px;
   border-radius: 999px;
@@ -325,8 +325,7 @@ nav {
   /* width: 85%; */
   overflow-x: hidden;
   /* fix */
-  border-top-right-radius: 16px;
-  border-bottom-right-radius: 16px;
+  border-radius: 1rem;
   background-color: #121212;
   padding: 0 1.5rem;
   box-sizing: border-box;
@@ -736,7 +735,6 @@ a {
   .container {
     left: 0;
     min-width: 100%;
-    justify-content: space-between;
     box-sizing: border-box;
     background-color: black;
   }
@@ -765,7 +763,7 @@ a {
   .aa {
     margin: 0px;
     border-radius: 0px;
-  
+    min-width: 100vw;
   }
 
   .sidebar-menu::before {

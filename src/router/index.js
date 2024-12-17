@@ -1,41 +1,49 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import Home from "../views/HomeView.vue";
 import CardInfo from "../views/CardInfo.vue";
 import WorkShopView from "@/views/WorkShopView.vue";
 import HeroMemberView from "@/views/HeroMemberView.vue";
 import OfficialProductList from "@/views/OfficialProductList.vue";
 import CardListbySeries from "@/views/Card List by Series.vue";
-import MainPage from "@/views/MainPage.vue";
+// import MainPage from "@/views/MainPage.vue";
 import AccountPage from "@/views/AccountPage.vue";
 import DailyCard from "../views/DailyCard.vue";
 import Faq from "../views/Faq.vue";
 import FaqInfo from "../views/FaqInfo.vue";
 import Login from "../views/Login.vue";
 import Signup from "../views/Signup.vue";
-import LoginHomePageView from "@/views/LoginHomepage.vue";
+// import LoginHomePageView from "@/views/LoginHomepage.vue";
 import CardSeries from "@/views/CardSeries.vue";
 import Carddeck from "../components/card-deck/Carddeck.vue";
 import AddArticle from "../views/AddArticle.vue";
 import Social from "../views/Social.vue";
-import MyCard from "../views/MyCardView.vue";
+import MyCardView from "../views/MyCardView.vue";
 import Findcard from "../components/Mycard/find-card.vue";
 import Remitcard from "../components/Mycard/remit-card.vue";
 import RemitCardNf from "../components/Mycard/remit-cardnf.vue";
 import AuthSuccess from "../views/AuthSuccess.vue";
 import MyArticle from "../views/MyArticle.vue";
+import Warning from "../components/Mycard/warning.vue";
+import Delete from "../components/Mycard/delete.vue";
 
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: "/",
+      name: "home",
+      component: Home,
+    },
+    {
+      // path: card/:id
       path: "/card-info",
       name: "card-info",
       component: CardInfo,
     },
     {
-      path: "/work-shop",
-      name: "work-shop",
+      path: "/workshop",
+      name: "workshop",
       component: WorkShopView,
     },
     {
@@ -45,18 +53,18 @@ const router = createRouter({
     },
     {
 
-      path: "/OfficialProductList",
-      name: "OfficialProductList",
+      path: "/products",
+      name: "products",
       component: OfficialProductList,
     },
     {
-      path: "/Card-List-by-Series",
-      name: "CardListbySeries",
+      path: "/series",
+      name: "series",
       component: CardListbySeries,
     },
     {
       path: '/daily-card',
-      name: 'daily-info',
+      name: 'daily-card',
       component: DailyCard
     },
     {
@@ -65,18 +73,19 @@ const router = createRouter({
       component: Faq
     },
     {
+      // path: '/faq/:id',
       path: '/faq-info',
       name: 'faq-info',
       component: FaqInfo
     },
+    // {
+    //   path: "/main-page",
+    //   name: "main-page",
+    //   component: MainPage,
+    // },
     {
-      path: "/main-page",
-      name: "main-page",
-      component: MainPage,
-    },
-    {
-      path: "/account-page",
-      name: "account-page",
+      path: "/user",
+      name: "user",
       component: AccountPage,
     },
     {
@@ -89,11 +98,11 @@ const router = createRouter({
       name: 'signup',
       component: Signup
     },
-    {
-      path: "/login-homepage",
-      name: "login-homepage",
-      component: LoginHomePageView,
-    },
+    // {
+    //   path: "/login-homepage",
+    //   name: "login-homepage",
+    //   component: LoginHomePageView,
+    // },
     {
       path: "/card-series",
       name: "card-series",
@@ -114,9 +123,9 @@ const router = createRouter({
       component: Social
     },
     {
-      path: "/mycard",
-      name: "mycard",
-      component: MyCard
+      path: "/mycardview",
+      name: "mycardview",
+      component: MyCardView
     },
     {
       path: "/findcard",
@@ -134,6 +143,11 @@ const router = createRouter({
       component: RemitCardNf,
     },
     {
+      path: "/deck",
+      name: "deck",
+      component: MyCardView,
+    },
+    {
       path: '/auth-success',
       name: 'auth-success',
       component: AuthSuccess
@@ -142,8 +156,17 @@ const router = createRouter({
       path: "/social/my",
       name: "my-article",
       component: MyArticle
-    }
-
+    },
+    {
+      path: "/warning",
+      name: "warning",
+      component: Warning
+    },
+    {
+      path: "/delete",
+      name: "delete",
+      component: Delete
+    },
   ],
 });
 

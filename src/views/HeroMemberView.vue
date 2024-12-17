@@ -3,6 +3,7 @@ import MainFooter from "@/components/MainFooter.vue";
 import PageControl from "@/components/work-shop/PageControl.vue";
 import SideBar from "@/components/work-shop/SideBar.vue";
 import { onMounted, ref } from "vue";
+import PaypalCheckout from "@/components/PaypalCheckout.vue";
 
 onMounted(() => {
     import("@/assets/js/hero-member/hero-member-animation.js")
@@ -287,7 +288,8 @@ onMounted(() => {
                       </li>
                     </ul>
                     <div class="hero-member-main-member-type-section-content-item-btn">
-                      <button>立即前往 Patreon</button>
+                      <!-- <button>立即前往 Patreon</button> -->
+                      <PaypalCheckout />
                     </div>
                   </div>
                 </a>

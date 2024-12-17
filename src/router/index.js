@@ -27,6 +27,7 @@ import Warning from "../components/Mycard/warning.vue";
 import Delete from "../components/Mycard/delete.vue";
 
 
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -123,6 +124,11 @@ const router = createRouter({
       component: Social
     },
     {
+      path: "/mycard",
+      name: "mycard",
+      component: MyCardView
+    },
+    {
       path: "/findcard",
       name: "findcard",
       component: Findcard,
@@ -140,7 +146,7 @@ const router = createRouter({
     {
       path: "/deck",
       name: "deck",
-      component: MyCardView
+      component: MyCardView,
     },
     {
       path: '/auth-success',

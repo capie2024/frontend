@@ -315,20 +315,21 @@ const getSeriesCards = cardSeriesStore.getSeriesCards;
 const saveLastViewSeries = cardSeriesStore.saveLastViewSeries;
     
 const handleSeries = async(seriesId) => {
+
     try {
+        // 先獲取系列卡片數據
+        await getSeriesCards(seriesId);
+        
         router.push('/card-series');
 
         // 保存最後瀏覽的系列
-        saveLastViewSeries(seriesId);
-
-        // 先獲取系列卡片數據
-        await getSeriesCards(seriesId);
+        saveLastViewSeries(seriesId);    
 
         // 更新已查看的卡片記錄
         await saveViewedSeries(seriesId);
 
     } catch (error) {
-
+    
         console.error("處理時出現錯誤：", error);
     }
     

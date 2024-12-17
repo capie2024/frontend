@@ -1,7 +1,6 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import dayjs from 'dayjs';
 
 function getUserIdFromToken(token) {
     try {
@@ -18,22 +17,35 @@ function getUserIdFromToken(token) {
 export default {
     data() {
         return {
-            deckData: {},  // 儲存從 API 獲得的牌組資料
+            deckData: {
+                deck:[],
+            },  // 儲存從 API 獲得的牌組資料
             sortBy: '', // 用於設置排序條件
             togglePriceView: false, // 用於切換價格表顯示
             toggleTableView: false, // 用於切換顯示模式
         };
     },
     computed: {
+        totalPrice() {
+        // 確保 deckData.deck 是陣列
+        if (!Array.isArray(this.deckData.deck)) {
+            return 0;
+        }
+
+        // 使用 reduce 計算總和
+        return this.deckData.deck.reduce((sum, card) => {
+            return sum + (card.price?.number || 0); // 確保價格存在
+        }, 0);
+    },
         uniqueProductNames() {
         // 使用 Set 來過濾掉重複的 productName
         const productNames = this.deckData.deck.map(card => card.productName);
         return [...new Set(productNames)];
     },
     groupedCards() {
-        if (!Array.isArray(this.deckData.deck)) {
-            return []; // 確保 deck 是陣列，如果不是，返回空陣列
-        }
+        if (!Array.isArray(this.deckData.deck) || this.deckData.deck.length === 0) {
+        return []; // 如果 deck 不是陣列或為空，返回空陣列
+    }
 
         let sorted = [];
         if (this.sortBy === "level") {
@@ -63,10 +75,16 @@ export default {
 
         // 分組邏輯
         const grouped = sorted.reduce((acc, card) => {
-            const groupKey = card[this.sortBy]; // 根據當前的 sortBy 屬性作為分組依據
+            let groupKey = card[this.sortBy]; // 根據當前的 sortBy 屬性作為分組依據
+            
+            if (!groupKey) {
+                groupKey = "角色";
+            }
+
             if (!acc[groupKey]) {
                 acc[groupKey] = [];
             }
+            
             acc[groupKey].push(card);
             return acc;
         }, {});
@@ -99,6 +117,10 @@ export default {
     },
 
     methods: {
+        goToArticlePage() {
+            // 使用 Vue 的路由進行跳轉
+            this.$router.push('/add-article');
+        },
         async fetchDeckData() {
     const deckId = this.$route.params.deck_id;
     console.log('Deck ID:', deckId);  // 用來檢查是否能獲取到 deck_id
@@ -213,12 +235,20 @@ export default {
                                 <div class="description-item description2">複製牌組</div>
                             </button>
                             <button class="social-btn-item social-btn3">
-                                <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
-                                <div class="description-item description3">匯出牌組</div>
-                            </button>
-                            <button class="social-btn-item social-btn4">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
-                                <div class="description-item description4">通知</div>
+                                <div class="description-item description7">匯出牌組</div>
+                            </button>
+                            <button class="social-btn-item social-btn3" @click="goToArticlePage">
+                                <svg data-v-f57a085e="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"></path></svg>
+                                <div class="description-item description3">發布文章</div>
+                            </button>
+                            <button class="social-btn-item social-btn3">
+                                <svg data-v-f57a085e="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path></svg>
+                                <div class="description-item description4">刪除</div>
+                            </button>
+                            <button class="social-btn-item social-btn3">
+                                <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
+                                <div class="description-item description5">通知</div>
                             </button>
                             <button class="user-btn">
                                 <div class="btn-img">
@@ -229,8 +259,8 @@ export default {
                             </button>
                             <button class="social-btn-item social-btn5">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"></path></svg>
-                                <div class="description-item description5">複製牌組</div>
-                                <div class="description-item description6">匯出牌組</div>
+                                <!-- <div class="description-item description5">複製牌組</div> -->
+                                <!-- <div class="description-item description6">匯出牌組</div> -->
                             </button>
                         </div>
                     </header>
@@ -248,15 +278,15 @@ export default {
                             <div class="carddeck-name">
                                 <h1>{{ deckData.deck_name }}</h1>
                             </div>
-                            <div class="data-container">
+                            <div class="data-container" >
                                 <div class="user-link"   v-if="deckData && deckData.users && deckData.users.username">
-                                    <div class="user-img">
-                                        <img src="/src/img/麻衣.png" alt="">
+                                    <div class="user-img" v-if="deckData.users.picture">
+                                        <img :src="deckData.users.picture" alt="">
                                     </div>
                                     <span class="date-container">
                                         <a href="#">{{deckData.users.username}}</a>
                                         發布於
-                                        <span>{{ deckData.build_time }}</span>
+                                        <span>{{ deckData.build_time.slice(0, 10) }}</span>
                                     </span>
                                 </div>
                                 <span class="data-item" v-if="deckData && Array.isArray(deckData.deck)">
@@ -266,7 +296,7 @@ export default {
                                 <span class="data-item">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none" data-v-5634e853=""><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg>&nbsp;
                                     總價
-                                    <span> 牌組價錢</span>
+                                    <span>{{ totalPrice }}円</span>
                                 </span>
                                 <span class="data-item"   v-if="deckData.deck && deckData.deck.length > 0">
                                     <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg>&nbsp;
@@ -286,7 +316,7 @@ export default {
                                 <span>內容描述</span>
                             </div>
                             <div class="article-content">
-                                <p>沒東西</p>
+                                <p>{{deckData.deck_description}}</p>
                             </div>
                         </div>
                         
@@ -340,9 +370,9 @@ export default {
                     </nav>
 
                     <div class="card-info">
-                        <div class="row" v-for="group in groupedCards" :key="group.group">
+                        <div class="row" v-if="groupedCards && groupedCards.length" v-for="group in groupedCards" :key="group.group || '未分類'">
                             <div class="card-info-header">
-                                <h2 class="group-title">{{ group.group || '未分類'}} - {{ group.cards.length }}</h2>
+                                <h2 class="group-title">{{ group.group || '未分類' }} - {{ group.cards.length || 0 }}</h2>
                                 <div class="group-count" data-v-1d946842="">
                                     <img data-v-1d946842="" src="https://bottleneko.app/soul.gif" class="size-4">
                                     <span data-v-1d946842="" class="font-mono flex-none">{{ countSoulCards(group.cards) }}</span>
@@ -439,6 +469,7 @@ export default {
 </template>
 
 <style scoped>
+
     .price-row{
         display: flex;
         justify-content: center;
@@ -1049,7 +1080,10 @@ export default {
         display: flex;
         position: relative;
     }
-
+    main::-webkit-scrollbar {
+    width: 0px;  /* 隱藏滾動條 */
+    background: transparent;  /* 滾動條的背景設為透明 */
+}
     .sidebar-container {
         background-color: #000000;
         min-width: 270px;
@@ -1161,7 +1195,7 @@ export default {
         height: 72px;
         position: fixed;
         top:0;
-        z-index: 1;
+        z-index: 2;
     }
 
     header {
@@ -1271,23 +1305,27 @@ export default {
 
 
     .description1 {
-        right:206px;
+        right:286px;
     }
 
     .description2 {
-        right:150px;
+        right:235px;
     }
 
     .description3 {
-        right:110px;
+        right:155px;
     }
 
     .description4 {
-        right:90px;
+        right:131px;
     }
 
     .description5 {
-        right: -20px;
+        right: 91px;
+    }
+
+    .description7 {
+        right: 193px;
     }
 
     .description6 {
@@ -1307,6 +1345,9 @@ export default {
     .social-btn1:hover .description1,
     .social-btn2:hover .description2,
     .social-btn3:hover .description3,
+    .social-btn3:hover .description4,
+    .social-btn3:hover .description5,
+    .social-btn3:hover .description7,
     .social-btn4:hover .description4{
         opacity: 1;
         visibility: visible;
@@ -1464,7 +1505,9 @@ export default {
 
 
     .date-container a,.data-item a{
-        text-decoration: underline;
+        text-decoration: none;
+        margin-left: 5px;
+         pointer-events: none;
     }
 
     .data-item {

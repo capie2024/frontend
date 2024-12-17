@@ -165,7 +165,7 @@ export default {
             }
         },
         async fetchArticleId() {
-            const postCode = this.$route.params.post_code;  // 使用 post_code 從路由中獲取參數
+            const postCode = this.$route.params.post_code;  
             if (!postCode) {
                 console.error("Error: postCode is not available in route params");
                 return;
@@ -185,29 +185,32 @@ export default {
         },
         async fetchMessages() {
             if (!this.articleId) {
-                console.log("articleId is not available for fetching messages");
+                console.error("Error: articleId is not available for fetching messages");
                 return;
             }
+
             try {
                 const response = await axios.get(
-                    `http://localhost:3000/api/comments?postCode=${this.articleId}`
+                    `http://localhost:3000/api/comments?articleId=${this.articleId}`
                 );
-                // 按創建時間降序排序
-                this.messages = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                // 假設返回的每條留言中包含 userLiked 和 userHated 字段
-                this.messages.forEach((message) => {
-                    message.liked = message.liked || false;  // 根據返回的字段設置 liked
-                    message.hated = message.hated || false;  // 根據返回的字段設置 hated
-                    message.likeCount = message.like_count || 0;  // 設置 likeCount（如果返回的有這個字段）
 
-                    // 設置大頭貼圖片的 URL
-                    message.pictureUrl = message.users.picture || '/default-avatar.png';  // 如果沒有圖片則使用預設圖片
+                // 按創建時間降序排序
+                this.messages = response.data.sort(
+                    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+                );
+
+                this.messages.forEach((message) => {
+                    message.liked = message.liked || false;
+                    message.hated = message.hated || false;
+                    message.likeCount = message.like_count || 0;
+                    message.pictureUrl = message.users?.picture || '/default-avatar.png';
                 });
+
                 console.log("Fetched messages:", this.messages);
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
-        },      
+        },
         async sendMessage() {
             console.log('sendMessage called');
 

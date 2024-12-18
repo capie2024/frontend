@@ -416,12 +416,14 @@ import jsPDF from "jspdf";
 import axios from "axios";
 import Swal from "sweetalert2";
 export default {
+
     data() {
     return {
       deckId: "", // 用來儲存用戶輸入的 Deck ID
       buttons: [false, false], // 按鈕的狀態分別是 false
       deckValid: false, // 判斷是否有對應的牌組
       deckInvalid: false, // 判斷是否為無效代碼
+      isVisible: false,
     };
   },
   computed: {
@@ -453,15 +455,14 @@ export default {
       if (modalElement) {
         modalElement.style.display = 'none';
       }
+      this.isVisible = false;
     },
-  },
-
-
-    // 切換按鈕的 active 狀態
+   // 切換按鈕的 active 狀態
     toggleActive(index) {
       // 僅在點擊自身範圍時切換樣式
       this.buttons[index] = !this.buttons[index];
     },
+    
     async checkDeckId() {
       if (this.deckId && this.deckId.length >= 5) {
         try {
@@ -495,7 +496,7 @@ export default {
     this.deckInvalid = false;
   }
     },
-async exportToPDF() {
+    async exportToPDF() {
         console.log("開始執行匯出 PDF");
         if (!this.deckId) {
             alert("請輸入牌組代碼");
@@ -614,8 +615,8 @@ async exportToPDF() {
           console.error("匯出 PDF 時發生錯誤:", error.message);
           alert("匯出 PDF 時發生錯誤：" + error.message);
         }
-      }
-    };
-    
+    }
+  },
+}
 </script>
     

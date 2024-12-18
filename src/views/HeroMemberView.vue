@@ -5,42 +5,41 @@ import SideBar from "@/components/work-shop/SideBar.vue";
 import { onMounted, ref } from "vue";
 import PaypalCheckout from "@/components/PaypalCheckout.vue";
 import axios from "axios";
-import { computed } from "vue";
-
+import router from '@/router'
 
 const isHeroMember = ref(false)
+const isTokenAvailable = ref(true)
+
 const checkHeroMember = async() => {
-  console.log("已執行");
   
   const userToken = localStorage.getItem("token");
-  console.log(userToken);
   
-  try {
-    const res = await axios.get("http://localhost:3000/api/check-hero-member",{
-    headers: {
-      Authorization: `Bearer ${userToken}`,
-    }
-  });
-  console.log(res);
   
-  }catch(error){
-    console.log(error);
-  }  
+    try {
+      const res = await axios.get("http://localhost:3000/api/check-hero-member",{
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      }
+    });
+    isHeroMember.value = res.data.isHeroMember
+  
+    }catch(error){
+      if(error.response.status == 403){
+        isTokenAvailable.value = false
+      }
+      console.log(error.response);
+      console.log(error.response.data);
+    }  
 }
-console.log(isHeroMember.value);
 
+// 會員付費完成後將按鈕顯示為英雄會員狀態
 const switchBtn = (value) => {
-  console.log("已執行");
-  console.log(value);
-  
   isHeroMember.value = value
 }
 
 onMounted(async() => {
     import("@/assets/js/hero-member/hero-member-animation.js")
-    await checkHeroMember()
-    console.log(isHeroMember.value);
-    
+    await checkHeroMember()    
 })
 
 </script>
@@ -61,7 +60,9 @@ onMounted(async() => {
                 </div>
                 <h1 class="hero-member-main-start-section-content-title">英雄榜</h1>
                 <p class="hero-member-main-start-section-content-text">成為專屬會員，解鎖更多功能</p>
-                <button class="hero-member-main-start-section-content-btn">立即成為英雄</button>
+                <a href="#become-member">
+                  <button class="hero-member-main-start-section-content-btn">立即成為英雄</button>
+                </a>
               </div>
             </section>
             <section class="hero-member-main-function-section">
@@ -283,7 +284,7 @@ onMounted(async() => {
                 </div>
             </div>
             </section>
-            <section class="hero-member-main-member-type-section">
+            <section id="become-member" class="hero-member-main-member-type-section">
               <div class="hero-member-main-member-type-section-topbar">
                 <h2 class="hero-member-main-member-type-section-topbar-title">探索適合您的用戶</h2>
               </div>
@@ -322,8 +323,9 @@ onMounted(async() => {
                       </li>
                     </ul>
                     <div class="hero-member-main-member-type-section-content-item-btn">
-                      <!-- <button>立即前往 Patreon</button> -->
-                      <PaypalCheckout @update-isheromember="switchBtn" />
+                      <button v-if="isHeroMember && isTokenAvailable">您已經是英雄會員</button>
+                      <PaypalCheckout @update-isheromember="switchBtn" v-else-if="!isHeroMember && isTokenAvailable" />
+                      <button v-else-if="!isTokenAvailable" @click="router.push('/login')" >請重新登入後再嘗試</button>
                     </div>
                   </div>
                 </a>

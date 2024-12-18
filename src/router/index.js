@@ -17,7 +17,7 @@ import CardSeries from "@/views/CardSeries.vue";
 import Carddeck from "../components/card-deck/Carddeck.vue";
 import AddArticle from "../views/AddArticle.vue";
 import Social from "../views/Social.vue";
-import MyCard from "../views/MyCardView.vue";
+import MyCardView from "../views/MyCardView.vue";
 import Findcard from "../components/Mycard/find-card.vue";
 import Remitcard from "../components/Mycard/remit-card.vue";
 import RemitCardNf from "../components/Mycard/remit-cardnf.vue";
@@ -25,7 +25,6 @@ import AuthSuccess from "../views/AuthSuccess.vue";
 import MyArticle from "../views/MyArticle.vue";
 import Warning from "../components/Mycard/warning.vue";
 import Delete from "../components/Mycard/delete.vue";
-import MyCardView from "../views/MyCardView.vue";
 import deckPage from "../components/card-deck/deck-page.vue";
 
 const router = createRouter({
@@ -146,7 +145,7 @@ const router = createRouter({
     {
       path: "/deck",
       name: "deck",
-      component: MyCardView
+      component: MyCardView,
     },
     {
       path: '/auth-success',

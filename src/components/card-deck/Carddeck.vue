@@ -30,12 +30,20 @@ export default {
         loggedInUserId: null,
         token: localStorage.getItem('token'),
         created_at: null,
+        cards:[],
+        sortedCards: [],
+        sortBy: "typeTranslate",
+        groupedCards: [],
+        toggleTableView: false,
+        togglePriceView: false,
         };
     },
     mounted() {
         this.fetchArticleId();
         this.fetchCurrentUser();
+        this.fetchDeck();
     },
+
     created() {
         this.loggedInUserId = getUserIdFromToken(this.token);
         console.log("Logged in user ID:", this.loggedInUserId);
@@ -49,9 +57,92 @@ export default {
                 if (!createdAt) return "未知時間";
                 return dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss");
             };
+        },
+        groupedCards() {
+            let sorted = [];
+            if (this.sortBy === "level") {
+                sorted = [...this.cards].sort((a, b) => a.level - b.level);
+            } 
+            else if (this.sortBy === "color") {
+                const colorOrder = ["red", "yellow", "green", "blue"];
+                sorted = [...this.cards].sort((a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color));
+            } 
+            else if (this.sortBy === "typeTranslate") {
+                const typeOrder = ["角色", "事件", "名場"];
+                sorted = [...this.cards].sort((a, b) => typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate));
+            } 
+            else if (this.sortBy === "rare") {
+                sorted = [...this.cards].sort((a, b) => {
+                    if (a.rare.length !== b.rare.length) {
+                        return a.rare.length - b.rare.length;
+                    }
+                return a.rare.localeCompare(b.rare, "en");
+                });
+            } 
+            else if (this.sortBy === "seriesCode") {
+                sorted = [...this.cards].sort((a, b) => a.seriesCode.localeCompare(b.seriesCode, "en"));
+            }else{
+                sorted = [...this.cards];
+            }
+            // 分組邏輯
+            const grouped = sorted.reduce((acc, card) => {
+            const groupKey = card[this.sortBy]; // 根據當前的 sortBy 屬性作為分組依據
+            if (!acc[groupKey]) {
+                acc[groupKey] = [];
+            }
+            acc[groupKey].push(card);
+                return acc;
+            }, {});
+
+            // 定義顏色對應表
+            const colorMap = {
+                    red: "紅色",
+                    yellow: "黃色",
+                    green: "綠色",
+                    blue: "藍色",
+                };
+
+            // 等級轉換為中文格式
+            const levelLabel = (level) => `${level}等`;
+
+            // 根據 sortBy 動態轉換分組鍵值
+            return Object.entries(grouped).map(([key, cards]) => ({
+                group: this.sortBy === "color"
+                    ? colorMap[key] || key // 顏色轉換
+                    : this.sortBy === "level"
+                    ? levelLabel(key)      // 等級轉換
+                    : key,                 // 其他保持原值
+                cards,
+            }));        
         },    
     },
     methods: {
+        togglePriceTableView() {
+            this.togglePriceView = !this.togglePriceView;
+        },
+        toggleViewMode() {
+            this.toggleTableView = !this.toggleTableView;
+        },
+        countSoulCards(cards) {
+            return cards.filter(card => card.trigger.includes('soul')).length;
+        },
+        setSortBy(property) {
+            this.sortBy = property; // 設定排序條件
+        },
+        async fetchDeck() {
+            try {
+                const postCode = this.$route.params.post_code;  // 获取当前路由的 post_code
+                const response = await axios.get(`http://localhost:3000/api/deck/${postCode}`);
+
+                const deckList = response.data[0].deck_list;
+                this.cards = deckList.deck;  
+
+                console.log('Deck Name:', this.deckName);
+                console.log('All cards:', this.cards);
+            } catch (error) {
+                console.error('Failed to fetch specific deck:', error);
+            }
+        },
         async fetchCurrentUser() {
             try {
                 const userToken = localStorage.getItem("token");
@@ -655,54 +746,96 @@ export default {
                     </div>
                     <nav class="toolbar">
                         <div class="toolbar-area1">
-                            <button class="tool-btn1">
+                            <button class="tool-btn1" @click="setSortBy('typeTranslate')"
+                            :class="{'active': sortBy === 'typeTranslate'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>類型</span>
                             </button>
-                            <button class="tool-btn1">
+                            <button class="tool-btn1" @click="setSortBy('color')"
+                            :class="{'active': sortBy === 'color'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>顏色</span>
                             </button>
-                            <button class="tool-btn1">
+                            <button class="tool-btn1" @click="setSortBy('level')"
+                            :class="{'active': sortBy === 'level'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>等級</span>
                             </button>
-                            <button class="tool-btn1" style="min-width: 86px">
+                            <button class="tool-btn1" style="min-width: 86px" @click="setSortBy('rare')"
+                            :class="{'active': sortBy === 'rare'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>稀有度</span>
                             </button>
-                            <button class="tool-btn1">
+                            <button class="tool-btn1" @click="setSortBy('seriesCode')"
+                            :class="{'active': sortBy === 'seriesCode'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
                                 <span>商品</span>
                             </button>
-                            <button class="func-btn func-btn1">
-                                <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z"></path></svg>
-                                <div class="func-text func-text1">開啟劇院模式</div>
-                            </button>
                         </div>
                         <div class="toolbar-area2">
-                            <button class="func-btn func-btn2">
-                                <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"></path></svg>
-                                <div class="func-text func-text2">關閉堆疊</div>
+                            <button class="func-btn func-btn4" @click="togglePriceTableView"
+                            :style="{ backgroundColor: togglePriceView ? '#060608' : '#06b6d4' }">
+                                <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path>
+                                </svg>
+                                <div class="func-text func-text4">開啟價格</div>
                             </button>
-                            <button class="func-btn func-btn3">
-                                <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg>
-                                <div class="func-text func-text3">開啟價格</div>
-                            </button>
-                            <button class="func-btn func-btn4">
-                                <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"></path></svg>
-                                <div class="func-text func-text4">列表清單</div>
-                            </button>
-                            <button class="func-btn func-btn5">
+                            <button class="func-btn func-btn5" @click="toggleTableView = true"
+                            :style="{ backgroundColor: toggleTableView ? '#06b6d4' : '' }">
                                 <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"></path></svg>
                                 <div class="func-text func-text5">表格顯示</div>
                             </button>
-                            <button class="func-btn func-btn6">
+                            <button class="func-btn func-btn6" @click="toggleTableView = false"
+                            :style="{ backgroundColor: !toggleTableView ? '#06b6d4' : '' }">
                                 <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0 1 20.25 6v12A2.25 2.25 0 0 1 18 20.25H6A2.25 2.25 0 0 1 3.75 18V6A2.25 2.25 0 0 1 6 3.75h1.5m9 0h-9"></path></svg>
                                 <div class="func-text func-text6">卡片資訊</div>
                             </button>
                         </div>
                     </nav>
+
+                    <div class="card-info">
+                        <div class="row" v-for="group in groupedCards" :key="group.group">
+                            <div class="card-info-header">
+                                <h2 class="group-title">{{ group.group || '未分類'}} - {{ group.cards.length }}</h2>
+                                <div class="group-count" data-v-1d946842="">
+                                    <img data-v-1d946842="" src="https://bottleneko.app/soul.gif" class="size-4">
+                                    <span data-v-1d946842="" class="font-mono flex-none">{{ countSoulCards(group.cards) }}</span>
+                                </div>
+                            </div>
+                            <div class="card-row">
+                                <div class="col-Info" v-for="card in group.cards" :key="card.index">
+                                    <p class="price-row" v-if="!togglePriceView">
+                                        <svg data-v-27aeb5c1="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="currency-icon">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
+                                        </svg>
+                                        <span data-v-27aeb5c1="" class="price-row-text">{{ card.price.number }}</span>
+                                        <span data-v-27aeb5c1="" class="price-row-text">{{ card.rare }}</span>
+                                    </p>
+
+                                    <div class="card-info-image">
+                                        <img :src="card.cover">
+                                        <div class="card-inner-info">
+                                            <div class="card-inner-info-header">
+                                                <p>{{ card.id }}</p>
+                                                <p>{{ card.rare }}</p>
+                                            </div>
+                                            <h3>{{ card.title }}</h3>
+                                            <div class="details" v-if="!toggleTableView">
+                                                <div><span>類型</span>{{ card.typeTranslate }}</div>
+                                                <div><span>魂傷</span>{{ card.soul }}</div>
+                                                <div><span>等級</span>{{ card.level }}</div>
+                                                <div><span>攻擊</span>{{ card.attack }}</div>
+                                                <div><span>費用</span>{{ card.cost }}</div>
+                                            </div>
+                                            <div class="price-download" v-if="!toggleTableView">
+                                                <p> ${{ card.price.number }} </p>
+                                            <button><svg data-v-69cfbdbc="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
                 <nav class="footer-nav">
                     <a class="nav-link" href="#">
@@ -759,6 +892,281 @@ export default {
 </template>
 
 <style scoped>
+    .price-row{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+        color: #c9a83d;
+        gap: .25rem;
+        margin-top: 30px;
+        font-size: 16px;
+    }
+
+    .currency-icon{
+        width: 20px;
+        height: 20px;
+        stroke: #c9a83d;
+    }
+
+    .tool-btn1.active{
+        background: linear-gradient(45deg, #7dca31, #21b8c8);
+    }
+
+    .card-row{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -5px;
+    box-sizing: border-box;
+
+    }
+
+    .card-info-header{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+    margin-top: 3rem;
+    }
+
+    .group-count{
+    display: flex;
+    align-items: center;
+    gap: 4px; 
+    background-color: #1e1e1e;
+    border-radius: 9999px;
+    padding: 4px 8px;
+    color: white;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    margin-left: 1rem;
+    }
+
+    .group-title{
+    color: white;
+    display: block;
+    font-weight: 700;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-image {
+    /* display: flex; */
+    position: relative;
+    object-fit: cover;
+    border-radius:10px ;
+    overflow: hidden;
+    margin: 5px;
+    box-sizing: border-box;
+    cursor: pointer;
+    }
+
+    .col-Sheet, .col-Info {
+    width: calc((100% - 10px)/4);
+    }
+
+    .card-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    }
+
+    .card-image div {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    gap:5px;
+    padding: 20px 5px 10px 10px;
+    box-sizing: border-box;
+    color: white;
+    background-image: linear-gradient(transparent, #0009 40%, #000000bf);
+    }
+
+    .card-image div p {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    }
+
+    .card-image div h3 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 18px;
+    white-space: nowrap; 
+    max-width: calc(100% - 40px); 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+    .card-image button {
+    position: absolute;
+    background: transparent;
+    bottom: 10px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    cursor: pointer;
+    }
+
+    .card-image:hover div {
+    display: none;
+    }
+
+    .card-image:hover button {
+    border: none;
+    background: rgba(0, 0, 0, 0.697);
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    }
+    
+    
+    /* card-info */
+
+    .card-info {
+    padding: 20px;
+    box-sizing: border-box;
+    position: absolute;
+    top: 580px;
+    display: flex;
+    flex-direction: column;
+    }
+
+    .card-info-image {
+    display:flex;
+    flex-direction: column;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 5px;
+    background-color: #121212;
+    cursor: pointer;
+    }
+
+    .card-info-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    }
+
+    .card-inner-info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+    }
+
+    .card-inner-info-header,.price-download {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    text-align: center;
+    }
+
+    .card-inner-info-header p,.price-download p {
+    color:#71717A;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    margin: 0;
+    }
+
+    .card-inner-info-header p:last-child {
+    color: #63DDEE;
+    }
+
+    .card-inner-info h3 {
+    margin:0;
+    color: white;
+    font-weight: bold;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+    .details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: #121212;
+    color: white;
+    gap:10px;
+    }
+
+    .details div {
+    width: calc((100% - 10px)/2);
+    }
+
+    .details span{
+    margin-right: 5px;
+    /* background-color: #CA8A04; */
+    border-radius: 7px;
+    padding: 2px;
+    }
+
+    .bg-red {
+    background-color: #ef4444;
+    }
+
+    .bg-blue {
+    background-color: #3b82f6;
+    }
+
+    .bg-green {
+    background-color: #22c55e;
+    }
+
+    .bg-yellow {
+    background-color: #eab308;
+    }
+
+    .bg-purple {
+    background-color: #a855f7;
+    }
+
+    .price-download {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    }
+
+    .price-download p {
+    color: #F59E0B;
+    }
+
+    .price-download button {
+    width: 35px;
+    height:35px;
+    background-color: #ffffff34;
+    border-radius: 50%;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .price-download button:hover {
+    background-color: #000000;
+    }
+
+
     .send-btn span
     .cancel-btn span{
         font-size: .75rem;
@@ -914,7 +1322,7 @@ export default {
 
     .message-section{
         width: 95%;
-        height: 80vh;
+        height: 60vh;
     }
 
     .message-scroll{
@@ -1409,10 +1817,11 @@ export default {
     main {
         margin-top: 8px;
         position: relative;
-        width: calc(100% - 8px);
+        /* width: calc(100% - 8px); 
         /* height: calc(100vh - 1rem); */
         height: auto;
         overflow: hidden;
+        overflow-y: scroll;
         scroll-behavior: smooth;
         border-radius: 20px 20px 0 0;
     }
@@ -1677,16 +2086,16 @@ export default {
         width: 100%;
         display: flex;
         margin-left: 24px;
-        position: absolute;
-        top: 450px;
-        display: none;
+        position: absolute; 
+        top: 550px;  
+        /* display: none; */
     }
 
     .toolbar-area1 {
         width: 50%;
         display: flex;
         gap: 20px;
-        display: none;
+        /* display: none; */
     }
 
     .tool-btn1 {
@@ -1707,6 +2116,7 @@ export default {
         color: white;
         font-size: 14px;
         font-weight: 900;
+        width: 100%;
     }
 
     .tool-btn1:hover {
@@ -1755,8 +2165,8 @@ export default {
         visibility: hidden;
         transition:ease 0.3s;
         position:absolute;
-        right:0;
-        top:35px;
+        right: 20px;
+        top: 50px;
     }
 
     .toolbar-area2 {
@@ -1764,7 +2174,7 @@ export default {
         gap: 20px;
         position: absolute;
         right: 50px;
-        display: none;
+        /* display: none; */
     }
 
 
@@ -1786,11 +2196,11 @@ export default {
     }
 
     .func-text5 {
-        right:-33px;
+        right:-30px;
     }
 
     .func-text6 {
-        right:-35px;
+        right:-25px;
     }
 
     .func-btn1:hover .func-text1,
@@ -1977,7 +2387,31 @@ export default {
         margin-left: 5px;
     }
 
+    @media screen and (min-width: 1400px) {
+        .col-Sheet, .col-Info {
+            width: calc((100% - 10px) / 5);
+        }
+
+    }
+
     @media screen and (max-width: 1199px) {
+        .toolbar {
+            position: absolute;
+            top: 930px;
+        }
+
+        .card-info{
+            margin-top: 400px;
+        }
+
+        .tool-btn1 span{
+            width: 100%;
+        }
+
+        .col-Sheet, .col-Info {
+            width: calc((100% - 10px) / 3);
+        }
+
         textarea {
             color: white !important;
             text-align: left !important;
@@ -2160,8 +2594,7 @@ export default {
         }
 
         .footer-nav {
-            /* display: flex; */
-            display: none;    
+            display: flex;
         }
 
         .deck-container {
@@ -2175,22 +2608,24 @@ export default {
 
     @media screen and (max-width: 800px) {
         .toolbar {
-            width: 50%;
-            flex-direction: column;
-            display: none;
+            width: 100%;
         }
         
         .toolbar-area1 {
-            width: 50%;
             gap: 8px;
-            display: none;
         }
         
         .toolbar-area2 {
-            width: 50%;
-            position: static;
-            display: none;
+            gap: 8px;
+
         } 
+    }
+
+    @media screen and (max-width: 768px) {
+        .col-Sheet, .col-Info {
+            width: calc((100% - 10px) / 2);
+        }
+
     }
 
     @media screen and (max-width: 410px) {

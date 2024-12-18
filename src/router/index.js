@@ -25,8 +25,7 @@ import AuthSuccess from "../views/AuthSuccess.vue";
 import MyArticle from "../views/MyArticle.vue";
 import Warning from "../components/Mycard/warning.vue";
 import Delete from "../components/Mycard/delete.vue";
-
-
+import deckPage from "../components/card-deck/deck-page.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -167,6 +166,11 @@ const router = createRouter({
       path: "/delete",
       name: "delete",
       component: Delete
+    },
+    {
+      path: "/deckPage/:deck_id",
+      name: "deckPage",
+      component: deckPage
     },
   ],
 });

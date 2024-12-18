@@ -90,7 +90,7 @@ export default {
     
     <section  class=" fixed top-0 left-0 w-screen h-screen z-[100] grid overflow-y-auto overflow-x-hidden md:overflow-hidden backdrop-blur place-content-center" ref="modalSection">
         <div data-v-502f6c5f=""  class="bg-base  md:rounded-xl relative h-mobile-full overflow-auto flex flex-col w-[50vw] ">
-            <header data-v-502f6c5f="" class="pt-4 px-4 sticky top-0 z-20 flex items-start pb-2 bg-zinc-900 border-b border-zinc-800 items-center" >
+            <header data-v-502f6c5f="" class="pt-4 px-4 sticky top-0 z-20 flex  pb-2 bg-zinc-900 border-b border-zinc-800 items-center" >
                 <h2 data-v-502f6c5f="" class="grow-1 w-full text-white" id="title">尋找牌組</h2>
                 <div data-v-502f6c5f="" class="flex-none flex gap-2 justify-end">
                     <button data-v-502f6c5f=""  class="flex-none p-1 rounded-full bg-black/70 hover:bg-white hover:text-black text-white " @click="confirmClose">

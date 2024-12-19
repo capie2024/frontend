@@ -18,7 +18,7 @@
 </template>
 
 
-<style>
+<style scoped>
 
 .container {
     display: grid;

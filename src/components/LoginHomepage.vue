@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
-import SidebarGrid from '@/components/SidebarGrid.vue'
+// import SidebarGrid from '@/components/SidebarGrid.vue'
 
 onMounted(() => {
   import ("@/assets/js/login-homepage/css-control.js")
@@ -14,7 +14,7 @@ onMounted(() => {
 
 <template>
     <div class="All">
-      <SidebarGrid />
+      <!-- <SidebarGrid /> -->
       <div class="container">
         <!-- 通知與登入 -->
         <div class="icons">

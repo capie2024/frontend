@@ -1,7 +1,7 @@
 <script setup>
 import MainFooter from "@/components/MainFooter.vue";
 import HeaderInput from "../components/work-shop/HeaderInput.vue";
-import SideBar from "@/components/work-shop/SideBar.vue";
+import SideBar from "../components/SidebarGrid.vue"
 import router from '@/router'
 </script>
 

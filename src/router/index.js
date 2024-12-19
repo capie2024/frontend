@@ -112,7 +112,8 @@ const router = createRouter({
     },
     {
       path: '/social/:post_code', 
-      component: Carddeck,        
+      component: Carddeck,
+      props: true,
     },
     {
       path: "/add-article",

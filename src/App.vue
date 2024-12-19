@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { ref, onMounted } from "vue";
 import { RouterLink, RouterView } from "vue-router";
 // import CardInfo from "@/views/CardInfo.vue";
@@ -8,16 +8,16 @@ import SidebarGrid from "./components/SidebarGrid.vue";
 
 const cardInfoStore = useCardInfoStore();
 const { cardInfoDisplay } = storeToRefs(cardInfoStore);
-</script>
+</script> -->
 
 <template>
-<div class="overflow-hidden bg-black root-container"> 
-    <SidebarGrid style="grid-area: sidebar;" /> 
+<!-- <div class="overflow-hidden bg-black root-container"> 
+    <SidebarGrid style="grid-area: sidebar;" />  --> -->
     <router-view />
- </div>
+<!-- </div>  -->
 </template>
 
-<style scoped>
+<!-- <style scoped>
 .root-container {
   display: grid;
   grid-template-columns: 270px 1fr;
@@ -38,4 +38,4 @@ const { cardInfoDisplay } = storeToRefs(cardInfoStore);
       height: 100vh;
   }
 } 
-</style>
+</style> -->

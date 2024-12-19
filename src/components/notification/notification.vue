@@ -8,12 +8,19 @@
                 </svg>
                 <span v-if="unreadCount > 0" data-v-3e737e76="" class="absolute -top-1 -right-1 text-xs rounded-full px-1 bg-red-500 text-white pb-[2px]">{{ unreadCount }}</span>
             </label>
+            
             <div class="z-10 notice-grid">
                 <div class="notice-grid-up">
                     <h2>通知({{ unreadCount }})</h2>
                 </div>
                 <div class="notice-grid-down-1" v-if="notices.length > 0">
-                    <a v-for="notice in notices" :key="notice.id" class="cursor-pointer p-4 text-white flex items-center gap-2 hover:bg-zinc-500/20">
+                    <a v-for="notice in notices" :key="notice.id" 
+                    @click="markAsRead(notice.id, notice.post_code)"
+                    :class="[
+                        'notice-item', 
+                        notice.is_read === false ? 'unread' : 'read',                         
+                        'cursor-pointer p-4 text-white flex items-center gap-2 hover:bg-zinc-500/20'
+                    ]">                        
                         <div class="flex-none w-[3rem] h-[3rem] rounded-full bg-zinc-500/50 grid place-content-center">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"></path>
@@ -21,7 +28,7 @@
                         </div>
                         <div class="select-none">
                             <h3 class="font-bold line-clamp-2 break-all">{{ notice.title }}</h3>
-                            <p class="text-sm text-zinc-400">您有新留言．
+                            <p class="text-sm text-zinc-400">您的牌組有新留言． <br>
                                 <span class="font-mono text-xs">{{ formattedTime(notice.created_at) }}</span>
                             </p>
                         </div>
@@ -44,15 +51,16 @@
 
 <script>
 import dayjs from 'dayjs';
+import axios from 'axios';
 
 export  default {
     data() {
         return {
-            unreadCount: 0,
+            unreadCount: "",
             notices: [],
         };
     },
-    created(){
+    mounted(){
         this.fetchNotices();
     },
     computed: {
@@ -64,7 +72,36 @@ export  default {
         },
     },
     methods: {
+        async markAsRead(noticeId, postCode) {
+            try {
+                const response = await axios.post('http://localhost:3000/api/mark-as-read', { noticeId }, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if (response.data.is_read) {
+                    const notice = this.notices.find(n => n.id === noticeId);
+                    if (notice) {
+                        notice.is_read = response.data.is_read; 
+                        console.log(notice.is_read);
+                    } else {
+                        console.error('Failed to mark the notification as read.');
+                }}
+                
+                this.unreadCount -= 1;
+
+                // this.goToPost(postCode);
+            } catch (error) {
+                console.error('Error marking as read:', error);
+            }
+        },
+        goToPost(postCode) {
+            console.log('Navigating to post_code:', postCode);
+            this.$router.push(`/social/${ postCode }`);
+        },
         async fetchNotices() {
+            const token = localStorage.getItem('token');
+
             try {
                 const response = await fetch('http://localhost:3000/api/notices',{
                     headers: {
@@ -72,6 +109,7 @@ export  default {
                     }
                 });
                 const data = await response.json();
+                console.log('Fetched data from backend:', data);
                 this.unreadCount = data.unreadCount || 0; 
                 this.notices = (data.notices || []).sort((a, b) => {
                 return new Date(b.created_at) - new Date(a.created_at);
@@ -88,9 +126,22 @@ export  default {
 <style>
 @import '@/assets/base.css';
 
+.notice-item.read{
+    background-color: #1f1f22;
+}
+
+.notice-item.unread {
+    background-color: #29343e;     
+}
+
 .notice-grid-down-1{
-    background-color: #1f1f22;    
     border-radius: 0px 0px 10px 10px;
+    height: 100%;
+    overflow-y: scroll;   
+}
+
+.notice-grid-down-1::-webkit-scrollbar {
+    display: none; /* 隱藏滾動條 */
 }
 
 .notice-wrapper{
@@ -98,7 +149,6 @@ export  default {
     justify-content: flex-end;
     margin-right: 136px;
     margin-top: 16px;
-    
 }
 
 .notice{
@@ -128,17 +178,15 @@ export  default {
 }
 
 .notice-grid{
-    display: grid;
-    grid-template-columns: 352px;
-    grid-template-rows: 64px 416px;
     position: absolute;
     top: 120%;
     left: 50%;
     transform: translateX(-70%);
     opacity: 0;
-    height: 0;
     transition: opacity 0.3s ease, height 0.3s ease, transform 0.3s ease;
     z-index: 999;
+    width: 350px;
+    height: 700px;
 }
 
 #notice-jump:checked ~ .notice-grid{
@@ -150,14 +198,13 @@ export  default {
 }
 
 .notice-grid-up{
-    grid-area: 1/1/2/2;
     background-color: #27272a;
     padding: 24px 16px 8px 16px;
     border-radius: 10px 10px 0px 0px;
+    position: sticky;
 }
 
 .notice-grid-down {
-    grid-area: 2/1/3/2;
     background-color: #1f1f22;    
     border-radius: 0px 0px 10px 10px;
     padding: 16px;

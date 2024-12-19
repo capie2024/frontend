@@ -42,7 +42,7 @@ export const useCardSeriesStore = defineStore("card-series", () => {
   // 獲取指定系列所有卡牌資訊;
   const getSeriesCards = async (seriesId) => {
     try {
-      const seriesRes = await axios.get(`http://localhost:3000/api/serise`);
+      const seriesRes = await axios.get(`http://localhost:3000/api/series`);
       const selectedSeries = seriesRes.data.find((series) => {
         return series.id == seriesId;
       })
@@ -50,7 +50,7 @@ export const useCardSeriesStore = defineStore("card-series", () => {
       seriesInfo.value = selectedSeries;
       // console.log(seriesInfo.value);
       
-      const res = await axios.get(`http://localhost:3000/api/serise/${seriesId}`);
+      const res = await axios.get(`http://localhost:3000/api/series/${seriesId}`);
         // console.log(res.data);
       res.data.forEach((card) => {
         if (card.type === "キャラ") {

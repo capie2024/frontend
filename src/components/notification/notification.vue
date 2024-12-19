@@ -18,7 +18,7 @@
                     @click="markAsRead(notice.id, notice.post_code)"
                     :class="[
                         'notice-item', 
-                        notice.is_read === false ? 'unread' : 'read',                         
+                        notice.is_read ? 'read' : 'unread',                      
                         'cursor-pointer p-4 text-white flex items-center gap-2 hover:bg-zinc-500/20'
                     ]">                        
                         <div class="flex-none w-[3rem] h-[3rem] rounded-full bg-zinc-500/50 grid place-content-center">
@@ -40,7 +40,7 @@
                     </a>
                 </div>
                 <div class="notice-grid-down" v-else>
-                    <img src="https://bottleneko.app/images/status/empty.png" alt="no-data">
+                    <img src="@/assets/img/logo-use/no-data.png" alt="no-data">
                     <h2>沒東西</h2>
                     <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
                 </div>
@@ -74,26 +74,35 @@ export  default {
     methods: {
         async markAsRead(noticeId, postCode) {
             try {
+        // 先找到通知
+                const notice = this.notices.find(n => n.id === noticeId);
+
+                // 如果通知已經是已讀狀態，直接返回，不再執行減少未讀計數
+                if (notice && notice.is_read) {
+                    console.log("This notice is already read.");
+                    return;
+                }
+
+                // 向後端發送請求，標記為已讀
                 const response = await axios.post('http://localhost:3000/api/mark-as-read', { noticeId }, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-                if (response.data.is_read) {
-                    const notice = this.notices.find(n => n.id === noticeId);
-                    if (notice) {
-                        notice.is_read = response.data.is_read; 
-                        console.log(notice.is_read);
-                    } else {
-                        console.error('Failed to mark the notification as read.');
-                }}
-                
-                this.unreadCount -= 1;
 
-                // this.goToPost(postCode);
+                if (response.data.is_read) {
+                    // 成功標記為已讀，更新通知狀態
+                    if (notice) {
+                        notice.is_read = true;
+                    }
+                    // 減少未讀計數
+                    this.unreadCount -= 1;
+
+                    this.goToPost(postCode);
+                }
             } catch (error) {
                 console.error('Error marking as read:', error);
-            }
+            }        
         },
         goToPost(postCode) {
             console.log('Navigating to post_code:', postCode);
@@ -101,23 +110,24 @@ export  default {
         },
         async fetchNotices() {
             const token = localStorage.getItem('token');
-
             try {
-                const response = await fetch('http://localhost:3000/api/notices',{
+                const response = await fetch('http://localhost:3000/api/notices', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 const data = await response.json();
-                console.log('Fetched data from backend:', data);
-                this.unreadCount = data.unreadCount || 0; 
+                console.log(data);
                 this.notices = (data.notices || []).sort((a, b) => {
-                return new Date(b.created_at) - new Date(a.created_at);
-            });            
+                    return new Date(b.created_at) - new Date(a.created_at);
+                });
+                // 初始加載時，設定正確的未讀通知數量
+                this.unreadCount = data.unreadCount || 0;
+
             } catch (error) {
-                    console.error('Error fetching notices:', error);
+                console.error('Error fetching notices:', error);
             }
-        }    
+        }
     },
 }
 
@@ -215,7 +225,7 @@ export  default {
 }
 
 .notice-grid-down img{
-    width: 240px;
+    /* width: 240px; */
     height: 240px;
     margin-bottom: 30px;
 }

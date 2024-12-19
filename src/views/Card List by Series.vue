@@ -320,7 +320,7 @@ const handleSeries = async(seriesId) => {
         // 先獲取系列卡片數據
         await getSeriesCards(seriesId);
         
-        router.push('/card-series');
+        router.push(`/card-series/${ seriesId }`);
 
         // 保存最後瀏覽的系列
         saveLastViewSeries(seriesId);    

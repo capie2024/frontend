@@ -1,8 +1,8 @@
 <script setup>
 import MainFooter from "@/components/MainFooter.vue";
 import PageControl from "@/components/work-shop/PageControl.vue";
-import SideBar from "@/components/work-shop/SideBar.vue";
 import { onMounted, ref } from "vue";
+import SidebarGrid from "@/components/SidebarGrid.vue";
 import PaypalCheckout from "@/components/PaypalCheckout.vue";
 import axios from "axios";
 import router from '@/router'
@@ -46,7 +46,7 @@ onMounted(async() => {
 
 <template>
     <div class="hero-member-page-container">
-        <SideBar />
+        <SidebarGrid />
         <div class="hero-member-main-content-container">
           <header class="hero-member-header">
             <PageControl />

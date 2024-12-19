@@ -1,6 +1,7 @@
 import { ref, computed, reactive } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
+import { useRoute } from 'vue-router';
 
 export const useCardSeriesStore = defineStore("card-series", () => {
   
@@ -41,7 +42,7 @@ export const useCardSeriesStore = defineStore("card-series", () => {
   // 獲取指定系列所有卡牌資訊;
   const getSeriesCards = async (seriesId) => {
     try {
-      const seriesRes = await axios.get(`http://localhost:3000/api/serise`);
+      const seriesRes = await axios.get(`http://localhost:3000/api/series`);
       const selectedSeries = seriesRes.data.find((series) => {
         return series.id == seriesId;
       })
@@ -49,7 +50,7 @@ export const useCardSeriesStore = defineStore("card-series", () => {
       seriesInfo.value = selectedSeries;
       // console.log(seriesInfo.value);
       
-      const res = await axios.get(`http://localhost:3000/api/serise/${seriesId}`);
+      const res = await axios.get(`http://localhost:3000/api/series/${seriesId}`);
         // console.log(res.data);
       res.data.forEach((card) => {
         if (card.type === "キャラ") {
@@ -78,13 +79,17 @@ export const useCardSeriesStore = defineStore("card-series", () => {
 
   // 獲取最後瀏覽的系列
   const getLastViewSeries = async () => {
+    const route = useRoute();
+    const seriesId = route.params.series_id;
     // console.log(seriesCardList.value);
-    if (seriesCardList.value.length === 0) {
-      const lastViewSeriesId = localStorage.getItem("lastViewSeriesId");
-      if (lastViewSeriesId) {
-        // console.log("開始重新獲取");
-        await getSeriesCards(lastViewSeriesId);
-      }
+    // if (seriesCardList.value.length === 0) {
+    //   const lastViewSeriesId = localStorage.getItem("lastViewSeriesId");
+    //   if(lastViewSeriesId){
+    //     await getSeriesCards(lastViewSeriesId);
+    //   }
+    // }
+    if (seriesId) {
+      await getSeriesCards(seriesId);
     }
   };
 

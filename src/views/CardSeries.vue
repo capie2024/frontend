@@ -146,10 +146,10 @@ const finalStep = async() => {
                 title: '成功',
                 text: '成功創建牌組'
               })
-      router.push('/carddeck')
+      router.push(`/deckPage/${ res.data.data.deck_id }`)
       console.log("完成創建牌組並跳轉");
     }else if(res.status == 403){
-      awaitSwal.fire({
+      await Swal.fire({
                 icon: 'error',
                 title: '錯誤',
                 text: '請重新登入'

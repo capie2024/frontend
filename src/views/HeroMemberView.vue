@@ -1,8 +1,8 @@
 <script setup>
 import MainFooter from "@/components/MainFooter.vue";
 import PageControl from "@/components/work-shop/PageControl.vue";
-import SideBar from "@/components/work-shop/SideBar.vue";
 import { onMounted, ref } from "vue";
+import SidebarGrid from "@/components/SidebarGrid.vue";
 
 onMounted(() => {
     import("@/assets/js/hero-member/hero-member-animation.js")
@@ -12,7 +12,7 @@ onMounted(() => {
 
 <template>
     <div class="hero-member-page-container">
-        <SideBar />
+        <SidebarGrid />
         <div class="hero-member-main-content-container">
           <header class="hero-member-header">
             <PageControl />

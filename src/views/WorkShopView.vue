@@ -1,9 +1,9 @@
 <script setup>
 // import PageControl from '@/components/PageControl.vue'
 import MainFooter from '@/components/MainFooter.vue'
-import Sidebar from '@/components/work-shop/SideBar.vue'
 import PageControl from '@/components/work-shop/PageControl.vue';
 import router from '@/router'
+import SidebarGrid from "@/components/SidebarGrid.vue";
 
 const workShopData = [
   {
@@ -39,7 +39,7 @@ const workShopData = [
 
 <template>
   <div class="work-shop-page-container">
-    <Sidebar />
+    <SidebarGrid />
     <div class="work-shop-main-content-container">
       <header class="work-shop-header">
         <PageControl />

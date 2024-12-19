@@ -4,17 +4,13 @@ import { RouterLink, RouterView } from "vue-router";
 // import CardInfo from "@/views/CardInfo.vue";
 import { storeToRefs } from "pinia";
 import { useCardInfoStore } from "@/stores/card-info";
-import SidebarGrid from "./components/SidebarGrid.vue";
 
 const cardInfoStore = useCardInfoStore();
 const { cardInfoDisplay } = storeToRefs(cardInfoStore);
 </script>
 
 <template>
-<!-- <div class="overflow-hidden bg-black root-container">  -->
-    <!-- <SidebarGrid style="grid-area: sidebar;" />  -->
     <router-view />
- <!-- </div> -->
 </template>
 
 <style scoped>

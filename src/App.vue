@@ -10,9 +10,7 @@ const { cardInfoDisplay } = storeToRefs(cardInfoStore);
 </script>
 
 <template>
-
   <router-view />
-
 </template>
 
 <style scoped>

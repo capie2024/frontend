@@ -1,7 +1,5 @@
 <template>
-
-  <SidebarGrid style="grid-area: sidebar;" />
-
+  <SidebarGrid style="grid-area: sidebar;" />  
   <main>
       <div class="header-bg">
           <header>
@@ -36,49 +34,26 @@
       </div>
       <section class="title-area">
          <div class="title-area-container">
-
-            <button class="upload-btn" @click="handleButtonClick">
-              <svg v-if="!imageUrl" data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-20 w-20"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
-                
-              <img v-if="imageUrl" :src="imageUrl" alt="預覽圖片" class="preview-image" />
-              <input
-                type="file"
-                class="file-input"
-                @change="handleFileUpload"
-                accept="image/*"
-                ref="fileInput"
-              />
-              <svg v-if="imageUrl" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-              
-            </button>
-            <div class="add-section">
-              <div class="add-article">
-                  <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>
-                  <p>新增文章</p>
+              <button class="upload-btn" alt="">
+                  <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-20 w-20"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
+                  <img :src="deckData.deck_cover"  alt="">
+               </button>
+              <div class="add-section">
+                  <div class="add-article">
+                      <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>
+                      <p>新增文章</p>
+                  </div>
+                  <input v-model="title" class="enter-title" type="text" >
+                  <div class="card-select-area">
+                      <button class="card-select-btn">
+                          <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
+                          <p> {{ deckData.deck_name }} </p>
+                      </button>
+                      <div class="cannot-change">
+                          <p>非必填，但新增文章後將無法更改牌組內容</p>
+                      </div>
+                  </div>
               </div>
-              <input v-model="title" class="enter-title" type="text" placeholder="請輸入標題">
-              <div class="card-select-area">
-                <button class="card-select-btn" @click="toggleMenu">
-                  <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
-                  <p>{{ seriesName }}</p>
-                </button>
-                <ul class="menu-area" v-show="menuExpanded" :style="{ height: menuHeight + 'px' }">
-                  <li class="menu-search">
-                    <input v-model="searchQuery" @keyup="searchSeries" class="keyword" type="text" placeholder="Keyword">
-                    <button @click="clearSearch">✖</button>
-                  </li>
-                    
-                  <li class="menu" v-for="deck in filteredDecks" :key="deck.id" v-if="decks && decks.length" @click="selectDeck(deck)">
-                    <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
-                    <p class="text-xs truncate">{{ deck.deck_name }}</p>
-                  </li>
-                </ul>
-
-                <div class="cannot-change">
-                    <p>非必填，但新增文章後將無法更改牌組內容</p>
-                </div>
-              </div>
-            </div>
          </div>
       </section>
       <section class="text-area">
@@ -110,9 +85,7 @@
       <footer>
           123
       </footer>
-
-      <!-- <nav class="footer-nav">
-
+      <nav class="footer-nav">
           <a class="nav-link" href="#">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
               </svg>
@@ -138,9 +111,7 @@
               <img src="/src/img/麻衣.png" alt="">
               <div class="link-word">工作坊</div>
           </a>
-
-      </nav> -->
-      
+      </nav>
 
       <div class="deck-container">
           <div class="deck-img">
@@ -167,8 +138,9 @@
 </template>
 <script>
 import axios from 'axios';
-import Swal from 'sweetalert2'
-import SidebarGrid from '../components/SidebarGrid.vue'
+import Swal from 'sweetalert2';
+import SidebarGrid from '../SidebarGrid.vue';
+
 
 export default {
   components: {
@@ -176,157 +148,76 @@ export default {
   },
   data() {
     return {
-      token: null, 
+      token: null,
+      deckData: {
+        deck_name: '',
+        deck:[],
+      },
       title: '',  
       content: '', 
-      imageUrl: null,
-      uploadedImage: null,
-      deckId: null,
-      decks :[],
-      filteredDecks: [],
-      menuExpanded: false, 
-      menuHeight: 0, 
-      searchQuery : '',
-      seriesName: '選擇牌組',
     };
   },
+
   mounted() {
     this.token = localStorage.getItem('token');
-    this.getUserDecks();
+    this.fetchDeckData();
   },
+
   methods: {
+    async fetchDeckData() {
+      const deckId = this.$route.params.deck_id;
+      try {
+        const response = await axios.get(`http://localhost:3000/api/deck-page/${deckId}`);
+        this.deckData = response.data;
+        this.title = this.deckData.deck_name || '';
+        
+        if (!Array.isArray(this.deckData.deck)) {
+            this.deckData.deck = [];
+        }
+        this.id = this.deckData.id
+      } catch (error) {
+        console.error('獲取文章資料失敗', error);
+      }
+    },
     async submitArticle() {
       try {
-        
-        const formData = new FormData();
-        formData.append('title', this.title); 
-        formData.append('content', this.content); 
-        formData.append('deck_id', parseInt(this.deckId, 10));
-        
-        if (this.uploadedImage) {
-          formData.append('picture', this.uploadedImage); 
-        } else if (this.imageUrl) {
-          formData.append('post_picture', this.imageUrl); 
-        }
 
         const response = await axios.post(
-          'http://localhost:3000/api/articles', 
-          formData, 
+           'http://localhost:3000/api/decks',
           {
-          headers: {
-              'Authorization': `Bearer ${this.token}`, 
+            title: this.title,
+            content: this.content,
+            deck_id: this.id,
+            post_picture: this.deckData.deck_cover,
           },
+          {
+            headers: {
+              Authorization: `Bearer ${this.token}`, 
+            },
           }
         );
 
-        
+       
         Swal.fire({
-            icon: 'success',
-            title: '成功',
-            showConfirmButton: false,
-            timer: 1000,
+          icon: 'success',
+          title: '成功',
+          showConfirmButton: false,
+          timer: 1000,
         });
 
         this.title = '';
         this.content = '';
-        this.imageUrl = null;
-        this.uploadedImage = null;
-        this.seriesName = '選擇牌組';
+        this.post_picture = null;
       } catch (error) {
         console.error('新增文章失敗:', error);
         Swal.fire({
-            icon: 'error',
-            title: '新增文章失敗',
-        });
-      }
-    },
-
-    handleButtonClick() {
-      if (this.imageUrl) {
-        this.imageUrl = null; 
-        this.uploadedImage = null;
-        this.$refs.fileInput.value = ""; // 重置 input 的值
-        event.preventDefault(); 
-      }
-    },
-
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.uploadedImage = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.imageUrl = e.target.result; // 設置圖片 URL
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    
-    async getUserDecks() {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        return;
-      }
-
-      try {
-        const res = await axios.get('http://localhost:3000/decks', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        this.decks = res.data.decks;
-        this.filteredDecks = res.data.decks;
-        console.log('用戶牌組：', this.decks);
-      } catch (error) {
-        console.error('獲取用戶牌組失敗：', error);
-        Swal.fire({
           icon: 'error',
-          title: '獲取用戶牌組失敗',
-          text: error.response?.data?.message || '請稍後重試',
+          title: '新增文章失敗',
         });
       }
     },
-
-    selectDeck(deck) {
-      this.title = deck.deck_name;
-      this.seriesName = deck.deck_name;
-      this.imageUrl = deck.deck_cover;
-      this.deckId = deck.id;
-      this.menuExpanded = false; 
-    },
-
-    clearSearch() {
-      this.searchQuery = ''; 
-      this.filteredDecks = this.decks;
-      this.calculateMenuHeight();
-    },
-
-    toggleMenu() {
-      this.menuExpanded = !this.menuExpanded;
-      if (this.menuExpanded) {
-        this.calculateMenuHeight();
-      }
-    },
-
-    calculateMenuHeight() {
-      this.menuHeight = 45 + this.filteredDecks.length * 35; 
-    },
-
-    searchSeries() {
-      if (!this.searchQuery.trim()) {
-        this.filteredDecks = this.decks;
-      } else {
-        const query = this.searchQuery.toLowerCase();
-        this.filteredDecks = this.decks.filter(deck => 
-          deck.deck_name?.toLowerCase().includes(query)
-        );
-      }
-      this.calculateMenuHeight();
-    },
-  }
+  },
 };
-
 </script>
 <style scoped>
 div, span, applet, object, iframe,
@@ -406,94 +297,8 @@ table {
   padding: 16px;
 }
 
-.sidebar-head{
-  text-decoration: none;
-  color: black;
-  cursor: pointer;
-}
 
-.icon{
-  width: 40px;
-  height: 40px;
-}
 
-.icon-text{
-  width: 85px;
-  height: 35px;
-}
-
-.sidebar-menu{
-  margin-top: 20px;
-}
-
-.sidebar-menu > li{
-  display: flex;
-  align-items: center;
-  width: 238px;
-  height: 40px;
-  margin-bottom: 5px;
-}
-
-.w-7{
-  width: 1.75rem;
-}
-
-.h-7{
-  height: 1.75rem;
-}
-
-.sidebar-menu li h2{
-  color: #a1a1aa; 
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.sidebar-menu a {
-  display: flex;
-  align-items: center; 
-  text-decoration: none;
-  color: #a1a1aa;
-  gap: 10px;
-}
-
-.sidebar-menu a:hover h2{
-  color: white; 
-}
-
-.sidebar-menu a:hover svg {
-  stroke: white; 
-}
-
-.translate-btn{
-  display: flex;
-  align-items: center;
-  width: 238px;
-  height: 40px;
-  gap: 8px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(45deg, #a855f7, #ec4899); 
-  color: white;
-  margin-top: 20px;
-  cursor: pointer;
-  position: relative;
-}
-
-.translate-btn::after{
-  content: "";
-  position: absolute;
-  border-top: 1px solid #3f3f46;
-  top: 50px;
-  left: 0;
-  right: 0;
-  width: 100%;
-}
-
-.sidebar p {
-  color: #a1a1aa;
-  font-size: 16px;
-  margin-top: 30px;
-}
 
 
 .pagebtn-area {
@@ -714,17 +519,19 @@ header {
   height: 240px;
   background-color: #333333;
   border-radius: 10px;
+  overflow: hidden;
   cursor: pointer;
   border: none;
   position: relative;
-  overflow: hidden;
 }
-.preview-image {
-  width: 240px;        
-  position: absolute;  
-  top: 0;
+
+.upload-btn img {
+  width: 240px;
+  position: absolute;
   left: 0;
+  top: 0;
 }
+
 
 
 .upload-btn svg {
@@ -739,16 +546,6 @@ header {
 .upload-btn:hover svg {
   visibility: visible;
   opacity: 1;
-}
-
-.file-input {
- position: absolute;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
- opacity: 0;
- cursor: pointer;
 }
 
 .add-section {
@@ -799,57 +596,6 @@ header {
   font-weight: 900;
 }
 
-.menu {
-  display: flex;
-  align-items: center;
-  padding: 5px 10px ;
-  color: white;
-  cursor: pointer;
-}
-
-.menu-area {
-  display:grid;
-  position: absolute;
-  background-color: #20567a;
-  border-radius: 7px;
-  width:270px;
-  margin-top: 45px;
-  margin-left: 5px;
-  overflow: hidden;
-  transition: height 1s ease;
-}
-
-.menu-search {
-  display: flex;
-  align-items: center;
-  padding: 10px ;
-  color: white;
-  position: relative;
-  width:250px;
-}
-
-.keyword  {
-  box-sizing: border-box;
-  color: white;
-  padding: 4px 8px;
-  border: 1px solid gray;
-  border-radius:10px;
-  display: flex;
-  background-color: transparent;
-  outline: none;
-  width:250px;
-}
-
-.menu-search button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    color: white;
-    position: absolute;
-    right: 12px;
-}
-
 .card-select-area {
   width: 100%;
   display: flex;
@@ -879,8 +625,7 @@ header {
   background-color: #2D7894;
 }
 
-
-.card-select-btn svg, .menu svg {
+.card-select-btn svg {
   width: 24px;
   height: 24px;
   stroke: white;
@@ -1227,10 +972,6 @@ footer {
       min-width: 100%;
   }
 
-  .sidebar-container {
-      display: none;
-  }
-
   main {
       margin-left: 0;
       width: 100%;
@@ -1279,6 +1020,10 @@ footer {
       margin: 0 auto;
   }
 
+  .upload-btn img {
+      width:288px;
+  }
+
   .add-section {
       width: 100%;
       margin-left: 16px;
@@ -1307,19 +1052,7 @@ footer {
       width: 90%;
   }
 
- .menu-area {
-  width: 89%;
- }
- .menu-search {
-  width: 100%;
- }
- .menu-search button {
-  right:40px;
- }
- .keyword {
-  width: 97%;
- }
-
+ 
 
   .cannot-change p {
       font-size: 20px;
@@ -1331,49 +1064,7 @@ footer {
       height: 650px;
       flex-direction: column;
   }
-
-  .edit-area {
-      width: 95%;
-      box-sizing: border-box;
-      background-color: #1C3D4B;
-      margin:16px auto;
-  }
-
-  .message-user-img img{
-      width: 50px;
-      height: 50px;
-  }
-
-  .enter-message {
-      width: 100%;
-  }
-
-  .message-area {
-      width: 95%;
-      height: 40px;
-      margin-top: 36px;
-      margin-left: 16px;
-  }
   
-
-  .message {
-      width: 90%;
-      height: 50px;
-      gap: 8px;
-      background-color: #2a2a2b;
-  }
-
-  .message-count {
-      position: absolute;
-      top:70px;
-      right: 20px;
-  }
-
-  
-  .footer-nav {
-      display: flex;    
-  }
-
 
   .edit-area {
       width: 95%;

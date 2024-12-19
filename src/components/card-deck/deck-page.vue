@@ -133,7 +133,8 @@ export default {
         },
         goToArticlePage() {
             // 使用 Vue 的路由進行跳轉
-            this.$router.push('/add-article');
+            const deckId = this.$route.params.deck_id;
+            this.$router.push(`/add/${deckId}`);
         },
         toggleRemitCard() {
             this.isVisible = !this.isVisible;

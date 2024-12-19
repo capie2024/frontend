@@ -1,7 +1,8 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import dayjs from 'dayjs';
+import SidebarGrid from '../SidebarGrid.vue';
+import RemitCard from "../Mycard/remit-card.vue";
 
 function getUserIdFromToken(token) {
     try {
@@ -16,107 +17,147 @@ function getUserIdFromToken(token) {
 }
 
 export default {
+    components: {
+        RemitCard,
+        SidebarGrid
+    },
     data() {
         return {
-        newMessage: "",  // 儲存輸入的留言內容
-        messages: [],    // 儲存所有留言
-        username: "",    // 用戶名稱
-        showAllMessages: false,
-        showMenu: false,
-        isEditing: false,
-        likeCount: 0 || 0,
-        liked: false,
-        hated: false,
-        loggedInUserId: null,
-        token: localStorage.getItem('token'),
-        created_at: null,
-        cards:[],
-        sortedCards: [],
-        sortBy: "typeTranslate",
-        groupedCards: [],
-        toggleTableView: false,
-        togglePriceView: false,
+            // 控制組件顯示或隱藏
+            isVisible: false,
+            deckData: {
+                deck: []
+            },  // 儲存從 API 獲得的牌組資料
+            sortBy: '', // 用於設置排序條件
+            togglePriceView: false, // 用於切換價格表顯示
+            toggleTableView: false, // 用於切換顯示模式
         };
     },
-    mounted() {
-        this.fetchArticleId();
-        this.fetchCurrentUser();
-        this.fetchDeck();
-    },
-
-    created() {
-        this.loggedInUserId = getUserIdFromToken(this.token);
-        console.log("Logged in user ID:", this.loggedInUserId);
-    },
     computed: {
-        isLoggedIn() {
-            return localStorage.getItem('token') !== null;
+        totalPrice() {
+            if (!Array.isArray(this.deckData.deck)) {
+                return 0;
+            }
+            return this.deckData.deck.reduce((sum, card) => {
+                return sum + (card.price?.number || 0); // 確保價格存在
+            }, 0);
         },
-        formattedTime() {
-            return (createdAt) => {
-                if (!createdAt) return "未知時間";
-                return dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss");
-            };
+        uniqueProductNames() {
+            const productNames = this.deckData.deck.map(card => card.productName);
+            return [...new Set(productNames)];
         },
         groupedCards() {
+            if (!Array.isArray(this.deckData.deck) || this.deckData.deck.length === 0) {
+                return [];
+            }
+
             let sorted = [];
             if (this.sortBy === "level") {
-                sorted = [...this.cards].sort((a, b) => a.level - b.level);
-            } 
-            else if (this.sortBy === "color") {
+                sorted = [...this.deckData.deck].sort((a, b) => a.level - b.level);
+            } else if (this.sortBy === "color") {
                 const colorOrder = ["red", "yellow", "green", "blue"];
-                sorted = [...this.cards].sort((a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color));
-            } 
-            else if (this.sortBy === "typeTranslate") {
+                sorted = [...this.deckData.deck].sort((a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color));
+            } else if (this.sortBy === "typeTranslate") {
                 const typeOrder = ["角色", "事件", "名場"];
-                sorted = [...this.cards].sort((a, b) => typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate));
-            } 
-            else if (this.sortBy === "rare") {
-                sorted = [...this.cards].sort((a, b) => {
+                sorted = [...this.deckData.deck].sort((a, b) => typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate));
+            } else if (this.sortBy === "rare") {
+                sorted = [...this.deckData.deck].sort((a, b) => {
                     if (a.rare.length !== b.rare.length) {
                         return a.rare.length - b.rare.length;
                     }
-                return a.rare.localeCompare(b.rare, "en");
+                    return a.rare.localeCompare(b.rare, "en");
                 });
-            } 
-            else if (this.sortBy === "seriesCode") {
-                sorted = [...this.cards].sort((a, b) => a.seriesCode.localeCompare(b.seriesCode, "en"));
-            }else{
-                sorted = [...this.cards];
+            } else if (this.sortBy === "seriesCode") {
+                sorted = [...this.deckData.deck].sort((a, b) => a.seriesCode.localeCompare(b.seriesCode, "en"));
+            } else {
+                sorted = [...this.deckData.deck];
             }
-            // 分組邏輯
+
             const grouped = sorted.reduce((acc, card) => {
-            const groupKey = card[this.sortBy]; // 根據當前的 sortBy 屬性作為分組依據
-            if (!acc[groupKey]) {
-                acc[groupKey] = [];
-            }
-            acc[groupKey].push(card);
+                let groupKey = card[this.sortBy];
+                if (!groupKey) {
+                    groupKey = "角色";
+                }
+
+                if (!acc[groupKey]) {
+                    acc[groupKey] = [];
+                }
+
+                acc[groupKey].push(card);
                 return acc;
             }, {});
 
-            // 定義顏色對應表
             const colorMap = {
-                    red: "紅色",
-                    yellow: "黃色",
-                    green: "綠色",
-                    blue: "藍色",
-                };
+                red: "紅色",
+                yellow: "黃色",
+                green: "綠色",
+                blue: "藍色",
+            };
 
-            // 等級轉換為中文格式
             const levelLabel = (level) => `${level}等`;
 
-            // 根據 sortBy 動態轉換分組鍵值
             return Object.entries(grouped).map(([key, cards]) => ({
-                group: this.sortBy === "color"
-                    ? colorMap[key] || key // 顏色轉換
-                    : this.sortBy === "level"
-                    ? levelLabel(key)      // 等級轉換
-                    : key,                 // 其他保持原值
+                group: this.sortBy === "color" ? colorMap[key] || key : this.sortBy === "level" ? levelLabel(key) : key,
                 cards,
-            }));        
-        },    
+            }));
+        }
+    },
+    mounted() {
+        this.fetchDeckData();
     },
     methods: {
+        confirmClose() {
+        Swal.fire({
+            title: '確定要離開嗎？',
+            text: '您的資料尚未完成，確定要離開嗎？',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '離開',
+            cancelButtonText: '取消',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+            // 用戶確認離開，隱藏模態框
+            this.isVisible = false;
+            }
+        });
+        },
+        hideModal() {
+        // 使用 Vue 的響應式來隱藏 RemitCard 和 overlay
+        this.isVisible = false;
+        },
+        toggleVisibility() {
+        this.isVisible = !this.isVisible; // 切換 isVisible 的值
+        },
+        goToArticlePage() {
+            // 使用 Vue 的路由進行跳轉
+            this.$router.push('/add-article');
+        },
+        toggleRemitCard() {
+            this.isVisible = !this.isVisible;
+        },
+        async fetchDeckData() {
+            const deckId = this.$route.params.deck_id;
+            console.log('Deck ID:', deckId);  // 用來檢查是否能獲取到 deck_id
+
+            try {
+                const response = await axios.get(`http://localhost:3000/api/deck-page/${deckId}`);
+                this.deckData = response.data;
+
+                if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
+                    console.error('回傳資料格式錯誤:', this.deckData);
+                    Swal.fire('錯誤', '無法獲取有效的資料', 'error');
+                    return;
+                }
+
+                if (!Array.isArray(this.deckData.deck)) {
+                    this.deckData.deck = [];
+                }
+            } catch (error) {
+                console.error('Error fetching deck data:', error);
+                Swal.fire('錯誤', '無法獲取資料', 'error');
+            }
+        },
         togglePriceTableView() {
             this.togglePriceView = !this.togglePriceView;
         },
@@ -127,340 +168,21 @@ export default {
             return cards.filter(card => card.trigger.includes('soul')).length;
         },
         setSortBy(property) {
-            this.sortBy = property; // 設定排序條件
-        },
-        async fetchDeck() {
-            try {
-                const postCode = this.$route.params.post_code;  // 获取当前路由的 post_code
-                const response = await axios.get(`http://localhost:3000/api/deck/${postCode}`);
-
-                const deckList = response.data[0].deck_list;
-                this.cards = deckList.deck;  
-
-                console.log('Deck Name:', this.deckName);
-                console.log('All cards:', this.cards);
-            } catch (error) {
-                console.error('Failed to fetch specific deck:', error);
-            }
-        },
-        async fetchCurrentUser() {
-            try {
-                const userToken = localStorage.getItem("token");
-
-                if (!userToken) {
-                    console.error("User token not found.");
-                    return;
-                }
-
-                const response = await axios.get('http://localhost:3000/api/currentUser', {
-                    headers: {
-                        Authorization: `Bearer ${userToken}`,
-                    },
-                });
-
-                console.log("Fetched user data:", response.data);
-                this.currentUser = response.data;            
-            } catch (error) {
-                console.error('Failed to fetch current user:', error);
-            }
-        },
-        async fetchArticleId() {
-            const postCode = this.$route.params.post_code;  
-            if (!postCode) {
-                console.error("Error: postCode is not available in route params");
-                return;
-            }
-            console.log("Post code:", postCode);
-            try {
-                // 根據 post_code 查詢對應的 article_id
-                const response = await axios.get(`http://localhost:3000/api/article-id/${postCode}`);
-                this.articleId = response.data.article_id;  // 從後端獲取 article_id
-                console.log("Fetched article ID:", this.articleId);
-
-                // 確保在獲取 articleId 後再獲取其他資料
-                await this.fetchMessages();  
-            } catch (error) {
-                console.error("Error fetching article_id:", error);
-            }
-        },
-        async fetchMessages() {
-            if (!this.articleId) {
-                console.error("Error: articleId is not available for fetching messages");
-                return;
-            }
-
-            try {
-                const response = await axios.get(
-                    `http://localhost:3000/api/comments?articleId=${this.articleId}`
-                );
-
-                // 按創建時間降序排序
-                this.messages = response.data.sort(
-                    (a, b) => new Date(b.created_at) - new Date(a.created_at)
-                );
-
-                this.messages.forEach((message) => {
-                    message.liked = message.liked || false;
-                    message.hated = message.hated || false;
-                    message.likeCount = message.like_count || 0;
-                    message.pictureUrl = message.users?.picture || '/default-avatar.png';
-                });
-
-                console.log("Fetched messages:", this.messages);
-            } catch (error) {
-                console.error("Error fetching messages:", error);
-            }
-        },
-        async sendMessage() {
-            console.log('sendMessage called');
-
-            if (!this.articleId) {
-                console.log(' articleId is not available');
-                return;  // 防止未設置 post_id 時發送留言
-            }
-
-            if (this.newMessage.trim() !== "" && this.articleId) {
-                const userToken = localStorage.getItem('token');
-
-                if (!userToken) {
-                    console.error('User token is missing');
-                    Swal.fire({
-                        title: "請先登入",
-                        text: "留言功能需要登入才能使用。",
-                        icon: "warning",
-                        confirmButtonText: "確定",
-                        }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'http://localhost:5173/login';
-                    }
-                });
-                    return;
-                }
-
-                const newMessage = {
-                    article_id: this.articleId,
-                    message: this.newMessage.trim(),
-                    like_count: 0,
-                    created_at: new Date().toISOString(),
-                }
-                try {
-                    const response = await axios.post('http://localhost:3000/api/send-message', {newMessage},{
-                        headers:{
-                            Authorization: `Bearer ${userToken}`,
-                        },
-                    });
-                    console.log('Message sent:', response.data);
-                    this.messages.unshift(response.data);  
-                    this.newMessage = ""; 
-                } catch (error) {
-                    console.error('Error sending message:', error);
-                }
-            } else {
-                console.log('Invalid message or post_id');
-            }
-        },
-        toggleMenu(messageId) {
-            const message = this.messages.find((message) => message.id === messageId);
-            if (message) {
-                if (message.user_id === this.loggedInUserId) {
-                    message.showMenu = !message.showMenu;
-                } else {
-                    console.log("無權限編輯此留言");
-                }
-            } else {
-                console.log("Message not found");
-            }
-        },        
-        toggleEdit(message) {
-            message.isEditing = true;
-            message.showMenu = !message.showMenu;
-            message.editContent = message.message; // 初始化編輯內容
-        },
-         // 送出編輯
-        async submitEdit(message) {
-            console.log('submitEdit called');
-            const userToken = localStorage.getItem('token');
-
-            if (!userToken) {
-                console.error('User token is missing');
-                return;
-            }
-
-            try {
-                const response = await axios.put(`http://localhost:3000/api/comments/${message.id}`, {
-                    message: message.editContent, 
-                },
-            {
-                headers: {
-                    Authorization: `Bearer ${userToken}`,
-                }
-            });
-                if (response.status === 200) {
-                    // 後端返回的更新資料
-                    const updatedComment = response.data    
-                    // 更新前端顯示的留言
-                    message.message = updatedComment.message;
-                    message.created_at = updatedComment.created_at;
-                    message.isEditing = false; // 結束編輯模式
-                } else {
-                    console.error('更新失敗', response);
-                    alert('更新失敗，請稍後再試！');
-                }
-            } catch (error) {
-                console.error('更新失敗', error);
-                alert('無法連接到伺服器，請稍後再試！');
-            }
-        },        
-        // 取消編輯
-        cancelEdit(message) {
-            message.isEditing = false; // 結束編輯模式
-        },
-        async deleteMessage(messageId) {
-            console.log("Attempting to delete message with ID:", messageId);         
-            Swal.fire({
-                title: "刪除留言",
-                text: "確定要刪除留言嗎？將會清除目前編輯的所有資訊。",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "OK"
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        const userToken = localStorage.getItem("token");
-
-                        if (!userToken) {
-                            console.error("User token not found.");
-                            return;
-                        }
-
-                        const response = await axios.delete(`http://localhost:3000/api/comments/${messageId}`,{
-                            headers: {
-                                Authorization: `Bearer ${userToken}`,
-                            }
-                        });
-                        console.log("Response from server:", response.data);
-                        if (response.status === 200) {
-                            Swal.fire("刪除成功!", "你的留言已被刪除", "success");
-                            this.messages = this.messages.filter((message) => message.id !== messageId);
-                        }
-                    } catch (error) {
-                        console.error("Delete request failed:", error.response?.data || error.message);
-                        Swal.fire("刪除失敗", error.response?.data?.error || "Failed to delete the comment.", "error");
-                    }
-                }
-            });
-        },
-        toggleMessages(){
-            this.showAllMessages = !this.showAllMessages
-        },
-        async toggleLike(message) {
-            try {
-                const userToken = localStorage.getItem("token");
-                if (!userToken) {
-                    console.error("User token not found.");
-                    return;
-                }
-
-                const response = await axios.post(
-                    `http://localhost:3000/api/comments/${message.id}/toggleLike`, {},
-                    { 
-                        headers: {
-                            Authorization: `Bearer ${userToken}`,
-                        }
-                    }
-                );
-
-                const { isLiked, isHated, likeCount } = response.data;
-
-                // 確保互斥狀態和 Like 數更新
-                message.liked = isLiked;
-                message.hated = isHated;
-                message.likeCount = likeCount; // 確保畫面同步更新 Like 數
-            } catch (error) {
-                console.error("Error toggling like:", error.response || error.message);
-            }
-        },
-        async toggleHate(message) {
-            try {
-                const userToken = localStorage.getItem("token");
-                if (!userToken) {
-                    console.error("User token not found.");
-                    return;
-                }
-
-                const response = await axios.post(
-                    `http://localhost:3000/api/comments/${message.id}/toggleHate`, {},
-                    { 
-                        headers: {
-                            Authorization: `Bearer ${userToken}`,
-                    }
-                });
-
-                const { isHated, isLiked, likeCount } = response.data;
-
-                // 確保互斥狀態和 Like 數更新
-                message.hated = isHated;
-                message.liked = isLiked;
-                message.likeCount = likeCount; // 確保畫面同步更新 Like 數
-            } catch (error) {
-                console.error("Error toggling hate:", error.response || error.message);
-            }
+            this.sortBy = property;
         }
     }
-}  
+};
 </script>
 
+
 <template>
+    <SidebarGrid/> 
     <div class="container">
-        <nav class="sidebar-container">
-            <div class="sidebar">
-                <a href="https://bottleneko.app/" class="sidebar-head">
-                    <img src="/src/img/bottleneko-icon.png" alt="" class="icon">
-                    <img src="/src/img/bottleneko-icon-text.png" alt="" class="icon-text">
-                </a>
-                <ul class="sidebar-menu">
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z"></path><path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z"></path></svg>                        
-                            <h2>首頁</h2>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg"  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>                        
-                            <h2>系列卡表</h2>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>                        
-                            <h2>我的牌組</h2>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg"  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"></path></svg>                        
-                            <h2>社群</h2>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg"  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"></path></svg>                        
-                            <h2>工作坊</h2>
-                        </a>
-                    </li>
-                </ul>
-                <button class="translate-btn">
-                    <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"></path></svg>
-                    <h2>原文翻譯</h2>
-                </button>
-                <p>沒東西</p>
-            </div>
-        </nav>        
         <div class="bg-container">
             <main>
+            <div  v-if="isVisible"  >
+                <RemitCard v-if="isVisible" />
+            </div>
                 <div class="bg-black">
                     <header>
                         <div class="pagebtn-area">
@@ -470,24 +192,29 @@ export default {
                             <button class="page-btn next-btn">
                                 <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
                             </button>
-                            <h2>タイトルカップ in WGP2024 東京会場 優勝 牌組</h2>
+                            <h2>{{ deckData.deck_name }}</h2>
                         </div>
                         <div class="btn-area">
-                            <button class="social-btn-item social-btn1">
-                                <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path></svg>
-                                <div class="description-item description1">分享</div>
-                            </button>
+                            
                             <button class="social-btn-item social-btn2">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"></path></svg>
                                 <div class="description-item description2">複製牌組</div>
                             </button>
+                            <button class="social-btn-item social-btn3" @click="toggleRemitCard" >
+                                <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
+                                <div class="description-item description7">匯出牌組</div>
+                            </button>
+                            <button class="social-btn-item social-btn3" @click="goToArticlePage">
+                                <svg data-v-f57a085e="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"></path></svg>
+                                <div class="description-item description3">發布文章</div>
+                            </button>
+                            <button class="social-btn-item social-btn3">
+                                <svg data-v-f57a085e="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2 red"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path></svg>
+                                <div class="description-item description4">刪除牌組</div>
+                            </button>
                             <button class="social-btn-item social-btn3">
                                 <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
-                                <div class="description-item description3">匯出牌組</div>
-                            </button>
-                            <button class="social-btn-item social-btn4">
-                                <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
-                                <div class="description-item description4">通知</div>
+                                <div class="description-item description5">通知</div>
                             </button>
                             <button class="user-btn">
                                 <div class="btn-img">
@@ -498,8 +225,8 @@ export default {
                             </button>
                             <button class="social-btn-item social-btn5">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"></path></svg>
-                                <div class="description-item description5">複製牌組</div>
-                                <div class="description-item description6">匯出牌組</div>
+                                <!-- <div class="description-item description5">複製牌組</div> -->
+                                <!-- <div class="description-item description6">匯出牌組</div> -->
                             </button>
                         </div>
                     </header>
@@ -507,37 +234,40 @@ export default {
                 <section class="carddeck-information">
                     <div class="information-container">
                         <div class="carddeck-img">
-                            <img src="/src/img/麻衣.png" alt="">
+                            <img :src="deckData.deck_cover"  alt="">
                         </div>
                         <div class="carddeck-data">
-                            <p class="user-number"><svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>&nbsp;8Vzcc</p>
+                            <p class="user-number">
+                            <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path>
+                            </svg>{{ deckData.deck_id }}</p>
                             <div class="carddeck-name">
-                                <h1>タイトルカップ in WGP2024 東京会場 優勝 牌組</h1>
+                                <h1>{{ deckData.deck_name }}</h1>
                             </div>
-                            <div class="data-container">
-                                <div class="user-link">
-                                    <div class="user-img">
-                                        <img src="/src/img/麻衣.png" alt="">
+                            <div class="data-container" >
+                                <div class="user-link"   v-if="deckData && deckData.users && deckData.users.username">
+                                    <div class="user-img" v-if="deckData.users.picture">
+                                        <img :src="deckData.users.picture" alt="">
                                     </div>
                                     <span class="date-container">
-                                        <a href="#">XXXX</a>
+                                        <a href="#">{{deckData.users.username}}</a>
                                         發布於
-                                        <span>2024-01-01</span>
+                                        <span>{{ deckData.build_time.slice(0, 10) }}</span>
                                     </span>
                                 </div>
-                                <span class="data-item">
+                                <span class="data-item" v-if="deckData && Array.isArray(deckData.deck)">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none" data-v-5634e853=""><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>&nbsp;
-                                    總數50張
+                                    總數{{deckData.deck.length}}張
                                 </span>
                                 <span class="data-item">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none" data-v-5634e853=""><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg>&nbsp;
                                     總價
-                                    <span>11460円</span>
+                                    <span>{{ totalPrice }}円</span>
                                 </span>
-                                <span class="data-item">
+                                <span class="data-item"   v-if="deckData.deck && deckData.deck.length > 0">
                                     <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg>&nbsp;
                                     系列包含
-                                    <a>ペルソナ</a>
+                                    <a v-for="(product, index) in uniqueProductNames" :key="index" href="#">{{ product }}</a>
                                 </span>
                             </div>
                         </div>
@@ -549,203 +279,13 @@ export default {
                         <div class="text-container">
                             <div class="article-title">
                                 <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="text-white/50 size-8"><path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97ZM6.75 8.25a.75.75 0 0 1 .75-.75h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H7.5Z" clip-rule="evenodd"></path></svg>
-                                <span>文章內容</span>
+                                <span>內容描述</span>
                             </div>
                             <div class="article-content">
-                                <p>123</p>
+                                <p>{{deckData.deck_description}}</p>
                             </div>
                         </div>
-                        <!-- 留言區域 -->
-                        <div class="message-area">
-                            <!-- 留言輸入 -->
-                            <div class="user-message">
-                                <div class="message-user-img">
-                                    <img :src="currentUser?.picture" alt="">
-                                </div>
-                                <div class="message">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 default-transition text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"></path></svg>
-                                    <input 
-                                    class="enter-message" 
-                                    type="text" 
-                                    placeholder="留言..."
-                                    v-model="newMessage"
-                                    >
-                                    <button @click="sendMessage">
-                                        <svg class="send-message" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <h3 class="message-count">{{ messages.length }}則留言</h3>
-                            <!-- 留言列表 -->
-                            <section class="message-section">
-                                <div class="message-list message-scroll" v-if="messages.length > 0" >
-                                    <!-- 顯示前兩條留言 -->
-                                    <div class="message-list-info"
-                                    v-for="(message,id) in messages.slice(0,2)"
-                                    :key="message.id">                                   
-                                        <section>
-                                            <div class="message-user-img">
-                                                <img :src="message.users.picture" alt="">
-                                            </div>
-                                        </section>
-                                        <div class="message-body">
-                                            <div class="message-header">
-                                                <div class="message-user-name">
-                                                    <h4>{{ message.users.username}}</h4>
-                                                    <div>
-                                                        發佈於
-                                                        <span>{{ formattedTime(message.created_at) }}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="dot">
-                                                    <button @click="toggleMenu(message.id)">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 dot">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"></path>
-                                                        </svg>
-                                                    </button>
-                                                    <div class="dot-menu" @click.stop="toggleMenu(message.id)" v-if="message.showMenu">
-                                                        <a class="edit" @click.stop="toggleEdit(message)">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
-                                                            </svg>
-                                                            <span>編輯</span>
-                                                        </a>
-                                                        <a class="delete" @click="deleteMessage(message.id)">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
-                                                            </svg>
-                                                            <span>刪除</span>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- 非編輯模式：顯示文字 -->
-                                            <p class="text-white" v-if="!message.isEditing">{{ message.message }}</p>
-                                            <!-- 編輯模式：顯示 textarea -->
-                                            <div class="bg-black/30 p-1 rounded-xl" v-if="message.isEditing">
-                                                <textarea v-model="message.editContent" rows="3" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500 text-white" placeholder=""></textarea>
-                                            </div>
-                                            <!-- 按鈕區域 -->                                         
-                                            <div class="message-btn-area">
-                                                <button v-if="message.isEditing" @click="submitEdit(message)" class="flex-none rounded-full py-1 pl-1 pr-2 flex items-center bg-white text-zinc-800 send-btn">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5">
-                                                        </path>
-                                                    </svg>
-                                                    <span class="text-xs text-mono leading-none font-bold">送出</span>
-                                                </button>
-                                                <button v-if="message.isEditing" @click="cancelEdit(message)" class="flex-none rounded-full py-1 pl-1 pr-2 flex items-center bg-amber-600 text-white cancel-btn">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
-                                                    </svg>
-                                                    <span class="text-xs text-mono leading-none font-bold">取消</span>
-                                                </button>
-                                                <button class="message-like" @click="toggleLike(message)">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5" 
-                                                    :class="{'fill-red-500': message.liked || message.likeCount > 0}">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"></path>
-                                                    </svg>
-                                                    <span class="text-xs text-mono leading-none font-bold">{{ message.likeCount }}</span>
-                                                </button>
-                                                <button class="message-bad-like" @click="toggleHate(message)">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"
-                                                    :class="{'bg-gray': message.hated }">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54"></path>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- 顯示更多留言按鈕，當 messages 超過 2 條且 showAllMessages 為 false 時顯示 -->
-                                    <button class="read-more" v-if="messages.length > 2 && !showAllMessages" @click="toggleMessages">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"></path>
-                                        </svg>
-                                        <span>閱讀更多</span>
-                                    </button>
-                                    <!-- 顯示所有留言，當 showAllMessages 為 true 時顯示 -->
-                                    <div v-if="showAllMessages" class="message-list">
-                                        <div class=" message-list-info" 
-                                        v-for="(message,id) in messages.slice(2)" 
-                                        :key="message.id">
-                                            <section>
-                                                <div class="message-user-img">
-                                                    <img :src="message.users.picture" alt="">
-                                                </div>
-                                            </section>
-                                            <div class="message-body">
-                                                <div class="message-header">
-                                                    <div class="message-user-name">
-                                                        <h4>{{ message.users.username }}</h4>
-                                                        <div>發佈於 
-                                                            <span>{{ formattedTime(message.created_at) }}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="dot">
-                                                        <button @click="toggleMenu(message.id)">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 dot">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"></path>
-                                                            </svg>
-                                                        </button>
-                                                        <div class="dot-menu" @click.stop="toggleMenu(message.id)" v-if="message.showMenu">
-                                                            <a class="edit" @click="toggleEdit(message)">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
-                                                                </svg>
-                                                                <span>編輯</span>
-                                                            </a>
-                                                            <a class="delete" @click="deleteMessage(message.id)">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 flex-none">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
-                                                                </svg>
-                                                                <span>刪除</span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            <!-- 非編輯模式：顯示文字 -->
-                                            <p class="text-white" v-if="!message.isEditing">{{ message.message }}</p>
-                                            <!-- 編輯模式：顯示 textarea -->
-                                            <div class="bg-black/30 p-1 rounded-xl" v-if="message.isEditing">
-                                                <textarea v-model="message.editContent" rows="3" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500 text-white" placeholder=""></textarea>
-                                            </div>
-                                            <!-- 按鈕區域 -->                                         
-                                            <div class="message-btn-area">
-                                                <button v-if="message.isEditing" @click="submitEdit(message)" class="flex-none rounded-full py-1 pl-1 pr-2 flex items-center bg-white text-zinc-800 send-btn">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5">
-                                                        </path>
-                                                    </svg>
-                                                    <span class="text-xs text-mono leading-none font-bold">送出</span>
-                                                </button>
-                                                <button v-if="message.isEditing" @click="cancelEdit(message)" class="flex-none rounded-full py-1 pl-1 pr-2 flex items-center bg-amber-600 text-white cancel-btn">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
-                                                    </svg>
-                                                    <span class="text-xs text-mono leading-none font-bold">取消</span>
-                                                </button>
-                                                <button class="message-like" @click="toggleLike(message)">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"
-                                                    :class="{'fill-red-500': message.liked || message.likeCount > 0}">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"></path>
-                                                    </svg>
-                                                    <span class="text-xs text-mono leading-none font-bold">{{ message.likeCount }}</span>
-                                                </button>
-                                                <button class="message-bad-like" @click="toggleHate(message)">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"
-                                                    :class="{'bg-gray': message.hated }">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54"></path>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
+                        
                     </div>
                     <nav class="toolbar">
                         <div class="toolbar-area1">
@@ -796,9 +336,9 @@ export default {
                     </nav>
 
                     <div class="card-info">
-                        <div class="row" v-for="group in groupedCards" :key="group.group">
+                        <div class="row" v-if="groupedCards && groupedCards.length" v-for="group in groupedCards" :key="group.group || '未分類'">
                             <div class="card-info-header">
-                                <h2 class="group-title">{{ group.group || '未分類'}} - {{ group.cards.length }}</h2>
+                                <h2 class="group-title">{{ group.group || '未分類' }} - {{ group.cards.length || 0 }}</h2>
                                 <div class="group-count" data-v-1d946842="">
                                     <img data-v-1d946842="" src="https://bottleneko.app/soul.gif" class="size-4">
                                     <span data-v-1d946842="" class="font-mono flex-none">{{ countSoulCards(group.cards) }}</span>
@@ -895,6 +435,17 @@ export default {
 </template>
 
 <style scoped>
+
+    .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 99;
+    
+}
     .price-row{
         display: flex;
         justify-content: center;
@@ -1046,7 +597,7 @@ export default {
     padding: 20px;
     box-sizing: border-box;
     position: absolute;
-    top: 580px;
+    top: 250px;
     display: flex;
     flex-direction: column;
     }
@@ -1501,11 +1052,16 @@ export default {
     }
 
     .container {
-        width: 100%;
+        width: 86%;
         display: flex;
         position: relative;
+        left: 270px;
+        top: -40px;
     }
-
+    main::-webkit-scrollbar {
+    width: 0px;  /* 隱藏滾動條 */
+    background: transparent;  /* 滾動條的背景設為透明 */
+}
     .sidebar-container {
         background-color: #000000;
         min-width: 270px;
@@ -1539,6 +1095,7 @@ export default {
 
     .sidebar-menu{
         margin-top: 20px;
+        padding: 0px;
     }
 
     .sidebar-menu > li{
@@ -1612,11 +1169,12 @@ export default {
 
     .bg-black {
         background-color: #000000;
-        width: calc(100% - 278px);
+        width: calc(100% - 270px);
         height: 72px;
         position: fixed;
         top:0;
-        z-index: 1;
+        z-index: 5;
+        left: 270px;
     }
 
     header {
@@ -1624,7 +1182,7 @@ export default {
         border-radius: 20px 20px 0 0;
         position: absolute;
         top: 8px;
-        width: 100%;
+        width:100%;
         height: 64px;
         display: flex;
         align-items: center;
@@ -1678,6 +1236,7 @@ export default {
         right: 28px;
         display: flex;
         gap:8px;
+        width: 311px;
     }
 
 
@@ -1699,7 +1258,11 @@ export default {
         height: 24px !important;
         stroke: white;
     }
-
+    .social-btn-item .red {
+        width: 24px !important;
+        height: 24px !important;
+        stroke: red;
+    }
     .social-btn5 {
         display: none;
     }
@@ -1726,23 +1289,27 @@ export default {
 
 
     .description1 {
-        right:206px;
+        right:286px;
     }
 
     .description2 {
-        right:150px;
+        right:235px;
     }
 
     .description3 {
-        right:110px;
+        right:155px;
     }
 
     .description4 {
-        right:90px;
+        right:131px;
     }
 
     .description5 {
-        right: -20px;
+        right: 91px;
+    }
+
+    .description7 {
+        right: 193px;
     }
 
     .description6 {
@@ -1762,6 +1329,9 @@ export default {
     .social-btn1:hover .description1,
     .social-btn2:hover .description2,
     .social-btn3:hover .description3,
+    .social-btn3:hover .description4,
+    .social-btn3:hover .description5,
+    .social-btn3:hover .description7,
     .social-btn4:hover .description4{
         opacity: 1;
         visibility: visible;
@@ -1812,21 +1382,18 @@ export default {
 
 
     .bg-container {
-        margin-left: 270px;
-        width: calc(100% - 270px);
+        width:100%;
         padding-bottom: 1rem; 
     }
 
     main {
-        margin-top: 8px;
         position: relative;
-        /* width: calc(100% - 8px); 
-        /* height: calc(100vh - 1rem); */
         height: auto;
         overflow: hidden;
         overflow-y: scroll;
         scroll-behavior: smooth;
         border-radius: 20px 20px 0 0;
+        
     }
 
 
@@ -1839,7 +1406,7 @@ export default {
     }
 
     .information-container {
-        margin-top:210px;
+        margin-top:200px;
         width: 100%;
         box-sizing: border-box;
         gap: 32px;
@@ -1883,19 +1450,18 @@ export default {
     }
 
     .carddeck-name h1 {
-        width: 70%;
+        /* width: 70%; */
         min-height: 138px;
         font-size: 70px;
         font-weight: bold;
         color: white;
         white-space: nowrap; /* 強制單行顯示 */
-        overflow: hidden; /* 隱藏超出部分 */
+        /* overflow: hidden; 隱藏超出部分 */
         text-overflow: ellipsis;
     }
 
     .data-container {
-        width: 55%;
-        margin-top: 16px;
+        width: 100%;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -1924,7 +1490,9 @@ export default {
 
 
     .date-container a,.data-item a{
-        text-decoration: underline;
+        text-decoration: none;
+        margin-left: 5px;
+         pointer-events: none;
     }
 
     .data-item {
@@ -1949,13 +1517,13 @@ export default {
     }
 
     .main-container-bg{
-        background: linear-gradient(rgba(59, 130, 246, 0.44) 100px, transparent 500px);
+        background: linear-gradient(rgba(59, 130, 246, 0.44) 100px, transparent 500px) ;
         width: 100%;
         height: 500px;
         position: absolute;
         top: 0;
         left: 0;
-        z-index: -1;
+        z-index: 1;
     }
 
     .article-area {
@@ -1963,12 +1531,13 @@ export default {
     }
 
     .text-container {
-        width: 60%;
+        width: 100%;
         padding: 8px;
         box-sizing: border-box;
         background: linear-gradient(to bottom, #1E2D48, #1A2232);;
-        margin: 32px 0 0 24px;
+        margin: 32px 24px;
         border-radius: 10px;
+        z-index: 2;
     }
 
     .article-title {
@@ -2090,7 +1659,8 @@ export default {
         display: flex;
         margin-left: 24px;
         position: absolute; 
-        top: 550px;  
+        top: 200px;  
+        z-index: 1;
         /* display: none; */
     }
 
@@ -2220,7 +1790,7 @@ export default {
         width: 100%;
         height: 66px;
         display: flex;
-        background-color: #0D0B0C;
+        
         position: fixed;
         bottom: 0;
         display: none;    
@@ -2398,13 +1968,33 @@ export default {
     }
 
     @media screen and (max-width: 1199px) {
+        .social-btn1:hover .description1,
+        .social-btn2:hover .description2,
+        .social-btn3:hover .description3,
+        .social-btn3:hover .description4,
+        .social-btn3:hover .description5,
+        .social-btn3:hover .description7,
+        .social-btn4:hover .description4{
+        visibility: hidden;
+    }
+    .social-btn-item{
+        width: auto;
+    }
+    .btn-area{
+        width: auto;
+    }
+    .container{
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
         .toolbar {
             position: absolute;
-            top: 930px;
+            top: 300px;
         }
 
         .card-info{
-            margin-top: 400px;
+            margin-top: 50px;
         }
 
         .tool-btn1 span{
@@ -2425,7 +2015,7 @@ export default {
         }
 
         .sidebar-container {
-            display: none;
+            background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
         }
 
         .bg-container {
@@ -2449,6 +2039,7 @@ export default {
             position: absolute;
             top: 0;
             width: 100%;
+            left: 0;
         }
 
         header {
@@ -2467,14 +2058,13 @@ export default {
         .pagebtn-area h2 {
             display: none;
         }
-
-        .social-btn5 {
+        .social-btn2, 
+        .social-btn3,
+        .social-btn4 {
             display: block;
         }
 
-        .social-btn2,
-        .social-btn3,
-        .social-btn4,
+        
         .user-btn{
             display: none;
         }
@@ -2552,7 +2142,7 @@ export default {
 
         .text-container {
             width: 95%;
-            height: 100%;
+            height: 50%;
             margin:16px auto;
             padding: 8px;
             margin: 1rem auto;
@@ -2628,7 +2218,9 @@ export default {
         .col-Sheet, .col-Info {
             width: calc((100% - 10px) / 2);
         }
-
+        .container {
+            all: unset !important; /* 這會取消所有屬性 */
+  }
     }
 
     @media screen and (max-width: 410px) {

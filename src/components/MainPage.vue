@@ -1,5 +1,7 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
+import axios from "axios";
+import placeholderImage from '@/img/card-loading.png' // 預設圖片
 
 const isScrolled = ref(false); // 是否滾動
 
@@ -17,8 +19,53 @@ const main = () => {
   }
 };
 
+const numberOfGrids = 10; // 總共有幾個 grid
+const itemsPerGrid = 10; // 每個 grid 有幾個卡片
+
+const grids = ref(
+    Array.from({ length: numberOfGrids }, () =>
+        Array.from({ length: itemsPerGrid }, () => placeholderImage)
+    )
+)
+
+const API_URL = 'http://localhost:3000'
+
+const fetchGrids = async () => {
+    try {
+        // 使用 Promise.all 並行請求，提高效率
+        const gridPromises = Array.from({ length: numberOfGrids }, async () => {
+            const itemPromises = Array.from({ length: itemsPerGrid }, async () => {
+                try {
+                    const response = await axios.get(`${API_URL}/cards/random`)
+                    const covers = response.data.covers
+        
+                    // 隨機選擇一個圖片網址，如果為空值則使用預設圖片
+                    return covers.length > 0 ? covers[Math.floor(Math.random() * covers.length)] : placeholderImage;
+                } catch(error) {
+                    console.error('單個卡片請求失敗：', error)
+                    return placeholderImage
+                }
+            })
+
+            // 等待每個網格的所有項目
+            return Promise.all(itemPromises)
+        })
+
+        // 更新網格
+        grids.value = await Promise.all(gridPromises)
+    } catch (error) {
+        console.error('讀取失敗：', error);
+        // 如果向後端發送請求失敗，全部使用預設圖片
+        grids.value = Array.from({ length: numberOfGrids }, () => 
+            Array.from({ length: itemsPerGrid }, () => placeholderImage)
+        )
+    }
+}
+
+
 onMounted(() => {
   main();
+  fetchGrids();
 });
 
 onBeforeUnmount(() => {
@@ -29,12 +76,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <header class="z-10 h-16 header-bg overflow-hidden">
-        <nav class="header-container w-full h-full px-4 py-6 flex items-center gap-2 relative default-transition" :class="{ 'scrolled': isScrolled }">
+    <header class="z-10 h-16 overflow-hidden header-bg">
+        <nav class="relative flex items-center justify-end w-full h-full gap-2 px-4 py-6 header-container default-transition" :class="{ 'scrolled': isScrolled }">
             <div class="notice">
                 <input type="checkbox" id="notice-jump">
-                <label for="notice-jump" class="flex-none p-1 rounded-full default-transition hover:bg-zinc-800/50 text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
+                <label for="notice-jump" class="flex-none p-1 text-white rounded-full default-transition hover:bg-zinc-800/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
                 </label>
                 <div class="z-10 notice-grid">
                     <div class="notice-grid-up">
@@ -65,15 +112,74 @@ onBeforeUnmount(() => {
         </nav>
     </header>
 
-    <main class="relative content-container flex flex-col pt-[10px] rounded-b-2xl bg-base scroll-smooth scrollbar z-1">
-        <div class="content px-4 md:px-6 h-full">
-            <section class="bottleneko-section">
-                <div>
-                <img src="https://bottleneko.app/icon.png" alt="" />
+    <main class="relative flex flex-col content-container rounded-b-2xl bg-base scroll-smooth scrollbar z-1">
+        <div class="h-full px-4 content md:px-6">
+            <section class="h-[75vh] relative overflow-hidden -mx-4 md:-mx-6">
+                <div class="container flex gap-4 default-transition">
+                    <div v-for="(grid, gridIndex) in grids"
+                        :key="gridIndex"
+                        :class="`grid${gridIndex + 1} flex flex-col flex-wrap items-center justify-center flex-none gap-4`"
+                    >
+                        <div v-for="(imageUrl, index) in grid" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                            <!-- <img v-else :src="placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl"> -->
+                        </div>
+                    </div>
+                    <!-- <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid2">
+                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid3">
+                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid4">
+                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid5">
+                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid6">
+                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid7">
+                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid8">
+                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid9">
+                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid10">
+                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
+                        </div>
+                    </div> -->
                 </div>
-                <h1>Capie</h1>
-                <p>- 輕鬆開啟你的卡牌派對 -</p>
+                <div class="logo-banner">
+                    <div class="bg-zinc-900 rounded-xl">
+                        <img src="../img/capie-icon.png" alt="" class="w-32 h-32 shadow-2xl rounded-2xl shadow-black/50"/>
+                    </div>
+                    <h1 class="mb-0 text-3xl font-black text-white md:text-6xl">Capie</h1>
+                    <p class="mb-12 text-xl text-white/50">- 輕鬆開啟你的卡牌派對 -</p>
+                </div>
             </section>
+            
     
             <section class="author-section">
                 <div>
@@ -98,7 +204,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="author-text">
                     <p>
-                    貓罐子 BottleNeko 是個 WS
+                    Capie 是個 WS
                     組牌工具，抱持著身為玩家熱情而開發。我們希望大家在過程中能夠有好的體驗與幫助到您，也希望能夠聽見您的需求使我們更好！
                     </p>
                 </div>
@@ -316,7 +422,7 @@ onBeforeUnmount(() => {
                         d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
                         ></path>
                     </svg>
-                    <h3>貓罐子是什麼？</h3>
+                    <h3>Capie是什麼？</h3>
                     <svg
                         class="dropdown-icon"
                         xmlns="http://www.w3.org/2000/svg"
@@ -333,7 +439,7 @@ onBeforeUnmount(() => {
                     </svg>
                     </label>
                     <p class="answer">
-                    貓罐子是一個線上的卡牌組牌工具，提供各種便利的功能，讓您可以輕鬆的組牌、分享牌組、查詢卡片等等。
+                    Capie是一個線上的卡牌組牌工具，提供各種便利的功能，讓您可以輕鬆的組牌、分享牌組、查詢卡片等等。
                     目前專為 Weiβ Schwarz 卡牌遊戲製作。
                     </p>
                 </div>
@@ -370,12 +476,12 @@ onBeforeUnmount(() => {
                     </svg>
                     </label>
                     <p class="answer">
-                    目前貓罐子以全網站式開發，但您能可以透過以下方式加入至主畫面：<br /><br />
-                    1. 在裝置上開啟原生瀏覽器並進入貓罐子網站 <br />
+                    目前Capie以全網站式開發，但您能可以透過以下方式加入至主畫面：<br /><br />
+                    1. 在裝置上開啟原生瀏覽器並進入Capie網站 <br />
                     2. Android 裝置點選 [安裝]。 iPhone
                     裝置輕觸網址列右上方的「分享」圖示 <br />
                     3. 找出並輕觸「加入主畫面」並按照畫面上的指示操作 <br />
-                    4. 在手機桌面即可出現貓罐子應用程式 <br />
+                    4. 在手機桌面即可出現Capie應用程式 <br />
                     <br />
                     相關教學
                     <span
@@ -402,7 +508,7 @@ onBeforeUnmount(() => {
                         d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
                         ></path>
                     </svg>
-                    <h3>我的貓罐子打不開或是轉圈圈？</h3>
+                    <h3>我的Capie打不開或是轉圈圈？</h3>
                     <svg
                         class="dropdown-icon"
                         xmlns="http://www.w3.org/2000/svg"
@@ -456,12 +562,12 @@ onBeforeUnmount(() => {
                     </svg>
                     </label>
                     <p class="answer">
-                    由於貓罐子提供很多功能，您可以首先到 "系列卡表"
+                    由於Capie提供很多功能，您可以首先到 "系列卡表"
                     尋找喜愛的系列查看，<br />
                     卡片會有中文翻譯/機器翻譯，點選加入按鈕進行牌組製作。<br />
                     或是您可以到社群上找大家或是官方賽事的牌組來複製。<br /><br />
     
-                    如果您對此仍不熟悉，歡迎至貓罐子 Discord
+                    如果您對此仍不熟悉，歡迎至Capie Discord
                     頻道讓大家一起幫你解答：<span>
                         <a href="https://discord.com/invite/QMtPcXrdBq"
                         >Discord
@@ -539,10 +645,10 @@ onBeforeUnmount(() => {
                     </svg>
                     </label>
                     <p class="answer">
-                    目前貓罐子搜集來自<span
+                    目前Capie搜集來自<span
                         ><a href="https://ws-tcg.com/"> WS官方</a></span
                     >以及<span><a href="https://yuyu-tei.jp/">遊遊亭</a></span
-                    >的價格資訊，以及強大的貓罐子管理群資源。<br />
+                    >的價格資訊，以及強大的Capie管理群資源。<br />
                     如果您有資源想與我們分享或商業合作，請與我聯繫！
                     </p>
                 </div>
@@ -562,7 +668,7 @@ onBeforeUnmount(() => {
                         d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
                         ></path>
                     </svg>
-                    <h3>貓罐子與武士道</h3>
+                    <h3>Capie與武士道</h3>
                     <svg
                         class="dropdown-icon"
                         xmlns="http://www.w3.org/2000/svg"
@@ -579,10 +685,10 @@ onBeforeUnmount(() => {
                     </svg>
                     </label>
                     <p class="answer">
-                    貓罐子提供的 Weiβ Schwarz 卡牌資訊以及卡圖，皆為<span
+                    Capie提供的 Weiβ Schwarz 卡牌資訊以及卡圖，皆為<span
                         ><a href="https://ws-tcg.com/">武士道官方資料</a></span
-                    >，與貓罐子本身無任何關係。<br />
-                    若卡片資訊有相關侵權問題，則會下架其內容，貓罐子僅為提供輔助工具進行服務。
+                    >，與Capie本身無任何關係。<br />
+                    若卡片資訊有相關侵權問題，則會下架其內容，Capie僅為提供輔助工具進行服務。
                     </p>
                 </div>
                 <div>
@@ -1148,7 +1254,7 @@ header {
     /* grid-area: navbar; */
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-    background-color: rgba(18, 18, 18, 1);
+    background-color: transparent;
 }
 
 .header-container.scrolled {
@@ -1303,7 +1409,10 @@ header {
 }
 
 .content-container {
-    height: calc(100vh - 64px - .5rem);
+    margin-top: calc(-64px + .5rem);
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    height: calc(100vh - .5rem);
     width: calc(100vw - 270px - .5rem);
     /* grid-area: main-view; */
     background-color: #121212;
@@ -1317,16 +1426,69 @@ header {
     }
 }
 
-.bottleneko-section {
-    height: 30rem;
-    background-color: #121212;
+.container {
+    transform: translateY(-30%) translate(-10%) skewY(10deg) skew(-10deg);
+}
+
+@keyframes marqueeUpDown {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.grid1, .grid2, .grid3, .grid4, .grid5, .grid6, .grid7, .grid8, .grid9, .grid10 {
+    animation: marqueeUpDown 50s linear infinite;
+}
+
+.grid1, .grid3, .grid5, .grid7, .grid9 {
+    animation-delay: 5s;
+    animation-direction: normal;
+}
+
+.grid2, .grid4, .grid6, .grid8, .grid10 {
+    animation-delay: -20s;
+    animation-direction: reverse;
+}
+
+.item {
+    flex: none;
+}
+
+.item::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: .75rem;
+    position: absolute;
+    z-index: -1;
+    background: linear-gradient(to bottom left, rgba(243, 236, 100, 0.825), rgba(249, 135, 14, 0.89));
+    transform: translate(5px) translateY(5px);
+}
+
+.logo-banner {
+    position: absolute;
+    bottom: 0;
+    z-index: 5;
+    width: 100%;
+    height: 20rem;
+    background: linear-gradient(to top,var(--tw-gradient-stops));
+    --tw-gradient-from: #121212 var(--tw-gradient-from-position);
+    --tw-gradient-stops: var(--tw-gradient-from),hsla(0,0%,7%,.9) var(--tw-gradient-via-position),var(--tw-gradient-to);
+    --tw-gradient-to: transparent var(--tw-gradient-to-position);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
     gap: 1rem;
     margin: 0 auto;
-    margin-bottom: 48px;
+    margin-bottom: -1rem;
 }
 
 .author-section {
@@ -1389,17 +1551,17 @@ header {
     background-color: #121212;
 }
 
-.bottleneko-section img {
+.logo-banner img {
     height: 128px;
 }
 
-.bottleneko-section h1 {
+.logo-banner h1 {
     font-size: 60px;
     font-weight: bold;
     color: white;
 }
 
-.bottleneko-section p {
+.logo-banner p {
     font-size: 20px;
     font-weight: bold;
     color: #757474;
@@ -2407,11 +2569,16 @@ link-area3 a svg {
       margin: 0;
       border-radius: 0;
     }
+
     .content-container {
         width: 100%;
     }
 
-    .bottleneko-section h1 {
+    .container div div img {
+        height: 15rem;
+    }
+
+    .logo-banner h1 {
         font-size: 30px !important;
     }
 
@@ -2612,6 +2779,12 @@ link-area3 a svg {
         height: auto;
         /* position: none; */
     }
+    }
+
+    @media screen and (width < 1024px) {
+        .container div div img {
+            height: 10rem;
+        }
     }
     </style>
 

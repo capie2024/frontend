@@ -58,7 +58,7 @@ const workShopData = [
               <i class="fa-solid fa-arrow-right"></i>
             </div>
           </a>
-          <router-link to="/" class="hero-member-box">
+          <router-link to="/hero-member" class="hero-member-box">
             <div class="hero-member-box-left-icon">
               <i class="fa-solid fa-star"></i>
             </div>

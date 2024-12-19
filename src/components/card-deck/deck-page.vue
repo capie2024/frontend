@@ -176,7 +176,7 @@ export default {
 
 
 <template>
-    <SidebarGrid  /> 
+    <SidebarGrid/> 
     <div class="container">
         <div class="bg-container">
             <main>
@@ -195,10 +195,10 @@ export default {
                             <h2>{{ deckData.deck_name }}</h2>
                         </div>
                         <div class="btn-area">
-                            <button class="social-btn-item social-btn1">
+                            <!-- <button class="social-btn-item social-btn1">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path></svg>
                                 <div class="description-item description1">分享</div>
-                            </button>
+                            </button> -->
                             <button class="social-btn-item social-btn2">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"></path></svg>
                                 <div class="description-item description2">複製牌組</div>
@@ -212,8 +212,8 @@ export default {
                                 <div class="description-item description3">發布文章</div>
                             </button>
                             <button class="social-btn-item social-btn3">
-                                <svg data-v-f57a085e="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path></svg>
-                                <div class="description-item description4">刪除</div>
+                                <svg data-v-f57a085e="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2 red"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path></svg>
+                                <div class="description-item description4">刪除牌組</div>
                             </button>
                             <button class="social-btn-item social-btn3">
                                 <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
@@ -1239,6 +1239,7 @@ export default {
         right: 28px;
         display: flex;
         gap:8px;
+        width: 311px;
     }
 
 
@@ -1260,7 +1261,11 @@ export default {
         height: 24px !important;
         stroke: white;
     }
-
+    .social-btn-item .red {
+        width: 24px !important;
+        height: 24px !important;
+        stroke: red;
+    }
     .social-btn5 {
         display: none;
     }
@@ -1973,8 +1978,13 @@ export default {
         .social-btn3:hover .description5,
         .social-btn3:hover .description7,
         .social-btn4:hover .description4{
-        
         visibility: hidden;
+    }
+    .social-btn-item{
+        width: auto;
+    }
+    .btn-area{
+        width: auto;
     }
     .container{
         left: 0;
@@ -2008,7 +2018,7 @@ export default {
         }
 
         .sidebar-container {
-            display: none;
+            background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
         }
 
         .bg-container {
@@ -2051,14 +2061,13 @@ export default {
         .pagebtn-area h2 {
             display: none;
         }
-
-        .social-btn5 {
+        .social-btn2, 
+        .social-btn3,
+        .social-btn4 {
             display: block;
         }
 
-        .social-btn2,
-        .social-btn3,
-        .social-btn4,
+        
         .user-btn{
             display: none;
         }
@@ -2213,7 +2222,7 @@ export default {
             width: calc((100% - 10px) / 2);
         }
         .container {
-    all: unset !important; /* 這會取消所有屬性 */
+            all: unset !important; /* 這會取消所有屬性 */
   }
     }
 

@@ -1,8 +1,7 @@
-<script>
+<script setup>
 import { ref } from "vue";
 import Swal from "sweetalert2";
-export default {
-  setup() {
+
     const button = ref(true); // true 代表 "deck"，false 代表 "social"
     const searchType = ref(""); // 默認類型
     const searchCode = ref(""); // 用戶輸入的代碼
@@ -68,21 +67,8 @@ export default {
       const modalElement = document.querySelector(".modal"); 
       if (modalElement) {
         modalElement.style.display = 'none';
-      }
     };
-    return {
-      button,
-      searchType,
-      searchCode,
-      error,
-      changeBtn,
-      fetchAndNavigate,
-      confirmClose,
-      modalSection,
-      hideModal,
-    };
-  },
-};
+}
 </script>
 
 

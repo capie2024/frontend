@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import axios from "axios";
+import placeholderImage from '@/img/card-loading.png' // 預設圖片
 
 const isScrolled = ref(false); // 是否滾動
 
@@ -20,42 +21,47 @@ const main = () => {
 
 const numberOfGrids = 10; // 總共有幾個 grid
 const itemsPerGrid = 10; // 每個 grid 有幾個卡片
-const grids = ref([]);
 
-const placeholderImage = '../img/card-loading.png'; // 預設圖片
-const imageUrl = ref(null);
+const grids = ref(
+    Array.from({ length: numberOfGrids }, () =>
+        Array.from({ length: itemsPerGrid }, () => placeholderImage)
+    )
+)
 
 const API_URL = 'http://localhost:3000'
 
 const fetchGrids = async () => {
-  try {
-    const gridPromises = [];
-    for (let i = 0; i < numberOfGrids; i++) {
-      const itemPromises = [];
-      for (let j = 0; j < itemsPerGrid; j++) {
-        itemPromises.push(
-          axios.get(`${API_URL}/cards/random`)
-            .then((response) => {
-                const covers = response.data.covers;
-                // 隨機選擇一個圖片網址，如果為空值則使用預設圖片
-                return covers.length > 0 ? covers[Math.floor(Math.random() * covers.length)] : placeholderImage;
+    try {
+        // 使用 Promise.all 並行請求，提高效率
+        const gridPromises = Array.from({ length: numberOfGrids }, async () => {
+            const itemPromises = Array.from({ length: itemsPerGrid }, async () => {
+                try {
+                    const response = await axios.get(`${API_URL}/cards/random`)
+                    const covers = response.data.covers
+        
+                    // 隨機選擇一個圖片網址，如果為空值則使用預設圖片
+                    return covers.length > 0 ? covers[Math.floor(Math.random() * covers.length)] : placeholderImage;
+                } catch(error) {
+                    console.error('單個卡片請求失敗：', error)
+                    return placeholderImage
+                }
             })
-            .catch(() => null)
-        );
-      }
-      // 等待所有卡片的圖片網址取得完成
-      gridPromises.push(Promise.all(itemPromises));
+
+            // 等待每個網格的所有項目
+            return Promise.all(itemPromises)
+        })
+
+        // 更新網格
+        grids.value = await Promise.all(gridPromises)
+    } catch (error) {
+        console.error('讀取失敗：', error);
+        // 如果向後端發送請求失敗，全部使用預設圖片
+        grids.value = Array.from({ length: numberOfGrids }, () => 
+            Array.from({ length: itemsPerGrid }, () => placeholderImage)
+        )
     }
-    
-    grids.value = await Promise.all(gridPromises);
-  } catch (error) {
-    console.error('讀取失敗：', error);
-    // 如果向後端發送請求失敗，全部使用預設圖片
-    grids.value = Array.from({ length: numberOfGrids }, () =>
-      Array.from({ length: itemsPerGrid }, () => placeholderImage)
-    );
-  }
-};
+}
+
 
 onMounted(() => {
   main();
@@ -71,7 +77,7 @@ onBeforeUnmount(() => {
 
 <template>
     <header class="z-10 h-16 overflow-hidden header-bg">
-        <nav class="relative flex items-center w-full h-full gap-2 px-4 py-6 header-container default-transition" :class="{ 'scrolled': isScrolled }">
+        <nav class="relative flex items-center justify-end w-full h-full gap-2 px-4 py-6 header-container default-transition" :class="{ 'scrolled': isScrolled }">
             <div class="notice">
                 <input type="checkbox" id="notice-jump">
                 <label for="notice-jump" class="flex-none p-1 text-white rounded-full default-transition hover:bg-zinc-800/50">
@@ -106,7 +112,7 @@ onBeforeUnmount(() => {
         </nav>
     </header>
 
-    <main class="relative content-container flex flex-col rounded-b-2xl bg-base scroll-smooth scrollbar z-1">
+    <main class="relative flex flex-col content-container rounded-b-2xl bg-base scroll-smooth scrollbar z-1">
         <div class="h-full px-4 content md:px-6">
             <section class="h-[75vh] relative overflow-hidden -mx-4 md:-mx-6">
                 <div class="container flex gap-4 default-transition">
@@ -119,47 +125,47 @@ onBeforeUnmount(() => {
                             <!-- <img v-else :src="placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl"> -->
                         </div>
                     </div>
-                    <!-- <div class="grid2 flex flex-col flex-wrap items-center justify-center flex-none gap-4">
+                    <!-- <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid2">
                         <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
                         </div>
                     </div>
-                    <div class="grid3 flex flex-col flex-wrap items-center justify-center flex-none gap-4">
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid3">
                         <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
                         </div>
                     </div>
-                    <div class="grid4 flex flex-col flex-wrap items-center justify-center flex-none gap-4">
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid4">
                         <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
                         </div>
                     </div>
-                    <div class="grid5 flex flex-col flex-wrap items-center justify-center flex-none gap-4">
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid5">
                         <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
                         </div>
                     </div>
-                    <div class="grid6 flex flex-col flex-wrap items-center justify-center flex-none gap-4">
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid6">
                         <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
                         </div>
                     </div>
-                    <div class="grid7 flex flex-col flex-wrap items-center justify-center flex-none gap-4">
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid7">
                         <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
                         </div>
                     </div>
-                    <div class="grid8 flex flex-col flex-wrap items-center justify-center flex-none gap-4">
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid8">
                         <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
                         </div>
                     </div>
-                    <div class="grid9 flex flex-col flex-wrap items-center justify-center flex-none gap-4">
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid9">
                         <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
                         </div>
                     </div>
-                    <div class="grid10 flex flex-col flex-wrap items-center justify-center flex-none gap-4">
+                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid10">
                         <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
                             <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
                         </div>
@@ -167,9 +173,9 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="logo-banner">
                     <div class="bg-zinc-900 rounded-xl">
-                        <img src="../img/capie-icon.png" alt="" class="h-32 w-32 rounded-2xl shadow-2xl shadow-black/50"/>
+                        <img src="../img/capie-icon.png" alt="" class="w-32 h-32 shadow-2xl rounded-2xl shadow-black/50"/>
                     </div>
-                    <h1 class="mb-0 font-black text-3xl md:text-6xl text-white">Capie</h1>
+                    <h1 class="mb-0 text-3xl font-black text-white md:text-6xl">Capie</h1>
                     <p class="mb-12 text-xl text-white/50">- 輕鬆開啟你的卡牌派對 -</p>
                 </div>
             </section>

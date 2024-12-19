@@ -1,6 +1,6 @@
 <template>
     <div class="All">
-      <nav class="sidebar-container">
+      <!-- <nav class="sidebar-container">
             <a href="https://bottleneko.app/" class="sidebar-head">
                 <img src="https://bottleneko.app/icon.png" alt="" class="nav-icon">
                 <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3352.25 1012.65" class="h-[1.5rem] default-transition fill-white nav-svg" >
@@ -75,7 +75,8 @@
                 </svg>
                 <h2>原文翻譯</h2>
             </button>
-        </nav>
+        </nav> -->
+        <SidebarGrid/>
         <div class="aa">
             <div class="top-container">
                 <!-- 通知與登入 -->
@@ -309,6 +310,7 @@
 </template>
   
 <script setup>
+import SidebarGrid from '../components/SidebarGrid.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 

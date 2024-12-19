@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import GoogleLogin from '../components/GoogleLogin.vue';
+import SidebarGrid from '../components/SidebarGrid.vue';
 
 const router = useRouter()
 
@@ -56,88 +57,100 @@ const submit = async () => {
 </script>
 
 <template>
-    <div>
-        <header class="z-10 h-16 md:mt-2 md:mr-2 header-bg md:rounded-t-2xl">
-        <nav class="header-container">
-            <button class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"></path>
-                </svg>
-            </button>
-            <button class="flex-none hidden p-1 text-white rounded-full md:block bg-black/50 default-transition hover:bg-zinc-800/50 disabled:opacity-30" disabled>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                </svg>
-            </button>
-            <div class="w-full min-w-0 text-lg font-bold text-white md:text-2xl">
-                <h2 class="invisible text-2xl font-bold truncate">每日卡歷史回顧</h2>
-            </div>
-            <div class="z-10 notice">
-                <input type="checkbox" id="notice-jump">
-                <label for="notice-jump" class="inline-flex items-center p-1 text-center text-white rounded-full default-transition hover:bg-zinc-800/50">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
-                </label>
-                <div class="z-10 notice-grid">
-                    <div class="notice-grid-up">
-                        <h2>通知(0)</h2>
-                    </div>
-                    <div class="notice-grid-down">
-                        <img src="https://bottleneko.app/images/status/empty.png" alt="no-data">
-                        <h2>沒東西</h2>
-                        <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
+    <div class="w-full h-full overflow-hidden bg-black root-container">
+        <SidebarGrid />
+        <div>
+            <header class="z-10 h-16 md:mt-2 md:mr-2 header-bg md:rounded-t-2xl">
+            <nav class="header-container">
+                <button class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"></path>
+                    </svg>
+                </button>
+                <button class="flex-none hidden p-1 text-white rounded-full md:block bg-black/50 default-transition hover:bg-zinc-800/50 disabled:opacity-30" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                    </svg>
+                </button>
+                <div class="w-full min-w-0 text-lg font-bold text-white md:text-2xl">
+                    <h2 class="invisible text-2xl font-bold truncate">每日卡歷史回顧</h2>
+                </div>
+                <div class="z-10 notice">
+                    <input type="checkbox" id="notice-jump">
+                    <label for="notice-jump" class="inline-flex items-center p-1 text-center text-white rounded-full default-transition hover:bg-zinc-800/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
+                    </label>
+                    <div class="z-10 notice-grid">
+                        <div class="notice-grid-up">
+                            <h2>通知(0)</h2>
+                        </div>
+                        <div class="notice-grid-down">
+                            <img src="https://bottleneko.app/images/status/empty.png" alt="no-data">
+                            <h2>沒東西</h2>
+                            <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50">
-                <div class="flex flex-col items-center gap-1 p-1 rounded-full">
-                    <div class="flex-none rounded-full size-6 bg-black/70">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="m-1 text-zinc-200">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path>
+                <div class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50">
+                    <div class="flex flex-col items-center gap-1 p-1 rounded-full">
+                        <div class="flex-none rounded-full size-6 bg-black/70">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="m-1 text-zinc-200">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <span class="text-sm flex-none max-w-[8rem] truncate" @click="goLogin">登入</span>
+                    <div class="p-1 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
                         </svg>
                     </div>
                 </div>
-                <span class="text-sm flex-none max-w-[8rem] truncate" @click="goLogin">登入</span>
-                <div class="p-1 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
-                    </svg>
-                </div>
+            </nav>
+            </header>
+            <div class="background">
+                <main class="relative content-container bg-base z-1">
+                    <div class="h-full px-4 content scroll-smooth scrollbar md:px-6">
+                        <section class="grid w-full place-content-center">
+                            <form @submit.prevent="submit" class="flex flex-col items-center justify-center gap-4 p-4 shadow-lg rounded-xl">
+                                <div class="flex items-center gap-2">
+                                    <img src="../img/capie-icon.png" alt="" class="h-[5rem] w-[5rem] rounded-full">
+                                </div>
+                                <h3 class="text-2xl font-bold text-white">會員登入</h3>
+                                <div class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path></svg>
+                                    <input id="email" type="email" placeholder="信箱" v-model.trim="email" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500">
+                                </div>
+                                <div class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+                                    <input id="password" type="password" placeholder="密碼" v-model.trim="password" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500">
+                                </div>
+                                <div class="flex flex-col w-full gap-2">
+                                    <button type="submit" :disabled="!email || !password" class="flex items-center justify-center w-full gap-2 p-2 text-white cursor-pointer rounded-2xl ring ring-white/50 hover:bg-white/90 hover:text-zinc-900">登入</button>
+                                    <button class="flex items-center justify-center w-full gap-2 p-2 rounded-2xl text-cyan-500/50 hover:text-cyan-500" @click="goSignup">還沒有帳號？前往註冊</button>
+                                </div>
+                                <hr class="w-full my-4 border border-zinc-700/50">
+                                <GoogleLogin />
+                            </form>
+                        </section>
+                    </div>
+                </main>
             </div>
-        </nav>
-        </header>
-        <div class="background">
-            <main class="relative content-container bg-base z-1">
-                <div class="h-full px-4 content scroll-smooth scrollbar md:px-6">
-                    <section class="w-full md:grid md:place-content-center">
-                        <form @submit.prevent="submit" class="flex flex-col items-center justify-center gap-4 p-4 shadow-lg rounded-xl">
-                            <div class="flex items-center gap-2">
-                                <img src="../img/bottleneko-icon.png" alt="" class="h-[5rem] w-[5rem] rounded-full">
-                            </div>
-                            <h3 class="text-2xl font-bold text-white">會員登入</h3>
-                            <div class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path></svg>
-                                <input id="email" type="email" placeholder="信箱" v-model.trim="email" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500">
-                            </div>
-                            <div class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-                                <input id="password" type="password" placeholder="密碼" v-model.trim="password" class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500">
-                            </div>
-                            <div class="flex flex-col w-full gap-2">
-                                <button type="submit" :disabled="!email || !password" class="flex items-center justify-center w-full gap-2 p-2 text-white cursor-pointer rounded-2xl ring ring-white/50 hover:bg-white/90 hover:text-zinc-900">登入</button>
-                                <button class="flex items-center justify-center w-full gap-2 p-2 rounded-2xl text-cyan-500/50 hover:text-cyan-500" @click="goSignup">還沒有帳號？前往註冊</button>
-                            </div>
-                            <hr class="w-full my-4 border border-zinc-700/50">
-                            <GoogleLogin />
-                        </form>
-                    </section>
-                </div>
-            </main>
         </div>
     </div>
 </template>
 
 <style scoped>
 @import '@/assets/base.css';
+
+.root-container {
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    grid-template-rows: 4rem 1fr;
+    grid-template-areas:
+        "sidebar main"
+        "sidebar main";
+}
 
 input:focus {
     outline: 2px solid transparent;
@@ -314,6 +327,16 @@ section > form {
 }
 
 @media screen and (width < 1200px) {
+    .root-container {
+        display: grid;
+        grid-template-areas:
+            "main"
+            "main";
+        grid-template-columns: 1fr;
+        grid-template-rows: 4rem 1fr;
+        height: 100vh;
+    }
+
     header {
         width: 100%;
         position: fixed;
@@ -326,73 +349,6 @@ section > form {
     }
 
     .login-btn {
-        display: none;
-    }
-
-    .sidebar-container {
-        width: 100%;
-        max-height: 65.5px;
-        position: fixed;
-        bottom: 0;
-        z-index: 999;
-        display: unset;
-        padding: 0;
-    }
-    
-    .sidebar-container::before {
-        content: "";
-        position: absolute;
-        z-index: -1;
-        top: -32px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
-    }
-    
-    .sidebar-head {
-        display: none;
-    }
-
-    .sidebar-menu {
-        display: flex;
-        width: 100%;
-        margin: 0px;
-        top: 2.5rem;
-    }
-
-    .sidebar-menu > li {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-    }
-
-    .sidebar-menu > .md-menu {
-        display: block;
-    }
-
-    .sidebar-menu li h2 {
-        font-size: 9px;
-    }
-
-    .sidebar-menu a {
-        width: 100%;
-        height: 100%;
-        flex-direction: column;
-        gap: .25rem;
-        justify-content: space-between;
-        padding: 8px 12px 12px;
-        box-sizing: border-box;
-    }
-
-    .translate-btn {
-        display: none;
-    }
-
-    .translate-btn + p {
         display: none;
     }
 

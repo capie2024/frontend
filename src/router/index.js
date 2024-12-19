@@ -105,12 +105,11 @@ const router = createRouter({
     //   component: LoginHomePageView,
     // },
     {
-      path: "/card-series",
-      name: "card-series",
+      path: "/card-series/:series_id",
       component: CardSeries
     },
     {
-      path: '/social/:post_code', 
+      path: '/social/:post_code',
       component: Carddeck,        
     },
     {

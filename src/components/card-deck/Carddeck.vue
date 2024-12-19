@@ -37,12 +37,16 @@ export default {
         toggleTableView: false,
         togglePriceView: false,
         article: null,
+        deckData: {
+                deck:[],
+            },  // 儲存從 API 獲得的牌組資料
         };
     },
     mounted() {
         this.fetchArticleId();
         this.fetchCurrentUser();
         this.fetchDeck();
+        this.fetchDeckData()
     },
 
     async created() {
@@ -123,6 +127,18 @@ export default {
                 cards,
             }));        
         },    
+        totalPrice() {
+            if (!Array.isArray(this.deckData.deck)) {
+                return 0;
+            }
+            return this.deckData.deck.reduce((sum, card) => {
+                return sum + (card.price?.number || 0); 
+            }, 0);
+        },
+        uniqueProductNames() {
+            const productNames = this.deckData.deck.map(card => card.productName);
+            return [...new Set(productNames)];
+        },
     },
     methods: {
         togglePriceTableView() {
@@ -144,9 +160,11 @@ export default {
 
                 const deckList = response.data[0].deck_list;
                 this.cards = deckList.deck;  
-
+                this.deckId = deckList.deck_id;
                 console.log('Deck Name:', this.deckName);
                 console.log('All cards:', this.cards);
+
+                await this.fetchDeckData(); 
             } catch (error) {
                 console.error('Failed to fetch specific deck:', error);
             }
@@ -422,6 +440,25 @@ export default {
             }
             return date.split('T')[0];
         },
+        async fetchDeckData() {
+            const Id = this.deckId;
+            try {
+                const response = await axios.get(`http://localhost:3000/api/deck-page/${Id}`);
+                this.deckData = response.data;
+                if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
+                    console.error('回傳資料格式錯誤:', this.deckData);
+                    Swal.fire('錯誤', '無法獲取有效的資料', 'error');
+                    return; 
+                }
+
+
+                if (!Array.isArray(this.deckData.deck)) {
+                    this.deckData.deck = [];
+                }
+            } catch (error) {
+                console.error('無法獲取資料:', error);
+            }
+        },
     }
 }  
 </script>
@@ -526,7 +563,7 @@ export default {
                             :alt="article.title">
                         </div>
                         <div class="carddeck-data">
-                            <p class="user-number"><svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>&nbsp;8Vzcc</p>
+                            <p class="user-number"><svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>{{ article.post_code }}</p>
                             <h1>{{ article.title }}</h1>
                             <div class="data-container">
                                 <div class="user-link">
@@ -541,17 +578,17 @@ export default {
                                 </div>
                                 <span class="data-item">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none" data-v-5634e853=""><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>&nbsp;
-                                    總數50張
+                                    總數{{deckData.deck.length}}張
                                 </span>
                                 <span class="data-item">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none" data-v-5634e853=""><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg>&nbsp;
                                     總價
-                                    <span>11460円</span>
+                                    <span>{{ totalPrice }}円</span>
                                 </span>
-                                <span class="data-item">
+                                <span class="data-item" v-if="deckData.deck && deckData.deck.length > 0">
                                     <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg>&nbsp;
                                     系列包含
-                                    <a>ペルソナ</a>
+                                    <a v-for="(product, index) in uniqueProductNames" :key="index" href="#">{{ product }}</a>
                                 </span>
                             </div>
                         </div>
@@ -1834,8 +1871,6 @@ export default {
     main {
         margin-top: 8px;
         position: relative;
-        /* width: calc(100% - 8px); 
-        /* height: calc(100vh - 1rem); */
         height: auto;
         overflow: hidden;
         overflow-y: scroll;
@@ -1872,7 +1907,6 @@ export default {
     }
 
     .carddeck-data {
-        /* margin-top:18px; */
         display: flex;
         justify-content: end;
         flex-direction: column;
@@ -1884,10 +1918,11 @@ export default {
    }
 
     .user-number {
-        font-size: 12px;
+        font-size: 20px;
         color: white;
         display: flex;
         align-items: center;
+        gap: 7px;
     }
 
     .user-number svg {
@@ -1907,13 +1942,12 @@ export default {
         font-size: 70px;
         font-weight: bold;
         color: white;
-        white-space: nowrap; /* 強制單行顯示 */
-        overflow: hidden; /* 隱藏超出部分 */
+        white-space: nowrap; 
+        overflow: hidden; 
         text-overflow: ellipsis;
     }
 
     .data-container {
-        width: 55%;
         margin-top: 16px;
         display: flex;
         flex-wrap: wrap;
@@ -1949,6 +1983,11 @@ export default {
     .data-item {
         display: flex;
         align-items: center;
+    }
+
+    .data-item:nth-of-type(3){
+        flex-wrap: wrap;
+        gap:10px;
     }
 
     span svg {
@@ -2534,15 +2573,14 @@ export default {
             width: 100%;
             font-size: 30px;
             height: 20px;
-            white-space:unset; /* 強制單行顯示 */
-            overflow: visible; /* 隱藏超出部分 */
+            white-space:unset; 
+            overflow: visible; 
             text-overflow:unset;
         }
 
         .carddeck-data {
             width: 100%;
             margin:18px 8px 0 8px;
-            height: 200px;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -2555,11 +2593,9 @@ export default {
             align-items: start;
             font-size: 14px;
             gap: 5px;
-            transform: translateY(10px);
         }
 
         .main-container {
-            /* top: 623px; */
             height: 100%;
         }
         
@@ -2652,8 +2688,8 @@ export default {
 
     @media screen and (max-width: 410px) {
         .carddeck-name h1 {
-            white-space:nowrap; /* 強制單行顯示 */
-            overflow: hidden; /* 隱藏超出部分 */
+            white-space:nowrap; 
+            overflow: hidden; 
             text-overflow:ellipsis;
         }
     }

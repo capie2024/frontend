@@ -1,6 +1,9 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useDeckMakeStore } from "@/stores/deck-make";
+import SidebarGrid from '../SidebarGrid.vue';
+import RemitCard from "../Mycard/remit-card.vue";
 
 function getUserIdFromToken(token) {
     try {
@@ -15,205 +18,195 @@ function getUserIdFromToken(token) {
 }
 
 export default {
+    components: {
+        RemitCard,
+        SidebarGrid
+    },
     data() {
         return {
+            // 控制組件顯示或隱藏
+            isVisible: false,
             deckData: {
-                deck:[],
+                deck: []
             },  // 儲存從 API 獲得的牌組資料
             sortBy: '', // 用於設置排序條件
             togglePriceView: false, // 用於切換價格表顯示
             toggleTableView: false, // 用於切換顯示模式
+            deckMakeStore: useDeckMakeStore(),
         };
     },
     computed: {
         totalPrice() {
-        // 確保 deckData.deck 是陣列
-        if (!Array.isArray(this.deckData.deck)) {
-            return 0;
-        }
-
-        // 使用 reduce 計算總和
-        return this.deckData.deck.reduce((sum, card) => {
-            return sum + (card.price?.number || 0); // 確保價格存在
-        }, 0);
-    },
+            if (!Array.isArray(this.deckData.deck)) {
+                return 0;
+            }
+            return this.deckData.deck.reduce((sum, card) => {
+                return sum + (card.price?.number || 0); // 確保價格存在
+            }, 0);
+        },
         uniqueProductNames() {
-        // 使用 Set 來過濾掉重複的 productName
-        const productNames = this.deckData.deck.map(card => card.productName);
-        return [...new Set(productNames)];
-    },
-    groupedCards() {
-        if (!Array.isArray(this.deckData.deck) || this.deckData.deck.length === 0) {
-        return []; // 如果 deck 不是陣列或為空，返回空陣列
-    }
+            const productNames = this.deckData.deck.map(card => card.productName);
+            return [...new Set(productNames)];
+        },
+        groupedCards() {
+            if (!Array.isArray(this.deckData.deck) || this.deckData.deck.length === 0) {
+                return [];
+            }
 
-        let sorted = [];
-        if (this.sortBy === "level") {
-            sorted = [...this.deckData.deck].sort((a, b) => a.level - b.level);
-        } 
-        else if (this.sortBy === "color") {
-            const colorOrder = ["red", "yellow", "green", "blue"];
-            sorted = [...this.deckData.deck].sort((a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color));
-        } 
-        else if (this.sortBy === "typeTranslate") {
-            const typeOrder = ["角色", "事件", "名場"];
-            sorted = [...this.deckData.deck].sort((a, b) => typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate));
-        } 
-        else if (this.sortBy === "rare") {
-            sorted = [...this.deckData.deck].sort((a, b) => {
-                if (a.rare.length !== b.rare.length) {
-                    return a.rare.length - b.rare.length;
+            let sorted = [];
+            if (this.sortBy === "level") {
+                sorted = [...this.deckData.deck].sort((a, b) => a.level - b.level);
+            } else if (this.sortBy === "color") {
+                const colorOrder = ["red", "yellow", "green", "blue"];
+                sorted = [...this.deckData.deck].sort((a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color));
+            } else if (this.sortBy === "typeTranslate") {
+                const typeOrder = ["角色", "事件", "名場"];
+                sorted = [...this.deckData.deck].sort((a, b) => typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate));
+            } else if (this.sortBy === "rare") {
+                sorted = [...this.deckData.deck].sort((a, b) => {
+                    if (a.rare.length !== b.rare.length) {
+                        return a.rare.length - b.rare.length;
+                    }
+                    return a.rare.localeCompare(b.rare, "en");
+                });
+            } else if (this.sortBy === "seriesCode") {
+                sorted = [...this.deckData.deck].sort((a, b) => a.seriesCode.localeCompare(b.seriesCode, "en"));
+            } else {
+                sorted = [...this.deckData.deck];
+            }
+
+            const grouped = sorted.reduce((acc, card) => {
+                let groupKey = card[this.sortBy];
+                if (!groupKey) {
+                    groupKey = "角色";
                 }
-                return a.rare.localeCompare(b.rare, "en");
-            });
-        } 
-        else if (this.sortBy === "seriesCode") {
-            sorted = [...this.deckData.deck].sort((a, b) => a.seriesCode.localeCompare(b.seriesCode, "en"));
-        } else {
-            sorted = [...this.deckData.deck];
+
+                if (!acc[groupKey]) {
+                    acc[groupKey] = [];
+                }
+
+                acc[groupKey].push(card);
+                return acc;
+            }, {});
+
+            const colorMap = {
+                red: "紅色",
+                yellow: "黃色",
+                green: "綠色",
+                blue: "藍色",
+            };
+
+            const levelLabel = (level) => `${level}等`;
+
+            return Object.entries(grouped).map(([key, cards]) => ({
+                group: this.sortBy === "color" ? colorMap[key] || key : this.sortBy === "level" ? levelLabel(key) : key,
+                cards,
+            }));
         }
-
-        // 分組邏輯
-        const grouped = sorted.reduce((acc, card) => {
-            let groupKey = card[this.sortBy]; // 根據當前的 sortBy 屬性作為分組依據
-            
-            if (!groupKey) {
-                groupKey = "角色";
-            }
-
-            if (!acc[groupKey]) {
-                acc[groupKey] = [];
-            }
-            
-            acc[groupKey].push(card);
-            return acc;
-        }, {});
-
-        // 定義顏色對應表
-        const colorMap = {
-            red: "紅色",
-            yellow: "黃色",
-            green: "綠色",
-            blue: "藍色",
-        };
-
-        // 等級轉換為中文格式
-        const levelLabel = (level) => `${level}等`;
-
-        // 根據 sortBy 動態轉換分組鍵值
-        return Object.entries(grouped).map(([key, cards]) => ({
-            group: this.sortBy === "color"
-                ? colorMap[key] || key // 顏色轉換
-                : this.sortBy === "level"
-                ? levelLabel(key)      // 等級轉換
-                : key,                 // 其他保持原值
-            cards,
-        }));
-    }
-},
-
+    },
     mounted() {
         this.fetchDeckData();
     },
-
     methods: {
+        confirmClose() {
+        Swal.fire({
+            title: '確定要離開嗎？',
+            text: '您的資料尚未完成，確定要離開嗎？',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '離開',
+            cancelButtonText: '取消',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+            // 用戶確認離開，隱藏模態框
+            this.isVisible = false;
+            }
+        });
+        },
+        hideModal() {
+        // 使用 Vue 的響應式來隱藏 RemitCard 和 overlay
+        this.isVisible = false;
+        },
+        toggleVisibility() {
+        this.isVisible = !this.isVisible; // 切換 isVisible 的值
+        },
         goToArticlePage() {
             // 使用 Vue 的路由進行跳轉
-            this.$router.push('/add-article');
+            const deckId = this.$route.params.deck_id;
+            this.$router.push(`/add/${deckId}`);
+        },
+        toggleRemitCard() {
+            this.isVisible = !this.isVisible;
         },
         async fetchDeckData() {
-    const deckId = this.$route.params.deck_id;
-    console.log('Deck ID:', deckId);  // 用來檢查是否能獲取到 deck_id
+            const deckId = this.$route.params.deck_id;
+            console.log('Deck ID:', deckId);  // 用來檢查是否能獲取到 deck_id
 
-    try {
-        const response = await axios.get(`http://localhost:3000/api/deck-page/${deckId}`);
-        this.deckData = response.data;
+            try {
+                const response = await axios.get(`http://localhost:3000/api/deck-page/${deckId}`);
+                this.deckData = response.data;
 
-        // 檢查資料格式，注意 user 改為 users
-        if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
-            console.error('回傳資料格式錯誤:', this.deckData);
-            Swal.fire('錯誤', '無法獲取有效的資料', 'error');
-            return;  // 終止進一步執行
-        }
+                if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
+                    console.error('回傳資料格式錯誤:', this.deckData);
+                    Swal.fire('錯誤', '無法獲取有效的資料', 'error');
+                    return;
+                }
 
-        // 確保 deck 是一個陣列
-        if (!Array.isArray(this.deckData.deck)) {
-            this.deckData.deck = [];
-        }
-    } catch (error) {
-        console.error('Error fetching deck data:', error);
-        Swal.fire('錯誤', '無法獲取資料', 'error');
-    }
-},
+                if (!Array.isArray(this.deckData.deck)) {
+                    this.deckData.deck = [];
+                }
+            } catch (error) {
+                console.error('Error fetching deck data:', error);
+                Swal.fire('錯誤', '無法獲取資料', 'error');
+            }
+        },
         togglePriceTableView() {
             this.togglePriceView = !this.togglePriceView;
         },
-
         toggleViewMode() {
             this.toggleTableView = !this.toggleTableView;
         },
-
         countSoulCards(cards) {
             return cards.filter(card => card.trigger.includes('soul')).length;
         },
-
         setSortBy(property) {
             this.sortBy = property; // 設定排序條件
         },
+        async copyDeck(){
+            this.deckMakeStore.selectedCards = this.deckData.deck
+            const cardCode = this.deckData.deck[0].seriesCode
+            console.log(cardCode);
+            
+            let seriesId = ''
+            try {
+                const response = await axios.get(`http://localhost:3000/api/series`)
+                seriesId = response.data.find((series)=> {
+                    if(series.code.includes(cardCode)){
+                        return series
+                    }
+                }).id
+                
+            } catch (error) {
+                
+            }
+            console.log(seriesId);
+            
+            this.$router.push(`/card-series/${ seriesId }`)
+        }
     }
 };
 </script>
 
 
 <template>
+    <SidebarGrid/> 
     <div class="container">
-        <!-- <nav class="sidebar-container">
-            <div class="sidebar">
-                <a href="https://bottleneko.app/" class="sidebar-head">
-                    <img src="/src/img/bottleneko-icon.png" alt="" class="icon">
-                    <img src="/src/img/bottleneko-icon-text.png" alt="" class="icon-text">
-                </a>
-                <ul class="sidebar-menu">
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z"></path><path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z"></path></svg>                        
-                            <h2>首頁</h2>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg"  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>                        
-                            <h2>系列卡表</h2>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>                        
-                            <h2>我的牌組</h2>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg"  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"></path></svg>                        
-                            <h2>社群</h2>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
-                            <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg"  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"></path></svg>                        
-                            <h2>工作坊</h2>
-                        </a>
-                    </li>
-                </ul>
-                <button class="translate-btn">
-                    <svg data-v-11825b1c="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"></path></svg>
-                    <h2>原文翻譯</h2>
-                </button>
-                <p>沒東西</p>
-            </div>
-        </nav>         -->
         <div class="bg-container">
             <main>
+            <div  v-if="isVisible"  >
+                <RemitCard v-if="isVisible" />
+            </div>
                 <div class="bg-black">
                     <header>
                         <div class="pagebtn-area">
@@ -230,11 +223,11 @@ export default {
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path></svg>
                                 <div class="description-item description1">分享</div>
                             </button>
-                            <button class="social-btn-item social-btn2">
+                            <button class="social-btn-item social-btn2" @click="copyDeck" >
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"></path></svg>
                                 <div class="description-item description2">複製牌組</div>
                             </button>
-                            <button class="social-btn-item social-btn3">
+                            <button class="social-btn-item social-btn3" @click="toggleRemitCard" >
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
                                 <div class="description-item description7">匯出牌組</div>
                             </button>
@@ -243,8 +236,8 @@ export default {
                                 <div class="description-item description3">發布文章</div>
                             </button>
                             <button class="social-btn-item social-btn3">
-                                <svg data-v-f57a085e="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path></svg>
-                                <div class="description-item description4">刪除</div>
+                                <svg data-v-f57a085e="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2 red"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path></svg>
+                                <div class="description-item description4">刪除牌組</div>
                             </button>
                             <button class="social-btn-item social-btn3">
                                 <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
@@ -470,6 +463,16 @@ export default {
 
 <style scoped>
 
+    .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 99;
+    
+}
     .price-row{
         display: flex;
         justify-content: center;
@@ -1076,9 +1079,11 @@ export default {
     }
 
     .container {
-        width: 100%;
+        width: 86%;
         display: flex;
         position: relative;
+        left: 270px;
+        top: -40px;
     }
     main::-webkit-scrollbar {
     width: 0px;  /* 隱藏滾動條 */
@@ -1195,7 +1200,8 @@ export default {
         height: 72px;
         position: fixed;
         top:0;
-        z-index: 2;
+        z-index: 5;
+        left: 270px;
     }
 
     header {
@@ -1257,6 +1263,7 @@ export default {
         right: 28px;
         display: flex;
         gap:8px;
+        width: 311px;
     }
 
 
@@ -1278,7 +1285,11 @@ export default {
         height: 24px !important;
         stroke: white;
     }
-
+    .social-btn-item .red {
+        width: 24px !important;
+        height: 24px !important;
+        stroke: red;
+    }
     .social-btn5 {
         display: none;
     }
@@ -1409,6 +1420,7 @@ export default {
         overflow-y: scroll;
         scroll-behavior: smooth;
         border-radius: 20px 20px 0 0;
+        
     }
 
 
@@ -1532,13 +1544,13 @@ export default {
     }
 
     .main-container-bg{
-        background: linear-gradient(rgba(59, 130, 246, 0.44) 100px, transparent 500px);
+        background: linear-gradient(rgba(59, 130, 246, 0.44) 100px, transparent 500px) ;
         width: 100%;
         height: 500px;
         position: absolute;
         top: 0;
         left: 0;
-        z-index: -1;
+        z-index: 1;
     }
 
     .article-area {
@@ -1552,6 +1564,7 @@ export default {
         background: linear-gradient(to bottom, #1E2D48, #1A2232);;
         margin: 32px 24px;
         border-radius: 10px;
+        z-index: 2;
     }
 
     .article-title {
@@ -1989,8 +2002,18 @@ export default {
         .social-btn3:hover .description5,
         .social-btn3:hover .description7,
         .social-btn4:hover .description4{
-        
         visibility: hidden;
+    }
+    .social-btn-item{
+        width: auto;
+    }
+    .btn-area{
+        width: auto;
+    }
+    .container{
+        left: 0;
+        top: 0;
+        width: 100%;
     }
         .toolbar {
             position: absolute;
@@ -2019,7 +2042,7 @@ export default {
         }
 
         .sidebar-container {
-            display: none;
+            background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
         }
 
         .bg-container {
@@ -2043,6 +2066,7 @@ export default {
             position: absolute;
             top: 0;
             width: 100%;
+            left: 0;
         }
 
         header {
@@ -2061,14 +2085,13 @@ export default {
         .pagebtn-area h2 {
             display: none;
         }
-
-        .social-btn5 {
+        .social-btn2, 
+        .social-btn3,
+        .social-btn4 {
             display: block;
         }
 
-        .social-btn2,
-        .social-btn3,
-        .social-btn4,
+        
         .user-btn{
             display: none;
         }
@@ -2222,7 +2245,9 @@ export default {
         .col-Sheet, .col-Info {
             width: calc((100% - 10px) / 2);
         }
-
+        .container {
+            all: unset !important; /* 這會取消所有屬性 */
+  }
     }
 
     @media screen and (max-width: 410px) {

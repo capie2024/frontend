@@ -26,6 +26,7 @@ import MyArticle from "../views/MyArticle.vue";
 import Warning from "../components/Mycard/warning.vue";
 import Delete from "../components/Mycard/delete.vue";
 import deckPage from "../components/card-deck/deck-page.vue";
+import AddPostDeck from "../components/card-deck/AddPostDeck.vue";
 import Notice from "../components/notification/notification.vue";
 
 
@@ -106,14 +107,12 @@ const router = createRouter({
     //   component: LoginHomePageView,
     // },
     {
-      path: "/card-series",
-      name: "card-series",
+      path: "/card-series/:series_id",
       component: CardSeries
     },
     {
-      path: '/social/:post_code', 
-      component: Carddeck,
-      props: true,
+      path: '/social/:post_code',
+      component: Carddeck,        
     },
     {
       path: "/add-article",
@@ -174,6 +173,11 @@ const router = createRouter({
       path: "/deckPage/:deck_id",
       name: "deckPage",
       component: deckPage
+    },
+    {
+      path: "/add/:deck_id",
+      name:"AddPostDeck",
+      component:AddPostDeck
     },
     {
       path: "/notice",

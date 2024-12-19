@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <nav class="sidebar-container">
+        <!-- <nav class="sidebar-container">
             <div class="sidebar">
                 <a href="https://bottleneko.app/" class="sidebar-head">
                     <img src="/src/img/bottleneko-icon.png" alt="" class="icon">
@@ -44,7 +44,8 @@
                 </button>
                 <p>沒東西</p>
             </div>
-        </nav>
+        </nav> -->
+        <SidebarGrid style="grid-area: sidebar;" />
         <div class="social-container">
             <div class="header-container">
                 <div class="search-container">
@@ -111,7 +112,9 @@
                     class="card-link"
                 >
                     <div class="card-img">
-                        <img src="/src/img/麻衣.png" alt="">
+                        <img v-if="article.post_picture" 
+                            :src="article.post_picture" 
+                            :alt="article.title">
                     </div>
                     <div class="card-user">
                         <div class="card-user-flex">
@@ -192,8 +195,12 @@
 </template>
 <script>
 import axios from 'axios';
+import SidebarGrid from '../components/SidebarGrid.vue';
 
 export default {
+    components: {
+    SidebarGrid,
+  },
   data() {
     return {
       articles: [],

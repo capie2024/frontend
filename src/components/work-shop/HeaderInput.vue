@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+
+</script>
 
 <template>
    <div class="header-container Top-bar">
@@ -17,13 +19,22 @@
             </button>
         </div>
         
-        <button class="header-button" id="name-btn">
+        <!-- <button class="header-button" id="name-btn">
              <i class="fa-solid fa-arrow-up  " ></i><span>名稱</span>
             </button>
         <button class="header-button" id="date-btn" >
             <i class="fa-solid fa-arrow-up  " ></i><span>日期</span>
-        </button>
-        
+        </button> -->
+        <div class="sort-button">
+            <button class="active1" :class="{ 'selected' : nameIsSelected }" :style="{ background: nameIsSelected ? 'linear-gradient(to right, #5eead4, #93c5fd)' : 'white' }" @click="toggleNameSort" >
+                <i class="fa-solid fa-arrow-up" :class="{ 'rotate180' : nameIsSorted }"></i>
+                名稱
+            </button>
+            <button class="active2"  :class="{ 'selected' : dateIsSelected }" :style="{ background: dateIsSelected ? 'linear-gradient(to right, #5eead4, #93c5fd)' : 'white' }" @click="toggleDateSort">
+                <i class="fa-solid fa-arrow-up " :class="{ 'rotate180' : dateIsSorted }"></i>
+                日期
+            </button>
+        </div>
         <div class="w-full login">
             <div class="notice">
                 <input type="checkbox" id="notice-jump">
@@ -38,16 +49,6 @@
                     </svg>
                 </label>
                 <p class="notice-txt">通知</p>
-                <!-- <div class="notice-grid">
-                    <div class="notice-grid-up">
-                        <h2>通知(0)</h2>
-                    </div>
-                    <div class="notice-grid-down">
-                        <img src="https://bottleneko.app/images/status/empty.png" alt="">
-                        <h2>沒東西</h2>
-                        <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
-                    </div>
-                </div> -->
             </div>
             <button class="login-btn" data-bs-toggle="modal" data-bs-target="#login">
                 <svg xmlns="http://www.w3.org/2000/svg" stroke="white" fill="none" viewBox="0 0 24 24"
@@ -66,7 +67,6 @@
             </button>
         </div>
     </div>
-  <!-- <div class="page-control-space"></div> -->
 </template>
 
 <style scoped>
@@ -421,6 +421,48 @@
   color: #000;
   transform:rotate(180deg);
 }
+
+.sort-button {
+    display: flex;
+    gap: .5rem;
+}
+
+.sort-button button {
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    color:black;
+    font-weight: 700;
+    padding: 8px 15px;
+    white-space: nowrap;
+    font-size: .875rem;
+    background-size: 200% 100%; /* 設定背景大小以便反轉 */
+    background-position: 0% 0%; /* 初始位置 */
+}
+
+.sort-button button i {
+    transition: 0.3s ease; 
+}
+
+.active1 {
+    background:white;
+}
+
+.active2 {
+    background: linear-gradient(to right, #5eead4, #93c5fd  );
+}
+
+.selected {
+  background: linear-gradient(to right, #5eead4, #93c5fd);
+}
+
+
+.rotate180 {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-in;
+}
+
 
 .icon {
   color: #666;

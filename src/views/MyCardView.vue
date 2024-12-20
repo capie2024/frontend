@@ -209,6 +209,8 @@ const fetchMyDecks = async () => {
         });
     originalDecks.value = response.data.decks
     cardDecks.value = [...originalDecks.value].sort(dateSort);
+    // cardDecks.value = originalDecks.value
+    //   .map(decks => decks.deck_name) ;
     console.log(cardDecks.value)
     sortState.value = 0;
     dateIsSorted.value = false;
@@ -228,7 +230,6 @@ const fetchCardSeries = async () => {
     try {
         const response = await axios.get('http://localhost:3000/api/series');
         originalSeries.value = response.data
-        console.log(originalSeries.value)
     }
     catch (err) {
         error.value = '獲取系列卡表資料失敗' + err.message
@@ -273,8 +274,8 @@ const nameSort = (a, b) => {
 
 
 const nameSortReverse = (a, b) => {
-  const nameA = a.name;
-  const nameB = b.name;
+  const nameA = a.deck_name;
+  const nameB = b.deck_name;
 
   const len = Math.min(nameA.length, nameB.length);
   for (let i = 0; i < len; i++) {
@@ -304,17 +305,17 @@ const nameSortReverse = (a, b) => {
 };
 
 
-
+// originalDecks.value[i].deck_name
 // 名稱排序切換
 const toggleNameSort = () => {
   if (nameIsSorted.value) {
-    cardDecks.value = [...originalDecks.value[i].deck_name].sort(nameSortReverse)
+    cardDecks.value = [...originalDecks.value].sort(nameSortReverse);
     nameIsSorted.value = false;
     nameIsSelected.value = true;
     dateIsSorted.value = false;
     dateIsSelected.value = false;
   } else {
-    cardDecks.value = [...originalDecks.value[i].deck_name].sort(nameSort)
+    cardDecks.value = [...originalDecks.value].sort(nameSort);
     nameIsSorted.value = true;
     nameIsSelected.value = true;
     dateIsSorted.value = false;
@@ -322,6 +323,8 @@ const toggleNameSort = () => {
     sortState.value = 0;
   }
 }
+
+
 
 //日期排序切換
 const toggleDateSort = () => {
@@ -352,6 +355,7 @@ const toggleDateSort = () => {
 }
 
 
+
 // 獲取我的牌組seriesCode
 const seriesCodes = ref([]);
 const fetchSeriesCode = async () => {
@@ -369,7 +373,6 @@ const fetchSeriesCode = async () => {
        decksItem.deck.forEach(card => {
          if (card.seriesCode && !seriesCodes.value.includes(card.seriesCode)) {
              seriesCodes.value.push(card.seriesCode);
-            //  console.log(seriesCodes.value)
          }
        });
      });
@@ -395,7 +398,7 @@ const findZhNames = () => {
             })           
         }
     })
-    console.log(matchedNames)
+    console.log(matchedNames.value)
  };
 
 

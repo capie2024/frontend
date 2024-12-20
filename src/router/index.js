@@ -38,12 +38,12 @@ const router = createRouter({
       name: "home",
       component: Home,
     },
-    {
-      // path: card/:id
-      path: "/card-info",
-      name: "card-info",
-      component: CardInfo,
-    },
+    // {
+    //   // path: card/:id
+    //   path: "/card-info",
+    //   name: "card-info",
+    //   component: CardInfo,
+    // },
     {
       path: "/workshop",
       name: "workshop",

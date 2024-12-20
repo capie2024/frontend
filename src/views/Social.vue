@@ -1,7 +1,7 @@
 <template>
     <div class="root-container">
         <SidebarGrid style="grid-area: sidebar;" />
-        <div class="container">
+        <div class="container" style="grid-area: main">
             <div class="social-container">
                 <div class="header-container">
                     <div class="search-container">
@@ -209,12 +209,18 @@ export default {
 };
 </script>
 <style scoped>
+    html,body {
+        width: 100%;
+    }
+
     a {
         text-decoration: none;
         color: #FFFFFF;
     }
 
     .root-container {
+    width: 100%;
+     height: 100vh;
       display: grid;
       grid-template-columns: 270px 1fr;
       grid-template-rows: 4rem 1fr;
@@ -223,17 +229,20 @@ export default {
           "sidebar main";
     }
 
+    .sidebar-container {
+        position: fixed;
+        top: 0;
+    }
 
     .container {
         width: 100%;
-        display: flex;
-        height: 100vh;
+        display: block;
         position: relative;
     }
 
+
     .social-container {
         width: 100%;
-        height: 100%;
         position: relative;
         background-color: #121212;
     }
@@ -244,6 +253,7 @@ export default {
         min-width: 30%;
         height: 64px;
         position: fixed;
+        top: 0;
         display: flex;
         flex-wrap: wrap;
         gap:10px;
@@ -435,10 +445,8 @@ export default {
     }
 
     .card-area {
-        padding: 20px;
+        padding:250px 20px 20px 20px;
         width: 100%;
-        position: absolute;
-        top: 250px;
         display: grid;
         grid-template-columns: repeat(4,  1fr);
         grid-gap: 24px;
@@ -554,8 +562,7 @@ export default {
         padding-right: 8px;
         height: 56px;
         position: fixed;
-        bottom: 66px;
-        display: flex;
+        bottom: 65.5px;
         display: none;
     }
 
@@ -680,9 +687,13 @@ export default {
               "main"
               "main";
           grid-template-columns: 1fr;
-          grid-template-rows: 4rem 1fr;
-          height: 100vh;
+          grid-template-rows: 64px 1fr;
         }
+        .sidebar-container {
+            top:auto;
+            bottom: 0;
+        }
+
 
         .search-container {
             width: calc(100% - 191px);
@@ -733,6 +744,16 @@ export default {
     }
 
     @media screen and (max-width: 768px) {
+        .root-container {
+          display: grid;
+          grid-template-areas:
+              "main"
+              "main";
+          grid-template-columns: 1fr;
+          grid-template-rows: 64px 1fr;
+          overflow: visible;
+        }
+
         .xx {
             background-color: #fff;
             z-index: 1;

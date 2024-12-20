@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, defineEmits } from "vue";
-import { loadScript } from "@paypal/paypal-js";
+// import { loadScript } from "@paypal/paypal-js";
 import axios from "axios";
 import sweetalert from "sweetalert2";
 

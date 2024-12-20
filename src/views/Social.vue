@@ -212,7 +212,7 @@ export default {
   async created() {
     try {
       const response = await axios.get('http://localhost:3000/api/articles');
-      this.articles = response.data; 
+      this.articles = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       this.filteredArticles = this.articles;
     } catch (error) {
       console.error('獲取文章列表失敗', error);

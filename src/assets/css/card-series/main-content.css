@@ -517,6 +517,7 @@ input[type="checkbox"] {
   flex-wrap: wrap;
   margin: 0 -5px;
   box-sizing: border-box;
+  container-type: inline-size;
 }
 
 .card-image {
@@ -766,21 +767,16 @@ input[type="checkbox"] {
   color: rgb(161, 161, 170);
 }
 
-@media screen and (1200px <= width < 1475px) {
-  .card-info-image {
-    min-width: 180px;
-  }
-  .col-Info {
+@container ( width < 1220px ) {
+
+  .col-Sheet, .col-Info {
     width:25%;
   }
 }
 
-@media screen and (width < 1290px){
-  .card-info-image {
-    min-width: 160px;
-  }
-
-  .col-Info {
+@container ( width < 810px ) {
+  
+  .col-Sheet, .col-Info {
     width:calc(100% / 3);
   }
 }

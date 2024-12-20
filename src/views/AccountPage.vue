@@ -675,7 +675,6 @@ header.scrolled {
     align-items: center;
     position: relative;
     z-index: 1;
-    margin-top: 0.5rem;
 }
 
 .header-title {
@@ -781,6 +780,7 @@ header.scrolled .header-title {
     height: calc(100vh - 1rem);
     width: calc(100vw - 270px - .5rem);
     border-radius: 1rem;
+    margin-top: 0.5rem;
     overflow: scroll;
     background-color: #32c9ff;
 }
@@ -1436,7 +1436,6 @@ a {
     }
 
     .header-container {
-        background-color: #30bdf0;
         margin-top: 0rem;
     }
 

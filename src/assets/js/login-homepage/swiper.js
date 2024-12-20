@@ -1,6 +1,8 @@
 import Swiper from 'swiper/bundle';
 import 'swiper/css/bundle';
 
+
+
 const firstSwiper = new Swiper(".first-swiper-container", {
     direction: 'horizontal',
     loop: true,
@@ -30,7 +32,7 @@ const firstSwiper = new Swiper(".first-swiper-container", {
     }
   });
 
-console.log(firstSwiper);
+
 // firstSwiper.use()
 
 const secondSwiper = new Swiper(".second-swiper-container", {
@@ -41,10 +43,6 @@ const secondSwiper = new Swiper(".second-swiper-container", {
     effect: 'cards',
     grabCursor: true,
   });
-
-console.log(secondSwiper);
-
-
 
 const thirdSwiper = new Swiper(".third-swiper-container", {
   direction: 'horizontal',
@@ -79,7 +77,6 @@ const thirdSwiper = new Swiper(".third-swiper-container", {
   
 })
 
-console.log(thirdSwiper);
 
 
 

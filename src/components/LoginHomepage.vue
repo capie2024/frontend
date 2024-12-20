@@ -1,14 +1,62 @@
 <script setup>
-import { onMounted } from 'vue'
+import { ref,onMounted,nextTick } from 'vue'
+import axios from 'axios';
 // import SidebarGrid from '@/components/SidebarGrid.vue'
 
-onMounted(() => {
-  import ("@/assets/js/login-homepage/css-control.js")
-  import ("@/assets/js/login-homepage/swiper")
-  import ("@/assets/js/login-homepage/fancybox")
+onMounted(async() => {
+  await nextTick();
+  await import ("@/assets/js/login-homepage/css-control.js")
+  await import ("@/assets/js/login-homepage/swiper")
+  await import ("@/assets/js/login-homepage/fancybox")
 })
 
+const items = ref({ topics: [], videos: [] ,});
 
+// 格式化資料函數，避免顯示 null 或 undefined
+const formatValue = (value, defaultValue = '無資料') => {
+  return value !== null && value !== undefined ? value : defaultValue;
+};
+
+// 格式化日期函數
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date instanceof Date && !isNaN(date) ? date.toLocaleDateString() : '無發布日期';
+};
+
+// 當組件掛載時請求資料
+onMounted(async () => {
+  try {
+    const response = await axios.get('/api/topics');
+    const apiData = response.data;  // API 返回的資料
+
+    // 分別處理 topics 和 videos 資料
+    const topics = apiData.find(item => item.title === 'topics');
+    const videos = apiData.find(item => item.title === 'videos');
+
+    // 若找到了 topics 和 videos，將它們分別賦值
+    if (topics) {
+      items.value.topics = topics.items.map(item => ({
+        ...item.data,  // 解構出每個 topic 的資料
+        title: formatValue(item.data.title),
+        link: formatValue(item.data.link),
+        cover: formatValue(item.data.cover),
+      }));
+    }
+
+    if (videos) {
+      items.value.videos = videos.items.map(item => ({
+        ...item.data,  // 解構出每個 video 的資料
+        title: formatValue(item.data.title),
+        ytId: formatValue(item.data.ytId),
+        publishAt: formatDate(item.data.publishAt),
+        authorName: formatValue(item.data.author?.name),
+        authorHead: formatValue(item.data.author?.head),
+      }));
+    }
+  } catch (err) {
+    return error('獲取資料失敗:', err.message);
+  }
+});
 
 </script>
 
@@ -40,41 +88,11 @@ onMounted(() => {
         <div class="card1">
           <!-- first swiper -->
           <div class="swiper first-swiper-container">
-            <div class="swiper-wrapper first-swiper-wrapper" id="">
-              <div class="swiper-slide first-swiper-slide">
+            <div class="swiper-wrapper first-swiper-wrapper" id=""  v-if="items.topics.length">
+              <div class="swiper-slide first-swiper-slide"  v-for="(item, index) in items.topics" :key="index">
                 <a href="#">
-                  <img src="@/assets/img/login-homepage/開拓嘉年華.jpeg" alt="">
-                  <p>2023 高速領域-開拓嘉年華 </p>
-                </a>
-              </div>
-              <div class="swiper-slide first-swiper-slide">
-                <a href="#">
-                  <img src="@/assets/img/login-homepage/三周年.jpg" alt="">
-                  <p>貓罐子三週年</p>
-                </a>
-              </div>
-              <div class="swiper-slide first-swiper-slide">
-                <a href="#">
-                  <img src="@/assets/img/login-homepage/全新英雄榜.png" alt="">
-                  <p>全新英雄榜登場</p>
-                </a>
-              </div>
-              <div class="swiper-slide first-swiper-slide">
-                <a href="#">
-                  <img src="@/assets/img/login-homepage/新手教學.png" alt="">
-                  <p>V2 初來乍到 新手教學</p>
-                </a>
-              </div>
-              <div class="swiper-slide first-swiper-slide">
-                <a href="#">
-                  <img src="@/assets/img/login-homepage/社群文章教學.png" alt="">
-                  <p>貓罐子 社群文章 教學</p>
-                </a>
-              </div>
-              <div class="swiper-slide first-swiper-slide">
-                <a href="#">
-                  <img src="@/assets/img/login-homepage/常見效果文與中文對照表.jpg" alt="">
-                  <p>常見效果文與中文對照表</p>
+                  <img :src="item.cover" :alt="item.title">
+                  <p>{{ item.title }} </p>
                 </a>
               </div>
             </div>
@@ -157,153 +175,20 @@ onMounted(() => {
         <div class="card3">
           <!-- third swiper -->
           <div class="swiper third-swiper-container">
-            <div class="swiper-wrapper third-swiper-wrapper">
-              <div class="swiper-slide third-swiper-slide">
-                <a href="#">
+            <div class="swiper-wrapper third-swiper-wrapper" >
+              <div class="swiper-slide third-swiper-slide" v-for="(video, index) in items.videos" :key="index" >
+                <a :href="'https://www.youtube.com/watch?v=' + video.ytId">
                   <div class="third-swiper-slide-content">
                     <div class="third-swiper-slide-content-img">
-                      <img src="@/assets/img/login-homepage/video-img/bottleneko v2.1.jpg" alt="">
+                      <img src="@/assets/img/login-homepage/新手教學.png" alt="">
                     </div>
                     <div class="third-swiper-slide-content-info" >
-                      <h2>貓罐子 v2.1 網站功能展示</h2>
+                      <h2>{{ video.title || '無標題' }}</h2>
                       <div class="third-swiper-slide-content-info-text">
-                        <img src="@/assets/img/login-homepage/video-img/管理員LOGO.png" alt="">
+                        <img :src="video.author.head" alt="">
                         <div class="third-swiper-slide-content-info-text-box">
-                          <p>貓罐子管理員</p>
-                          <p>2023-08-31</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide third-swiper-slide">
-                <a href="#">
-                  <div class="third-swiper-slide-content">
-                    <div class="third-swiper-slide-content-img">
-                      <img src="@/assets/img/login-homepage/video-img/感謝祭.jpg" alt="">
-                    </div>
-                    <div class="third-swiper-slide-content-info" >
-                      <h2>貓罐子 二週年感謝祭</h2>
-                      <div class="third-swiper-slide-content-info-text">
-                        <img src="@/assets/img/login-homepage/video-img/管理員LOGO.png" alt="">
-                        <div class="third-swiper-slide-content-info-text-box">
-                          <p>貓罐子管理員</p>
-                          <p>2023-08-31</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide third-swiper-slide">
-                <a href="#">
-                  <div class="third-swiper-slide-content">
-                    <div class="third-swiper-slide-content-img">
-                      <img src="@/assets/img/login-homepage/video-img/スパイファミリーの画像イメージ.jpg" alt="">
-                    </div>
-                    <div class="third-swiper-slide-content-info" >
-                      <h2>【WS】【弦暇之諭】 Weiß Schwarz雜談#62 スパイファミリー SPY×FAMILY 間諜家家酒牌組分享</h2>
-                      <div class="third-swiper-slide-content-info-text">
-                        <img src="@/assets/img/login-homepage/video-img/管理員LOGO.png" alt="">
-                        <div class="third-swiper-slide-content-info-text-box">
-                          <p>高速領域</p>
-                          <p>2023-08-31</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide third-swiper-slide">
-                <a href="#">
-                  <div class="third-swiper-slide-content">
-                    <div class="third-swiper-slide-content-img">
-                      <img src="@/assets/img/login-homepage/video-img/bottleneko v2.1.jpg" alt="">
-                    </div>
-                    <div class="third-swiper-slide-content-info" >
-                      <h2>【WS】【弦暇之諭】 Weiß Schwarz雜談#61 ウマ娘 プリティーダービー 賽馬娘牌組分享</h2>
-                      <div class="third-swiper-slide-content-info-text">
-                        <img src="@/assets/img/login-homepage/video-img/管理員LOGO.png" alt="">
-                        <div class="third-swiper-slide-content-info-text-box">
-                          <p>高速領域</p>
-                          <p>2023-08-31</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide third-swiper-slide">
-                <a href="#">
-                  <div class="third-swiper-slide-content">
-                    <div class="third-swiper-slide-content-img">
-                      <img src="@/assets/img/login-homepage/video-img/リコリスの画像ファイル.jpg" alt="">
-                    </div>
-                    <div class="third-swiper-slide-content-info" >
-                      <h2>【WS】【弦暇之諭】 Weiß Schwarz雜談#54 リコリス・リコイル Lycoris Recoil 莉可麗絲牌組分享</h2>
-                      <div class="third-swiper-slide-content-info-text">
-                        <img src="@/assets/img/login-homepage/video-img/管理員LOGO.png" alt="">
-                        <div class="third-swiper-slide-content-info-text-box">
-                          <p>高速領域</p>
-                          <p>2023-08-31</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide third-swiper-slide">
-                <a href="#">
-                  <div class="third-swiper-slide-content">
-                    <div class="third-swiper-slide-content-img">
-                      <img src="@/assets/img/login-homepage/video-img/判定チュートリアル.jpg" alt="">
-                    </div>
-                    <div class="third-swiper-slide-content-info" >
-                      <h2>【Weiβ Schwarz 教學】獲得/給予判定標誌「CX的效果可不只有CX可以用」#38</h2>
-                      <div class="third-swiper-slide-content-info-text">
-                        <img src="@/assets/img/login-homepage/video-img/管理員LOGO.png" alt="">
-                        <div class="third-swiper-slide-content-info-text-box">
-                          <p>くろう-KUROU-</p>
-                          <p>2023-08-31</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide third-swiper-slide">
-                <a href="#">
-                  <div class="third-swiper-slide-content">
-                    <div class="third-swiper-slide-content-img">
-                      <img src="@/assets/img/login-homepage/video-img/遊び方.jpg" alt="">
-                    </div>
-                    <div class="third-swiper-slide-content-info" >
-                      <h2>【Weiβ Schwarz 教學】(1) 認識卡片/牌組構成規則｜WS教學#1</h2>
-                      <div class="third-swiper-slide-content-info-text">
-                        <img src="@/assets/img/login-homepage/video-img/管理員LOGO.png" alt="">
-                        <div class="third-swiper-slide-content-info-text-box">
-                          <p>くろう-KUROU-</p>
-                          <p>2023-08-31</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="swiper-slide third-swiper-slide">
-                <a href="#">
-                  <div class="third-swiper-slide-content">
-                    <div class="third-swiper-slide-content-img">
-                      <img src="@/assets/img/login-homepage/video-img/カードセットメイカーアプリ画像.jpg" alt="">
-                    </div>
-                    <div class="third-swiper-slide-content-info" >
-                      <h2>【Weiβ Schwarz 教學】貓罐子組牌器「彩蛋居然是牌組卡表大放送!?」｜WS教學#12</h2>
-                      <div class="third-swiper-slide-content-info-text">
-                        <img src="@/assets/img/login-homepage/video-img/管理員LOGO.png" alt="">
-                        <div class="third-swiper-slide-content-info-text-box">
-                          <p>くろう-KUROU-</p>
-                          <p>2023-08-31</p>
+                          <p>{{ video.author.name }}</p>
+                          <p>{{ formatDate(video.publishAt) }}</p>
                         </div>
                       </div>
                     </div>

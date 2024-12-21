@@ -133,7 +133,8 @@ export default {
         },
         goToArticlePage() {
             // 使用 Vue 的路由進行跳轉
-            this.$router.push('/add-article');
+            const deckId = this.$route.params.deck_id;
+            this.$router.push(`/add/${deckId}`);
         },
         toggleRemitCard() {
             this.isVisible = !this.isVisible;
@@ -174,8 +175,8 @@ export default {
         },
         async copyDeck(){
             this.deckMakeStore.selectedCards = this.deckData.deck
+            this.deckMakeStore.saveLastDeckEdit();
             const cardCode = this.deckData.deck[0].seriesCode
-            console.log(cardCode);
             
             let seriesId = ''
             try {
@@ -187,7 +188,7 @@ export default {
                 }).id
                 
             } catch (error) {
-                
+                console.log(error);
             }
             console.log(seriesId);
             

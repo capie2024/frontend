@@ -35,6 +35,25 @@
                             <span>登入</span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
+                    </a>
+                </button>
+            </section>
+            <h2 class="title">
+                搜尋結果
+                <br>
+                <span class="subtitle">一共有 {{ searchResultCount }} 結果</span>
+            </h2>
+            <section class="card-area">
+                <a v-for="article in filteredArticles" 
+                    :key="article.post_code" 
+                    :href="'/social/' + article.post_code" 
+                    class="card-link"
+                >
+                    <div class="card-img">
+                        <img v-if="article.post_picture" 
+                            :src="article.post_picture" 
+                            :alt="article.title">
+
                     </div>
                 </div>
                 <section class="flex-item-hidden">

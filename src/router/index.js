@@ -26,6 +26,9 @@ import MyArticle from "../views/MyArticle.vue";
 import Warning from "../components/Mycard/warning.vue";
 import Delete from "../components/Mycard/delete.vue";
 import deckPage from "../components/card-deck/deck-page.vue";
+import AddPostDeck from "../components/card-deck/AddPostDeck.vue";
+import Notice from "../components/notification/notification.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -171,6 +174,16 @@ const router = createRouter({
       name: "deckPage",
       component: deckPage
     },
+    {
+      path: "/add/:deck_id",
+      name:"AddPostDeck",
+      component:AddPostDeck
+    },
+    {
+      path: "/notice",
+      name: "notice",
+      component: Notice
+    }
   ],
 });
 

@@ -1,16 +1,8 @@
 <script setup>
 import { ref,onMounted,nextTick } from 'vue'
 import axios from 'axios';
-// import SidebarGrid from '@/components/SidebarGrid.vue'
 
-onMounted(async() => {
-  await nextTick();
-  await import ("@/assets/js/login-homepage/css-control.js")
-  await import ("@/assets/js/login-homepage/swiper")
-  await import ("@/assets/js/login-homepage/fancybox")
-})
-
-const items = ref({ topics: [], videos: [] ,});
+const items = ref({ topics: [], videos: [] , latestProducts: [] });
 
 // 格式化資料函數，避免顯示 null 或 undefined
 const formatValue = (value, defaultValue = '無資料') => {
@@ -23,8 +15,16 @@ const formatDate = (dateStr) => {
   return date instanceof Date && !isNaN(date) ? date.toLocaleDateString() : '無發布日期';
 };
 
+onMounted(() => {
+   nextTick();
+   import ("@/assets/js/login-homepage/css-control.js")
+   import ("@/assets/js/login-homepage/swiper")
+   import ("@/assets/js/login-homepage/fancybox")
+})
+
 // 當組件掛載時請求資料
 onMounted(async () => {
+
   try {
     const response = await axios.get('/api/topics');
     const apiData = response.data;  // API 返回的資料
@@ -32,8 +32,10 @@ onMounted(async () => {
     // 分別處理 topics 和 videos 資料
     const topics = apiData.find(item => item.title === 'topics');
     const videos = apiData.find(item => item.title === 'videos');
+    const latest = apiData.find((item) => item.title === '最新商品');
 
-    // 若找到了 topics 和 videos，將它們分別賦值
+
+     // 處理 topics 資料
     if (topics) {
       items.value.topics = topics.items.map(item => ({
         ...item.data,  // 解構出每個 topic 的資料
@@ -43,6 +45,7 @@ onMounted(async () => {
       }));
     }
 
+    // 處理 videos 資料
     if (videos) {
       items.value.videos = videos.items.map(item => ({
         ...item.data,  // 解構出每個 video 的資料
@@ -51,6 +54,17 @@ onMounted(async () => {
         publishAt: formatDate(item.data.publishAt),
         authorName: formatValue(item.data.author?.name),
         authorHead: formatValue(item.data.author?.head),
+      }));
+    }
+
+    // 處理最新商品資料
+    if (latest) {
+      items.value.latestProducts = latest.items.map((item) => ({
+        cover: formatValue(item.data.cover),
+        name: formatValue(item.data.name),
+        description: formatValue(item.data.description),
+        link: formatValue(item.data.link),
+        publishAt: formatDate(item.data.publishAt),
       }));
     }
   } catch (err) {
@@ -271,9 +285,9 @@ onMounted(async () => {
           </a>
         </h2> 
         <section class="show-card">
-          <a href="#" class="url transition-colors">
+          <a href="#" class="url transition-colors" v-for="product in items.latestProducts" :key="product.name">
                   <div>
-                      <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
+                      <img :src="product.cover" alt="商品圖片">
                   </div>
                   <div class="card-text">
                       <div class="flex">
@@ -285,8 +299,8 @@ onMounted(async () => {
                           </svg>
                           <p class="color-a1">OSK</p>
                       </div>
-                      <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                      <p class="color-a1">2023-12-08</p>
+                      <p class="font-size20 color-white padding-bottom" >{{ product.name }}</p>
+                      <p class="color-a1">{{ product.publishAt }}</p>
                   </div>
           </a>
       </section>

@@ -114,7 +114,6 @@ const finalStep = async() => {
   const coverCard = selectedCards.value.find((card)=> {
     return card.id == chooseCoverCard.value
   })
-  console.log(coverCard);
   
   if(deckName.value.trim() != '' && deckDescription.value.trim() != '' && chooseCoverCard.value.trim() != '') {
     const deckData = {
@@ -124,7 +123,6 @@ const finalStep = async() => {
       deckCover: coverCard.cover
     }
     const res = await sendDeckToDatabase(deckData);
-    console.log(res);
     
     if(res == undefined){
       await Swal.fire({
@@ -136,7 +134,6 @@ const finalStep = async() => {
     }
 
     if(res.status == 200){        
-      console.log("已傳送給後端存入資料庫");
       settingDeckStatus.value = false
       sidebarSelectedStatus.value = true
       deckName.value = ''
@@ -149,7 +146,6 @@ const finalStep = async() => {
                 text: '成功創建牌組'
               })
       router.push(`/deckPage/${ res.data.data.deck_id }`)
-      console.log("完成創建牌組並跳轉");
     }else if(res.status == 403){
       await Swal.fire({
                 icon: 'error',
@@ -196,10 +192,8 @@ const sortCount = ref(0);
 const handleKeyWord = () => {
   if(filterVaribleSet.keyWord.trim() != ''){
     applyBtnStatus.value = true
-    console.log("更新關鍵字");
   }else if(filterVaribleSet.keyWord.trim() == ''){
       checkHaveFilterOrSort();
-      console.log("目前關鍵字為空");
   }
 }
 
@@ -257,7 +251,6 @@ const handleUseKeyWordBtn = (keyWord) => {
 // 按下常用篩選按鈕
 const handleUseMyFiltersBtn = (myFilter) => {
   Object.assign(filterVaribleSet, myFilter.filters)
-  console.log("按下常用篩選按鈕");
   applyBtnStatus.value = true
 }
 

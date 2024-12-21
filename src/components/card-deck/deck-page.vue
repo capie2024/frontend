@@ -2,6 +2,7 @@
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useDeckMakeStore } from "@/stores/deck-make";
+import { useCardSeriesStore } from '@/stores/card-series';
 import SidebarGrid from '../SidebarGrid.vue';
 import RemitCard from "../Mycard/remit-card.vue";
 
@@ -33,6 +34,7 @@ export default {
             togglePriceView: false, // 用於切換價格表顯示
             toggleTableView: false, // 用於切換顯示模式
             deckMakeStore: useDeckMakeStore(),
+            cardSeriesStore: useCardSeriesStore(),
         };
     },
     computed: {
@@ -189,9 +191,8 @@ export default {
                 
             } catch (error) {
                 console.log(error);
-            }
-            console.log(seriesId);
-            
+            }            
+            this.cardSeriesStore.saveLastViewSeries(seriesId)
             this.$router.push(`/card-series/${ seriesId }`)
         }
     }

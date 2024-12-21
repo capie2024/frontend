@@ -1,8 +1,11 @@
 <script setup>
-import { ref, onMounted, defineEmits } from "vue";
+import { ref, onMounted } from "vue";
 import { loadScript } from "@paypal/paypal-js";
 import axios from "axios";
 import sweetalert from "sweetalert2";
+
+const API_URL = import.meta.env.VITE_API_URL
+const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID
 
 const emit = defineEmits(["update-isheromember"]);
 
@@ -10,8 +13,7 @@ onMounted(async () => {
 
   try {
     const paypal = await loadScript({
-      "client-id":
-        "AfYXwzdA45JeQ0BQdmptnOLBi01qoZ-CzooPxnmh7WD56ufGdgNZzSzVHthz2C-zTgMMOc49gaLSaBA3",
+      "client-id": PAYPAL_CLIENT_ID,
     });
 
     await paypal
@@ -27,7 +29,7 @@ onMounted(async () => {
         },
         async createOrder() {
           const response = await fetch(
-            "http://localhost:3000/api/create-paypal-order",
+            `${ API_URL }/api/create-paypal-order`,
             {
               method: "POST",
               headers: {
@@ -40,16 +42,12 @@ onMounted(async () => {
               }),
             }
           );
-
           const { order } = await response.json();
-          console.log(order);
 
-          return order.id;
-          
+          return order.id;          
         },
         async onApprove(data, actions) {
           const order = await actions.order.capture();
-          console.log(order);
 
           if (order.status === "COMPLETED") {
             sweetalert.fire({
@@ -60,7 +58,7 @@ onMounted(async () => {
 
             try {
               const res = await axios.post(
-                "http://localhost:3000/api/save-paypal-order",
+                `${ API_URL }/api/save-paypal-order`,
                 {
                   order: order,
                 },
@@ -71,8 +69,6 @@ onMounted(async () => {
                 }
               );
 
-              console.log(res);
-              console.log("已將訂單資訊傳入資料庫");
               emit("update-isheromember", true);
             } catch (error) {
               console.log(error);

@@ -7,6 +7,8 @@ import SidebarGrid from '../components/SidebarGrid.vue';
 
 Fancybox.bind('[data-fancybox="daily-card"]', {});
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const seriesSortTitleArr = ref([])
 const seriesSortCardsArr = ref([])
 const dateSortTitleArr = ref([])
@@ -14,15 +16,14 @@ const dateSortCardsArr = ref([])
 const thisCategory = ref('SERIES')
 const currentSection = ref('') // 紀錄目前所在內容標示
 
-const getDailyCards = async (category) => {
+const getDailyCards = async () => {
 
     seriesSortTitleArr.value = []
     seriesSortCardsArr.value = []
     dateSortTitleArr.value = []
     dateSortCardsArr.value = []
 
-    const { data } = await axios.get("http://localhost:3000/api/daily-card")
-    console.log(data);
+    const { data } = await axios.get(`${ API_URL }/api/daily-card`)
     
     // 取出系列
     data.forEach((item) => {
@@ -68,7 +69,6 @@ const getDailyCards = async (category) => {
             dateSortTitleArr.value.push(date)
         }
     })
-    // console.log("目前區塊標題:", dateSortTitleArr.value);
      // 取出各日期的卡片
     for(let i = 0; i < sortArr.value.length; i++){
         const cards = data.filter((item) => {
@@ -76,8 +76,6 @@ const getDailyCards = async (category) => {
         })
         dateSortCardsArr.value.push(cards)
     }
-    // console.log("目前區塊卡片:", dateSortCardsArr.value);
-
 }
 
 const switchCategory = (category) => {
@@ -89,7 +87,6 @@ const switchCategory = (category) => {
 }
 
 const goToSection = (target) => {
-        console.log("滾動到", target);    
         document.querySelector(`[data-id="${ target }"]`).scrollIntoView({behavior: "smooth"})    
 }
 

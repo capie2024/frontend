@@ -13,7 +13,3 @@ const { cardInfoDisplay } = storeToRefs(cardInfoStore);
     <router-view />
     <CardInfo v-if="cardInfoDisplay" :key="cardInfoDisplay" />
 </template>
-
-<style scoped>
-
-</style>

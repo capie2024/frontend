@@ -563,7 +563,7 @@ export default {
                                 <span>文章內容</span>
                             </div>
                             <div class="article-content">
-                                <p>{{ article.content }}</p>
+                                <p v-html="article.content"></p>
                             </div>
                         </div>
                         <!-- 留言區域 -->
@@ -758,7 +758,7 @@ export default {
                             </section>
                         </div>
                     </div>
-                    <nav class="toolbar">
+                    <nav class="toolbar" v-if="groupedCards.length > 0">
                         <div class="toolbar-area1">
                             <button class="tool-btn1" @click="setSortBy('typeTranslate')"
                             :class="{'active': sortBy === 'typeTranslate'}">

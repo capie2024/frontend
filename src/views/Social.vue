@@ -64,10 +64,12 @@
                     <i class="fa-solid fa-x"></i>
                 </button>
                 <div class="sign-container">
+                  <a :href="'/add'">
                     <button class="add-article">
                         <i class="fa-solid fa-pen-to-square"></i>
                         新增文章
                     </button>
+                  </a>
                     <button class="add-article-hidden">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </button>
@@ -136,7 +138,7 @@
                         </div>
                         <div class="card-name">
                             <h2>{{ article.title }}</h2>
-                            <p>{{ article.content }}</p>
+                            <p v-html="article.content"></p>
                         </div>
                     </div>
                 </a>     
@@ -704,17 +706,15 @@ export default {
     }
 
     .card-name p {
-        font-size: 10px;
+        margin-top: 8px;
+        font-size: 16px;
         color: rgb(170, 168, 168);
+        height: 16px;
+        overflow: hidden;
     }
 
     .card-name h2 {
         font-weight: 900;
-    }
-
-    .card-name p {
-        margin-top: 8px;
-        font-size: 16px;
     }
 
     .footer-nav {

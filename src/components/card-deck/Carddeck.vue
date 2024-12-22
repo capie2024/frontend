@@ -21,7 +21,7 @@ export default {
       SidebarGrid, 
     },
     data() {
-        return {
+      return {
         newMessage: "",  // 儲存輸入的留言內容
         messages: [],    // 儲存所有留言
         username: "",    // 用戶名稱
@@ -42,9 +42,9 @@ export default {
         togglePriceView: false,
         article: null,
         deckData: {
-                deck:[],
-            },  // 儲存從 API 獲得的牌組資料
-        };
+          deck:[],
+        }, 
+      };
     },
     mounted() {
         this.fetchArticleId();

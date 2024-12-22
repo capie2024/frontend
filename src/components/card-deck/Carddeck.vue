@@ -8,7 +8,6 @@ function getUserIdFromToken(token) {
     try {
         const payload = token.split(".")[1];
         const decodedPayload = JSON.parse(atob(payload));
-        console.log("Decoded Payload:", decodedPayload);
         return decodedPayload.userId || null; // 檢查是否有 userId
     } catch (error) {
         console.error("無法解析 token:", error);
@@ -55,7 +54,6 @@ export default {
 
     async created() {
         this.loggedInUserId = getUserIdFromToken(this.token);
-        console.log("Logged in user ID:", this.loggedInUserId);
         const postCode = this.$route.params.post_code;
         try {
             const response = await axios.get(`http://localhost:3000/api/articles/${postCode}`);
@@ -165,8 +163,6 @@ export default {
                 const deckList = response.data[0].deck_list;
                 this.cards = deckList.deck;  
                 this.deckId = deckList.deck_id;
-                console.log('Deck Name:', this.deckName);
-                console.log('All cards:', this.cards);
 
                 await this.fetchDeckData(); 
             } catch (error) {
@@ -188,7 +184,6 @@ export default {
                     },
                 });
 
-                console.log("Fetched user data:", response.data);
                 this.currentUser = response.data;            
             } catch (error) {
                 console.error('Failed to fetch current user:', error);
@@ -200,12 +195,10 @@ export default {
                 console.error("Error: postCode is not available in route params");
                 return;
             }
-            console.log("Post code:", postCode);
             try {
                 // 根據 post_code 查詢對應的 article_id
                 const response = await axios.get(`http://localhost:3000/api/article-id/${postCode}`);
                 this.articleId = response.data.article_id;  // 從後端獲取 article_id
-                console.log("Fetched article ID:", this.articleId);
 
                 // 確保在獲取 articleId 後再獲取其他資料
                 await this.fetchMessages();  
@@ -236,16 +229,13 @@ export default {
                     message.pictureUrl = message.users?.picture || '/default-avatar.png';
                 });
 
-                console.log("Fetched messages:", this.messages);
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
         },
         async sendMessage() {
-            console.log('sendMessage called');
 
             if (!this.articleId) {
-                console.log(' articleId is not available');
                 return;  // 防止未設置 post_id 時發送留言
             }
 
@@ -279,7 +269,6 @@ export default {
                             Authorization: `Bearer ${userToken}`,
                         },
                     });
-                    console.log('Message sent:', response.data);
                     this.messages.unshift(response.data);  
                     this.newMessage = ""; 
                 } catch (error) {
@@ -308,7 +297,6 @@ export default {
         },
          // 送出編輯
         async submitEdit(message) {
-            console.log('submitEdit called');
             const userToken = localStorage.getItem('token');
 
             if (!userToken) {
@@ -346,7 +334,6 @@ export default {
             message.isEditing = false; // 結束編輯模式
         },
         async deleteMessage(messageId) {
-            console.log("Attempting to delete message with ID:", messageId);         
             Swal.fire({
                 title: "刪除留言",
                 text: "確定要刪除留言嗎？將會清除目前編輯的所有資訊。",
@@ -370,7 +357,6 @@ export default {
                                 Authorization: `Bearer ${userToken}`,
                             }
                         });
-                        console.log("Response from server:", response.data);
                         if (response.status === 200) {
                             Swal.fire("刪除成功!", "你的留言已被刪除", "success");
                             this.messages = this.messages.filter((message) => message.id !== messageId);
@@ -878,7 +864,7 @@ export default {
     </div>
 </template>
 
-<style scoped>
+<style scoped>    
     .price-row{
         display: flex;
         justify-content: center;

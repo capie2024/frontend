@@ -1,7 +1,7 @@
 <template>
     <div class="container">
-        <SidebarGrid style="grid-area: sidebar;" />
-        <div class="container" style="grid-area: main">
+        <SidebarGrid />
+        <div class="main">
             <div class="social-container">
                 <div class="header-container">
                     <div class="search-container">
@@ -20,10 +20,12 @@
                         <i class="fa-solid fa-x"></i>
                     </button>
                     <div class="sign-container">
-                        <button class="add-article">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                            新增文章
-                        </button>
+                        <a :href="'/add'">
+                            <button class="add-article">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                新增文章
+                            </button>
+                        </a>
                         <button class="add-article-hidden">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
@@ -34,6 +36,25 @@
                             <i class="fa-regular fa-user"></i>
                             <span>登入</span>
                             <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <section class="flex-item-hidden">
+                <button  
+                    v-for="(item, index) in socialHistory"
+                    :key="index" 
+                    class="user-button" 
+                    @click="handleHistoryClick(item.searchQuery)"
+                >
+                    <a href="#">
+                        <div class="user-link">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>{{ item.searchQuery }}</span>
+                        </div>
+                        <div class="user-link">
+                            <i class="fa-regular fa-window-restore"></i>
+                            <span>-</span>
                         </div>
                     </a>
                 </button>
@@ -53,91 +74,34 @@
                         <img v-if="article.post_picture" 
                             :src="article.post_picture" 
                             :alt="article.title">
-
                     </div>
-                </div>
-                <section class="flex-item-hidden">
-                    <button  
-                        v-for="(item, index) in socialHistory"
-                        :key="index" 
-                        class="user-button" 
-                        @click="handleHistoryClick(item.searchQuery)"
-                    >
-                        <a href="#">
-                            <div class="user-link">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                <span>{{ item.searchQuery }}</span>
+                    <div class="card-user">
+                        <div class="card-user-flex">
+                            <div class="card-user-img">
+                                <img :src="article.users.picture" alt="用戶頭像">
                             </div>
-                            <div class="user-link">
-                                <i class="fa-regular fa-window-restore"></i>
-                                <span>-</span>
-                            </div>
-                        </a>
-                    </button>
-                </section>
-                <h2 class="title">
-                    搜尋結果
-                    <br>
-                    <span class="subtitle">一共有 {{ searchResultCount }} 結果</span>
-                </h2>
-                <section class="card-area">
-                    <a v-for="article in filteredArticles" 
-                        :key="article.post_code" 
-                        :href="'/social/' + article.post_code" 
-                        class="card-link"
-                    >
-                        <div class="card-img">
-                            <img src="/src/img/麻衣.png" alt="">
-                        </div>
-                        <div class="card-user">
-                            <div class="card-user-flex">
-                                <div class="card-user-img">
-                                    <img :src="article.users.picture" alt="用戶頭像">
-                                </div>
-                                <div class="card-user-p">
-                                    <p>{{ article.users.username }}</p>
-                                    <div class="date-container">
-                                        <p class="date">{{ formatDate(article.created_at) }}</p>
-                                        <i class="fa-solid fa-globe"></i>
-                                        <p class="card-code">{{ article.post_code }}</p>
-                                        <div class="chat">
-                                            <i class="fa-regular fa-comment"></i>
-                                            <p>1</p>
-                                        </div>
+                            <div class="card-user-p">
+                                <p>{{ article.users.username }}</p>
+                                <div class="date-container">
+                                    <p class="date">{{ formatDate(article.created_at) }}</p>
+                                    <i class="fa-solid fa-globe"></i>
+                                    <p class="card-code">{{ article.post_code }}</p>
+                                    <div class="chat">
+                                        <i class="fa-regular fa-comment"></i>
+                                        <p>1</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-name">
-                                <h2>{{ article.title }}</h2>
-                                <p>{{ article.content }}</p>
-                            </div>
                         </div>
-                    </a>     
-                        
-                </section>
-            </div>
-            <div class="deck-container">
-                <div class="deck-img">
-                    <img src="/src/img/麻衣.png" alt="">
-                </div>
-                <div class="deck-content">
-                    <div class="line"></div>
-                    <div class="total-cards">
-                        <h2>刪除 DG/S02-027R</h2>
-                        <span>牌組製作，共84張卡</span>
-                    </div>
-                    <div class="deckbtn-area">
-                        <button class="deck-btn">
-                            <i class="fa-regular fa-circle-up"></i>
-                        </button>
-                        <div class="pay-btn">
-                            <svg width="24px" height="24px" data-v-c2dbc95b="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
-                            <span>00000 ¥</span>
+                        <div class="card-name">
+                            <h2>{{ article.title }}</h2>
+                            <p v-html="article.content"></p>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>     
+                </a>     
+                    
+            </section>
+        </div>    
     </div>
 </template>
 <script>
@@ -159,7 +123,7 @@ export default {
   async created() {
     try {
       const response = await axios.get('http://localhost:3000/api/articles');
-      this.articles = response.data; 
+      this.articles = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       this.filteredArticles = this.articles;
     } catch (error) {
       console.error('獲取文章列表失敗', error);
@@ -237,26 +201,25 @@ export default {
         color: #FFFFFF;
     }
 
-    .root-container {
-    width: 100%;
-     height: 100vh;
-      display: grid;
-      grid-template-columns: 270px 1fr;
-      grid-template-rows: 4rem 1fr;
-      grid-template-areas:
-          "sidebar main"
-          "sidebar main";
-    }
-
     .sidebar-container {
         position: fixed;
         top: 0;
+        background-color: black;
     }
 
     .container {
         width: 100%;
         display: block;
         position: relative;
+    }
+
+    .main {
+        margin-left:270px;
+        height:100vh; 
+        overflow: hidden;
+  
+        overflow-y: scroll;
+        scrollbar-width: none;    
     }
 
 
@@ -406,11 +369,11 @@ export default {
 
     .flex-item-hidden {
         display: flex;
+        padding-left: 20px;
         height: 62px;
         border-radius: 20px;
-        position: absolute;
-        top: 80px;
-        left: 24px;
+        /* position: absolute; */
+        margin-top: 80px;
         gap: 16px;
     }
 
@@ -448,13 +411,12 @@ export default {
 
     .title {
         display: block;
-        position: absolute;
-        top: 172px;
-        left: 24px;
         font-size: 25px;
         font-weight: 900;
         line-height: 1.75rem;
         color: #fff;
+        text-align:start;
+        margin-bottom: 10px;
     }
 
     .subtitle {
@@ -464,7 +426,7 @@ export default {
     }
 
     .card-area {
-        padding:250px 20px 20px 20px;
+        padding:0px 20px 20px 20px;
         width: 100%;
         display: grid;
         grid-template-columns: repeat(4,  1fr);
@@ -563,17 +525,15 @@ export default {
     }
 
     .card-name p {
-        font-size: 10px;
+        margin-top: 8px;
+        font-size: 16px;
         color: rgb(170, 168, 168);
+        height: 16px;
+        overflow: hidden;
     }
 
     .card-name h2 {
         font-weight: 900;
-    }
-
-    .card-name p {
-        margin-top: 8px;
-        font-size: 16px;
     }
 
     .deck-container {
@@ -700,14 +660,11 @@ export default {
     }
 
     @media screen and (max-width: 1200px) {
-        .root-container {
-          display: grid;
-          grid-template-areas:
-              "main"
-              "main";
-          grid-template-columns: 1fr;
-          grid-template-rows: 64px 1fr;
+        
+        .main {
+            margin-left:0px;
         }
+
         .sidebar-container {
             top:auto;
             bottom: 0;
@@ -763,15 +720,6 @@ export default {
     }
 
     @media screen and (max-width: 768px) {
-        .root-container {
-          display: grid;
-          grid-template-areas:
-              "main"
-              "main";
-          grid-template-columns: 1fr;
-          grid-template-rows: 64px 1fr;
-          overflow: visible;
-        }
 
         .xx {
             background-color: #fff;

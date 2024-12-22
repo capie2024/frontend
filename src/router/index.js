@@ -115,7 +115,7 @@ const router = createRouter({
       component: Carddeck,        
     },
     {
-      path: "/add-article",
+      path: "/add",
       name: "add-article",
       component: AddArticle
     },

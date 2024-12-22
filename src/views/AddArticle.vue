@@ -87,9 +87,18 @@
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="text-white/50 size-8" data-v-b086c574=""><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"></path></svg>
                   <input type="text" placeholder="#Tag1#Tag2">
               </div>
-              <textarea v-model="content" name="" id="" class="enter-text">
 
-              </textarea>
+              <editor v-model="content"
+                api-key = Tiny_API_KEY
+                :init="{
+                  height: 415,
+                  menubar: false,
+                  plugins: 'lists link image',
+                  toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
+                  content_style: 'body { background-color: #222F3E ;color: #FFF; }' ,
+                }"
+              />
+
           </div>
           <div class="message-area">
               <div class="user-message">
@@ -110,7 +119,7 @@
       <footer>
           123
       </footer>     
-      </footer>
+
 
       <div class="deck-container">
           <div class="deck-img">
@@ -139,10 +148,12 @@
 import axios from 'axios';
 import Swal from 'sweetalert2'
 import SidebarGrid from '../components/SidebarGrid.vue'
+import Editor from '@tinymce/tinymce-vue';
 
 export default {
   components: {
     SidebarGrid, 
+    Editor,
   },
   data() {
     return {
@@ -266,12 +277,6 @@ export default {
       this.menuExpanded = false; 
     },
 
-    clearSearch() {
-      this.searchQuery = ''; 
-      this.filteredDecks = this.decks;
-      this.calculateMenuHeight();
-    },
-
     toggleMenu() {
       this.menuExpanded = !this.menuExpanded;
       if (this.menuExpanded) {
@@ -294,9 +299,15 @@ export default {
       }
       this.calculateMenuHeight();
     },
+
+    clearSearch() {
+      this.searchQuery = ''; 
+      this.filteredDecks = this.decks;
+      this.calculateMenuHeight();
+    },
   }
 };
-}
+
 </script>
 <style scoped>
 div, span, applet, object, iframe,
@@ -578,7 +589,7 @@ main {
   height: 72px;
   position: fixed;
   top:0;
-  z-index: 1;
+  z-index: 4;
 }
 
 header {
@@ -704,6 +715,7 @@ header {
   padding: 5px 10px ;
   color: white;
   cursor: pointer;
+  gap: 5px;
 }
 
 .menu-area {
@@ -716,6 +728,7 @@ header {
   margin-left: 5px;
   overflow: hidden;
   transition: height 1s ease;
+  z-index: 3;
 }
 
 .menu-search {
@@ -1140,7 +1153,6 @@ footer {
       background-color: #000000;
       width: 100%;
       height: 64px;
-      z-index: 1;
   }
 
   header {
@@ -1176,6 +1188,9 @@ footer {
       width: 288px;
       height: 288px;
       margin: 0 auto;
+  }
+  .preview-image {
+    width: 288px;
   }
 
   .add-section {

@@ -5,7 +5,7 @@ import { useCardInfoStore } from "@/stores/card-info";
 
 export const useDeckMakeStore = defineStore("deck-make", () => {
   const cardInfoStore = useCardInfoStore();
-  // const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow;
+  const API_URL = import.meta.env.VITE_API_URL
 
   const selectedCards = ref([]);
   const editType = ref("CHECK_INFO");
@@ -20,23 +20,16 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
       selectedCards.value = [];
     }
     const card = selectedCardData;
-    // console.log(card);
     selectedCards.value.push(card);
-    console.log(selectedCards.value);
     saveLastDeckEdit();
     switchSortMode();
   };
 
   // 根據卡牌在製作牌組內的位置，移除所選卡牌
   const removeCard = (card) => {
-    console.log("開始移除卡牌");
     const cardIndex = selectedCards.value.findIndex(
       (item) => item.id === card.id
     );
-    console.log(card.id);
-    console.log(cardIndex);
-    console.log(selectedCards.value[cardIndex]);
-
     selectedCards.value.splice(cardIndex, 1);
     saveLastDeckEdit();
     switchSortMode();
@@ -44,7 +37,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
 
   // 清空製作牌組內的卡牌和重置最後編輯狀態
   const clearSelectedCards = () => {
-    console.log("開始清理卡牌製作");
     selectedCards.value = [];
     localStorage.removeItem("deckEdit");
     switchSortMode();
@@ -52,7 +44,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
 
   // 存取最後製作牌組的編輯狀態
   const saveLastDeckEdit = () => {
-    console.log("存取至localstorage");
     localStorage.setItem("deckEdit", JSON.stringify(selectedCards.value));
   };
 
@@ -67,7 +58,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
   // 計算製作牌組內所有卡牌的總價
   const countDeck = computed(() => {
     return selectedCards.value.reduce((total, card) => {
-      //   console.log(total, card.price.number);
       return total + card.price.number;
     }, 0);
   });
@@ -96,12 +86,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
 
   const checkTypeAndRunFunction = (card, cardIndex, deckIndex) => {
     if (editType.value === "CHECK_INFO") {
-      console.log("查看卡片資訊");
-      // console.log(
-        //   "卡片資訊:" + card.name,
-        //   "卡片索引值:" + cardIndex,
-      //   "牌組索引值:" + deckIndex
-      // );
       cardInfoStore.getCardInfoAndShow(card);
     } else if (editType.value === "ADD_CARD") {
       addCard(card);
@@ -118,7 +102,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
     if (sortStatus.value === "TYPE") {
       // 獲取所有卡牌的類型
       const typeArr = [];
-      // console.log(selectedCards.value);
 
       selectedCards.value.forEach((card) => {
         if (typeArr.length <= 0) {
@@ -127,7 +110,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         const ishave = typeArr.find((type) => type === card.typeTranslate);
         if (ishave === undefined) {
           typeArr.push(card.typeTranslate);
-          // console.log(card.typeTranslate);
         }
       });
       sortedTitle.value = typeArr;
@@ -144,7 +126,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
       });
     } else if (sortStatus.value === "COLOR") {
       const typeArr = [];
-      // console.log(selectedCards.value);
 
       selectedCards.value.forEach((card) => {
         if (typeArr.length <= 0) {
@@ -153,7 +134,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         const ishave = typeArr.find((color) => color === card.color);
         if (ishave === undefined) {
           typeArr.push(card.color);
-          // console.log(card.color);
         }
       });
       sortedTitle.value = typeArr;
@@ -170,7 +150,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
       });
     } else if (sortStatus.value === "LEVEL") {
       const typeArr = [];
-      // console.log(selectedCards.value);
 
       selectedCards.value.forEach((card) => {
         if (typeArr.length <= 0) {
@@ -179,7 +158,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         const ishave = typeArr.find((level) => level === card.level);
         if (ishave === undefined) {
           typeArr.push(card.level);
-          // console.log(card.level);
         }
       });
       sortedTitle.value = typeArr;
@@ -196,7 +174,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
       });
     } else if (sortStatus.value === "RARE") {
       const typeArr = [];
-      // console.log(selectedCards.value);
 
       selectedCards.value.forEach((card) => {
         if (typeArr.length <= 0) {
@@ -205,7 +182,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         const ishave = typeArr.find((rare) => rare === card.rare);
         if (ishave === undefined) {
           typeArr.push(card.rare);
-          // console.log(card.rare);
         }
       });
       sortedTitle.value = typeArr;
@@ -222,7 +198,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
       });
     } else if (sortStatus.value === "PRODUCT") {
       const typeArr = [];
-      // console.log(selectedCards.value);
 
       selectedCards.value.forEach((card) => {
         if (typeArr.length <= 0) {
@@ -233,7 +208,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         );
         if (ishave === undefined) {
           typeArr.push(card.productName);
-          // console.log(card.productName);
         }
       });
       sortedTitle.value = typeArr;
@@ -249,7 +223,6 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         sortedDeck.value.push(cardArr);
       });
     }
-    // console.log(sortedDeck.value);
   };
 
   // 選擇要切換的類型
@@ -262,9 +235,8 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
   const sendDeckToDatabase = async (deckData) => {
     try {
       const userToken = localStorage.getItem("token");
-      // console.log(userToken);
   
-      const res = await axios.post("http://localhost:3000/api/add-deck", 
+      const res = await axios.post(`${ API_URL }/api/add-deck`, 
       {
         deckData
       },
@@ -274,13 +246,10 @@ export const useDeckMakeStore = defineStore("deck-make", () => {
         }
       }
       );
-      console.log(res.data);
-      console.log("已傳送");
       
       return res;
     } catch (error) {
      console.log(error);
-      
     }
   }
   

@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import Loading from '../components/Loading.vue';
+import SideBar from '../components/SidebarGrid.vue'
 
 const router = useRouter();
 const name = ref('')
@@ -23,7 +24,7 @@ const postCount = computed(() => posts.value.length);
 
 const getAccount = async () => {
   const token = localStorage.getItem('token');
-  console.log('token:', token);
+  
   if (!token) {
     Swal.fire({
         icon: 'error',
@@ -84,9 +85,7 @@ const editName = () => {
 };
 
 // 保存新的用户名
-const saveName = async () => {
-  console.log('saveName called');
-  
+const saveName = async () => {  
   const token = localStorage.getItem('token');
   if (!token) {
     Swal.fire({
@@ -124,15 +123,12 @@ const saveName = async () => {
 
 // 取消编辑
 const cancelEdit = () => {
-    console.log('cancelEdit called');
   name.value = originalName.value; // 恢复原始用户名
   isEditingName.value = false;
 };
 
 // 點擊上傳頭像
 const uploadPic = () => {
-    console.log('uploadPic called');
-    
     if (fileInput.value) {
       fileInput.value.click();
     }
@@ -166,8 +162,6 @@ const handleFileChange = async (event) => {
         'Content-Type': 'multipart/form-data',
       },
     });
-
-    console.log('圖片上傳成功：', res.data);
     
     // 更新圖片網址，添加時間戳，避免緩存
     picture.value = res.data.data.picture + '?' + Date.now();
@@ -180,7 +174,6 @@ const handleFileChange = async (event) => {
     });
   } catch (error) {
     console.error('圖片上傳失敗：', error);
-    console.log(error)
     Swal.fire({
       icon: 'error',
       title: '圖片上傳失敗',
@@ -206,7 +199,6 @@ const getUserDecks = async () => {
     });
 
     decks.value = res.data.decks;
-    console.log('用戶牌組：', decks.value);
     
   } catch (error) {
     console.error('獲取用戶牌組失敗：', error);
@@ -233,10 +225,8 @@ const getUserArticles = async () => {
     });
 
     posts.value = res.data.posts;
-    console.log('用戶文章：', posts.value);
     
   } catch (error) {
-    console.error('獲取用戶文章失敗：', error);
     Swal.fire({
       icon: 'error',
       title: '獲取用戶文章失敗',
@@ -275,7 +265,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div>
+    <div class="layout">
+        <SideBar />
         <header class="h-16 z-10" :class="{ 'scrolled': isScrolled }">
             <nav class="header-container">
                 <button class="flex-none p-1 rounded-full bg-black/50 text-white default-transition hover:bg-zinc-800/50">
@@ -410,7 +401,7 @@ onBeforeUnmount(() => {
                                             <p class="text-xs truncate">{{ deck.deck_id }}</p>
                                         </div>
                                         <p class="pb-1 text-sm md:text-base font-normal md:font-bold !text-white truncate">{{ deck.deck_name }}</p>
-                                        <p class="text-xs md:text-sm font-mono text-zinc-400 truncate">{{ deck.build_time }}</p>
+                                        <p class="text-xs md:text-sm font-mono text-zinc-400 truncate">{{ deck.build_time.substring(0, 10) }}</p>
                                     </div>
                                 </a>
                                 <a href="/mycard" class="url transition-colors overflow-hidden">
@@ -442,7 +433,7 @@ onBeforeUnmount(() => {
                                             <p class="text-xs truncate">{{ post.post_code }}</p>
                                         </div>
                                         <p class="pb-1 text-sm md:text-base font-normal md:font-bold !text-white truncate">{{ post.title }}</p>
-                                        <p class="text-xs md:text-sm font-mono text-zinc-400 truncate">{{ formatDate(post.created_at) }}</p>
+                                        <p class="text-xs md:text-sm font-mono text-zinc-400 truncate">{{ post.created_at.substring(0, 10) }}</p>
                                     </div>
                                 </a>
                                 <a href="/social/my" class="url transition-colors overflow-hidden">
@@ -638,6 +629,11 @@ onBeforeUnmount(() => {
 @import '@/assets/base.css';
 @import '@/assets/main.css';
 
+.layout{
+    display: flex;
+    flex-direction: row;
+}
+
 .default-transition {
     transition-duration: .3s;
     transition-property: all;
@@ -773,9 +769,9 @@ header.scrolled .header-title {
     height: calc(100vh - 1rem);
     width: calc(100vw - 270px - .5rem);
     border-radius: 1rem;
+    margin-top: 0.5rem;
     overflow: scroll;
     background-color: #32c9ff;
-    margin: 0.5rem 0.5rem 0.5rem 0;
 }
 
 .content-container {
@@ -872,8 +868,6 @@ header.scrolled .header-title {
     padding-bottom: 2rem;
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
-    /* margin-right: 0.5rem;
-    margin-bottom: 0.5rem; */
     overflow: auto;
     grid-area: main-view;
     &::-webkit-scrollbar {
@@ -1108,16 +1102,16 @@ header.scrolled .header-title {
 
 .scrollbar-y {
     &::-webkit-scrollbar{
-      width: 1rem;
+        width: 1rem;
     }
     &::-webkit-scrollbar-track {
-      background-color: #121212;
-      border-radius: 10px;
-      margin: 20px 130px;
+        background-color: #121212;
+        border-radius: 10px;
+        margin: 20px 130px;
     }
     /* &::-webkit-scrollbar-thumb{
-      border-radius: 10px;
-      background-color: cyan;
+        border-radius: 10px;
+        background-color: cyan;
     } */
 }
 
@@ -1430,6 +1424,14 @@ a {
         border-radius: 0%;
     }
 
+    .header-container {
+        margin-top: 0rem;
+    }
+
+    .show-card[data-v-ea08477a]::-webkit-scrollbar {
+        display: none; 
+    }
+
     .arrow-right{
         display: none;
     }
@@ -1472,6 +1474,8 @@ a {
     .show-card a{
         padding: 0;
         background-color: transparent;
+        display: block;
+        min-width: calc(50% - 2rem);
     }
 
     .show-card a:hover{

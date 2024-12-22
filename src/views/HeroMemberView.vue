@@ -7,6 +7,8 @@ import PaypalCheckout from "@/components/PaypalCheckout.vue";
 import axios from "axios";
 import router from '@/router'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const isHeroMember = ref(false)
 const isTokenAvailable = ref(true)
 
@@ -16,7 +18,7 @@ const checkHeroMember = async() => {
   
   
     try {
-      const res = await axios.get("http://localhost:3000/api/check-hero-member",{
+      const res = await axios.get(`${ API_URL }/api/check-hero-member`,{
       headers: {
         Authorization: `Bearer ${userToken}`,
       }
@@ -27,8 +29,6 @@ const checkHeroMember = async() => {
       if(error.response.status == 403){
         isTokenAvailable.value = false
       }
-      console.log(error.response);
-      console.log(error.response.data);
     }  
 }
 

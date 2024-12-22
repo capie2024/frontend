@@ -118,8 +118,8 @@
       </section>
       <footer>
           123
-      </footer>
-    
+      </footer>     
+
 
       <div class="deck-container">
           <div class="deck-img">
@@ -370,79 +370,9 @@ table {
   display: none;
 }
 
-
 .sidebar-container {
-  background-color: #000000;
-  width: 270px;
   position: fixed;
   top: 0;
-}
-
-
-
-.sidebar{
-  width: 238px;
-  height: 100vh;
-  background-color: black;
-  padding: 16px;
-}
-
-.sidebar-head{
-  text-decoration: none;
-  color: black;
-  cursor: pointer;
-}
-
-.icon{
-  width: 40px;
-  height: 40px;
-}
-
-.icon-text{
-  width: 85px;
-  height: 35px;
-}
-
-.sidebar-menu{
-  margin-top: 20px;
-}
-
-.sidebar-menu > li{
-  display: flex;
-  align-items: center;
-  width: 238px;
-  height: 40px;
-  margin-bottom: 5px;
-}
-
-.w-7{
-  width: 1.75rem;
-}
-
-.h-7{
-  height: 1.75rem;
-}
-
-.sidebar-menu li h2{
-  color: #a1a1aa; 
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.sidebar-menu a {
-  display: flex;
-  align-items: center; 
-  text-decoration: none;
-  color: #a1a1aa;
-  gap: 10px;
-}
-
-.sidebar-menu a:hover h2{
-  color: white; 
-}
-
-.sidebar-menu a:hover svg {
-  stroke: white; 
 }
 
 .translate-btn{
@@ -649,7 +579,6 @@ table {
 main {
   margin-left: 270px;
   width: calc(100% - 278px);
-  height: 100hv;
   background-color: #32C9FF;
   scroll-behavior: smooth;
 }
@@ -1211,7 +1140,7 @@ footer {
   }
 
   .sidebar-container {
-      display: none;
+      top:auto;
   }
 
   main {

@@ -278,7 +278,6 @@ const router = useRouter();
 const cardSeries = ref([])
 const originalSeries = ref([])
 const error = ref('')
-const API_URL = 'https://bottleneko.app/api/series'
 const sortState = ref(0)
 const searchQuery = ref('');
 const viewedSeries = ref([]);
@@ -286,7 +285,7 @@ const viewedSeries = ref([]);
 // 獲取系列卡表資料
 const fetchCardseries = async () => {
     try {
-        const response = await axios.get('/api/series');
+        const response = await axios.get('http://localhost:3000/api/series');
         originalSeries.value = response.data
         cardSeries.value = [...originalSeries.value].sort((a, b) => {
             const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;

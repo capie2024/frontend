@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { RouterLink, RouterView } from "vue-router";
-// import CardInfo from "@/views/CardInfo.vue";
+import CardInfo from "@/views/CardInfo.vue";
 import { storeToRefs } from "pinia";
 import { useCardInfoStore } from "@/stores/card-info";
 
@@ -11,8 +11,5 @@ const { cardInfoDisplay } = storeToRefs(cardInfoStore);
 
 <template>
     <router-view />
+    <CardInfo v-if="cardInfoDisplay" :key="cardInfoDisplay" />
 </template>
-
-<style scoped>
-
-</style>

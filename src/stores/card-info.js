@@ -15,11 +15,7 @@ export const useCardInfoStore = defineStore("card-info", () => {
   const rightDisabled = ref(null);
 
   const getCardInfoAndShow = (card) => {
-    cardInfo.value = card;
-    // console.log(cardInfo.value);
-    // console.log("成功傳入卡片資訊");
-    console.log("成功調用getCardInfoAndShow");
-  
+    cardInfo.value = card;  
     cardInfoDisplay.value = true;
     getCardInfoIndex();
   };
@@ -30,13 +26,10 @@ export const useCardInfoStore = defineStore("card-info", () => {
       return card.id === cardInfo.value.id;
     });
     
-    console.log(cardIndex.value);
     if(cardIndex.value == -1){
       setTimeout(() => {
         leftDisabled.value = true;
-        console.log("左按鈕被觸發:" + leftDisabled.value);
         rightDisabled.value = true;
-        console.log("右按鈕被觸發:" + rightDisabled.value);
       },0)
     }
     
@@ -57,7 +50,6 @@ export const useCardInfoStore = defineStore("card-info", () => {
   const changeCardInfoCard = (direction) => {
     getCardInfoIndex();
     if (cardIndex.value != -1) {
-        console.log(cardIndex.value + "不等於" + -1);
       if (direction == "left") {
         rightDisabled.value = false;
         if (cardIndex.value > 0) {

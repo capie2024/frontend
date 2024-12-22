@@ -109,38 +109,8 @@
       </section>
       <footer>
           123
+      </footer>     
       </footer>
-
-      <!-- <nav class="footer-nav">
-
-          <a class="nav-link" href="#">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
-              </svg>
-              <span class="link-word">首頁</span>
-          </a>
-          <a class="nav-link" href="#">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
-              <span class="link-word">系列卡表</span>
-          </a>
-          <a class="nav-link" href="#">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
-              <span class="link-word">我的牌組</span>
-          </a>
-          <a class="nav-link social-icon" href="#">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path d="M15.75 8.25a.75.75 0 0 1 .75.75c0 1.12-.492 2.126-1.27 2.812a.75.75 0 1 1-.992-1.124A2.243 2.243 0 0 0 15 9a.75.75 0 0 1 .75-.75Z"></path><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM4.575 15.6a8.25 8.25 0 0 0 9.348 4.425 1.966 1.966 0 0 0-1.84-1.275.983.983 0 0 1-.97-.822l-.073-.437c-.094-.565.25-1.11.8-1.267l.99-.282c.427-.123.783-.418.982-.816l.036-.073a1.453 1.453 0 0 1 2.328-.377L16.5 15h.628a2.25 2.25 0 0 1 1.983 1.186 8.25 8.25 0 0 0-6.345-12.4c.044.262.18.503.389.676l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.575 15.6Z" clip-rule="evenodd"></path></svg>
-              <span class="link-word">社群</span>
-          </a>
-          <a class="nav-link" href="#">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
-              <span class="link-word">通知</span>
-          </a>
-          <a class="nav-link" href="#">
-              <img src="/src/img/麻衣.png" alt="">
-              <div class="link-word">工作坊</div>
-          </a>
-
-      </nav> -->
-      
 
       <div class="deck-container">
           <div class="deck-img">
@@ -389,79 +359,9 @@ table {
   display: none;
 }
 
-
 .sidebar-container {
-  background-color: #000000;
-  width: 270px;
   position: fixed;
   top: 0;
-}
-
-
-
-.sidebar{
-  width: 238px;
-  height: 100vh;
-  background-color: black;
-  padding: 16px;
-}
-
-.sidebar-head{
-  text-decoration: none;
-  color: black;
-  cursor: pointer;
-}
-
-.icon{
-  width: 40px;
-  height: 40px;
-}
-
-.icon-text{
-  width: 85px;
-  height: 35px;
-}
-
-.sidebar-menu{
-  margin-top: 20px;
-}
-
-.sidebar-menu > li{
-  display: flex;
-  align-items: center;
-  width: 238px;
-  height: 40px;
-  margin-bottom: 5px;
-}
-
-.w-7{
-  width: 1.75rem;
-}
-
-.h-7{
-  height: 1.75rem;
-}
-
-.sidebar-menu li h2{
-  color: #a1a1aa; 
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.sidebar-menu a {
-  display: flex;
-  align-items: center; 
-  text-decoration: none;
-  color: #a1a1aa;
-  gap: 10px;
-}
-
-.sidebar-menu a:hover h2{
-  color: white; 
-}
-
-.sidebar-menu a:hover svg {
-  stroke: white; 
 }
 
 .translate-btn{
@@ -668,7 +568,6 @@ table {
 main {
   margin-left: 270px;
   width: calc(100% - 278px);
-  height: 100hv;
   background-color: #32C9FF;
   scroll-behavior: smooth;
 }
@@ -1228,7 +1127,7 @@ footer {
   }
 
   .sidebar-container {
-      display: none;
+      top:auto;
   }
 
   main {

@@ -296,7 +296,7 @@ export default {
     },
   }
 };
-
+}
 </script>
 <style scoped>
 div, span, applet, object, iframe,

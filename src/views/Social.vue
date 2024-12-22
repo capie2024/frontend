@@ -1,5 +1,5 @@
 <template>
-    <div class="root-container">
+    <div class="container">
         <SidebarGrid style="grid-area: sidebar;" />
         <div class="container" style="grid-area: main">
             <div class="social-container">

@@ -5,10 +5,10 @@
       <header>
         <div class="pagebtn-area">
           <button class="page-btn">
-              <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
           </button>
           <button class="page-btn next-btn">
-              <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
           </button>
           <h2>新增文章</h2>
         </div>
@@ -19,7 +19,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
           </button>
           <button class="bell">
-            <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
             <div class="notice">通知</div>
           </button>
           <button class="user-btn">
@@ -27,7 +27,7 @@
                   <img src="/src/img/麻衣.png" alt="">
               </div>                    
               <span>XXXX</span>
-              <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-4 w-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-4 w-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path></svg>
           </button>
         </div>
       </header>
@@ -35,18 +35,18 @@
     <section class="title-area">
       <div class="title-area-container">
         <button class="upload-btn" @click="handleButtonClick" alt="">
-          <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-20 w-20"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-20 w-20"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
           <img :src="deckData.deck_cover"  alt="">
         </button>
         <div class="add-section">
           <div class="add-article">
-            <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>
             <p>新增文章</p>
           </div>
           <input v-model="title" class="enter-title" type="text" >
           <div class="card-select-area">
             <button class="card-select-btn" @click="toggleMenu">
-              <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
               <p> {{ deckData.deck_name }} </p>
             </button>
             <ul class="menu-area" v-show="menuExpanded" :style="{ height: menuHeight + 'px' }">
@@ -56,7 +56,7 @@
               </li>
                     
               <li class="menu" v-for="deck in filteredDecks" :key="deck.id" v-if="decks && decks.length" @click="selectDeck(deck)">
-                <svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
                 <p class="text-xs truncate">{{ deck.deck_name }}</p>
               </li>
             </ul>
@@ -70,7 +70,7 @@
       <section class="text-area">
         <div class="edit-area">
           <div class="message-tag">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="text-white/50 size-8" data-v-b086c574=""><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="text-white/50 size-8"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"></path></svg>
             <input type="text" placeholder="#Tag1#Tag2">
           </div>
 
@@ -121,7 +121,7 @@
                       <i class="fa-regular fa-circle-up"></i>
                   </button>
                   <div class="pay-btn">
-                      <svg width="24px" height="24px" data-v-c2dbc95b="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
+                      <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
                       <span>00000 ¥</span>
                   </div>
               </div>
@@ -130,158 +130,159 @@
   </main>
 
 </template>
-<script>
+
+<script setup>
+import { ref, reactive, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import SidebarGrid from '../SidebarGrid.vue';
 import MainFooter from "@/components/MainFooter.vue";
 import Editor from '@tinymce/tinymce-vue';
 
-export default {
-  components: {
-    SidebarGrid, 
-    MainFooter,
-    Editor,
-  },
-  data() {
-    return {
-      token: null,
-      deckData: {
-        deck_name: '',
-        deck:[],
-      },
-      title: '',  
-      content: '', 
-      decks :[],
-      filteredDecks: [],
-      menuExpanded: false, 
-      menuHeight: 0, 
-      searchQuery : '',
-    };
-  },
 
-  mounted() {
-    this.token = localStorage.getItem('token');
-    this.fetchDeckData();
-    this.getUserDecks();
-  },
+const router = useRouter();
+const route = useRoute();
 
-  methods: {
-    async fetchDeckData() {
-      const deckId = this.$route.params.deck_id;
-      try {
-        const response = await axios.get(`http://localhost:3000/api/deck-page/${deckId}`);
-        this.deckData = response.data;
-        this.title = this.deckData.deck_name || '';
-        
-        if (!Array.isArray(this.deckData.deck)) {
-            this.deckData.deck = [];
-        }
-        this.id = this.deckData.id
-      } catch (error) {
-        console.error('獲取文章資料失敗', error);
-      }
-    },
 
-    async getUserDecks() {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        return;
-      }
-      try {
-        const res = await axios.get('http://localhost:3000/decks', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+const token = ref(localStorage.getItem('token'));
+const deckData = reactive({
+  deck_name: '',
+  deck: [],
+});
+const title = ref('');
+const content = ref('');
+const decks = ref([]);
+const filteredDecks = ref([]);
+const menuExpanded = ref(false);
+const menuHeight = ref(0);
+const searchQuery = ref('');
 
-        this.decks = res.data.decks;
-        this.filteredDecks = res.data.decks;
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: '獲取用戶牌組失敗',
-          text: error.response?.data?.message || '請稍後重試',
-        });
-      }
-    },
 
-    async submitArticle() {
-      try {
-
-        const response = await axios.post(
-           'http://localhost:3000/api/decks',
-          {
-            title: this.title,
-            content: this.content,
-            deck_id: this.id,
-            post_picture: this.deckData.deck_cover,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${this.token}`, 
-            },
-          }
-        );
-
-       
-        Swal.fire({
-          icon: 'success',
-          title: '成功',
-          showConfirmButton: false,
-          timer: 1000,
-        });
-
-        this.title = '';
-        this.content = '';
-        this.post_picture = null;
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: '新增文章失敗',
-        });
-      }
-    },
-
-    toggleMenu() {
-      this.menuExpanded = !this.menuExpanded;
-      if (this.menuExpanded) {
-        this.calculateMenuHeight();
-      }
-    },
-
-    calculateMenuHeight() {
-      this.menuHeight = 45 + this.filteredDecks.length * 35; 
-    },
-
-    selectDeck(deck) {
-      this.title = deck.deck_name;
-      this.deckData.deck_name = deck.deck_name;
-      this.deckData.deck_cover = deck.deck_cover;
-      this.id = deck.id;
-      this.menuExpanded = false; 
-    },
-
-    searchSeries() {
-      if (!this.searchQuery.trim()) {
-        this.filteredDecks = this.decks;
-      } else {
-        const query = this.searchQuery.toLowerCase();
-        this.filteredDecks = this.decks.filter(deck => 
-          deck.deck_name?.toLowerCase().includes(query)
-        );
-      }
-      this.calculateMenuHeight();
-    },
-
-    clearSearch() {
-      this.searchQuery = ''; 
-      this.filteredDecks = this.decks;
-      this.calculateMenuHeight();
-    },
-  },
+const fetchDeckData = async () => {
+  const API_URL = import.meta.env.VITE_API_URL;
+  const deckId = route.params.deck_id;
+  try {
+    const response = await axios.get(`${ API_URL }/api/deck-page/${ deckId }`);
+    title.value = response.data.deck_name || '';
+    deckData.deck_name = response.data.deck_name || '';
+    deckData.deck = Array.isArray(response.data.deck) ? response.data.deck : [];
+    deckData.deck_cover = response.data.deck_cover;
+    deckData.id = response.data.id;
+  } catch (error) {
+    console.error('獲取文章資料失敗', error);
+  }
 };
+
+
+const getUserDecks = async () => {
+  if (!token.value) return;
+  const API_URL = import.meta.env.VITE_API_URL;
+  try {
+    const res = await axios.get(`${ API_URL }/decks`, {
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    decks.value = res.data.decks;
+    filteredDecks.value = res.data.decks;
+  } catch (error) {
+    console.error('獲取牌組資料失敗', error);
+  }
+};
+
+
+const submitArticle = async () => {
+  try {
+    
+    const API_URL = import.meta.env.VITE_API_URL;
+    const response = await axios.post(
+      `${ API_URL }/api/decks`,
+      {
+        title: title.value,
+        content: content.value,
+        deck_id: deckData.id,
+        post_picture: deckData.deck_cover,
+      },
+      {
+        headers: { Authorization: `Bearer ${token.value}` },
+      }
+    );
+
+    const postCode = response.data.post_code;
+
+    Swal.fire({
+      icon: 'success',
+      title: '成功',
+      showConfirmButton: false,
+      timer: 1000,
+    }).then(() => {
+      router.push(`/social/${postCode}`);
+    });
+  } catch (error) {
+    if (error.response && error.response.status === 403) {
+
+      Swal.fire({
+        title: "請先登入",
+        text: "登入後才能發布文章",
+        icon: "warning",
+        confirmButtonText: "確定",
+      }).then(() => {
+        window.location.href = 'http://localhost:5173/login';
+      });
+    } else {
+
+      Swal.fire({
+        icon: 'error',
+        title: '新增文章失敗',
+        text: error.message, 
+      });
+    }
+  }
+};
+
+
+const toggleMenu = () => {
+  menuExpanded.value = !menuExpanded.value;
+  if (menuExpanded.value) calculateMenuHeight();
+};
+
+
+const calculateMenuHeight = () => {
+  menuHeight.value = 45 + filteredDecks.value.length * 35;
+};
+
+
+const selectDeck = (deck) => {
+  title.value = deck.deck_name;
+  deckData.deck_name = deck.deck_name;
+  deckData.deck_cover = deck.deck_cover;
+  deckData.id = deck.id;
+  menuExpanded.value = false;
+};
+
+
+const searchSeries = () => {
+  const query = searchQuery.value.trim().toLowerCase();
+  filteredDecks.value = query
+    ? decks.value.filter((deck) => deck.deck_name?.toLowerCase().includes(query))
+    : decks.value;
+  calculateMenuHeight();
+};
+
+
+const clearSearch = () => {
+  searchQuery.value = '';
+  filteredDecks.value = decks.value;
+  calculateMenuHeight();
+};
+
+
+onMounted(() => {
+  fetchDeckData();
+  getUserDecks();
+});
+
 </script>
+
 <style scoped>
 div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,

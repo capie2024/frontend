@@ -636,7 +636,7 @@ input[type="checkbox"] {
   display: flex;
   justify-content: space-between;
   color: white;
-  text-align: center;
+  text-align: start;
 }
 
 .card-inner-info-header p,.price-download p {
@@ -987,6 +987,19 @@ header {
   }
   .inner-info-container > div {
     flex-wrap: wrap;
+  }
+
+  .info-container-filter .card-control {
+    padding: 8px 8px 8px 12px;
+  }
+
+  .card-inner-info-header p {
+    overflow: hidden;
+    height: 16px;
+  }
+
+  .details div {
+    font-size: 12px;
   }
 }
 

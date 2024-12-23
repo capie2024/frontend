@@ -71,9 +71,10 @@
                     class="card-link"
                 >
                     <div class="card-img">
-                        <img v-if="article.post_picture" 
-                            :src="article.post_picture" 
-                            :alt="article.title">
+                        <img 
+                        :src="article && article.post_picture ? article.post_picture : 'https://bottleneko.app/images/cover.png'" 
+                        :alt="article && article.title ? article.title : 'Default Title'"
+                        >
                     </div>
                     <div class="card-user">
                         <div class="card-user-flex">

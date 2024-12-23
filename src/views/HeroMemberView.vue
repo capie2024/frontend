@@ -5,7 +5,7 @@ import { onMounted, ref, watch } from "vue";
 import SidebarGrid from "@/components/SidebarGrid.vue";
 import PaypalCheckout from "@/components/PaypalCheckout.vue";
 import axios from "axios";
-import router from '@/router'
+import router from "@/router";
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -501,7 +501,7 @@ onMounted(async() => {
               </div>
               <div class="hero-member-main-stores-about-section-content">
                 <div class="hero-member-main-stores-about-section-content-item">
-                  <img src="@/assets/img/hero-member/ready.png" alt="" />
+                  <img src="@/assets/img/logo-use/no-data.png" alt="" />
                   <div class="hero-member-main-stores-about-section-content-item-info">
                     <p>您的附近有店家</p>
                     <h3 class="hero-member-main-stores-about-section-content-item-title">連結店家</h3>
@@ -511,7 +511,7 @@ onMounted(async() => {
                   </button>
                 </div>
                 <div class="hero-member-main-stores-about-section-content-item">
-                  <img src="@/assets/img/hero-member/ready.png" alt="" />
+                  <img src="@/assets/img/logo-use/no-data.png" alt="" />
                   <div class="hero-member-main-stores-about-section-content-item-info">
                     <p>注意！賽事即將開始</p>
                     <h3 class="hero-member-main-stores-about-section-content-item-title">賽事資訊</h3>
@@ -521,7 +521,7 @@ onMounted(async() => {
                   </button>
                 </div>
                 <div class="hero-member-main-stores-about-section-content-item">
-                  <img src="@/assets/img/hero-member/ready.png" alt="" />
+                  <img src="@/assets/img/logo-use/no-data.png" alt="" />
                   <div class="hero-member-main-stores-about-section-content-item-info">
                     <p>看到直接買</p>
                     <h3 class="hero-member-main-stores-about-section-content-item-title">購買連結</h3>
@@ -531,7 +531,7 @@ onMounted(async() => {
                   </button>
                 </div>
                 <div class="hero-member-main-stores-about-section-content-item">
-                  <img src="@/assets/img/hero-member/ready.png" alt="" />
+                  <img src="@/assets/img/logo-use/no-data.png" alt="" />
                   <div class="hero-member-main-stores-about-section-content-item-info">
                     <p>B2B 與我商談</p>
                     <h3 class="hero-member-main-stores-about-section-content-item-title">與我聯絡</h3>

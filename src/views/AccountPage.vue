@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import Loading from '../components/Loading.vue';
 import SideBar from '../components/SidebarGrid.vue'
 
+const API_URL = import.meta.env.VITE_API_URL
 const router = useRouter();
 const name = ref('')
 const email = ref('')
@@ -37,7 +38,7 @@ const getAccount = async () => {
   }
 
   try {
-    const res = await axios.get('http://localhost:3000/users', {
+    const res = await axios.get(`${API_URL}/users`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },

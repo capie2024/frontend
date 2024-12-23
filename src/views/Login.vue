@@ -19,7 +19,7 @@ const goLogin = () => {
 const email = ref("")
 const password = ref("") 
 
-const API_URL = 'http://localhost:3000/auth'
+const API_URL = import.meta.env.VITE_API_URL
 
 const submit = async () => {
   try {

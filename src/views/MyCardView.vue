@@ -181,7 +181,6 @@ import axios from 'axios';
 const dateSort = (a, b) => {
         const dateA = a.build_time ? new Date(a.build_time) : null;
         const dateB = b.build_time ? new Date(b.build_time) : null;
-
         if (!dateA && !dateB) return 0; 
         if (!dateA) return 1;           
         if (!dateB) return -1;
@@ -190,10 +189,9 @@ const dateSort = (a, b) => {
 };
 
 // 日期早>晚排序
-const dateSortReverse = (a, b) => {
-        const dateA = a.build_time[0] ? new Date(a.build_time[0]) : null;
-        const dateB = b.build_time[0] ? new Date(b.build_time[0]) : null;
-
+const dateSortReverse = (a, b) => {       
+        const dateA = a.build_time ? new Date(a.build_time) : null;
+        const dateB = b.build_time ? new Date(b.build_time) : null;
         if (!dateA && !dateB) return 0;
         if (!dateA) return -1;
         if (!dateB) return 1;
@@ -220,7 +218,6 @@ const fetchMyDecks = async () => {
         },
         });
     originalDecks.value = response.data.decks
-    console.log(originalDecks.value)
     cardDecks.value = [...originalDecks.value].sort(dateSort);
     sortState.value = 0;
     dateIsSorted.value = false;
@@ -315,7 +312,6 @@ const nameSortReverse = (a, b) => {
 };
 
 
-// originalDecks.value[i].deck_name
 
 
 // 獲取我的牌組的seriesCode
@@ -360,7 +356,6 @@ const findZhNames = () => {
             })           
         }
     })
-    console.log(matchedNames.value)
  };
 
 
@@ -444,11 +439,10 @@ const toggleSeriesSort = (codes, index) => {
 
   // 根據日期按鈕的排序狀態進行排序
   if (dateIsSorted.value) {
+    sortedDecks.sort(dateSortReverse);
+  } else  {
     sortedDecks.sort(dateSort);
-  } else {
-    
   }
-
   // 更新牌組顯示
   cardDecks.value = sortedDecks;
 
@@ -485,7 +479,6 @@ const toggleNameSort = () => {
 //日期排序切換
 const toggleDateSort = () => {
   const decksToSort = seriesIsSelected.value ? cardDecks.value : originalDecks.value;
-  console.log(seriesIsSelected.value);
   
   
   if (sortState.value === 0) {

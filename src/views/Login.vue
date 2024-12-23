@@ -43,7 +43,6 @@ const submit = async () => {
       });
     }
   } catch (error) {
-    console.error('API Error:', error)
     Swal.fire({
       icon: 'error',
       title: '登入失敗',

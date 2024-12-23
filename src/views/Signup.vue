@@ -102,7 +102,6 @@ export default {
             this.$router.push("/login");
         }
     } catch (error) {
-    console.error("捕獲的錯誤：", error); // 紀錄完整錯誤資訊
 
     if (error.response) {
         // 處理後端返回的錯誤

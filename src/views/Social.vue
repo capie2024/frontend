@@ -71,9 +71,10 @@
                     class="card-link"
                 >
                     <div class="card-img">
-                        <img v-if="article.post_picture" 
-                            :src="article.post_picture" 
-                            :alt="article.title">
+                        <img 
+                        :src="article && article.post_picture ? article.post_picture : 'https://bottleneko.app/images/cover.png'" 
+                        :alt="article && article.title ? article.title : 'Default Title'"
+                        >
                     </div>
                     <div class="card-user">
                         <div class="card-user-flex">
@@ -142,13 +143,11 @@ export default {
         return date.split('T')[0];
     },
     handleEnter() {
-      console.log('當前 searchQuery:', this.searchQuery);
       this.searchArticles();
       this.addSearchHistory();
       this.searchQuery = '';
     },
     addSearchHistory() {
-      console.log('addSearchHistory 被调用');
       if (this.searchQuery.trim()) {
         const newHistory = { searchQuery: this.searchQuery.trim() };       
         const existingIndex = this.socialHistory.findIndex(
@@ -160,10 +159,7 @@ export default {
         }
         this.socialHistory = [newHistory, ...this.socialHistory];
         localStorage.setItem('socialHistory', JSON.stringify(this.socialHistory));
-        console.log('當前搜尋紀錄:', this.socialHistory);
-        } else {
-            console.log('searchQuery 為空，未添加搜尋紀錄');
-        }
+        } 
     },
     
 

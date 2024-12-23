@@ -246,7 +246,6 @@ onMounted(async () => {
   try {
     const response = await axios.get('/api/product');  // 更新 API URL
     products.value = response.data;  // 設置資料
-    console.log(response.data);
   } catch (err) {
     console.error('獲取產品資料失敗:', err.message);
   }

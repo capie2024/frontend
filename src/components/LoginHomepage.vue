@@ -1,31 +1,8 @@
 <script setup>
-import { ref,onMounted,nextTick } from 'vue'
+import { ref,onMounted } from 'vue'
 import axios from 'axios';
-import NavLoginBtn from './NavLoginBtn.vue';
-const items = ref({ topics: [], videos: [], latestProducts: [], series: [] });
-
-// 格式化資料函數，避免顯示 null 或 undefined
-const formatValue = (value, defaultValue = '無資料') => {
-  return value !== null && value !== undefined ? value : defaultValue;
-};
-
-// 格式化日期函數
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return date instanceof Date && !isNaN(date) ? date.toLocaleDateString() : '無發布日期';
-};
-
-
-onMounted(() => {
-   nextTick();
-   import ("@/assets/js/login-homepage/css-control.js")
-   import ("@/assets/js/login-homepage/swiper")
-   import ("@/assets/js/login-homepage/fancybox")
-})
-
-// 當組件掛載時請求資料
-onMounted(async () => {
-
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_DATA =async ()=>{
   try {
     const response = await axios.get('/api/topics');
     const apiData = response.data;  // API 返回的資料
@@ -82,12 +59,35 @@ onMounted(async () => {
   } catch (err) {
     console.error('獲取資料失敗:', err.message);
   }
-});
+}
+const items = ref({ topics: [], videos: [], latestProducts: [], series: [] });
+
+// 格式化資料函數，避免顯示 null 或 undefined
+const formatValue = (value, defaultValue = '無資料') => {
+  return value !== null && value !== undefined ? value : defaultValue;
+};
+
+// 格式化日期函數
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date instanceof Date && !isNaN(date) ? date.toLocaleDateString() : '無發布日期';
+};
+
+onMounted(async() => {
+  await API_DATA()
+   import ("@/assets/js/login-homepage/css-control.js")
+   import ("@/assets/js/login-homepage/swiper")
+   import ("@/assets/js/login-homepage/fancybox")
+})
+
+
+
 
 </script>
 
 <template>
     <div class="All">
+      <!-- <SidebarGrid /> -->
       <div class="container">
         <!-- 通知與登入 -->
         <div class="icons">
@@ -101,13 +101,12 @@ onMounted(async () => {
             </div>
           </div>
           <div class="icon"><i class="fa-regular fa-bell"></i></div>
-          <!-- <div class="login" id="login">
+          <div class="login" id="login">
             <span><i class="fa-regular fa-user"></i></span>
             <span>登入</span>
             <span><i class="fa-solid fa-chevron-down"></i></span>
-          </div> -->
+          </div>
         </div>
-        <NavLoginBtn />
       </div>
 
       <div class="aa">
@@ -127,7 +126,7 @@ onMounted(async () => {
         </div>
         <h2 class="title">
           每日卡
-          <a href="#" class="title-a">
+          <a :href="`${BASE_URL}/daily-card`" class="title-a">
             <svg
               data-v-0ed588ef=""
               xmlns="http://www.w3.org/2000/svg"
@@ -225,71 +224,9 @@ onMounted(async () => {
           </div>
           <!-- third swiper -->
         </div>
-
-        <!-- <h2 class="title">
-          <a href="#" class="title-a2">BCF2024全国決勝大会</a>
-          <a href="#" class="title-a3">
-            閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-            </svg>
-          </a>
-        </h2>
-        <section class="show-card">
-          <a href="#" class="url transition-colors">
-                  <div>
-                      <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
-                  </div>
-                  <div class="card-text">
-                      <div class="flex">
-                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
-                              <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                              </path>
-                              <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                              </path>
-                          </svg>
-                          <p class="color-a1">OSK</p>
-                      </div>
-                      <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                      <p class="color-a1">2023-12-08</p>
-                  </div>
-          </a>
-      </section> -->
-
-
-        <!-- <h2 class="title">
-          <a href="#" class="title-a2">2023 高速領域-開拓嘉年華</a>
-          <a href="#" class="title-a3">
-            閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-            </svg>
-          </a>
-        </h2> 
-        <section class="show-card">
-          <a href="#" class="url transition-colors">
-                  <div>
-                      <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
-                  </div>
-                  <div class="card-text">
-                      <div class="flex">
-                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
-                              <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                              </path>
-                              <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                              </path>
-                          </svg>
-                          <p class="color-a1">OSK</p>
-                      </div>
-                      <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                      <p class="color-a1">2023-12-08</p>
-                  </div>
-          </a>
-      </section> -->
-
-        <h2 class="title">
-          <a href="http://localhost:5173/products" class="title-a2">最新商品</a>
-          <a href="http://localhost:5173/products" class="title-a3">
+                <h2 class="title">
+          <a :href="`${BASE_URL}/products`" class="title-a2">最新商品</a>
+          <a :href="`${BASE_URL}/products`" class="title-a3">
             閱讀更多 
             <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
@@ -310,44 +247,13 @@ onMounted(async () => {
                       <p class="color-a1">{{ product.publishAt }}</p>
                       </div>
                       <p class="font-size20 color-white padding-bottom" >{{ product.name }}</p>
-                          <!-- <p class="color-a1" v-if="product.name" >{{ product.name }}</p> -->
                   </div>
           </a>
       </section>
 
-        <!-- <h2 class="title">
-          <a href="#" class="title-a2">第一線最新文章</a>
-          <a href="#" class="title-a3">
-            閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-            </svg>
-          </a>
-        </h2>
-        <section class="show-card">
-          <a href="#" class="url transition-colors">
-                  <div>
-                      <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
-                  </div>
-                  <div class="card-text">
-                      <div class="flex">
-                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
-                              <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                              </path>
-                              <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                              </path>
-                          </svg>
-                          <p class="color-a1">OSK</p>
-                      </div>
-                      <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                      <p class="color-a1">2023-12-08</p>
-                  </div>
-          </a>
-      </section> -->
-
         <h2 class="title">
-          <a href="http://localhost:5173/series" class="title-a2">卡片系列</a>
-          <a href="http://localhost:5173/series" class="title-a3">
+          <a :href="`${BASE_URL}/series`" class="title-a2">卡片系列</a>
+          <a :href="`${BASE_URL}/series`" class="title-a3">
             閱讀更多 
             <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
@@ -355,7 +261,7 @@ onMounted(async () => {
           </a>
         </h2>
         <section class="show-card">
-          <a :href="`http://localhost:5173/card-series/${series.id}`" class="url transition-colors" v-for="series in items.series" :key="series.id">
+          <a :href="`${BASE_URL}/card-series/${series.id}`" class="url transition-colors" v-for="series in items.series" :key="series.id">
                   <div>
                       <img :src="series.cover" alt="series cover">
                   </div>
@@ -374,156 +280,6 @@ onMounted(async () => {
                   </div>
           </a>
       </section>
-
-        <!-- <h2 class="title">
-          <a href="#" class="title-a2">WGP2023 全国決勝大会</a>
-          <a href="#" class="title-a3">
-            閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-            </svg>
-          </a>
-        </h2>
-        <section class="show-card">
-          <a href="#" class="url transition-colors">
-                  <div>
-                      <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
-                  </div>
-                  <div class="card-text">
-                      <div class="flex">
-                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
-                              <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                              </path>
-                              <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                              </path>
-                          </svg>
-                          <p class="color-a1">OSK</p>
-                      </div>
-                      <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                      <p class="color-a1">2023-12-08</p>
-                  </div>
-          </a>
-      </section> -->
-
-        <!-- <h2 class="title">
-          <a href="#" class="title-a2">タイトルカップ in WGP2023</a>
-          <a href="#" class="title-a3">
-            閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-            </svg>
-          </a>
-        </h2>
-        <section class="show-card">
-          <a href="#" class="url transition-colors">
-                  <div>
-                      <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
-                  </div>
-                  <div class="card-text">
-                      <div class="flex">
-                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
-                              <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                              </path>
-                              <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                              </path>
-                          </svg>
-                          <p class="color-a1">OSK</p>
-                      </div>
-                      <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                      <p class="color-a1">2023-12-08</p>
-                  </div>
-          </a>
-      </section> -->
-
-        <!-- <h2 class="title">
-          <a href="#" class="title-a2">トリオサバイバル in WGP2023</a>
-          <a href="#" class="title-a3">
-            閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-            </svg>
-          </a>
-        </h2>
-        <section class="show-card">
-          <a href="#" class="url transition-colors">
-                  <div>
-                      <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
-                  </div>
-                  <div class="card-text">
-                      <div class="flex">
-                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
-                              <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                              </path>
-                              <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                              </path>
-                          </svg>
-                          <p class="color-a1">OSK</p>
-                      </div>
-                      <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                      <p class="color-a1">2023-12-08</p>
-                  </div>
-          </a>
-      </section> -->
-
-        <!-- <h2 class="title">
-          <a href="#" class="title-a2">ネオスタンダード in WGP2023</a>
-          <a href="#" class="title-a3">
-            閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-            </svg>
-          </a>
-        </h2>
-        <section class="show-card">
-          <a href="#" class="url transition-colors">
-                  <div>
-                      <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
-                  </div>
-                  <div class="card-text">
-                      <div class="flex">
-                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
-                              <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                              </path>
-                              <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                              </path>
-                          </svg>
-                          <p class="color-a1">OSK</p>
-                      </div>
-                      <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                      <p class="color-a1">2023-12-08</p>
-                  </div>
-          </a>
-      </section> -->
-
-        <!-- <h2 class="title">
-          <a href="#" class="title-a2">"日本WS官方" 專欄</a>
-          <a href="#" class="title-a3">
-            閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-            </svg>
-          </a>
-        </h2>
-        <section class="show-card">
-          <a href="#" class="url transition-colors">
-                  <div>
-                      <img src="https://jasonxddd.me:9000/series-cover/osk_176×176.jpg" alt="">
-                  </div>
-                  <div class="card-text">
-                      <div class="flex">
-                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
-                              <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                              </path>
-                              <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                              </path>
-                          </svg>
-                          <p class="color-a1">OSK</p>
-                      </div>
-                      <p class="font-size20 color-white padding-bottom" >【我推的孩子】</p>
-                      <p class="color-a1">2023-12-08</p>
-                  </div>
-          </a>
-      </section> -->
 
         <footer class="hero-member-footer">
           <div class="work-shop-footer">

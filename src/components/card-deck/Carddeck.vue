@@ -3,7 +3,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
 import SidebarGrid from '@/components/SidebarGrid.vue'
-
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
 function getUserIdFromToken(token) {
     try {
         const payload = token.split(".")[1];
@@ -251,7 +251,7 @@ export default {
                         confirmButtonText: "確定",
                         }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = 'http://localhost:5173/login';
+                        window.location.href = `${BASE_URL}/login`;
                     }
                 });
                     return;

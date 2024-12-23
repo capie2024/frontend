@@ -50,7 +50,6 @@ const getAccount = async () => {
     await getUserDecks();
     await getUserArticles();
   } catch (error) {
-    console.error('獲取用戶資料失敗：', error);
     
     if (error.response && error.response.status === 403) {
         Swal.fire({
@@ -112,7 +111,6 @@ const saveName = async () => {
       timer: 1500,
     });
   } catch (error) {
-    console.error('更新名稱失敗：', error);
     Swal.fire({
       icon: 'error',
       title: '更新名稱失敗',
@@ -173,7 +171,6 @@ const handleFileChange = async (event) => {
       timer: 1500,
     });
   } catch (error) {
-    console.error('圖片上傳失敗：', error);
     Swal.fire({
       icon: 'error',
       title: '圖片上傳失敗',
@@ -201,7 +198,6 @@ const getUserDecks = async () => {
     decks.value = res.data.decks;
     
   } catch (error) {
-    console.error('獲取用戶牌組失敗：', error);
     Swal.fire({
       icon: 'error',
       title: '獲取用戶牌組失敗',

@@ -197,9 +197,7 @@ export default {
 
         this.decks = res.data.decks;
         this.filteredDecks = res.data.decks;
-        console.log('用戶牌組：', this.decks);
       } catch (error) {
-        console.error('獲取用戶牌組失敗：', error);
         Swal.fire({
           icon: 'error',
           title: '獲取用戶牌組失敗',
@@ -238,7 +236,6 @@ export default {
         this.content = '';
         this.post_picture = null;
       } catch (error) {
-        console.error('新增文章失敗:', error);
         Swal.fire({
           icon: 'error',
           title: '新增文章失敗',

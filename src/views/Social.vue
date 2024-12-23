@@ -142,13 +142,11 @@ export default {
         return date.split('T')[0];
     },
     handleEnter() {
-      console.log('當前 searchQuery:', this.searchQuery);
       this.searchArticles();
       this.addSearchHistory();
       this.searchQuery = '';
     },
     addSearchHistory() {
-      console.log('addSearchHistory 被调用');
       if (this.searchQuery.trim()) {
         const newHistory = { searchQuery: this.searchQuery.trim() };       
         const existingIndex = this.socialHistory.findIndex(
@@ -160,10 +158,7 @@ export default {
         }
         this.socialHistory = [newHistory, ...this.socialHistory];
         localStorage.setItem('socialHistory', JSON.stringify(this.socialHistory));
-        console.log('當前搜尋紀錄:', this.socialHistory);
-        } else {
-            console.log('searchQuery 為空，未添加搜尋紀錄');
-        }
+        } 
     },
     
 

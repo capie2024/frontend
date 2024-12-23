@@ -8,7 +8,6 @@ function getUserIdFromToken(token) {
     try {
         const payload = token.split(".")[1];
         const decodedPayload = JSON.parse(atob(payload));
-        console.log("Decoded Payload:", decodedPayload);
         return decodedPayload.userId || null; // 檢查是否有 userId
     } catch (error) {
         console.error("無法解析 token:", error);
@@ -21,7 +20,7 @@ export default {
       SidebarGrid, 
     },
     data() {
-        return {
+      return {
         newMessage: "",  // 儲存輸入的留言內容
         messages: [],    // 儲存所有留言
         username: "",    // 用戶名稱
@@ -40,17 +39,28 @@ export default {
         groupedCards: [],
         toggleTableView: false,
         togglePriceView: false,
-        };
+        article: null,
+        deckData: {
+          deck:[],
+        }, 
+      };
     },
     mounted() {
         this.fetchArticleId();
         this.fetchCurrentUser();
         this.fetchDeck();
+        this.fetchDeckData()
     },
 
-    created() {
+    async created() {
         this.loggedInUserId = getUserIdFromToken(this.token);
-        console.log("Logged in user ID:", this.loggedInUserId);
+        const postCode = this.$route.params.post_code;
+        try {
+            const response = await axios.get(`http://localhost:3000/api/articles/${postCode}`);
+            this.article = response.data; 
+        } catch (error) {
+            console.error('獲取文章資料失敗', error);
+        }
     },
     computed: {
         isLoggedIn() {
@@ -119,6 +129,18 @@ export default {
                 cards,
             }));        
         },    
+        totalPrice() {
+            if (!Array.isArray(this.deckData.deck)) {
+                return 0;
+            }
+            return this.deckData.deck.reduce((sum, card) => {
+                return sum + (card.price?.number || 0); 
+            }, 0);
+        },
+        uniqueProductNames() {
+            const productNames = this.deckData.deck.map(card => card.productName);
+            return [...new Set(productNames)];
+        },
     },
     methods: {
         togglePriceTableView() {
@@ -140,9 +162,9 @@ export default {
 
                 const deckList = response.data[0].deck_list;
                 this.cards = deckList.deck;  
+                this.deckId = deckList.deck_id;
 
-                console.log('Deck Name:', this.deckName);
-                console.log('All cards:', this.cards);
+                await this.fetchDeckData(); 
             } catch (error) {
                 console.error('Failed to fetch specific deck:', error);
             }
@@ -162,7 +184,6 @@ export default {
                     },
                 });
 
-                console.log("Fetched user data:", response.data);
                 this.currentUser = response.data;            
             } catch (error) {
                 console.error('Failed to fetch current user:', error);
@@ -174,12 +195,10 @@ export default {
                 console.error("Error: postCode is not available in route params");
                 return;
             }
-            console.log("Post code:", postCode);
             try {
                 // 根據 post_code 查詢對應的 article_id
                 const response = await axios.get(`http://localhost:3000/api/article-id/${postCode}`);
                 this.articleId = response.data.article_id;  // 從後端獲取 article_id
-                console.log("Fetched article ID:", this.articleId);
 
                 // 確保在獲取 articleId 後再獲取其他資料
                 await this.fetchMessages();  
@@ -210,16 +229,13 @@ export default {
                     message.pictureUrl = message.users?.picture || '/default-avatar.png';
                 });
 
-                console.log("Fetched messages:", this.messages);
             } catch (error) {
                 console.error("Error fetching messages:", error);
             }
         },
         async sendMessage() {
-            console.log('sendMessage called');
 
             if (!this.articleId) {
-                console.log(' articleId is not available');
                 return;  // 防止未設置 post_id 時發送留言
             }
 
@@ -253,7 +269,6 @@ export default {
                             Authorization: `Bearer ${userToken}`,
                         },
                     });
-                    console.log('Message sent:', response.data);
                     this.messages.unshift(response.data);  
                     this.newMessage = ""; 
                 } catch (error) {
@@ -282,7 +297,6 @@ export default {
         },
          // 送出編輯
         async submitEdit(message) {
-            console.log('submitEdit called');
             const userToken = localStorage.getItem('token');
 
             if (!userToken) {
@@ -320,7 +334,6 @@ export default {
             message.isEditing = false; // 結束編輯模式
         },
         async deleteMessage(messageId) {
-            console.log("Attempting to delete message with ID:", messageId);         
             Swal.fire({
                 title: "刪除留言",
                 text: "確定要刪除留言嗎？將會清除目前編輯的所有資訊。",
@@ -344,7 +357,6 @@ export default {
                                 Authorization: `Bearer ${userToken}`,
                             }
                         });
-                        console.log("Response from server:", response.data);
                         if (response.status === 200) {
                             Swal.fire("刪除成功!", "你的留言已被刪除", "success");
                             this.messages = this.messages.filter((message) => message.id !== messageId);
@@ -411,7 +423,32 @@ export default {
             } catch (error) {
                 console.error("Error toggling hate:", error.response || error.message);
             }
-        }
+        },
+        formatDate(date) {
+            if (!date) {
+            return '';
+            }
+            return date.split('T')[0];
+        },
+        async fetchDeckData() {
+            const Id = this.deckId;
+            try {
+                const response = await axios.get(`http://localhost:3000/api/deck-page/${Id}`);
+                this.deckData = response.data;
+                if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
+                    console.error('回傳資料格式錯誤:', this.deckData);
+                    Swal.fire('錯誤', '無法獲取有效的資料', 'error');
+                    return; 
+                }
+
+
+                if (!Array.isArray(this.deckData.deck)) {
+                    this.deckData.deck = [];
+                }
+            } catch (error) {
+                console.error('無法獲取資料:', error);
+            }
+        },
     }
 }  
 </script>
@@ -430,7 +467,7 @@ export default {
                             <button class="page-btn next-btn">
                                 <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
                             </button>
-                            <h2>タイトルカップ in WGP2024 東京会場 優勝 牌組</h2>
+                            <h2>{{ article.title }}</h2>
                         </div>
                         <div class="btn-area">
                             <button class="social-btn-item social-btn1">
@@ -467,37 +504,37 @@ export default {
                 <section class="carddeck-information">
                     <div class="information-container">
                         <div class="carddeck-img">
-                            <img src="/src/img/麻衣.png" alt="">
+                            <img v-if="article.post_picture" 
+                            :src="article.post_picture" 
+                            :alt="article.title">
                         </div>
                         <div class="carddeck-data">
-                            <p class="user-number"><svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>&nbsp;8Vzcc</p>
-                            <div class="carddeck-name">
-                                <h1>タイトルカップ in WGP2024 東京会場 優勝 牌組</h1>
-                            </div>
+                            <p class="user-number"><svg data-v-b086c574="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>{{ article.post_code }}</p>
+                            <h1>{{ article.title }}</h1>
                             <div class="data-container">
                                 <div class="user-link">
                                     <div class="user-img">
-                                        <img src="/src/img/麻衣.png" alt="">
+                                        <img :src="article.users.picture" alt="用戶頭像">
                                     </div>
                                     <span class="date-container">
-                                        <a href="#">XXXX</a>
+                                        <a href="#">{{ article.users.username }}</a>
                                         發布於
-                                        <span>2024-01-01</span>
+                                        <span>{{ formatDate(article.created_at) }}</span>
                                     </span>
                                 </div>
                                 <span class="data-item">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none" data-v-5634e853=""><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>&nbsp;
-                                    總數50張
+                                    總數{{deckData.deck.length}}張
                                 </span>
                                 <span class="data-item">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none" data-v-5634e853=""><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg>&nbsp;
                                     總價
-                                    <span>11460円</span>
+                                    <span>{{ totalPrice }}円</span>
                                 </span>
-                                <span class="data-item">
+                                <span class="data-item" v-if="deckData.deck && deckData.deck.length > 0">
                                     <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg>&nbsp;
                                     系列包含
-                                    <a>ペルソナ</a>
+                                    <a v-for="(product, index) in uniqueProductNames" :key="index" href="#">{{ product }}</a>
                                 </span>
                             </div>
                         </div>
@@ -512,7 +549,7 @@ export default {
                                 <span>文章內容</span>
                             </div>
                             <div class="article-content">
-                                <p>123</p>
+                                <p v-html="article.content"></p>
                             </div>
                         </div>
                         <!-- 留言區域 -->
@@ -707,7 +744,7 @@ export default {
                             </section>
                         </div>
                     </div>
-                    <nav class="toolbar">
+                    <nav class="toolbar" v-if="groupedCards.length > 0">
                         <div class="toolbar-area1">
                             <button class="tool-btn1" @click="setSortBy('typeTranslate')"
                             :class="{'active': sortBy === 'typeTranslate'}">
@@ -800,33 +837,6 @@ export default {
                         </div>
                     </div>
                 </section>
-                <nav class="footer-nav">
-                    <a class="nav-link" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
-                        </svg>
-                        <span class="link-word">首頁</span>
-                    </a>
-                    <a class="nav-link" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
-                        <span class="link-word">系列卡表</span>
-                    </a>
-                    <a class="nav-link" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
-                        <span class="link-word">我的牌組</span>
-                    </a>
-                    <a class="nav-link social-icon" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path d="M15.75 8.25a.75.75 0 0 1 .75.75c0 1.12-.492 2.126-1.27 2.812a.75.75 0 1 1-.992-1.124A2.243 2.243 0 0 0 15 9a.75.75 0 0 1 .75-.75Z"></path><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM4.575 15.6a8.25 8.25 0 0 0 9.348 4.425 1.966 1.966 0 0 0-1.84-1.275.983.983 0 0 1-.97-.822l-.073-.437c-.094-.565.25-1.11.8-1.267l.99-.282c.427-.123.783-.418.982-.816l.036-.073a1.453 1.453 0 0 1 2.328-.377L16.5 15h.628a2.25 2.25 0 0 1 1.983 1.186 8.25 8.25 0 0 0-6.345-12.4c.044.262.18.503.389.676l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.575 15.6Z" clip-rule="evenodd"></path></svg>
-                        <span class="link-word">社群</span>
-                    </a>
-                    <a class="nav-link" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7 link-svg"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
-                        <span class="link-word">通知</span>
-                    </a>
-                    <a class="nav-link" href="#">
-                        <img src="/src/img/麻衣.png" alt="">
-                        <div class="link-word">工作坊</div>
-                    </a>
-                </nav>
     
                 <div class="deck-container">
                     <div class="deck-img">
@@ -854,7 +864,7 @@ export default {
     </div>
 </template>
 
-<style scoped>
+<style scoped>    
     .price-row{
         display: flex;
         justify-content: center;
@@ -1285,7 +1295,7 @@ export default {
 
     .message-section{
         width: 95%;
-        height: 60vh;
+        height: 40vh;
     }
 
     .message-scroll{
@@ -1467,77 +1477,11 @@ export default {
     }
 
     .sidebar-container {
-        background-color: #000000;
         min-width: 270px;
         position: fixed;
+        background: #000;
     }
 
-
-
-    .sidebar{
-        width: 238px;
-        height: 100vh;
-        background-color: black;
-        padding: 16px;
-    }
-
-    .sidebar-head{
-        text-decoration: none;
-        color: black;
-        cursor: pointer;
-    }
-
-    .icon{
-        width: 40px;
-        height: 40px;
-    }
-
-    .icon-text{
-        width: 85px;
-        height: 35px;
-    }
-
-    .sidebar-menu{
-        margin-top: 20px;
-    }
-
-    .sidebar-menu > li{
-        display: flex;
-        align-items: center;
-        width: 238px;
-        height: 40px;
-        margin-bottom: 5px;
-    }
-
-    .w-7{
-        width: 1.75rem;
-    }
-
-    .h-7{
-        height: 1.75rem;
-    }
-
-    .sidebar-menu li h2{
-        color: #a1a1aa; 
-        font-weight: 700;
-        font-size: 16px;
-    }
-
-    .sidebar-menu a {
-        display: flex;
-        align-items: center; 
-        text-decoration: none;
-        color: #a1a1aa;
-        gap: 10px;
-    }
-
-    .sidebar-menu a:hover h2{
-        color: white; 
-    }
-
-    .sidebar-menu a:hover svg {
-        stroke: white; 
-    }
 
     .translate-btn{
         display: flex;
@@ -1564,11 +1508,6 @@ export default {
         width: 100%;
     }
 
-    .sidebar p {
-        color: #a1a1aa;
-        font-size: 16px;
-        margin-top: 30px;
-    }
 
     .bg-black {
         background-color: #000000;
@@ -1775,13 +1714,13 @@ export default {
         margin-left: 270px;
         width: calc(100% - 270px);
         padding-bottom: 1rem; 
+        background-color: #121212;
     }
 
     main {
+        width: calc(100% - 8px);
         margin-top: 8px;
         position: relative;
-        /* width: calc(100% - 8px); 
-        /* height: calc(100vh - 1rem); */
         height: auto;
         overflow: hidden;
         overflow-y: scroll;
@@ -1818,17 +1757,22 @@ export default {
     }
 
     .carddeck-data {
-        margin-top:18px;
         display: flex;
+        justify-content: end;
         flex-direction: column;
         gap: 8px;
     }
 
+    .carddeck-data h1 {
+       font-size: 72px;
+   }
+
     .user-number {
-        font-size: 12px;
+        font-size: 20px;
         color: white;
         display: flex;
         align-items: center;
+        gap: 7px;
     }
 
     .user-number svg {
@@ -1848,13 +1792,12 @@ export default {
         font-size: 70px;
         font-weight: bold;
         color: white;
-        white-space: nowrap; /* 強制單行顯示 */
-        overflow: hidden; /* 隱藏超出部分 */
+        white-space: nowrap; 
+        overflow: hidden; 
         text-overflow: ellipsis;
     }
 
     .data-container {
-        width: 55%;
         margin-top: 16px;
         display: flex;
         flex-wrap: wrap;
@@ -1892,6 +1835,11 @@ export default {
         align-items: center;
     }
 
+    .data-item:nth-of-type(3){
+        flex-wrap: wrap;
+        gap:10px;
+    }
+
     span svg {
         width: 24px;
         height: 24px;
@@ -1915,7 +1863,7 @@ export default {
         position: absolute;
         top: 0;
         left: 0;
-        z-index: -1;
+        /* z-index: -1; */
     }
 
     .article-area {
@@ -2176,58 +2124,6 @@ export default {
         visibility: visible;
     }
 
-    .footer-nav {
-        width: 100%;
-        height: 66px;
-        display: flex;
-        background-color: #0D0B0C;
-        position: fixed;
-        bottom: 0;
-        display: none;    
-    }
-
-    .nav-link {
-        width: 16.66%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .nav-link img {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-    }
-
-    .link-svg {
-        width: 28px;
-        height: 28px;
-        stroke: #b1afaf;
-    }
-
-    .link-word{
-        font-size: 9px;
-        margin-top: 8px;
-        color: #b1afaf;
-    }
-
-
-    .nav-link:hover svg{
-        stroke: white;
-    }
-
-    .nav-link:hover span {
-        color: white;
-    }
-
-    .social-icon svg{
-        stroke: white;
-    }
-
-    .social-icon span {
-        color: white;
-    }
 
 
     .deck-container {
@@ -2358,6 +2254,11 @@ export default {
     }
 
     @media screen and (max-width: 1199px) {
+        .sidebar-container {
+            min-width: 270px;
+            position: fixed;
+            background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
+        }
         .toolbar {
             position: absolute;
             top: 930px;
@@ -2382,10 +2283,6 @@ export default {
 
         .message-area{
             align-items: center !important;
-        }
-
-        .sidebar-container {
-            display: none;
         }
 
         .bg-container {
@@ -2475,15 +2372,14 @@ export default {
             width: 100%;
             font-size: 30px;
             height: 20px;
-            white-space:unset; /* 強制單行顯示 */
-            overflow: visible; /* 隱藏超出部分 */
+            white-space:unset; 
+            overflow: visible; 
             text-overflow:unset;
         }
 
         .carddeck-data {
             width: 100%;
             margin:18px 8px 0 8px;
-            height: 200px;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -2496,11 +2392,9 @@ export default {
             align-items: start;
             font-size: 14px;
             gap: 5px;
-            transform: translateY(10px);
         }
 
         .main-container {
-            /* top: 623px; */
             height: 100%;
         }
         
@@ -2556,10 +2450,6 @@ export default {
             text-align: right;
         }
 
-        .footer-nav {
-            display: flex;
-        }
-
         .deck-container {
             display: flex;
         }
@@ -2589,12 +2479,17 @@ export default {
             width: calc((100% - 10px) / 2);
         }
 
+        /* 硬寫 */
+        .container {
+            margin-top: 410px;
+        }
+
     }
 
     @media screen and (max-width: 410px) {
         .carddeck-name h1 {
-            white-space:nowrap; /* 強制單行顯示 */
-            overflow: hidden; /* 隱藏超出部分 */
+            white-space:nowrap; 
+            overflow: hidden; 
             text-overflow:ellipsis;
         }
     }

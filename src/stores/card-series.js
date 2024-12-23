@@ -1,57 +1,27 @@
 import { ref, computed, reactive } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
-import { useRoute } from 'vue-router';
 
 export const useCardSeriesStore = defineStore("card-series", () => {
   
+  const API_URL = import.meta.env.VITE_API_URL
+
   const serieslastReleaseTime = ref("");
   const seriesCode = ref("");
   const seriesInfo = ref("");
   const seriesCardList = ref([]);
   const seriesCardListLength = ref(0);
 
-  // リコリス測試用資料
-  const seriesTestData = ref("");
-
-  // 獲取指定系列資訊;
-  const getTestSeries = async (seriesId) => {
-    try {
-      const res = await axios.get(`/api/series`);
-      // console.log(res.data);
-      res.data.find((series) => {
-        if (series.id === seriesId) {
-          seriesTestData.value = series;
-        }
-      });
-      if (seriesTestData.value.sellAt == undefined) {
-        console.log("重新獲取");
-        getTestSeries(seriesId);
-      } else {
-        serieslastReleaseTime.value =
-          seriesTestData.value.sellAt[
-            seriesTestData.value.sellAt.length - 1
-          ];
-        seriesCode.value = seriesTestData.value.code.join(",");
-      }
-    } catch (err) {
-      console.log(err, "系列獲取失敗");
-    }
-  };
-
   // 獲取指定系列所有卡牌資訊;
   const getSeriesCards = async (seriesId) => {
     try {
-      const seriesRes = await axios.get(`http://localhost:3000/api/series`);
+      const seriesRes = await axios.get(`${ API_URL }/api/series`);
       const selectedSeries = seriesRes.data.find((series) => {
         return series.id == seriesId;
       })
-      // console.log(selectedSeries);
       seriesInfo.value = selectedSeries;
-      // console.log(seriesInfo.value);
       
-      const res = await axios.get(`http://localhost:3000/api/series/${seriesId}`);
-        // console.log(res.data);
+      const res = await axios.get(`${ API_URL }/api/series/${seriesId}`);
       res.data.forEach((card) => {
         if (card.type === "キャラ") {
           card.typeTranslate = "角色";
@@ -63,8 +33,6 @@ export const useCardSeriesStore = defineStore("card-series", () => {
       });
       seriesCardList.value = res.data;
       seriesCardListLength.value = seriesCardList.value.length;
-      // console.log(seriesCardList.value);
-      // console.log("獲取完卡片");
     } catch (err) {
       console.log(err);
     }
@@ -78,18 +46,14 @@ export const useCardSeriesStore = defineStore("card-series", () => {
   };
 
   // 獲取最後瀏覽的系列
-  const getLastViewSeries = async () => {
-    const route = useRoute();
-    const seriesId = route.params.series_id;
-    // console.log(seriesCardList.value);
-    // if (seriesCardList.value.length === 0) {
-    //   const lastViewSeriesId = localStorage.getItem("lastViewSeriesId");
-    //   if(lastViewSeriesId){
-    //     await getSeriesCards(lastViewSeriesId);
-    //   }
-    // }
+  const getLastViewSeries = async (seriesId) => {
     if (seriesId) {
       await getSeriesCards(seriesId);
+    }else if(seriesCardList.value.length === 0) {
+      const lastViewSeriesId = localStorage.getItem("lastViewSeriesId");
+      if(lastViewSeriesId){
+        await getSeriesCards(lastViewSeriesId);
+      }
     }
   };
 
@@ -100,8 +64,6 @@ export const useCardSeriesStore = defineStore("card-series", () => {
     getSeriesCards,
     saveLastViewSeries,
     getLastViewSeries,
-    seriesTestData,
-    getTestSeries,
     seriesInfo,
     seriesCardListLength
   };

@@ -5,10 +5,8 @@ import Swal from 'sweetalert2'
 
 export const useCardFilterStore = defineStore("card-filter", () => {
 
-  // 引入CardSeriesStore並使用
   const cardSeriesStore = useCardSeriesStore();
 
-  // seriesCardList是目前的系列所有的卡片，定義在CardSeriesStore裡
   const { seriesCardList } = storeToRefs(cardSeriesStore);
   const getLastViewSeries = cardSeriesStore.getLastViewSeries;
 
@@ -86,27 +84,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     rareFilterLRP: false,
     rareFilterSIR: false
   })
-
-  // 等級升降變數
-  // const levelSortStatus = ref(false);
-  // 顏色升降變數
-  // const colorSortStatus = ref(false);
-  // 價格升降變數
-  // const priceSortStatus = ref(false);
-  // 類型篩選變數
-  // const typeSortStatus = ref(false);
-  // 等級篩選變數
-  // const levelFilterStatus = ref(false);
-  // 顏色篩選變數
-  // const colorFilterStatus = ref(false);
-  // 費用篩選變數
-  // const costFilterStatus = ref(false);
-  // 魂傷篩選變數
-  // const soulFilterStatus = ref(false);
-  // 攻擊力篩選變數
-  // const attackFilterStatus = ref(false);
-  // 稀有度篩選變數
-  // const rareFilterStatus = ref(false);
   
   // 設定起始刪除計算時間
   const setStartTime = ref(0)  
@@ -130,7 +107,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       background: '#18181b',
       inputValidator: (value) => {
         if (value) {
-          console.log(value);
           if(!localStorage.getItem("myFiltersGroup")){
             myFiltersGroup.value.push({
               name: value,
@@ -182,9 +158,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
 
   // 儲存關鍵字功能
   const saveKeyWord = () => {
-    
-    console.log("有執行儲存關鍵字功能");
-    
+        
     if(!localStorage.getItem("keyWordGroup")){
       keyWordGroup.value = [filterVaribleSet.keyWord];
     }else{
@@ -229,13 +203,11 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     } else {
       filterVaribleSet.replaceKeyWord = true;
     }
-    console.log("目前是否使用AND:" + filterVaribleSet.replaceKeyWord);
   };
 
   // 篩選選項狀態切換
   const changeFilterStatus = (filterName) => {
     filterVaribleSet[filterName] = !filterVaribleSet[filterName];
-    console.log("目前篩選狀態是:" + filterVaribleSet[filterName]);
     checkHaveFilterOrSort();
   }
   
@@ -246,7 +218,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }else if(!Object.keys(filterVaribleSet).find((item) => filterVaribleSet[item] === true)){
       applyBtnStatus.value = false;
     }
-    console.log("目前是否有選擇篩選或排序:" + applyBtnStatus.value);
   }
   
   // 升降排序狀態切換
@@ -260,10 +231,7 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         filterVaribleSet.levelDownSort = true;
         filterVaribleSet.levelUpSort = false;
         checkUpDownSortArray('levelDownSort');
-      }
-      console.log("levelUpSort:" + filterVaribleSet.levelUpSort);
-      console.log("levelDownSort:" + filterVaribleSet.levelDownSort);
-      
+      }      
     }else if(sortName == 'color'){
       if(filterVaribleSet.colorUpSort === false){
         filterVaribleSet.colorUpSort = true;
@@ -274,9 +242,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         filterVaribleSet.colorUpSort = false;
         checkUpDownSortArray('colorDownSort');
       }
-      console.log("colorUpSort:" + filterVaribleSet.colorUpSort);
-      console.log("colorDownSort:" + filterVaribleSet.colorDownSort);
-      
     }else if(sortName == 'price'){
       if(filterVaribleSet.priceUpSort === false){
         filterVaribleSet.priceUpSort = true;
@@ -287,12 +252,8 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         filterVaribleSet.priceUpSort = false;
         checkUpDownSortArray('priceDownSort');
       }
-      console.log("priceUpSort:" + filterVaribleSet.priceUpSort);
-      console.log("priceDownSort:" + filterVaribleSet.priceDownSort);
     }
     checkHaveFilterOrSort();
-    console.log(filterVaribleSet.upDownSortArray);
-    console.log("已切換升降排序狀態");
   }
 
   // 檢查是否有重複的升降排序
@@ -303,7 +264,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     })
 
     if(!isHave){
-      console.log("沒有找到");
       if(sortName == 'levelUpSort'){
         const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
           return item === 'levelDownSort'
@@ -374,7 +334,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
 
   // 重置部分篩選
   const resetFilter = (filterArr) => {
-    console.log(filterArr);
     const checkUpDownSort = filterArr.find((item) => {
       return item === 'upDownSortArray' ||
       item === 'levelUpSort' ||
@@ -406,7 +365,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     }
 
     checkHaveFilterOrSort();
-    console.log("已重置該部分篩選");
   };
 
   // 重置全部篩選
@@ -424,7 +382,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     newSeriesCardList.value = [];
     seriesCardList.value = [];
     await getLastViewSeries();
-    console.log("已重置所有篩選");
   }
 
   // 篩選功能
@@ -435,7 +392,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
 
     // seriesCardList是目前的系列所有的卡片，newSeriesCardList是篩選後的卡片
     newSeriesCardList.value = seriesCardList.value;
-    // console.log("舊陣列：" + seriesCardList.value + "新陣列：" + newSeriesCardList.value);
 
     // 測試下面寫的篩選相關function能不能正常使用
     if (keyWord != "") {
@@ -444,27 +400,22 @@ export const useCardFilterStore = defineStore("card-filter", () => {
 
     if(filterVaribleSet.typeCharacter || filterVaribleSet.typeScene || filterVaribleSet.typeEvent){
       typeSort();
-      console.log("已執行類型排序");
     }
     
     if(filterVaribleSet.levelFilter0 || filterVaribleSet.levelFilter1 || filterVaribleSet.levelFilter2 || filterVaribleSet.levelFilter3){
       levelFilter();
-      console.log("已執行等級篩選");
     }
 
     if(filterVaribleSet.colorFilterRed || filterVaribleSet.colorFilterBlue || filterVaribleSet.colorFilterYellow){
       colorFilter();
-      console.log("已執行顏色篩選");
     }
     
     if(filterVaribleSet.costFilter0 || filterVaribleSet.costFilter1 || filterVaribleSet.costFilter2){
       costFilter();
-      console.log("已執行花費篩選");
     }
 
     if(filterVaribleSet.soulFilter0 || filterVaribleSet.soulFilter1 || filterVaribleSet.soulFilter2){
       soulFilter();
-      console.log("已執行魂傷篩選");
     }
 
     if(
@@ -493,7 +444,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       filterVaribleSet.attackFilter11000
     ){
       attackFilter();
-      console.log("已執行攻擊力篩選");
     }
 
     if(
@@ -516,7 +466,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       filterVaribleSet.rareFilterSIR
     ){
       rareFilter();
-      console.log("已執行稀有度篩選");
     }
 
     useUpDownSort();
@@ -540,7 +489,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
     // 第一階段 根據等級、顏色、價格排序
     if(filterVaribleSet.upDownSortArray[0] == 'levelUpSort' || filterVaribleSet.upDownSortArray[0] == 'levelDownSort'){
       levelSort();
-      console.log("已執行等級升降排序");
 
       newSeriesCardList.value.forEach((card) => {
         filterArray.value.push(card.level);
@@ -555,7 +503,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       }
       filterArray.value = uniArray.value;
-      console.log("這是等級陣列:" + filterArray.value);
 
       // 根據等級進行各別數組分組
       for(let i = 0; i < filterArray.value.length; i ++){
@@ -564,7 +511,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         })
         clusteredArray.value.push(filteredArray);
       }
-      // console.log("這是分類後陣列數量:" + clusteredArray.value.length);
       
       // 將數組解構成卡片合併成一個數組
       const unClusteredArray = ref([]);
@@ -576,7 +522,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       
     }else if(filterVaribleSet.upDownSortArray[0] == 'colorUpSort' || filterVaribleSet.upDownSortArray[0] == 'colorDownSort'){
       colorSort();
-      console.log("已執行顏色升降排序");
 
       newSeriesCardList.value.forEach((card) => {
         filterArray.value.push(card.color);
@@ -591,7 +536,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       }
       filterArray.value = uniArray.value;
-      console.log("這是顏色陣列:" + filterArray.value);
 
       // 根據顏色進行各別數組分組
       for(let i = 0; i < filterArray.value.length; i ++){
@@ -600,7 +544,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         })
         clusteredArray.value.push(filteredArray);
       }
-      // console.log("這是分類後陣列數量:" + clusteredArray.value.length);
       
       // 將數組解構成卡片合併成一個數組
       const unClusteredArray = ref([]);
@@ -611,7 +554,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
 
     }else if(filterVaribleSet.upDownSortArray[0] == 'priceUpSort' || filterVaribleSet.upDownSortArray[0] == 'priceDownSort'){
       priceSort();
-      console.log("已執行價格升降排序");
 
       newSeriesCardList.value.forEach((card) => {
         filterArray.value.push(card.price.number);
@@ -626,7 +568,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       }
       filterArray.value = uniArray.value;
-      console.log("這是價格陣列:" + filterArray.value);
 
       // 根據價格進行各別數組分組
       for(let i = 0; i < filterArray.value.length; i ++){
@@ -635,7 +576,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         })
         clusteredArray.value.push(filteredArray);
       }
-      // console.log("這是分類後陣列數量:" + clusteredArray.value.length);
       
       // 將數組解構成卡片合併成一個數組
       const unClusteredArray = ref([]);
@@ -644,22 +584,16 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       })
       newSeriesCardList.value = unClusteredArray.value;
       
-    }
-
-    console.log("這是分類後陣列數量:" + clusteredArray.value.length);
+    }   
     
-    
-
     // 第二階段 分組排序
     if(filterVaribleSet.upDownSortArray[1] == 'levelUpSort' || filterVaribleSet.upDownSortArray[1] == 'levelDownSort'){
 
       const newClusteredArray = ref([]);
       for(let i = 0; i < clusteredArray.value.length; i ++){
         const newArr = levelSortV2(clusteredArray.value[i]);
-        console.log("這是第" + i + "組:" + newArr);
         newClusteredArray.value.push(newArr);
       }
-      console.log("這是分類後陣列數量:" + newClusteredArray.value.length);
 
       const unClusteredArray = ref([]);
       newClusteredArray.value.forEach(arr => {
@@ -670,16 +604,13 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       // 將解構成卡片的數組賦值回原數組
       newSeriesCardList.value = unClusteredArray.value;
 
-      console.log("已執行等級升降排序");
     }else if(filterVaribleSet.upDownSortArray[1] == 'colorUpSort' || filterVaribleSet.upDownSortArray[1] == 'colorDownSort'){
 
       const newClusteredArray = ref([]);
       for(let i = 0; i < clusteredArray.value.length; i ++){
         const newArr = colorSortV2(clusteredArray.value[i]);
-        console.log("這是第" + i + "組:" + newArr);
         newClusteredArray.value.push(newArr);
       }
-      console.log("這是分類後陣列數量:" + newClusteredArray.value.length);
 
       const unClusteredArray = ref([]);
       newClusteredArray.value.forEach(arr => {
@@ -690,16 +621,13 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       // 將解構成卡片的數組賦值回原數組
       newSeriesCardList.value = unClusteredArray.value;
 
-      console.log("已執行顏色升降排序");
     }else if(filterVaribleSet.upDownSortArray[1] == 'priceUpSort' || filterVaribleSet.upDownSortArray[1] == 'priceDownSort'){
 
       const newClusteredArray = ref([]);
       for(let i = 0; i < clusteredArray.value.length; i ++){
         const newArr = priceSortV2(clusteredArray.value[i]);
-        console.log("這是第" + i + "組:" + newArr);
         newClusteredArray.value.push(newArr);
       }
-      console.log("這是分類後陣列數量:" + newClusteredArray.value.length);
 
       const unClusteredArray = ref([]);
       newClusteredArray.value.forEach(arr => {
@@ -709,8 +637,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       clusteredArray.value = newClusteredArray.value;
       // 將解構成卡片的數組賦值回原數組
       newSeriesCardList.value = unClusteredArray.value;
-
-      console.log("已執行價格升降排序");
     }
 
     // 第三階段 分組排序
@@ -817,15 +743,12 @@ export const useCardFilterStore = defineStore("card-filter", () => {
 
   // 關鍵字搜尋
   const keyWordFilter = (keyWord) => {
-    console.log(keyWord);
-    console.log("關鍵字搜尋開始");
     const keyWordArray = ref([]);
     if (filterVaribleSet.replaceKeyWord === false) {
       keyWordArray.value = [keyWord];
     } else if (filterVaribleSet.replaceKeyWord === true) {
       keyWordArray.value = keyWord.replace(" ", ",").split(",");
     }
-    console.log(keyWordArray);
     const filterCards = ref([]);
 
     keyWordArray.value.forEach((key) => {
@@ -836,12 +759,10 @@ export const useCardFilterStore = defineStore("card-filter", () => {
           card.i18n.zh.title.includes(key) ||
           card.i18n.zh.effect.includes(key)
         ) {
-          console.log("符合的卡:" + card);
           filterCards.value.push(card);
         }
       });
     });
-    console.log(filterCards.value);
     newSeriesCardList.value = filterCards.value;
   };
 
@@ -1234,7 +1155,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       });
     }
-    console.log(typeSortArr.value);
     newSeriesCardList.value = typeSortArr.value;
   };
 
@@ -1289,7 +1209,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       });      
     }
-    console.log(levelFilterArr.value);
     newSeriesCardList.value = levelFilterArr.value;
   };
 
@@ -1332,7 +1251,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       });
     }
-    console.log(colorFilterArr.value);
     newSeriesCardList.value = colorFilterArr.value;
   };
 
@@ -1375,7 +1293,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       });
     }
-    console.log(costFilterArr.value);
     newSeriesCardList.value = costFilterArr.value;
   };
 
@@ -1418,7 +1335,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
         }
       });
     }
-    console.log(soulFilterArr.value);
     newSeriesCardList.value = soulFilterArr.value;
   };
 
@@ -1702,7 +1618,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       });
     }
 
-    console.log(attackFilterArr.value);
     newSeriesCardList.value = attackFilterArr.value;
   };
 
@@ -1930,7 +1845,6 @@ export const useCardFilterStore = defineStore("card-filter", () => {
       });
     }
     
-    console.log(rareFilterArr.value);
     newSeriesCardList.value = rareFilterArr.value;
   };
 

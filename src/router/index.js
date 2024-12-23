@@ -26,6 +26,9 @@ import MyArticle from "../views/MyArticle.vue";
 import Warning from "../components/Mycard/warning.vue";
 import Delete from "../components/Mycard/delete.vue";
 import deckPage from "../components/card-deck/deck-page.vue";
+import AddPostDeck from "../components/card-deck/AddPostDeck.vue";
+import Notice from "../components/notification/notice.vue";
+import Notification from "../components/notification/notification.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,12 +38,12 @@ const router = createRouter({
       name: "home",
       component: Home,
     },
-    {
-      // path: card/:id
-      path: "/card-info",
-      name: "card-info",
-      component: CardInfo,
-    },
+    // {
+    //   // path: card/:id
+    //   path: "/card-info",
+    //   name: "card-info",
+    //   component: CardInfo,
+    // },
     {
       path: "/workshop",
       name: "workshop",
@@ -112,7 +115,7 @@ const router = createRouter({
       component: Carddeck,        
     },
     {
-      path: "/add-article",
+      path: "/add",
       name: "add-article",
       component: AddArticle
     },
@@ -171,6 +174,26 @@ const router = createRouter({
       name: "deckPage",
       component: deckPage
     },
+    {
+      path: "/add/:deck_id",
+      name:"AddPostDeck",
+      component:AddPostDeck
+    },
+    {
+      path: "/notice",
+      name: "notice",
+      component: Notice
+    },
+    {
+      path: "/notice",
+      name: "notice",
+      component: Notice
+    },
+    {
+      path:"/notification",
+      name:"notification",
+      component: Notification
+    }
   ],
 });
 

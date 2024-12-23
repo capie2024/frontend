@@ -2,6 +2,7 @@
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import axios from "axios";
 import placeholderImage from '@/img/card-loading.png' // 預設圖片
+import NavLoginBtn from "./NavLoginBtn.vue";
 
 const isScrolled = ref(false); // 是否滾動
 
@@ -66,7 +67,15 @@ const fetchGrids = async () => {
 
 onMounted(() => {
   main();
-  fetchGrids();
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        fetchGrids();
+        observer.disconnect(); // 執行一次後斷開觀察
+      }
+    });
+  });
+  observer.observe(document.getElementById('main-page'));
 });
 
 onBeforeUnmount(() => {
@@ -95,7 +104,7 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
             </div>
-            <div class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50">
+            <!-- <div class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50">
                 <div class="flex flex-col items-center gap-1 p-1 rounded-full">
                     <div class="flex-none rounded-full size-6 bg-black/70">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="m-1 text-zinc-200">
@@ -109,68 +118,23 @@ onBeforeUnmount(() => {
                         <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
                     </svg>
                 </div>
-            </div>
+            </div> -->
+            <NavLoginBtn />
         </nav>
     </header>
 
-    <main class="relative flex flex-col content-container rounded-b-2xl bg-base scroll-smooth scrollbar z-1">
+    <main id="main-page" class="relative flex flex-col content-container rounded-b-2xl bg-base scroll-smooth scrollbar z-1">
         <div class="h-full px-4 content md:px-6">
             <section class="h-[75vh] relative overflow-hidden -mx-4 md:-mx-6">
-                <div class="container flex gap-4 default-transition">
+                <div class="card-container flex gap-4 md:gap-6 default-transition">
                     <div v-for="(grid, gridIndex) in grids"
                         :key="gridIndex"
                         :class="`grid${gridIndex + 1} flex flex-col flex-wrap items-center justify-center flex-none gap-4`"
                     >
                         <div v-for="(imageUrl, index) in grid" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                            <!-- <img v-else :src="placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl"> -->
+                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[10rem] md:h-[15rem] lg:h-[20rem] rounded-xl">
                         </div>
                     </div>
-                    <!-- <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid2">
-                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                        </div>
-                    </div>
-                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid3">
-                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                        </div>
-                    </div>
-                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid4">
-                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                        </div>
-                    </div>
-                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid5">
-                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                        </div>
-                    </div>
-                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid6">
-                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                        </div>
-                    </div>
-                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid7">
-                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                        </div>
-                    </div>
-                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid8">
-                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                        </div>
-                    </div>
-                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid9">
-                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                        </div>
-                    </div>
-                    <div class="flex flex-col flex-wrap items-center justify-center flex-none gap-4 grid10">
-                        <div v-for="(imageUrl, index) in 10" :key="index" class="relative item">
-                            <img :src="imageUrl || placeholderImage" alt="卡片圖片" class="opacity-80 h-[20rem] rounded-xl">
-                        </div>
-                    </div> -->
                 </div>
                 <div class="logo-banner">
                     <div class="bg-zinc-900 rounded-xl">
@@ -1246,7 +1210,7 @@ nav {
 }
 
 header {
-    margin: .5rem .5rem 0 0;
+    margin: .4rem .5rem 0 0;
     border-top-left-radius: 1rem;
     border-top-right-radius: 1rem;
 }
@@ -1427,7 +1391,7 @@ header {
     }
 }
 
-.container {
+.card-container {
     transform: translateY(-30%) translate(-10%) skewY(10deg) skew(-10deg);
 }
 
@@ -1436,7 +1400,7 @@ header {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-50%);
+    transform: translateY(-20%);
   }
   100% {
     transform: translateY(0);
@@ -2573,6 +2537,8 @@ link-area3 a svg {
 
     .content-container {
         width: 100%;
+        border-radius: 0;
+        margin-top: -64px;
     }
 
     .container div div img {

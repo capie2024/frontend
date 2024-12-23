@@ -1,7 +1,7 @@
 <script setup>
 import { ref,onMounted,nextTick } from 'vue'
 import axios from 'axios';
-
+import NavLoginBtn from './NavLoginBtn.vue';
 const items = ref({ topics: [], videos: [], latestProducts: [], series: [] });
 
 // 格式化資料函數，避免顯示 null 或 undefined
@@ -14,6 +14,7 @@ const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return date instanceof Date && !isNaN(date) ? date.toLocaleDateString() : '無發布日期';
 };
+
 
 onMounted(() => {
    nextTick();
@@ -87,7 +88,6 @@ onMounted(async () => {
 
 <template>
     <div class="All">
-      <!-- <SidebarGrid /> -->
       <div class="container">
         <!-- 通知與登入 -->
         <div class="icons">
@@ -101,12 +101,13 @@ onMounted(async () => {
             </div>
           </div>
           <div class="icon"><i class="fa-regular fa-bell"></i></div>
-          <div class="login" id="login">
+          <!-- <div class="login" id="login">
             <span><i class="fa-regular fa-user"></i></span>
             <span>登入</span>
             <span><i class="fa-solid fa-chevron-down"></i></span>
-          </div>
+          </div> -->
         </div>
+        <NavLoginBtn />
       </div>
 
       <div class="aa">

@@ -2,6 +2,7 @@
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useDeckMakeStore } from "@/stores/deck-make";
+import { useCardSeriesStore } from '@/stores/card-series';
 import SidebarGrid from '../SidebarGrid.vue';
 import RemitCard from "../Mycard/remit-card.vue";
 
@@ -33,6 +34,7 @@ export default {
             togglePriceView: false, // 用於切換價格表顯示
             toggleTableView: false, // 用於切換顯示模式
             deckMakeStore: useDeckMakeStore(),
+            cardSeriesStore: useCardSeriesStore(),
         };
     },
     computed: {
@@ -133,7 +135,8 @@ export default {
         },
         goToArticlePage() {
             // 使用 Vue 的路由進行跳轉
-            this.$router.push('/add-article');
+            const deckId = this.$route.params.deck_id;
+            this.$router.push(`/add/${deckId}`);
         },
         toggleRemitCard() {
             this.isVisible = !this.isVisible;
@@ -174,8 +177,8 @@ export default {
         },
         async copyDeck(){
             this.deckMakeStore.selectedCards = this.deckData.deck
+            this.deckMakeStore.saveLastDeckEdit();
             const cardCode = this.deckData.deck[0].seriesCode
-            console.log(cardCode);
             
             let seriesId = ''
             try {
@@ -187,10 +190,9 @@ export default {
                 }).id
                 
             } catch (error) {
-                
-            }
-            console.log(seriesId);
-            
+                console.log(error);
+            }            
+            this.cardSeriesStore.saveLastViewSeries(seriesId)
             this.$router.push(`/card-series/${ seriesId }`)
         }
     }

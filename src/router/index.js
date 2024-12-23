@@ -164,13 +164,13 @@ const router = createRouter({
       name: "warning",
       component: Warning
     },
-    {
+    { 
       path: "/delete",
       name: "delete",
       component: Delete
     },
     {
-      path: "/deckPage/:deck_id",
+      path: "/deck/:deck_id",
       name: "deckPage",
       component: deckPage
     },

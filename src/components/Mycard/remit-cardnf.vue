@@ -68,7 +68,7 @@ export default {
   },
     methods:{
   async exportToPDF() {
-    console.log("開始執行匯出 PDF");
+    
     if (!this.deckId) {
         alert("請輸入 Deck ID");
         return;
@@ -97,7 +97,7 @@ export default {
 
       const { covers, deck_name } = await response.json();
 
-      console.log("Deck 名稱:", deck_name);
+      
 
       // 確認有取得 deck_name 和 covers
     if (!deck_name) {

@@ -6,17 +6,6 @@ import { useCardSeriesStore } from '@/stores/card-series';
 import SidebarGrid from '../SidebarGrid.vue';
 import RemitCard from "../Mycard/remit-card.vue";
 
-function getUserIdFromToken(token) {
-    try {
-        const payload = token.split(".")[1];
-        const decodedPayload = JSON.parse(atob(payload));
-        console.log("Decoded Payload:", decodedPayload);
-        return decodedPayload.userId || null; // 檢查是否有 userId
-    } catch (error) {
-        console.error("無法解析 token:", error);
-        return null;
-    }
-}
 
 export default {
     components: {
@@ -30,7 +19,7 @@ export default {
             deckData: {
                 deck: []
             },  // 儲存從 API 獲得的牌組資料
-            sortBy: '', // 用於設置排序條件
+            sortBy: 'typeTranslate',
             togglePriceView: false, // 用於切換價格表顯示
             toggleTableView: false, // 用於切換顯示模式
             deckMakeStore: useDeckMakeStore(),
@@ -51,10 +40,7 @@ export default {
             return [...new Set(productNames)];
         },
         groupedCards() {
-            if (!Array.isArray(this.deckData.deck) || this.deckData.deck.length === 0) {
-                return [];
-            }
-
+            
             let sorted = [];
             if (this.sortBy === "level") {
                 sorted = [...this.deckData.deck].sort((a, b) => a.level - b.level);
@@ -79,10 +65,7 @@ export default {
 
             const grouped = sorted.reduce((acc, card) => {
                 let groupKey = card[this.sortBy];
-                if (!groupKey) {
-                    groupKey = "角色";
-                }
-
+                
                 if (!acc[groupKey]) {
                     acc[groupKey] = [];
                 }
@@ -101,7 +84,11 @@ export default {
             const levelLabel = (level) => `${level}等`;
 
             return Object.entries(grouped).map(([key, cards]) => ({
-                group: this.sortBy === "color" ? colorMap[key] || key : this.sortBy === "level" ? levelLabel(key) : key,
+                group: this.sortBy === "color" 
+                ? colorMap[key] || key 
+                : this.sortBy === "level" 
+                ? levelLabel(key) 
+                : key,
                 cards,
             }));
         }
@@ -143,7 +130,7 @@ export default {
         },
         async fetchDeckData() {
             const deckId = this.$route.params.deck_id;
-            console.log('Deck ID:', deckId);  // 用來檢查是否能獲取到 deck_id
+            
 
             try {
                 const response = await axios.get(`http://localhost:3000/api/deck-page/${deckId}`);
@@ -190,7 +177,7 @@ export default {
                 }).id
                 
             } catch (error) {
-                console.log(error);
+                return (error);
             }            
             this.cardSeriesStore.saveLastViewSeries(seriesId)
             this.$router.push(`/card-series/${ seriesId }`)
@@ -201,8 +188,8 @@ export default {
 
 
 <template>
-    <SidebarGrid/> 
     <div class="container">
+    <SidebarGrid style="grid-area: sidebar;" />  
         <div class="bg-container">
             <main>
             <div  v-if="isVisible"  >
@@ -364,9 +351,9 @@ export default {
                     </nav>
 
                     <div class="card-info">
-                        <div class="row" v-if="groupedCards && groupedCards.length" v-for="group in groupedCards" :key="group.group || '未分類'">
+                        <div class="row" v-if="groupedCards && groupedCards.length" v-for="group in groupedCards" :key="group.group ">
                             <div class="card-info-header">
-                                <h2 class="group-title">{{ group.group || '未分類' }} - {{ group.cards.length || 0 }}</h2>
+                                <h2 class="group-title">{{ group.group || '角色' }} - {{ group.cards.length  }}</h2>
                                 <div class="group-count" data-v-1d946842="">
                                     <img data-v-1d946842="" src="https://bottleneko.app/soul.gif" class="size-4">
                                     <span data-v-1d946842="" class="font-mono flex-none">{{ countSoulCards(group.cards) }}</span>
@@ -463,7 +450,6 @@ export default {
 </template>
 
 <style scoped>
-
     .modal {
     position: fixed;
     top: 50%;
@@ -1080,11 +1066,9 @@ export default {
     }
 
     .container {
-        width: 86%;
+        width: 100%;
         display: flex;
         position: relative;
-        left: 270px;
-        top: -40px;
     }
     main::-webkit-scrollbar {
     width: 0px;  /* 隱藏滾動條 */
@@ -1410,8 +1394,9 @@ export default {
 
 
     .bg-container {
-        width:100%;
+        width:calc(100% - 270px);
         padding-bottom: 1rem; 
+        margin-left: 270px;
     }
 
     main {
@@ -1484,7 +1469,7 @@ export default {
         font-weight: bold;
         color: white;
         white-space: nowrap; /* 強制單行顯示 */
-        /* overflow: hidden; 隱藏超出部分 */
+        overflow: hidden; 
         text-overflow: ellipsis;
     }
 

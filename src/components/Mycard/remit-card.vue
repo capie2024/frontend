@@ -478,7 +478,7 @@ methods: {
   async checkDeckId() {
     if (this.deckId && this.deckId.length >= 5) {
       try {
-      console.log("Checking deck ID:", this.deckId); 
+      
       // 發送 API 請求檢查 deckId 是否存在
     const response = await axios.get(`http://localhost:3000/api/cardPDF?deckId=${this.deckId}`);
     
@@ -509,7 +509,7 @@ methods: {
   }
   },
   async exportToPDF() {
-      console.log("開始執行匯出 PDF");
+      
       if (!this.deckId) {
           alert("請輸入牌組代碼");
           return;
@@ -538,7 +538,7 @@ methods: {
   
         const { covers, deck_name } = await response.json();
   
-        console.log("Deck 名稱:", deck_name);
+        
   
         // 確認有取得 deck_name 和 covers
       if (!deck_name) {

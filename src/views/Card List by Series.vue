@@ -344,7 +344,7 @@ const saveViewedSeries = async (seriesId) => {
 
     } catch (err) {
 
-      console.log(err);
+      return (err);
     }
 };
 

@@ -1,7 +1,7 @@
 <script setup>
 import MainFooter from "@/components/MainFooter.vue";
 import PageControl from "@/components/work-shop/PageControl.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import SidebarGrid from "@/components/SidebarGrid.vue";
 import PaypalCheckout from "@/components/PaypalCheckout.vue";
 import axios from "axios";
@@ -38,14 +38,14 @@ const switchBtn = (value) => {
 }
 
 onMounted(async() => {
-    import("@/assets/js/hero-member/hero-member-animation.js")
-    await checkHeroMember()    
+  await import("@/assets/js/hero-member/hero-member-animation.js")
+  await checkHeroMember()
 })
 
 </script>
 
 <template>
-    <div class="hero-member-page-container">
+    <div class="hero-member-page-container" >
         <SidebarGrid />
         <div class="hero-member-main-content-container">
           <header class="hero-member-header">
@@ -475,11 +475,6 @@ onMounted(async() => {
             <section class="hero-member-main-fanpage-section">
               <div class="hero-member-main-fanpage-section-topbar">
                 <h2 class="hero-member-main-fanpage-section-topbar-title">與我聯繫</h2>
-              </div>
-              <div class="hero-member-main-fanpage-section-content">
-                <i class="fa-regular fa-bell"></i>
-                <span>功能實踐中！先行搶先體驗，歡迎與我聯繫！</span>
-                <a href="#">前往貓罐子粉專</a h>
               </div>
             </section>
             <section class="hero-member-main-stores-partners-section">

@@ -1,13 +1,18 @@
-<script setup></script>
+<script setup>
+import router from '@/router'
+
+const goBack = () => {
+  router.go(-1);
+}
+
+
+</script>
 
 <template>
   <div class="page-control-container">
     <div class="page-control">
       <div class="page-control-left">
-        <button class="page-control-up-btn">
-          <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <button class="page-control-down-btn">
+        <button class="page-control-up-btn" @click="goBack" >
           <i class="fa-solid fa-chevron-left"></i>
         </button>
       </div>

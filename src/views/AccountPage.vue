@@ -1090,7 +1090,7 @@ header.scrolled .header-title {
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x var(--tw-scroll-snap-strictness);
-    /* scrollbar-width: none; */
+    scrollbar-width: none;
     -ms-overflow-style: none;
     display: flex;
     gap: 1rem;

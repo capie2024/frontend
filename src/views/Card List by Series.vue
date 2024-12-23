@@ -269,9 +269,9 @@
 import SidebarGrid from '../components/SidebarGrid.vue';
 import { ref, computed, onMounted } from 'vue';
 import { useCardSeriesStore } from "@/stores/card-series";
-import { storeToRefs } from "pinia";
 import axios from "axios";
 import { useRouter } from 'vue-router'
+const API_URL = import.meta.env.VITE_API_URL; 
 
 const router = useRouter(); 
 
@@ -285,7 +285,7 @@ const viewedSeries = ref([]);
 // 獲取系列卡表資料
 const fetchCardseries = async () => {
     try {
-        const response = await axios.get('http://localhost:3000/api/series');
+        const response = await axios.get(`${API_URL}/api/series`);
         originalSeries.value = response.data
         cardSeries.value = [...originalSeries.value].sort((a, b) => {
             const dateA = a.sellAt[0] ? new Date(a.sellAt[0]) : null;

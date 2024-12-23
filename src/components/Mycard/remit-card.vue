@@ -415,6 +415,7 @@
 import jsPDF from "jspdf";
 import axios from "axios";
 import Swal from "sweetalert2";
+const API_URL = import.meta.env.VITE_API_URL; 
 
 export default {
   data() {
@@ -480,7 +481,7 @@ methods: {
       try {
       
       // 發送 API 請求檢查 deckId 是否存在
-    const response = await axios.get(`http://localhost:3000/api/cardPDF?deckId=${this.deckId}`);
+    const response = await axios.get(`${API_URL}/api/cardPDF?deckId=${this.deckId}`);
     
     // 假設如果返回資料中包含 deck_name，表示有效
     if (response.data && response.data.deck_name) {
@@ -515,7 +516,7 @@ methods: {
           return;
         }
   
-      const fontResponse = await fetch("http://localhost:3000/api/font");
+      const fontResponse = await fetch(`${API_URL}/api/font`);
       if (!fontResponse.ok) {
         throw new Error("無法獲取字型資料");
       }
@@ -527,7 +528,7 @@ methods: {
       }
   
       try {
-        const response = await fetch(`http://localhost:3000/api/cardPDF?deckId=${this.deckId}`);
+        const response = await fetch(`${API_URL}/api/cardPDF?deckId=${this.deckId}`);
         
         if (!response.ok) {
           console.error("API 回應非 OK:", response.status, response.statusText);

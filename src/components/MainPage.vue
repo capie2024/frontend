@@ -13,6 +13,7 @@ const handleScroll = () => {
 
 let mainElement = ref(null);
 
+
 const main = () => {
     mainElement.value = document.querySelector('.content-container');
   if (mainElement.value) {

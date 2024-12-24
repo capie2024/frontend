@@ -3,7 +3,10 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
 import SidebarGrid from '@/components/SidebarGrid.vue'
+
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
+const API_URL = import.meta.env.VITE_API_URL
+
 function getUserIdFromToken(token) {
     try {
         const payload = token.split(".")[1];
@@ -56,7 +59,7 @@ export default {
         this.loggedInUserId = getUserIdFromToken(this.token);
         const postCode = this.$route.params.post_code;
         try {
-            const response = await axios.get(`http://localhost:3000/api/articles/${postCode}`);
+            const response = await axios.get(`${API_URL}/api/articles/${postCode}`);
             this.article = response.data; 
         } catch (error) {
             console.error('獲取文章資料失敗', error);
@@ -158,7 +161,7 @@ export default {
         async fetchDeck() {
             try {
                 const postCode = this.$route.params.post_code;  // 获取当前路由的 post_code
-                const response = await axios.get(`http://localhost:3000/api/deck/${postCode}`);
+                const response = await axios.get(`${API_URL}/api/deck/${postCode}`);
 
                 const deckList = response.data[0].deck_list;
                 this.cards = deckList.deck;  
@@ -178,7 +181,7 @@ export default {
                     return;
                 }
 
-                const response = await axios.get('http://localhost:3000/api/currentUser', {
+                const response = await axios.get('${API_URL}/api/currentUser', {
                     headers: {
                         Authorization: `Bearer ${userToken}`,
                     },
@@ -197,7 +200,7 @@ export default {
             }
             try {
                 // 根據 post_code 查詢對應的 article_id
-                const response = await axios.get(`http://localhost:3000/api/article-id/${postCode}`);
+                const response = await axios.get(`${API_URL}/api/article-id/${postCode}`);
                 this.articleId = response.data.article_id;  // 從後端獲取 article_id
 
                 // 確保在獲取 articleId 後再獲取其他資料
@@ -214,7 +217,7 @@ export default {
 
             try {
                 const response = await axios.get(
-                    `http://localhost:3000/api/comments?articleId=${this.articleId}`
+                    `${API_URL}/api/comments?articleId=${this.articleId}`
                 );
 
                 // 按創建時間降序排序
@@ -264,7 +267,7 @@ export default {
                     created_at: new Date().toISOString(),
                 }
                 try {
-                    const response = await axios.post('http://localhost:3000/api/send-message', {newMessage},{
+                    const response = await axios.post('${API_URL}/api/send-message', {newMessage},{
                         headers:{
                             Authorization: `Bearer ${userToken}`,
                         },
@@ -305,7 +308,7 @@ export default {
             }
 
             try {
-                const response = await axios.put(`http://localhost:3000/api/comments/${message.id}`, {
+                const response = await axios.put(`${API_URL}/api/comments/${message.id}`, {
                     message: message.editContent, 
                 },
             {
@@ -352,7 +355,7 @@ export default {
                             return;
                         }
 
-                        const response = await axios.delete(`http://localhost:3000/api/comments/${messageId}`,{
+                        const response = await axios.delete(`${API_URL}/api/comments/${messageId}`,{
                             headers: {
                                 Authorization: `Bearer ${userToken}`,
                             }
@@ -380,7 +383,7 @@ export default {
                 }
 
                 const response = await axios.post(
-                    `http://localhost:3000/api/comments/${message.id}/toggleLike`, {},
+                    `${API_URL}/api/comments/${message.id}/toggleLike`, {},
                     { 
                         headers: {
                             Authorization: `Bearer ${userToken}`,
@@ -407,7 +410,7 @@ export default {
                 }
 
                 const response = await axios.post(
-                    `http://localhost:3000/api/comments/${message.id}/toggleHate`, {},
+                    `${API_URL}/api/comments/${message.id}/toggleHate`, {},
                     { 
                         headers: {
                             Authorization: `Bearer ${userToken}`,
@@ -426,14 +429,14 @@ export default {
         },
         formatDate(date) {
             if (!date) {
-            return '';
+                return '';
             }
             return date.split('T')[0];
         },
         async fetchDeckData() {
             const Id = this.deckId;
             try {
-                const response = await axios.get(`http://localhost:3000/api/deck-page/${Id}`);
+                const response = await axios.get(`${API_URL}/api/deck-page/${Id}`);
                 this.deckData = response.data;
                 if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
                     console.error('回傳資料格式錯誤:', this.deckData);

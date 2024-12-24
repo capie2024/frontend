@@ -5,6 +5,8 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import Loading from '../components/Loading.vue';
 import SideBar from '../components/SidebarGrid.vue'
+import Notice from '../components/notification/notice.vue'
+import Login from '../components/NavLoginBtn.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 const router = useRouter();
@@ -19,7 +21,7 @@ const isEditingName = ref(false) // 是否正在編輯名字
 const originalName = ref('') // 原始名字
 const isScrolled = ref(false); // 是否滾動
 
-// 計算獲取的牌組和文章數量
+// 計算獲取的牌組和文章數量 
 const deckCount = computed(() => decks.value.length);
 const postCount = computed(() => posts.value.length);
 
@@ -222,7 +224,6 @@ const getUserArticles = async () => {
     });
 
     posts.value = res.data.posts;
-    
   } catch (error) {
     Swal.fire({
       icon: 'error',
@@ -249,9 +250,18 @@ const logout = () => {
   router.replace({ name: 'login' });
 };
 
+const handleBack = () => {
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push("/") 
+  }
+}
+
 onMounted(() => {
   getAccount();
   main();
+  getUserArticles();
 });
 
 onBeforeUnmount(() => {
@@ -266,7 +276,7 @@ onBeforeUnmount(() => {
         <SideBar />
         <header class="h-16 z-10" :class="{ 'scrolled': isScrolled }">
             <nav class="header-container">
-                <button class="flex-none p-1 rounded-full bg-black/50 text-white default-transition hover:bg-zinc-800/50">
+                <button @click="handleBack" class="flex-none p-1 rounded-full bg-black/50 text-white default-transition hover:bg-zinc-800/50">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"></path>
                     </svg>
@@ -280,51 +290,13 @@ onBeforeUnmount(() => {
                     <h2 class="header-title truncate text-2xl font-bold">帳號管理</h2>
                 </div>
                 <div class="icons">
-                    <!-- <button class="setting">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path></svg>
-                        <p class="setting-txt">偏好設定</p>
-                    </button> -->
-                    <button class="update" @click="refreshPage">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
-                        <p class="update-txt">重新整理</p>
-                    </button>
                     <button class="logout" @click="logout">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"></path></svg>
                         <p class="logout-txt">登出</p>
                     </button>
                 </div>
-                <div class="notice z-10">
-                    <input type="checkbox" id="notice-jump">
-                    <label for="notice-jump" class="cursor-pointer inline-flex items-center p-1 rounded-full default-transition text-center hover:bg-zinc-800/50 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
-                    </label>
-                    <div class="notice-grid z-10">
-                        <div class="notice-grid-up">
-                            <h2>通知(0)</h2>
-                        </div>
-                        <div class="notice-grid-down">
-                            <img src="https://bottleneko.app/images/status/empty.png" alt="no-data">
-                            <h2>沒東西</h2>
-                            <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="login-btn flex rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50">
-                    <div class="p-1 rounded-full flex flex-col items-center gap-1">
-                        <div class="rounded-full size-6 flex-none bg-black/70 overflow-hidden">
-                            <img v-if="picture" :src="picture" alt="使用者頭像">
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="m-1 text-zinc-200">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <span class="text-sm max-w-[8rem] truncate">{{ name }}</span>
-                    <div class="p-1 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-4 w-4 flex-none">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
-                        </svg>
-                    </div>
-                </div>
+                <Notice/>
+                <Login/>
             </nav>
         </header>
         <div class="background scrollbar">
@@ -814,7 +786,6 @@ header.scrolled .header-title {
     border: none;
     position: relative;
     border-radius: 50%; 
-    padding: 6px;
 }
 
 .setting:hover,
@@ -1425,7 +1396,7 @@ a {
         margin-top: 0rem;
     }
 
-    .show-card[data-v-ea08477a]::-webkit-scrollbar {
+    .show-card::-webkit-scrollbar {
         display: none; 
     }
 

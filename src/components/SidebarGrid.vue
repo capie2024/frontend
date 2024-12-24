@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
-
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const isActive = ref(false)
 
 const changeStyle = () => {
@@ -17,6 +17,10 @@ const checkStatus = () => {
     isLoggedIn.value = true;
   }
 };
+
+const handleNotice = () => {
+    router.push({ name: "notification" })
+}
 
 onMounted(() => {
   checkStatus();

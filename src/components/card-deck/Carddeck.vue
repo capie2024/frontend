@@ -4,8 +4,9 @@ import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
 import SidebarGrid from '@/components/SidebarGrid.vue'
 
-const API_URL = import.meta.env.VITE_API_URL; 
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
+const API_URL = import.meta.env.VITE_API_URL
+
 function getUserIdFromToken(token) {
     try {
         const payload = token.split(".")[1];
@@ -181,6 +182,7 @@ export default {
                 }
 
                 const response = await axios.get('$API_URL/api/currentUser', {
+
                     headers: {
                         Authorization: `Bearer ${userToken}`,
                     },
@@ -266,6 +268,7 @@ export default {
                     created_at: new Date().toISOString(),
                 }
                 try {
+
                     const response = await axios.post('$API_URL/api/send-message', {newMessage},{
                         headers:{
                             Authorization: `Bearer ${userToken}`,
@@ -428,7 +431,7 @@ export default {
         },
         formatDate(date) {
             if (!date) {
-            return '';
+                return '';
             }
             return date.split('T')[0];
         },

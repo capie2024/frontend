@@ -49,10 +49,10 @@ export default {
         this.agreePolicy = false
     },
     goLogin(){
-        this.$router.push('/login');
+        window.location.href = `${BASE_URL}/login`;    
     },
     goMainPage(){
-        this.$router.push('/main-page');
+        window.location.href = `${BASE_URL}/`;    
     },
     async signup() {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/

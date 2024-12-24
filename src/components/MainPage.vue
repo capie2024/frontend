@@ -3,6 +3,7 @@ import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import axios from "axios";
 import placeholderImage from '@/img/card-loading.png' // 預設圖片
 import NavLoginBtn from "./NavLoginBtn.vue";
+import Notice from '../components/notification/notice.vue';
 
 const isScrolled = ref(false); // 是否滾動
 
@@ -88,22 +89,7 @@ onBeforeUnmount(() => {
 <template>
     <header class="z-10 h-16 overflow-hidden header-bg">
         <nav class="relative flex items-center justify-end w-full h-full gap-2 px-4 py-6 header-container default-transition" :class="{ 'scrolled': isScrolled }">
-            <div class="notice">
-                <input type="checkbox" id="notice-jump">
-                <label for="notice-jump" class="flex-none p-1 text-white rounded-full default-transition hover:bg-zinc-800/50">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
-                </label>
-                <div class="z-10 notice-grid">
-                    <div class="notice-grid-up">
-                        <h2>通知(0)</h2>
-                    </div>
-                    <div class="notice-grid-down">
-                        <img src="https://bottleneko.app/images/status/empty.png" alt="no-data">
-                        <h2>沒東西</h2>
-                        <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
-                    </div>
-                </div>
-            </div>
+            <Notice/>
             <!-- <div class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50">
                 <div class="flex flex-col items-center gap-1 p-1 rounded-full">
                     <div class="flex-none rounded-full size-6 bg-black/70">

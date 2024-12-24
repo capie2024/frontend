@@ -87,7 +87,7 @@
               </div>
 
               <editor v-model="content"
-                api-key = "pc94r8kvw7hpdgprkjk73s9qt5wb3cgfbw2nm630zxkc1j83"
+                :api-key = Tiny_API_KEY
                 :init="{
                   height: 415,
                   menubar: false,
@@ -150,6 +150,7 @@ import SidebarGrid from '../components/SidebarGrid.vue'
 import Editor from '@tinymce/tinymce-vue';
 
 const API_URL = import.meta.env.VITE_API_URL; 
+const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY
 
 export default {
   components: {

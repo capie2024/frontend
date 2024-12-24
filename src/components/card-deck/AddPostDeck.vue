@@ -75,7 +75,7 @@
           </div>
 
             <editor v-model="content"
-              api-key = "pc94r8kvw7hpdgprkjk73s9qt5wb3cgfbw2nm630zxkc1j83"
+              :api-key = Tiny_API_KEY
               :init="{
                 height: 415,
                 menubar: false,
@@ -140,7 +140,7 @@ import SidebarGrid from '../SidebarGrid.vue';
 import MainFooter from "@/components/MainFooter.vue";
 import Editor from '@tinymce/tinymce-vue';
 
-
+const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY
 const router = useRouter();
 const route = useRoute();
 

@@ -172,10 +172,10 @@
 <script setup>
 import MainFooter from "@/components/MainFooter.vue";
 import SidebarGrid from '../components/SidebarGrid.vue';
-import router from '@/router'
 import { onMounted, ref, computed } from 'vue';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL; 
 
 // 日期晚>早排序
 const dateSort = (a, b) => {
@@ -212,7 +212,7 @@ const seriesIsSelected = ref(false)
 // 獲取我的牌組資料
 const fetchMyDecks = async () => {
     try {
-        const response = await axios.get('http://localhost:3000/decks',{
+        const response = await axios.get(`${API_URL}/decks`,{
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`, 
         },
@@ -235,7 +235,7 @@ const fetchMyDecks = async () => {
 const originalSeries = ref([])
 const fetchCardSeries = async () => {
     try {
-        const response = await axios.get('http://localhost:3000/api/series');
+        const response = await axios.get(`${API_URL}/api/series`);
         originalSeries.value = response.data
         console.log(originalSeries.value)
     }
@@ -319,7 +319,7 @@ const nameSortReverse = (a, b) => {
 const seriesCodes = ref([]);
 const fetchSeriesCode = async () => {
    try {
-     const response = await axios.get('http://localhost:3000/decks', {
+     const response = await axios.get(`${API_URL}/decks`, {
        headers: {
          Authorization: `Bearer ${localStorage.getItem('token')}`,
        },
@@ -358,6 +358,7 @@ const findSeriesNames = () => {
         }
     })
 };
+
 
 
  // 比對seriesCode及code是否相同並新增至matchedCode
@@ -464,6 +465,7 @@ const toggleNameSort = () => {
     nameIsSelected.value = true;
     dateIsSorted.value = false;
     dateIsSelected.value = false;
+
 }
 
 

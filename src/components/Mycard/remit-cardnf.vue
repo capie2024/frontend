@@ -59,6 +59,7 @@
 <script>
 import jsPDF from "jspdf";
 
+const API_URL = import.meta.env.VITE_API_URL; 
 
 export default {
   data() {
@@ -74,7 +75,7 @@ export default {
         return;
       }
 
-    const fontResponse = await fetch("http://localhost:3000/api/font");
+    const fontResponse = await fetch(`${API_URL}/api/font`);
     if (!fontResponse.ok) {
       throw new Error("無法獲取字型資料");
     }
@@ -86,7 +87,7 @@ export default {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/cardPDF?deckId=${this.deckId}`);
+      const response = await fetch(`${API_URL}/api/cardPDF?deckId=${this.deckId}`);
       
       if (!response.ok) {
         console.error("API 回應非 OK:", response.status, response.statusText);

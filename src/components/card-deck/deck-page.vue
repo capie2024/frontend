@@ -6,6 +6,7 @@ import { useCardSeriesStore } from '@/stores/card-series';
 import SidebarGrid from '../SidebarGrid.vue';
 import RemitCard from "../Mycard/remit-card.vue";
 
+const API_URL = import.meta.env.VITE_API_URL; 
 
 export default {
     components: {
@@ -133,7 +134,7 @@ export default {
             
 
             try {
-                const response = await axios.get(`http://localhost:3000/api/deck-page/${deckId}`);
+                const response = await axios.get(`${API_URL}/api/deck-page/${deckId}`);
                 this.deckData = response.data;
 
                 if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
@@ -169,7 +170,7 @@ export default {
             
             let seriesId = ''
             try {
-                const response = await axios.get(`http://localhost:3000/api/series`)
+                const response = await axios.get(`${API_URL}/api/series`)
                 seriesId = response.data.find((series)=> {
                     if(series.code.includes(cardCode)){
                         return series

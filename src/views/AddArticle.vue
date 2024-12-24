@@ -1,7 +1,5 @@
 <template>
-
   <SidebarGrid style="grid-area: sidebar;" />
-
   <main>
       <div class="header-bg">
           <header>
@@ -89,7 +87,7 @@
               </div>
 
               <editor v-model="content"
-                api-key = Tiny_API_KEY
+                :api-key = Tiny_API_KEY
                 :init="{
                   height: 415,
                   menubar: false,
@@ -144,11 +142,15 @@
       </div>
   </main>
 </template>
+
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import Editor from '@tinymce/tinymce-vue';
+
+const API_URL = import.meta.env.VITE_API_URL; 
+const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY
 
 export default {
   components: {
@@ -191,7 +193,7 @@ export default {
         }
 
         const response = await axios.post(
-          'http://localhost:3000/api/articles', 
+          `${API_URL}/api/articles`, 
           formData, 
           {
           headers: {
@@ -249,7 +251,7 @@ export default {
       }
 
       try {
-        const res = await axios.get('http://localhost:3000/decks', {
+        const res = await axios.get(`${API_URL}/decks`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

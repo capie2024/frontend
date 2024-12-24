@@ -1,6 +1,5 @@
 <script setup>
-
-const API_URL = 'http://localhost:3000'
+const API_URL = import.meta.env.VITE_API_URL; 
 const redirectToGoogleAuth = () => {
   // this will redirect to the google auth page
   window.location.href = `${API_URL}/auth/google`;

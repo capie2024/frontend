@@ -1,8 +1,6 @@
 <script setup>
-// import PageControl from '@/components/PageControl.vue'
 import MainFooter from '@/components/MainFooter.vue'
 import PageControl from '@/components/work-shop/PageControl.vue';
-import router from '@/router'
 import SidebarGrid from "@/components/SidebarGrid.vue";
 
 const workShopData = [
@@ -10,30 +8,78 @@ const workShopData = [
     imgUrl: 'https://bottleneko.app/images/workshop/daily.png',
     title: '每日卡',
     icon: 'fa-solid fa-book-open',
+    path: '/daily-card',
   },
   {
     imgUrl: 'https://bottleneko.app/images/workshop/official.png',
     title: '官方商品',
     icon: 'fa-solid fa-book-open',
+    path: '/products',
   },
   {
     imgUrl: 'https://bottleneko.app/images/workshop/qa.png',
     title: '卡片問答集',
     icon: 'fa-solid fa-book-open',
+    path: '/faq',
   },
   {
     imgUrl: 'https://bottleneko.app/images/workshop/find.png',
     title: '尋找牌組',
     icon: 'fa-solid fa-cube',
+    path: '/findcard',
   },
   {
     imgUrl: 'https://bottleneko.app/images/workshop/report.png',
     title: '匯出牌組',
     icon: 'fa-solid fa-cube',
+    path: 'daily',
   },
 ]
 
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 
+const router = useRouter();
+const name = ref('')
+const email = ref('')
+const picture = ref('')
+
+// 從 localStorage 取得 token
+const token = localStorage.getItem('token')
+
+// 檢查是否已登入
+const isloggedIn = computed(() => !!token)
+
+const getAccount = async () => {
+  if (!isloggedIn.value) return;
+
+  try {
+    const res = await axios.get('http://localhost:3000/users', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    name.value = res.data.username
+    email.value = res.data.email
+    picture.value = res.data.picture
+  } catch (error) {
+      console.error('獲取用戶資料失敗：', error)
+  }
+}
+
+const gotoLink = () => {
+  if (isloggedIn.value) {
+    router.push({ name: 'user' })
+  } else {
+    router.push({ name: 'login' })
+  }
+}
+
+onMounted(() => {
+  getAccount();
+})
 
 </script>
 
@@ -46,9 +92,23 @@ const workShopData = [
       </header>
       <main class="work-shop-main">
         <div class="user-nav">
-          <a href="#" class="user-info-box">
+          <router-link v-if="isloggedIn" to="/user" class="user-info-box">
             <div class="user-info-box-left-icon">
-              <i class="fa-regular fa-user"></i>
+              <img v-if="picture" :src="picture" alt="使用者頭像">
+              <i v-else class="fa-solid fa-user"></i>
+            </div>
+            <div href="#" class="user-info-box-left-login-content">
+              <div class="user-info-box-left-login-title">{{ name }}</div>
+              <div class="user-info-box-left-login-text">前往我的專頁</div>
+            </div>
+            <div class="user-info-box-right">
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </router-link>
+          <router-link v-else to="/login" class="user-info-box">
+            <div class="user-info-box-left-icon">
+              <img v-if="picture" :src="picture" alt="使用者頭像">
+              <i v-else class="fa-solid fa-user"></i>
             </div>
             <div href="#" class="user-info-box-left-login-content">
               <div class="user-info-box-left-login-title">登入帳號</div>
@@ -57,7 +117,7 @@ const workShopData = [
             <div class="user-info-box-right">
               <i class="fa-solid fa-arrow-right"></i>
             </div>
-          </a>
+          </router-link>
           <router-link to="/hero-member" class="hero-member-box">
             <div class="hero-member-box-left-icon">
               <i class="fa-solid fa-star"></i>
@@ -76,7 +136,7 @@ const workShopData = [
           <p>找到你要的工具，發掘更多玩法。</p>
         </div>
         <div class="work-shop-group">
-          <a href="#" class="work-shop-outer" v-for="i in workShopData">
+          <router-link :to="i.path" class="work-shop-outer" v-for="i in workShopData">
             <div class="work-shop-item">
               <img :src="i.imgUrl" alt="" />
               <div class="work-shop-item-content">
@@ -86,7 +146,7 @@ const workShopData = [
                 <span>{{ i.title }}</span>
               </div>
             </div>
-          </a>
+          </router-link>
         </div>
         <div class="banner">
           <h2>如果你有任何酷點子</h2>
@@ -164,6 +224,13 @@ const workShopData = [
   line-height: 80px;
   font-size: 50px;
   color: white;
+}
+
+.user-info-box-left-icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .user-info-box-left-login-title {

@@ -1,11 +1,11 @@
 <script setup>
 import MainFooter from "@/components/MainFooter.vue";
 import PageControl from "@/components/work-shop/PageControl.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import SidebarGrid from "@/components/SidebarGrid.vue";
 import PaypalCheckout from "@/components/PaypalCheckout.vue";
 import axios from "axios";
-import router from '@/router'
+import router from "@/router";
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -38,14 +38,14 @@ const switchBtn = (value) => {
 }
 
 onMounted(async() => {
-    import("@/assets/js/hero-member/hero-member-animation.js")
-    await checkHeroMember()    
+  await import("@/assets/js/hero-member/hero-member-animation.js")
+  await checkHeroMember()
 })
 
 </script>
 
 <template>
-    <div class="hero-member-page-container">
+    <div class="hero-member-page-container" >
         <SidebarGrid />
         <div class="hero-member-main-content-container">
           <header class="hero-member-header">
@@ -476,11 +476,6 @@ onMounted(async() => {
               <div class="hero-member-main-fanpage-section-topbar">
                 <h2 class="hero-member-main-fanpage-section-topbar-title">與我聯繫</h2>
               </div>
-              <div class="hero-member-main-fanpage-section-content">
-                <i class="fa-regular fa-bell"></i>
-                <span>功能實踐中！先行搶先體驗，歡迎與我聯繫！</span>
-                <a href="#">前往貓罐子粉專</a h>
-              </div>
             </section>
             <section class="hero-member-main-stores-partners-section">
               <div class="hero-member-main-stores-partners-section-bg-img"></div>
@@ -506,7 +501,7 @@ onMounted(async() => {
               </div>
               <div class="hero-member-main-stores-about-section-content">
                 <div class="hero-member-main-stores-about-section-content-item">
-                  <img src="@/assets/img/hero-member/ready.png" alt="" />
+                  <img src="@/assets/img/logo-use/no-data.png" alt="" />
                   <div class="hero-member-main-stores-about-section-content-item-info">
                     <p>您的附近有店家</p>
                     <h3 class="hero-member-main-stores-about-section-content-item-title">連結店家</h3>
@@ -516,7 +511,7 @@ onMounted(async() => {
                   </button>
                 </div>
                 <div class="hero-member-main-stores-about-section-content-item">
-                  <img src="@/assets/img/hero-member/ready.png" alt="" />
+                  <img src="@/assets/img/logo-use/no-data.png" alt="" />
                   <div class="hero-member-main-stores-about-section-content-item-info">
                     <p>注意！賽事即將開始</p>
                     <h3 class="hero-member-main-stores-about-section-content-item-title">賽事資訊</h3>
@@ -526,7 +521,7 @@ onMounted(async() => {
                   </button>
                 </div>
                 <div class="hero-member-main-stores-about-section-content-item">
-                  <img src="@/assets/img/hero-member/ready.png" alt="" />
+                  <img src="@/assets/img/logo-use/no-data.png" alt="" />
                   <div class="hero-member-main-stores-about-section-content-item-info">
                     <p>看到直接買</p>
                     <h3 class="hero-member-main-stores-about-section-content-item-title">購買連結</h3>
@@ -536,7 +531,7 @@ onMounted(async() => {
                   </button>
                 </div>
                 <div class="hero-member-main-stores-about-section-content-item">
-                  <img src="@/assets/img/hero-member/ready.png" alt="" />
+                  <img src="@/assets/img/logo-use/no-data.png" alt="" />
                   <div class="hero-member-main-stores-about-section-content-item-info">
                     <p>B2B 與我商談</p>
                     <h3 class="hero-member-main-stores-about-section-content-item-title">與我聯絡</h3>

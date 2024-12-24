@@ -34,7 +34,7 @@ import Swal from "sweetalert2";
         if (response.ok) {
           const route =
             searchType.value === "deck"
-              ? `/deckPage/${data.data.deck_id}`
+              ? `/deck/${data.data.deck_id}`
               : `/social/${data.data.post_code}`;
           window.location.href = route; // 替代 Vue Router
         } else {

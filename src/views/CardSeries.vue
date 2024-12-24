@@ -147,7 +147,7 @@ const finalStep = async() => {
                 title: '成功',
                 text: '成功創建牌組'
               })
-      router.push(`/deckPage/${ res.data.data.deck_id }`)
+      router.push(`/deck/${ res.data.data.deck_id }`)
     }else if(res.status == 403){
       await Swal.fire({
                 icon: 'error',

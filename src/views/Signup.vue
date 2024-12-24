@@ -1,8 +1,11 @@
 <script>
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import SidebarGrid from '../components/SidebarGrid.vue';
+import SidebarGrid from '../components/SidebarGrid.vue'
+import GoogleLogin from '../components/GoogleLogin.vue'
+
 const API_URL = import.meta.env.VITE_API_URL; 
+
 export default {
         data() {
         return {
@@ -19,6 +22,7 @@ export default {
     },
     components: {
         SidebarGrid,
+        GoogleLogin
     },
     watch: {
             email:'validateForm',
@@ -248,10 +252,11 @@ export default {
                                 </div>
                                 <hr class="w-full my-4 border border-zinc-700/50">
                                 <span class="text-zinc-300">請先同意服務條款與隱私權政策</span>
-                                <button class="flex items-center w-full gap-2 p-2 bg-white border shadow rounded-2xl" disabled>
+                                <!-- <button class="flex items-center w-full gap-2 p-2 bg-white border shadow rounded-2xl" disabled>
                                     <img src="../img/google-icon.png" class="flex-none size-7">
                                     <span class="block w-full text-center"> Sign in with Google</span>
-                                </button>
+                                </button> -->
+                                <GoogleLogin />
                             </div>
                         </section>
                     </div>

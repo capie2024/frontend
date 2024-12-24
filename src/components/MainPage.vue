@@ -90,21 +90,6 @@ onBeforeUnmount(() => {
     <header class="z-10 h-16 overflow-hidden header-bg">
         <nav class="relative flex items-center justify-end w-full h-full gap-2 px-4 py-6 header-container default-transition" :class="{ 'scrolled': isScrolled }">
             <Notice/>
-            <!-- <div class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50">
-                <div class="flex flex-col items-center gap-1 p-1 rounded-full">
-                    <div class="flex-none rounded-full size-6 bg-black/70">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="m-1 text-zinc-200">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path>
-                        </svg>
-                    </div>
-                </div>
-                <span class="text-sm flex-none max-w-[8rem] truncate">登入</span>
-                <div class="p-1 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
-                    </svg>
-                </div>
-            </div> -->
             <NavLoginBtn />
         </nav>
     </header>
@@ -112,7 +97,7 @@ onBeforeUnmount(() => {
     <main id="main-page" class="relative flex flex-col content-container rounded-b-2xl bg-base scroll-smooth scrollbar z-1">
         <div class="h-full px-4 content md:px-6">
             <section class="h-[75vh] relative overflow-hidden -mx-4 md:-mx-6">
-                <div class="card-container flex gap-4 md:gap-6 default-transition">
+                <div class="flex gap-4 card-container md:gap-6 default-transition">
                     <div v-for="(grid, gridIndex) in grids"
                         :key="gridIndex"
                         :class="`grid${gridIndex + 1} flex flex-col flex-wrap items-center justify-center flex-none gap-4`"
@@ -135,11 +120,11 @@ onBeforeUnmount(() => {
             <section class="author-section">
                 <div>
                 <div class="author-icon">
-                    <img
+                    <!-- <img
                     src="https://jasonxddd.me:9000/image/1701747118927_head.png"
                     alt=""
-                    />
-                    <h2>罐罐作者</h2>
+                    /> -->
+                    <h2>Capie 團隊</h2>
                     <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -477,7 +462,7 @@ onBeforeUnmount(() => {
                     </label>
                     <p class="answer">
                     請您先確認處於網路良好狀態，並嘗試著重新開啟網站/應用程式，<br />
-                    如仍然失敗，請立即與作者罐罐聯絡，很有可能伺服器冒煙不乖了
+                    如仍然失敗，請立即與Capie團隊聯絡，很有可能伺服器冒煙不乖了
                     </p>
                 </div>
                 <div>

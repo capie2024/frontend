@@ -7,7 +7,7 @@ const redirectToGoogleAuth = () => {
 </script>
 
 <template>
-    <button type="button" @click="redirectToGoogleAuth" class="flex items-center w-full gap-2 p-2 bg-white border shadow rounded-2xl cursor-pointer">
+    <button type="button" @click="redirectToGoogleAuth" class="flex items-center w-full gap-2 p-2 bg-white border shadow cursor-pointer rounded-2xl">
         <img src="../img/google-icon.png" class="flex-none size-7">
         <span class="block w-full text-center"> Sign in with Google</span>
     </button>

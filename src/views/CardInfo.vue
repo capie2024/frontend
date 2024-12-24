@@ -111,16 +111,16 @@ onMounted(() => {
 
 </script>
 <template>
-    <section class="fixed top-0 left-0 w-screen h-screen z-[100] grid overflow-y-auto overflow-x-hidden md:overflow-hidden backdrop-blur place-content-center xs:-top-[44px]">
-        <div class="flex items-center gap-4 w-[80vw] 2xl:w-[70vw] h-[80vh] xs:flex-wrap xs:w-screen">
+    <section class="fixed sm:top-0 left-0 w-screen h-screen z-[100] grid overflow-y-auto overflow-x-hidden md:overflow-hidden backdrop-blur place-content-center xs:-top-[44px]">
+        <div class="flex sm:flex-nowrap items-center gap-4 sm:w-[80vw] 2xl:w-[70vw] h-[80vh] xs:flex-wrap xs:w-screen">
             <button class="p-4 text-white rounded-full arrow bg-black/50 disabled:bg-black/30 disabled:text-white/20 hover:bg-cyan-500" @click="changeCardInfoCard('left')" :disabled="leftDisabled" >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
                 </svg>
             </button>
-            <div class="card-wrapper flex-none rounded-2xl relative p-0 w-4/12 xs:w-3/4 xs:m-auto">
+            <div class="relative flex-none p-0 card-wrapper rounded-2xl sm:w-4/12 sm:m-0 xs:w-3/4 xs:m-auto">
                 <div class="card overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.1)]">
-                    <div class="glossy absolute top-0 left-0 w-full h-full rounded-2xl z-2 mix-blend-lighten"></div>
+                    <div class="absolute top-0 left-0 w-full h-full glossy rounded-2xl z-2 mix-blend-lighten"></div>
                     <img class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image" :src="cardInfo.cover" alt="" size="sm:100vw md:50vw lg:600px">
                     <!-- <img class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image" src="https://jasonxddd.me:7001/imgproxy/uTz5Qc1RtmVq-UACufPxVQk-G0eFfKvKWXNGEImcyHc/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0hPTF9XMTA0XzEyM1NTUC5wbmc.png" alt="" size="sm:100vw md:50vw lg:600px"> -->
                     <button class="absolute bottom-0 p-4 text-white rounded-full md-arrow left-2 bg-black/50 disabled:bg-black/30 disabled:text-white/20 hover:bg-cyan-500">
@@ -133,7 +133,7 @@ onMounted(() => {
                     </button>
                 </div>
             </div>
-            <div class="grow-1 w-full rounded-t-2xl rounded-b-none md:rounded-2xl bg-zinc-800 h-[80vh] overflow-auto scroll-smooth scrollbar">
+            <div class="grow-1 w-full xs:rounded-t-2xl xs:rounded-b-none sm:rounded-2xl bg-zinc-800 h-[80vh] overflow-auto scroll-smooth scrollbar">
                 <div class="sticky top-0 z-10 px-4 pt-4 shadow-xl rounded-xl bg-zinc-800">
                     <div class="flex items-center justify-between w-full gap-2">
                         <div class="flex items-center counter gap-x-1">
@@ -141,7 +141,7 @@ onMounted(() => {
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
                             </button>
                             <div class="text-white btn btn-sm bg-zinc-700">
-                                <span class="stroke-2 size-6 flex items-center justify-center">{{ cardCount }}</span>
+                                <span class="flex items-center justify-center stroke-2 size-6">{{ cardCount }}</span>
                                 <!-- <span class="text-center stroke-2 size-6">0</span> -->
                             </div>
                             <button class="text-white btn btn-sm bg-zinc-700 hover:bg-red-400" @click="removeCard(cardInfo)" >

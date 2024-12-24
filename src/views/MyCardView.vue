@@ -134,7 +134,7 @@
             <section class="show-card grid-card">
                 <a v-for="cardDeck in cardDecks" href="#" class="hover:bg-[rgb(39,39,42)] url gap15 transition-colors">
                 <div class="img-btn">
-                    <img :src ="cardDeck.deck_cover || '/src/img/cover.png'" class="aspect-square object-top object-cover" alt="">
+                    <img :src ="cardDeck.deck_cover || 'https://bottleneko.app/images/cover.png'" class="aspect-square object-top object-cover" alt="">
                     <button data-v-6e6279af="" class=" bottom-0 right-0 m-1 p-1 rounded-full bg-zinc-800  text-white">
                         <svg data-v-6e6279af="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 text-white stroke-2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0

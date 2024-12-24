@@ -60,7 +60,7 @@
                            
                             <a v-for="card in cardSeries" :key="card.id" href="#" class="url transition-colors" @click.prevent="handleSeries(card.id)" >
                                     <div>
-                                        <img :src ="card.cover || '/src/img/cover.png'" alt="">
+                                        <img :src ="card.cover || 'https://bottleneko.app/images/cover.png'" alt="">
                                     </div>
                                     <div class="card-text">
                                         <div class="flex">

@@ -485,7 +485,7 @@
     max-height: 100%;
     margin: 0px;
     color:white;
-    z-index:2;
+    z-index:4;
   }
   .sidebar-filter-header {
     height: 80px;

@@ -242,6 +242,7 @@ const handleApplyStatus = async() => {
       }
     }
   })
+  currentMain.value = '';
 }
 
 // 按下關鍵字按鈕
@@ -486,7 +487,7 @@ const handleUseMyFiltersBtn = (myFilter) => {
     
     <nav class="sidebar-container">
 
-      <SidebarGrid :class="{ hidden: currentMain === 'open-filter' }" />
+      <SidebarGrid :class="{ hidden: currentMain === 'open-filter' || currentMain === 'open-deck'}" />
 
       <section v-show="currentSidebar === 'open-filter'" class="sidebar-filter">
         <header class="sidebar-filter-header">
@@ -982,10 +983,10 @@ const handleUseMyFiltersBtn = (myFilter) => {
         <header class="sidebar-filter-header">
           <div>
             <p>卡片篩選</p>
-            <p>0 篩選、0 排序、關鍵字 : ""</p>
+            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ (filterVaribleSet.keyWord.trim()) }}"</p>
           </div>
           <div>
-            <button class="icon del-btn"><i class="fa-solid fa-trash"></i></button>
+            <button class="icon del-btn" @click="resetAllFilter"><i class="fa-solid fa-trash"></i></button>
             <button class="icon open-btn"><i class="fa-solid fa-chevron-down"></i></button>
             <button @click="closeSidebar" class="icon xmark-btn"><i class="fa-solid fa-xmark"></i></button>
           </div>
@@ -996,7 +997,7 @@ const handleUseMyFiltersBtn = (myFilter) => {
             <div class="menu" @click="MenuFilter(index)">
               <i :class="[filter.icon]"></i>
               <p>{{ filter.name }}</p>
-              <button class="icon del" v-if="filter.delButton" >
+              <button class="icon del" v-if="filter.delButton" @click.stop="resetFilter(filter.filterTag)">
                 <i class="fa-solid fa-trash"></i>
               </button>
               <button class="icon check" v-if="filter.checkButton" >
@@ -1009,118 +1010,141 @@ const handleUseMyFiltersBtn = (myFilter) => {
             <div class="menu-inner" v-show="filter.checked">
               <div v-if="filter.name === '常用'">
                 <span>"+" 按鈕可以儲存當下篩選內容，長按儲存篩選可以進行刪除。</span>
-                <button class="plus-btn-used"><i class="fa-solid fa-plus"></i></button>
+                <div class="myfilter-button-group" >
+                  <button class="plus-btn-used" @click="saveMyFilters" ><i class="fa-solid fa-plus"></i></button>
+                  <button class="myfilter-button-item" v-for="(myfilter, index) in myFiltersGroup" :key="index" @click="handleUseMyFiltersBtn(myfilter)" @mousedown="countMouseUp" @mouseup="deleteMyFilters(myfilter)" >{{ myfilter.name }}</button>
+                </div>
               </div>
               <div v-else-if="filter.name === '關鍵字'">
                 <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
-                  <br>當前搜尋內容： ""
+                  <br>當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
                 </span>
-                <div class="input-keyword" >
+                <div class="input-keyword" :class="{ 'input-keyword-haveValue': filterVaribleSet.keyWord.trim() != '' }">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
-                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋">
+                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="filterVaribleSet.keyWord" @input="handleKeyWord">
                   <div class="input-keyword-btn" >
-                    <button @click="changeReplaceKeyWord" ><span>AND</span></button>
+                    <button @click="changeReplaceKeyWord" ><span>{{ replaceWord }}</span></button>
                     <!-- <button><span>OR</span></button> -->
-                    <button class="plus-btn"><i class="fa-solid fa-plus"></i></button>
+                    <button class="plus-btn" @click="saveKeyWord"><i class="fa-solid fa-plus"></i></button>
                   </div>
                 </div>
-                <span class="keyword-below">"+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
-                  <br>無資料
-                  <p>新增預設關鍵字</p>
-                </span>
+                <p class="keyword-below">"+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
+                </p>
+                <span v-if="keyWordGroup.length === 0" >無資料</span>
+                <div class="keyword-button-group" >
+                  <button class="keyword-button-item" v-for="(keyWord, index) in keyWordGroup" :key="index" @click="handleUseKeyWordBtn(keyWord)" @mousedown="countMouseUp" @mouseup="deleteKeyWord(keyWord)" >{{ keyWord }}</button>
+                </div>
               </div>
               <div v-else-if="filter.name === '排序'">
                 <div class="menu-inner-slider-btn">
-                  <button><div class="slider-btn"></div>等級 <i class="fa-solid fa-arrow-up"></i></button>
-                  <button><div class="slider-btn"></div>顏色 <i class="fa-solid fa-arrow-up"></i></button>
-                  <button><div class="slider-btn"></div>價格 <i class="fa-solid fa-arrow-up"></i></button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelDownSort || !filterVaribleSet.levelUpSort, 'btn-active-bg': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" @click="changeSortStatus('level')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" >
+                      {{ levelOrder > 0 ? levelOrder : '' }}
+                    </div>
+                    等級
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.levelUpSort ,'arrow-down': filterVaribleSet.levelUpSort}" ></i>
+                  </button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorDownSort || !filterVaribleSet.colorUpSort, 'btn-active-bg': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" @click="changeSortStatus('color')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" >
+                      {{ colorOrder > 0 ? colorOrder : '' }}
+                    </div>
+                    顏色
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.colorUpSort ,'arrow-down': filterVaribleSet.colorUpSort}" ></i>
+                  </button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.priceDownSort || !filterVaribleSet.priceUpSort, 'btn-active-bg': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" @click="changeSortStatus('price')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" >
+                      {{ priceOrder > 0 ? priceOrder : '' }}
+                    </div>
+                    價格
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.priceUpSort ,'arrow-down': filterVaribleSet.priceUpSort}" ></i>
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '類型'">
                 <div class="menu-inner-btn">
-                  <button>角色</button>
-                  <button>事件</button>
-                  <button>名場</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeCharacter, 'btn-active-bg': filterVaribleSet.typeCharacter }" @click="changeFilterStatus('typeCharacter')" >角色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeEvent, 'btn-active-bg': filterVaribleSet.typeEvent }" @click="changeFilterStatus('typeEvent')" >事件</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeScene, 'btn-active-bg': filterVaribleSet.typeScene }" @click="changeFilterStatus('typeScene')" >名場</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '等級'">
                 <div class="menu-inner-btn">
-                  <button>0</button>
-                  <button>1</button>
-                  <button>2</button>
-                  <button>3</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter0, 'btn-active-bg': filterVaribleSet.levelFilter0 }" @click="changeFilterStatus('levelFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter1, 'btn-active-bg': filterVaribleSet.levelFilter1 }" @click="changeFilterStatus('levelFilter1')" >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter2, 'btn-active-bg': filterVaribleSet.levelFilter2 }" @click="changeFilterStatus('levelFilter2')" >2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter3, 'btn-active-bg': filterVaribleSet.levelFilter3 }" @click="changeFilterStatus('levelFilter3')" >3</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '顏色'">
                 <div class="menu-inner-btn">
-                  <button>黃色</button>
-                  <button>紅色</button>
-                  <button>藍色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterYellow, 'btn-active-bg': filterVaribleSet.colorFilterYellow }"@click="changeFilterStatus('colorFilterYellow')" >黃色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterRed, 'btn-active-bg': filterVaribleSet.colorFilterRed }"@click="changeFilterStatus('colorFilterRed')" >紅色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterBlue, 'btn-active-bg': filterVaribleSet.colorFilterBlue }"@click="changeFilterStatus('colorFilterBlue')" >藍色</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '費用'">
                 <div class="menu-inner-btn">
-                  <button>0</button>
-                  <button>1</button>
-                  <button>2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter0, 'btn-active-bg': filterVaribleSet.costFilter0 }"@click="changeFilterStatus('costFilter0')"  >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter1, 'btn-active-bg': filterVaribleSet.costFilter1 }"@click="changeFilterStatus('costFilter1')"  >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter2, 'btn-active-bg': filterVaribleSet.costFilter2 }"@click="changeFilterStatus('costFilter2')"  >2</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '魂傷'">
                 <div class="menu-inner-btn">
-                  <button>0</button>
-                  <button>1</button>
-                  <button>2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter0, 'btn-active-bg': filterVaribleSet.soulFilter0 }"@click="changeFilterStatus('soulFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter1, 'btn-active-bg': filterVaribleSet.soulFilter1 }"@click="changeFilterStatus('soulFilter1')" >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter2, 'btn-active-bg': filterVaribleSet.soulFilter2 }"@click="changeFilterStatus('soulFilter2')" >2</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '攻擊力'">
                 <div class="menu-inner-btn">
-                  <button>0</button>
-                  <button>500</button>
-                  <button>1000</button>
-                  <button>1500</button>
-                  <button>2000</button>
-                  <button>2500</button>
-                  <button>3000</button>
-                  <button>3500</button>
-                  <button>4000</button>
-                  <button>4500</button>
-                  <button>5000</button>
-                  <button>5500</button>
-                  <button>6000</button>
-                  <button>6500</button>
-                  <button>7000</button>
-                  <button>7500</button>
-                  <button>8000</button>
-                  <button>8500</button>
-                  <button>9000</button>
-                  <button>9500</button>
-                  <button>10000</button>
-                  <button>10500</button>
-                  <button>11000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter0, 'btn-active-bg': filterVaribleSet.attackFilter0 }"@click="changeFilterStatus('attackFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter500, 'btn-active-bg': filterVaribleSet.attackFilter500 }"@click="changeFilterStatus('attackFilter500')" >500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1000, 'btn-active-bg': filterVaribleSet.attackFilter1000 }"@click="changeFilterStatus('attackFilter1000')" >1000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1500, 'btn-active-bg': filterVaribleSet.attackFilter1500 }"@click="changeFilterStatus('attackFilter1500')" >1500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2000, 'btn-active-bg': filterVaribleSet.attackFilter2000 }"@click="changeFilterStatus('attackFilter2000')" >2000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2500, 'btn-active-bg': filterVaribleSet.attackFilter2500 }"@click="changeFilterStatus('attackFilter2500')" >2500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3000, 'btn-active-bg': filterVaribleSet.attackFilter3000 }"@click="changeFilterStatus('attackFilter3000')" >3000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3500, 'btn-active-bg': filterVaribleSet.attackFilter3500 }"@click="changeFilterStatus('attackFilter3500')" >3500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4000, 'btn-active-bg': filterVaribleSet.attackFilter4000 }"@click="changeFilterStatus('attackFilter4000')" >4000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4500, 'btn-active-bg': filterVaribleSet.attackFilter4500 }"@click="changeFilterStatus('attackFilter4500')" >4500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5000, 'btn-active-bg': filterVaribleSet.attackFilter5000 }"@click="changeFilterStatus('attackFilter5000')" >5000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5500, 'btn-active-bg': filterVaribleSet.attackFilter5500 }"@click="changeFilterStatus('attackFilter5500')" >5500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6000, 'btn-active-bg': filterVaribleSet.attackFilter6000 }"@click="changeFilterStatus('attackFilter6000')" >6000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6500, 'btn-active-bg': filterVaribleSet.attackFilter6500 }"@click="changeFilterStatus('attackFilter6500')" >6500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7000, 'btn-active-bg': filterVaribleSet.attackFilter7000 }"@click="changeFilterStatus('attackFilter7000')" >7000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7500, 'btn-active-bg': filterVaribleSet.attackFilter7500 }"@click="changeFilterStatus('attackFilter7500')" >7500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8000, 'btn-active-bg': filterVaribleSet.attackFilter8000 }"@click="changeFilterStatus('attackFilter8000')" >8000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8500, 'btn-active-bg': filterVaribleSet.attackFilter8500 }"@click="changeFilterStatus('attackFilter8500')" >8500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9000, 'btn-active-bg': filterVaribleSet.attackFilter9000 }"@click="changeFilterStatus('attackFilter9000')" >9000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9500, 'btn-active-bg': filterVaribleSet.attackFilter9500 }"@click="changeFilterStatus('attackFilter9500')" >9500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10000, 'btn-active-bg': filterVaribleSet.attackFilter10000 }"@click="changeFilterStatus('attackFilter10000')" >10000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10500, 'btn-active-bg': filterVaribleSet.attackFilter10500 }"@click="changeFilterStatus('attackFilter10500')" >10500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter11000, 'btn-active-bg': filterVaribleSet.attackFilter11000 }"@click="changeFilterStatus('attackFilter11000')" >11000</button>
                 </div>
               </div>
               <div v-else-if="filter.name === '稀有度'">
                 <div class="menu-inner-btn">
-                  <button>RR</button>
-                  <button>SSP</button>
-                  <button>LRR</button>
-                  <button>R</button>
-                  <button>SR</button>
-                  <button>OFR</button>
-                  <button>U</button>
-                  <button>C</button>
-                  <button>CR</button>
-                  <button>RRR</button>
-                  <button>CC</button>
-                  <button>PR</button>
-                  <button>TD</button>
-                  <button>SP</button>
-                  <button>N</button>
-                  <button>LRP</button>
-                  <button>SIR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRR, 'btn-active-bg': filterVaribleSet.rareFilterRR }"@click="changeFilterStatus('rareFilterRR')" >RR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSSP, 'btn-active-bg': filterVaribleSet.rareFilterSSP }"@click="changeFilterStatus('rareFilterSSP')" >SSP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRR, 'btn-active-bg': filterVaribleSet.rareFilterLRR }"@click="changeFilterStatus('rareFilterLRR')" >LRR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilteR, 'btn-active-bg': filterVaribleSet.rareFilterR}"@click="changeFilterStatus('rareFilterR')" >R</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSR, 'btn-active-bg': filterVaribleSet.rareFilterSR }"@click="changeFilterStatus('rareFilterSR')" >SR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterOFR, 'btn-active-bg': filterVaribleSet.rareFilterOFR }"@click="changeFilterStatus('rareFilterOFR')" >OFR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterU, 'btn-active-bg': filterVaribleSet.rareFilterU }"@click="changeFilterStatus('rareFilterU')" >U</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterC, 'btn-active-bg': filterVaribleSet.rareFilterC }"@click="changeFilterStatus('rareFilterC')" >C</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCR, 'btn-active-bg': filterVaribleSet.rareFilterCR }"@click="changeFilterStatus('rareFilterCR')" >CR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRRR, 'btn-active-bg': filterVaribleSet.rareFilterRRR }"@click="changeFilterStatus('rareFilterRRR')" >RRR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCC, 'btn-active-bg': filterVaribleSet.rareFilterCC }"@click="changeFilterStatus('rareFilterCC')" >CC</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterPR, 'btn-active-bg': filterVaribleSet.rareFilterPR }"@click="changeFilterStatus('rareFilterPR')" >PR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterTD, 'btn-active-bg': filterVaribleSet.rareFilterTD }"@click="changeFilterStatus('rareFilterTD')" >TD</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSP, 'btn-active-bg': filterVaribleSet.rareFilterSP }"@click="changeFilterStatus('rareFilterSP')" >SP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterN, 'btn-active-bg': filterVaribleSet.rareFilterN }"@click="changeFilterStatus('rareFilterN')" >N</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRP, 'btn-active-bg': filterVaribleSet.rareFilterLRP }"@click="changeFilterStatus('rareFilterLRP')" >LRP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSIR, 'btn-active-bg': filterVaribleSet.rareFilterSIR }"@click="changeFilterStatus('rareFilterSIR')" >SIR</button>
                 </div>
               </div>
-              <div v-else-if="filter.name === '判定'">
+              <!-- <div v-else-if="filter.name === '判定'">
                 <div class="menu-inner-btn">
                   <button>無</button>
                   <button>魂</button>
@@ -1150,15 +1174,170 @@ const handleUseMyFiltersBtn = (myFilter) => {
                   <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>PRカード【Wサイド】</button>
                   <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>[TD]リコリス・リコイル</button>
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
     
         <footer class="sidebar-filter-footer">
-          <button><span>Apply</span></button>
+          <button :class="{ 'apply-btn' : !applyBtnStatus, 'apply-btn-active' : applyBtnStatus}" @click="handleApplyStatus"><span>Apply</span></button>
         </footer>
       </section>
+      <section v-show="currentMain === 'open-deck'" class="sidebar-deck">
+        <header class="sidebar-header">
+          <div>
+            <p>牌組製作</p>
+            <p>已選擇 {{ selectedCards.length }} 張卡片，總價 ¥{{ countDeck }}</p>
+          </div>
+          <div>
+            <button class="icon del-btn" @click="clearDeckAndBacktoFirstStep" ><i class="fa-solid fa-trash"></i></button>
+            <button @click="closeSidebar" class="icon xmark-btn"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </header>
+    
+          <div class="sidebar-deck-choice" v-if="sidebarSelectedStatus === true" >
+            <button id="type-btn-active" v-if="sortStatus === 'TYPE'" >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap">類型</span>
+            </button>
+            <button @click="handleSwitchBtnClick('TYPE')" v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap">類型</span>
+            </button>
+            <button id="color-btn-active" v-if="sortStatus === 'COLOR'" >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap">顏色</span>
+            </button>
+            <button @click="handleSwitchBtnClick('COLOR')" v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap">顏色</span>
+            </button>
+            <button id="level-btn-active" v-if="sortStatus === 'LEVEL'" >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap select-none">等級</span>
+            </button>
+            <button @click="handleSwitchBtnClick('LEVEL')" v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap">等級</span>
+            </button>
+            <button id="rare-btn-active" v-if="sortStatus === 'RARE'" >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap">稀有度</span>
+            </button>
+            <button @click="handleSwitchBtnClick('RARE')" v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap">稀有度</span>
+            </button>
+            <button id="product-btn-active" v-if="sortStatus === 'PRODUCT'" >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap">商品</span>
+            </button>
+            <button @click="handleSwitchBtnClick('PRODUCT')" v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold whitespace-nowrap">商品</span>
+            </button>
+          </div>
+          <div class="sidebar-deck-control" v-if="sidebarSelectedStatus === true" >
+            <button class="cash" @click="showCardPrice = !showCardPrice" ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg></button>
+            <span class="divder font-mono flex-none text-zinc-500/50"> | </span>
+            
+            <button id="plus-active" @click="changeTypeToAdd" v-if="editType === 'ADD_CARD'" ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg></button>
+            <button class="plus" @click="changeTypeToAdd" v-else="editType === 'CHECK_INFO'"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg></button>
+
+            <button id="minus-active" @click="changeTypeToDelete" v-if="editType === 'DELETE_CARD'"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"></path></svg></button>
+            <button class="minus" @click="changeTypeToDelete" v-else ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"></path></svg></button>
+
+          </div>
+          <div class="card-content" v-if="sidebarSelectedStatus === true" >
+            <div class="card-section" v-for="(title, sortedTitleIndex) in sortedTitle" :key="sortedTitleIndex" >
+              <h3>{{ title }} - {{ sortedDeck[sortedTitleIndex].length }}</h3>
+              <div class="card-choiced">
+                <div class="row">
+                  <div class="col-choice" v-for="(card, index) in sortedDeck[sortedTitleIndex]" :key="index" @click="checkTypeAndRunFunction(card, index, sortedTitleIndex)" >
+                    <div class="card-price" v-if="showCardPrice">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
+                      <span>{{ card.price.number }}</span>
+                      <span>{{ card.rare }}</span>
+                    </div>
+                    <div class="card-image">
+                      <img :src="card.cover">
+                    </div>
+                    <!-- <div :class="{'card-count': true,'card-count-white': editType === 'CHECK_INFO', 'card-count-green': editType === 'ADD_CARD', 'card-count-red': editType === 'DELETE_CARD',}">1</div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="deck-save" v-if="settingDeckStatus === true">
+            <div class="deck-save-title-section">
+              <div class="deck-save-title-section-top">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
+                <h2>標題：</h2>
+              </div>
+              <input type="text" placeholder="輸入牌組名稱" name="deckName" id="deckName" v-model="deckName">
+              <p>設定預設牌組名稱，前往<a href="#">偏好設定</a></p>
+            </div>
+            <div class="deck-save-content-section">
+              <div class="deck-save-content-section-top">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
+                <h2>內容：</h2>
+              </div>
+              <textarea name="" id="" cols="30" rows="4" placeholder="用一段話介紹一下你的牌組" v-model="deckDescription" ></textarea>
+            </div>
+            <div class="deck-save-covercard-section" v-if="selectedCards.length > 0" >
+              <div class="deck-save-covercard-section-top">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
+                <h2>封面卡：</h2>
+              </div>
+              <div class="deck-save-covercard-section-content">
+                <div :class="{'deck-save-covercard-section-content-card': true, 'cover-card-selected': card.id === chooseCoverCard }" v-for="card in selectedCards" :key="card.id" @click="chooseCoverCard = card.id">
+                  <img :src="card.cover">
+                  <div class="deck-save-covercard-section-content-card-info">
+                    <h3>{{ card.title }}</h3>
+                    <p>{{ card.id}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    
+    
+        <footer class="sidebar-footer">
+          <button id="sidebar-footer-active" v-if="selectedCards.length > 0 && settingDeckStatus === false" @click="nextStep">
+            <span>下一步<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
+          </button>
+          <div class="sidebar-footer-box" v-else-if="settingDeckStatus === true">
+            <button id="sidebar-footer-active"  @click="finalStep">
+              <span>完成<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
+            </button>
+          </div>
+          <button v-else>
+            <span>下一步<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
+          </button>
+        </footer>
+      </section>
+
+      <div class="deck-container" @click="toggleFilter('open-deck')" v-if="selectedCards.length > 0">
+        <div class="deck-img">
+            <img src="/src/img/麻衣.png" alt="">
+        </div>
+        <div class="deck-content">
+            <div class="line"></div>
+            <div class="total-cards">
+                <h2>刪除 DG/S02-027R</h2>
+                <span>牌組製作，共{{ selectedCards.length }}張卡</span>
+            </div>
+            <div class="deckbtn-area">
+                <button class="deck-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
+                </button>
+                <div class="pay-btn">
+                    <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
+                    <span>{{ countDeck }} </span><span>¥</span>
+                </div>
+            </div>
+        </div>
+      </div>
     </div>
 
 </div>
@@ -1167,3 +1346,149 @@ const handleUseMyFiltersBtn = (myFilter) => {
 <style src="@/assets/css/card-series/main-content.css" scoped></style>
 <style src="@/assets/css/card-series/sidebar-filter.css" scoped></style>
 <style src="@/assets/css/card-series/sidebar-deck.css" scoped></style>
+<style scoped>
+
+.hidden {
+  display: none;
+}
+
+.deck-container {
+  width: 100%;
+  height: 56px;
+  position: fixed;
+  bottom: 66px;
+  display: none;
+  padding-right: 8px;
+  cursor: pointer;
+  z-index:3;
+}
+
+.deck-img {
+  overflow: hidden;
+  border-radius: 10px;
+  transform: translateX(8px);
+  z-index: 1;
+}
+
+.deck-img img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+}
+
+
+.deck-content {
+  width: 100%;
+  height: 56px;
+  background-color: rgba(86, 68, 10, 0.9);
+  display: flex;
+  padding-left: 8px;
+  border-radius: 0 10px 10px 0;
+  align-items: center;
+  position: relative;
+}
+
+.line {
+  position: absolute;
+  bottom: 52px;
+  width: 96%;
+  border-top:4px solid;
+  border-image: linear-gradient(to right, rgb(234, 179, 8) 0%, rgb(234, 179, 8) 89.0476%, rgb(34, 197, 94) 94.0476%, rgb(34, 197, 94) 95%) 5 / 1 / 0 stretch;
+}
+
+.total-cards {
+  width: 80%;
+  padding-top: 8px;
+  padding-left: 8px;
+}
+
+.total-cards h2 {
+  font-size: 15px;
+  font-weight: 00;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.total-cards span {
+  font-size: 13px;
+  color: #dad7d7;
+  font-weight: 700;
+}
+
+.deckbtn-area {
+  display: flex;
+  align-items: center;
+  width: 20%;
+  position: relative;
+  padding-left: 8px;
+}
+
+.deck-btn {
+  all: unset;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #F0F0F0;
+  background-color: rgba(86, 68, 10, 0.9);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: absolute;
+  right: 120px;
+  cursor: pointer;
+  justify-content: center;
+}
+
+.deck-btn:hover {
+    background-color: #42ebeb;
+}
+
+.deck-btn svg {
+  width: 25px;
+  height: 25px;
+}
+
+.deck-btn i::before {
+  font-size: 24px;
+}
+
+.pay-btn {
+  padding-left: 5px;
+  position: absolute;
+  right: 8px;
+  width: 86px;
+  min-width: 94px;
+  height: 32px;
+  background-color: #DAA61E;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  color: #dad7d7;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.pay-btn:hover {
+  background-color: #e27637;
+}
+
+.pay-btn span {
+  font-size: 14px;
+  margin-right: 5px;
+  gap: 5px;
+}
+
+@media screen and (max-width: 1199px) {
+  .deck-container {
+    display: flex;
+  }
+
+  .sidebar-container::before {
+    top: 0;
+  }
+
+  .sidebar-container {
+    z-index: 2;
+  }
+}
+</style>

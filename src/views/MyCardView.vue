@@ -65,7 +65,7 @@
          <div class="display-area">
                 <div class="display-card" style="transform: translate3d(0px, 0px, 0px);">
                     <div class="card-area" style="margin-right: 10px;">
-                        <button  v-for="(name, index) in matchedNames" :key="index" @click ="toggleSeriesSort(matchedCodes[index], index)" :class="{ selectedGray  :  sortedStates[index]}" class="hover:bg-[rgb(39,39,42)] overflow-hidden  rounded-lg border border-zinc-800 flex items-center gap-2 px-1 md:p-2 bac-1818 w-full-col">
+                        <button  v-for="(name, index) in matchedNames" :key="index" @click ="toggleSeriesSort(matchedCodes[index], index)" :class="{ selectedGray  :  sortedStates[index]}" class="relative hover:bg-[rgb(39,39,42)] overflow-hidden  rounded-lg border border-zinc-800 flex items-center gap-2 px-1 md:p-2 bac-1818 w-full-col">
                             <div class="grow-1 min-w-0 w-full text-left w-full-col ">
                                 <span class=" truncate text-xs text-zinc-400 font-mono flex items-center gap-1">
                                     <svg
@@ -77,10 +77,10 @@
                                         </path>
                                     </svg> 
                                     {{ (matchedCodes[index]).join(',') }}
-                                    </span>
+                                </span>
                                 <p class="hidden md:block truncate text-zinc-200 div-text card-name" >{{ name }}</p>
                             </div>
-                            <span class="font-bold text-white fz-24">{{ counts[index] }}</span>
+                            <span class="absolute right-2 font-bold text-white text-xl">{{ counts[index] }}</span>
                         </button>
                     </div>
                 </div>   
@@ -181,7 +181,6 @@ import axios from 'axios';
 const dateSort = (a, b) => {
         const dateA = a.build_time ? new Date(a.build_time) : null;
         const dateB = b.build_time ? new Date(b.build_time) : null;
-
         if (!dateA && !dateB) return 0; 
         if (!dateA) return 1;           
         if (!dateB) return -1;
@@ -190,10 +189,9 @@ const dateSort = (a, b) => {
 };
 
 // 日期早>晚排序
-const dateSortReverse = (a, b) => {
-        const dateA = a.build_time[0] ? new Date(a.build_time[0]) : null;
-        const dateB = b.build_time[0] ? new Date(b.build_time[0]) : null;
-
+const dateSortReverse = (a, b) => {       
+        const dateA = a.build_time ? new Date(a.build_time) : null;
+        const dateB = b.build_time ? new Date(b.build_time) : null;
         if (!dateA && !dateB) return 0;
         if (!dateA) return -1;
         if (!dateB) return 1;
@@ -220,7 +218,6 @@ const fetchMyDecks = async () => {
         },
         });
     originalDecks.value = response.data.decks
-    console.log(originalDecks.value)
     cardDecks.value = [...originalDecks.value].sort(dateSort);
     sortState.value = 0;
     dateIsSorted.value = false;
@@ -240,6 +237,7 @@ const fetchCardSeries = async () => {
     try {
         const response = await axios.get('http://localhost:3000/api/series');
         originalSeries.value = response.data
+        console.log(originalSeries.value)
     }
     catch (err) {
         error.value = '獲取系列卡表資料失敗' + err.message
@@ -315,7 +313,6 @@ const nameSortReverse = (a, b) => {
 };
 
 
-// originalDecks.value[i].deck_name
 
 
 // 獲取我的牌組的seriesCode
@@ -344,24 +341,23 @@ const fetchSeriesCode = async () => {
 };
 
 
-// 比對seriesCode及code並回傳系列中文名稱
+// 比對seriesCode及code並回傳系列名稱
 const matchedNames = ref([]);
-const findZhNames = () => {    
-  matchedNames.value = []; 
-
-    seriesCodes.value.forEach((code)=> {
-        for (let i= 0; i < originalSeries.value.length; i++) {
-            originalSeries.value[i].code.forEach((item)=>{
-                if(item == code){
-                    if (!matchedNames.value.includes(originalSeries.value[i].i18n.zh.name)) {
-                        matchedNames.value.push(originalSeries.value[i].i18n.zh.name);
+const findSeriesNames = () => {
+    matchedNames.value = [];
+    seriesCodes.value.forEach((code) => {
+        for (let i = 0; i < originalSeries.value.length; i++) {
+            originalSeries.value[i].code.forEach((item) => {
+                if (item == code) {
+                    const nameToAdd = originalSeries.value[i].i18n.zh.name || originalSeries.value[i].name;
+                    if (!matchedNames.value.includes(nameToAdd)) {
+                        matchedNames.value.push(nameToAdd);
                     }
                 }
-            })           
+            })
         }
     })
-    console.log(matchedNames.value)
- };
+};
 
 
  // 比對seriesCode及code是否相同並新增至matchedCode
@@ -409,108 +405,72 @@ const counts = computed(() => {
 });
 
 // 系列按鈕的排序功能
-const sortedStates =  ref({ }); // 追蹤每個按鈕的排序狀態
+const sortedStates = ref({}); 
 
 const toggleSeriesSort = (codes, index) => {
-  // 如果當前系列已排序，則恢復原始資料
-  if (sortedStates.value[index]) {
-    cardDecks.value = [...originalDecks.value];
-    if (nameIsSorted.value) {
-      cardDecks.value.sort(nameSort);
-    } else {
-      cardDecks.value.sort(nameSortReverse);
+    if (sortedStates.value[index]) {
+        cardDecks.value = [...originalDecks.value];
+        
+        if (dateIsSelected.value) {
+            cardDecks.value.sort(dateIsSorted.value ? dateSortReverse : dateSort);
+        } else if (nameIsSelected.value) {
+            cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse);
+        }
+        
+        sortedStates.value[index] = false;
+        seriesIsSelected.value = false;
+        return;
     }
-    if (dateIsSorted.value) {
-      cardDecks.value.sort(dateSort);
+
+    let sortedDecks = originalDecks.value.filter(decksItem =>
+        decksItem.deck.some(card =>
+            card.seriesCode && codes.includes(card.seriesCode)
+        )
+    );
+
+    if (dateIsSelected.value) {
+        sortedDecks.sort(dateIsSorted.value ? dateSortReverse : dateSort);
+    } else if (nameIsSelected.value) {
+        sortedDecks.sort(nameIsSorted.value ? nameSort : nameSortReverse);
     }
-    sortedStates.value[index] = false;
-    seriesIsSelected.value = false; // 重置系列選擇狀態
-    return;
-  }
 
-  // 篩選特定系列的牌組
-  const sortedDecks = originalDecks.value.filter(decksItem =>
-    decksItem.deck.some(card =>
-      card.seriesCode && codes.includes(card.seriesCode)
-    )
-  );
-
-  // 根據名稱按鈕的排序狀態進行排序
-  if (nameIsSorted.value) {
-    sortedDecks.sort(nameSort);
-  } else {
-    sortedDecks.sort(nameSortReverse);
-  }
-
-  // 根據日期按鈕的排序狀態進行排序
-  if (dateIsSorted.value) {
-    sortedDecks.sort(dateSort);
-  } else {
+    cardDecks.value = sortedDecks;
     
-  }
-
-  // 更新牌組顯示
-  cardDecks.value = sortedDecks;
-
-  // 重置所有按鈕狀態，然後設置當前按鈕為已排序
-  Object.keys(sortedStates.value).forEach(key => {
-    sortedStates.value[key] = false;
-  });
-  sortedStates.value[index] = true;
-  seriesIsSelected.value = true; // 設置系列選擇狀態
+    Object.keys(sortedStates.value).forEach(key => {
+        sortedStates.value[key] = false;
+    });
+    sortedStates.value[index] = true;
+    seriesIsSelected.value = true;
 }
 
-// 名稱排序切換
-const toggleNameSort = () => {
-  const decksToSort = seriesIsSelected.value ? cardDecks.value : originalDecks.value;
-  
-  if (nameIsSorted.value) {
-    cardDecks.value = [...decksToSort].sort(nameSortReverse);
-    nameIsSorted.value = false;
-    nameIsSelected.value = true;
-    dateIsSorted.value = false;
-    dateIsSelected.value = false;
-  } else {
-    cardDecks.value = [...decksToSort].sort(nameSort);
-    nameIsSorted.value = true;
-    nameIsSelected.value = true;
-    dateIsSorted.value = false;
-    dateIsSelected.value = false;
-    sortState.value = 0;
-  }
-}
-
-
-
-//日期排序切換
 const toggleDateSort = () => {
-  const decksToSort = seriesIsSelected.value ? cardDecks.value : originalDecks.value;
-  console.log(seriesIsSelected.value);
-  
-  
-  if (sortState.value === 0) {
-      cardDecks.value = [...decksToSort].sort(dateSortReverse);
-      sortState.value = 1; 
-      dateIsSorted.value = true;
-      dateIsSelected.value = true;
-      nameIsSorted.value = false;
-      nameIsSelected.value = false;
-  } else {
-        cardDecks.value = [...decksToSort].sort(dateSort);
-        sortState.value = 0;
-        dateIsSorted.value = false;
-        dateIsSelected.value = true;
-        nameIsSorted.value = false;
-        nameIsSelected.value = false;
-    }
+    const decksToSort = [...cardDecks.value];
+    dateIsSorted.value = !dateIsSorted.value;
+    sortState.value = dateIsSorted.value ? 1 : 0;
+    
+    cardDecks.value = decksToSort.sort(dateIsSorted.value ? dateSortReverse : dateSort);
+    
+    dateIsSelected.value = true;
+    nameIsSorted.value = false;
+    nameIsSelected.value = false;
 }
 
+const toggleNameSort = () => {
+    const decksToSort = [...cardDecks.value];
+    nameIsSorted.value = !nameIsSorted.value;
+    
+    cardDecks.value = decksToSort.sort(nameIsSorted.value ? nameSort : nameSortReverse);
+    
+    nameIsSelected.value = true;
+    dateIsSorted.value = false;
+    dateIsSelected.value = false;
+}
 
 
  const initData = async () => {
-    await fetchCardSeries();  // 先獲取系列卡表
-    await fetchSeriesCode();  // 再獲取牌組的系列代碼
-    findZhNames();
+    await fetchCardSeries();
+    await fetchSeriesCode();
+    findSeriesNames();
     findMatchedCode();
 }
 

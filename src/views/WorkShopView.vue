@@ -2,6 +2,8 @@
 import MainFooter from '@/components/MainFooter.vue'
 import PageControl from '@/components/work-shop/PageControl.vue';
 import SidebarGrid from "@/components/SidebarGrid.vue";
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 
 const workShopData = [
   {
@@ -36,26 +38,20 @@ const workShopData = [
   },
 ]
 
-import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
-import { useRouter } from 'vue-router'
 
-const router = useRouter();
 const name = ref('')
 const email = ref('')
 const picture = ref('')
-
-// 從 localStorage 取得 token
+const API_URL = import.meta.env.VITE_API_URL;
 const token = localStorage.getItem('token')
 
-// 檢查是否已登入
 const isloggedIn = computed(() => !!token)
 
 const getAccount = async () => {
   if (!isloggedIn.value) return;
 
   try {
-    const res = await axios.get('http://localhost:3000/users', {
+    const res = await axios.get(`${API_URL}/users`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -69,16 +65,8 @@ const getAccount = async () => {
   }
 }
 
-const gotoLink = () => {
-  if (isloggedIn.value) {
-    router.push({ name: 'user' })
-  } else {
-    router.push({ name: 'login' })
-  }
-}
-
-onMounted(() => {
-  getAccount();
+onMounted(async() => {
+  await getAccount();
 })
 
 </script>

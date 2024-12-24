@@ -2,6 +2,8 @@
 import dayjs from 'dayjs';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL; 
+
 export  default {
     data() {
         return {
@@ -33,7 +35,7 @@ export  default {
                 }
 
                 // 向後端發送請求，標記為已讀
-                const response = await axios.post('http://localhost:3000/api/mark-as-read', { noticeId }, {
+                const response = await axios.post(`${API_URL}/api/mark-as-read`, { noticeId }, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
@@ -59,7 +61,7 @@ export  default {
         async fetchNotices() {
             const token = localStorage.getItem('token');
             try {
-                const response = await fetch('http://localhost:3000/api/notices', {
+                const response = await fetch(`${API_URL}/api/notices`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

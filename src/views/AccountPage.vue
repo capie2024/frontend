@@ -99,7 +99,7 @@ const saveName = async () => {
   }
 
   try {
-    await axios.put('http://localhost:3000/users/update-name', { name: name.value }, {
+    await axios.put(`${API_URL}/users/update-name`, { name: name.value }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -155,7 +155,7 @@ const handleFileChange = async (event) => {
   isUploading.value = true; // 開始上傳
 
   try {
-    const res = await axios.post('http://localhost:3000/users/upload-picture', formData, {
+    const res = await axios.post(`${API_URL}/users/upload-picture`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data',
@@ -190,7 +190,7 @@ const getUserDecks = async () => {
   }
 
   try {
-    const res = await axios.get('http://localhost:3000/decks', {
+    const res = await axios.get(`${API_URL}/decks`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -215,7 +215,7 @@ const getUserArticles = async () => {
   }
 
   try {
-    const res = await axios.get('http://localhost:3000/posts', {
+    const res = await axios.get(`${API_URL}/posts`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -75,7 +75,7 @@
           </div>
 
             <editor v-model="content"
-              api-key = Tiny_API_KEY
+              api-key = "pc94r8kvw7hpdgprkjk73s9qt5wb3cgfbw2nm630zxkc1j83"
               :init="{
                 height: 415,
                 menubar: false,
@@ -192,6 +192,7 @@ const getUserDecks = async () => {
 
 const submitArticle = async () => {
   try {
+
     
     const API_URL = import.meta.env.VITE_API_URL;
     const response = await axios.post(
@@ -219,14 +220,14 @@ const submitArticle = async () => {
     });
   } catch (error) {
     if (error.response && error.response.status === 403) {
-
+      const BASE_URL = import.meta.env.VITE_BASE_URL; 
       Swal.fire({
         title: "請先登入",
         text: "登入後才能發布文章",
         icon: "warning",
         confirmButtonText: "確定",
       }).then(() => {
-        window.location.href = 'http://localhost:5173/login';
+        window.location.href = `${BASE_URL}/login`;
       });
     } else {
 

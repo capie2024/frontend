@@ -2,7 +2,7 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import SidebarGrid from '../components/SidebarGrid.vue';
-
+const API_URL = import.meta.env.VITE_API_URL; 
 export default {
         data() {
         return {

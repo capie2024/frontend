@@ -109,6 +109,8 @@
 import axios from 'axios';
 import SidebarGrid from '../components/SidebarGrid.vue';
 
+const API_URL = import.meta.env.VITE_API_URL; 
+
 export default {
     components: {
     SidebarGrid,
@@ -123,7 +125,7 @@ export default {
   },
   async created() {
     try {
-      const response = await axios.get('http://localhost:3000/api/articles');
+      const response = await axios.get(`${API_URL}/api/articles`);
       this.articles = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       this.filteredArticles = this.articles;
     } catch (error) {

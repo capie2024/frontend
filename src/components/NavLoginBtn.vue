@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL; 
 const router = useRouter();
 const name = ref('')
 const email = ref('')
@@ -18,7 +19,7 @@ const getAccount = async () => {
   if (!isloggedIn.value) return;
 
   try {
-    const res = await axios.get('http://localhost:3000/users', {
+    const res = await axios.get(`${API_URL}/users`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },

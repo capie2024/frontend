@@ -55,7 +55,6 @@ const router = createRouter({
       component: HeroMemberView,
     },
     {
-
       path: "/products",
       name: "products",
       component: OfficialProductList,

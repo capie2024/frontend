@@ -22,11 +22,7 @@ const startSectionContentIcon = document.querySelector(
 
 let functionSectionAnimetionClass = false;
 heroMemberMainContainer.addEventListener("scroll", (e) => {
-  // e.stopPropagation();
-  // console.log(e.target);
 
-  // console.log(e.target.scrollTop);
-  // console.log(startSection.offsetTop);
   startSectionHeight = startSection.offsetHeight;
 
   if (e.target.scrollTop > 0 && functionSectionAnimetionClass == false) {
@@ -82,11 +78,7 @@ const adArtistSectionContentIcon = document.querySelector(
 
 let adArtistSectionAnimetionClass = false;
 heroMemberMainContainer.addEventListener("scroll", (e) => {
-  // e.stopPropagation();
-  // console.log(e.target);
-
-  // console.log(e.target.scrollTop);
-  // console.log(adArtistSection.offsetTop);
+  
   adArtistSectionHeight = adArtistSection.offsetHeight;
 
   if (e.target.scrollTop > 2222 && adArtistSectionAnimetionClass == false) {
@@ -146,10 +138,7 @@ const storesPartnersSectionContentIcon = document.querySelector(
 
 let storesPartnersSectionAnimetionClass = false;
 heroMemberMainContainer.addEventListener("scroll", (e) => {
-  // e.stopPropagation();
-  // console.log(e.target);
-
-  // console.log(storesPartnersSection.offsetTop);
+  
   storesPartnersSectionHeight = storesPartnersSection.offsetHeight;
 
   if (
@@ -207,7 +196,6 @@ cardPriceItem.addEventListener("click", () => {
 
 cardPriceItemDescriptionBox.addEventListener("click", (e) => {
   e.stopPropagation();
-  console.log(e.target);
 
   cardPriceItemDescriptionBox.classList.add("hidden-info");
 });
@@ -359,21 +347,9 @@ const functionSectionContentLastItem = document.querySelector(
   ".hero-member-main-function-section-content-last-item"
 );
 
-// 計時器關閉重開功能 未完成X
-
-// functionSectionContent.addEventListener("mouseover", (e) => {
-//   closeScrollMoveInterval(scrollMoveInterval);
-// });
-
-// functionSectionContent.addEventListener("mouseout", (e) => {
-//       reStartScrollMoveInterval(scrollMoveInterval, functionSectionContent);
-// });
-
 // 更改按鈕樣式
 
 functionSectionContent.addEventListener("scroll", () => {
-  // console.log("在滾動");
-  // console.log(functionSectionContent.scrollLeft);
 
   if (functionSectionContent.scrollLeft == 0) {
     functionSectionLeftBtn.classList.add(
@@ -431,11 +407,9 @@ functionSectionRightBtn.addEventListener("click", () => {
       behavior: "smooth",
     });
   }
-  // console.log(functionSectionContent.scrollLeft);
 });
 
 // 自動輪播
-// console.log(functionSectionContentLastItem.offsetLeft);
 
 let firstStart = true;
 
@@ -465,7 +439,6 @@ let scrollMoveInterval = setInterval(() => {
           behavior: "smooth",
         });
         firstStart = false;
-        // console.log(window.innerWidth);
       }
     } else if (firstStart == false) {
       if (window.innerWidth < 1200) {
@@ -481,22 +454,16 @@ let scrollMoveInterval = setInterval(() => {
       }
     }
   }
-  // console.log("總寬度：" + functionSectionContent.scrollWidth);
-  // console.log("目前往左位移：" + functionSectionContent.scrollLeft);
-  // console.log("可視寬度：" + functionSectionContent.clientWidth);
-  // console.log("左位移＋可視寬度" + (functionSectionContent.scrollLeft + functionSectionContent.clientWidth));
 }, 3000);
 
 // 關閉計時器
 
 function closeScrollMoveInterval(interval) {
   clearInterval(interval);
-  console.log("計時器關閉");
 }
 
 // 重開計時器
 function reStartScrollMoveInterval(interval, scrollMoveElement) {
-  console.log("計時器重開");
 
   interval = setInterval(() => {
     // 判斷滾動條到底
@@ -523,7 +490,6 @@ function reStartScrollMoveInterval(interval, scrollMoveElement) {
             behavior: "smooth",
           });
           firstStart = false;
-          // console.log(window.innerWidth);
         }
       } else if (firstStart == false) {
         if (window.innerWidth < 1200) {
@@ -541,39 +507,6 @@ function reStartScrollMoveInterval(interval, scrollMoveElement) {
     }
   }, 3000);
 }
-
-// function區域 拖動功能 未完成X
-
-// 滑鼠按下
-let isDragging = false;
-
-// 初始位置
-let startX = 0;
-
-// 滾動條離容器左邊的距離
-let scrollLeft = 0;
-
-functionSectionContent.addEventListener("mousedown", (e) => {
-  isDragging = true;
-
-  // 初始位置 = 滑鼠按下的位置
-  startX = e.offsetX;
-});
-
-functionSectionContent.addEventListener("mousemove", (e) => {
-  if (isDragging) {
-    // 移動距離 = 滑鼠移動的位置 - 初始位置
-    let offsetX = e.offsetX - startX;
-    console.log(offsetX, "移動距離");
-
-    // functionSectionContent.scrollLeft = scrollLeft - offsetX;
-    // console.log(functionSectionContent.scrollLeft, "目前位置");
-  }
-});
-
-functionSectionContent.addEventListener("mouseup", () => {
-  isDragging = false;
-});
 
 // sponsors creators區域 左右按鈕功能
 
@@ -593,8 +526,6 @@ const sponsorsCreatorsSectionContent = document.querySelector(
 // 更改按鈕樣式
 
 sponsorsCreatorsSectionContent.addEventListener("scroll", () => {
-  // console.log("在滾動");
-  // console.log(sponsorsCreatorsSectionContent.scrollLeft);
 
   if (sponsorsCreatorsSectionContent.scrollLeft == 0) {
     sponsorsCreatorsSectionLeftBtn.classList.add(
@@ -682,7 +613,6 @@ let sponsorsCreatorsScrollMoveInterval = setInterval(() => {
           behavior: "smooth",
         });
         sponsorsCreatorsFirstStart = false;
-        // console.log(window.innerWidth);
       }
     } else if (sponsorsCreatorsFirstStart == false) {
       if (window.innerWidth < 1200) {
@@ -715,15 +645,9 @@ const storesAboutSectionContent = document.querySelector(
   ".hero-member-main-stores-about-section-content"
 );
 
-// console.log(storesAboutSectionContent);
-//   storesAboutSectionContent.scrollLeft = 200;
-// console.log(storesAboutSectionContent.offsetLeft);
-
 // 更改按鈕樣式
 
 storesAboutSectionContent.addEventListener("scroll", () => {
-  // console.log("在滾動");
-  // console.log(storesAboutSectionContent.scrollLeft);
 
   if (storesAboutSectionContent.scrollLeft == 0) {
     storesAboutSectionLeftBtn.classList.add(
@@ -811,7 +735,6 @@ let storesAboutScrollMoveInterval = setInterval(() => {
           behavior: "smooth",
         });
         storesAboutFirstStart = false;
-        // console.log(window.innerWidth);
       }
     } else if (storesAboutFirstStart == false) {
       if (window.innerWidth < 1200) {

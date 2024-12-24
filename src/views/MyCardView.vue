@@ -220,7 +220,7 @@ const fetchMyDecks = async () => {
         },
         });
     originalDecks.value = response.data.decks
-    console.log(originalDecks.value)
+    // console.log(originalDecks.value)
     cardDecks.value = [...originalDecks.value].sort(dateSort);
     sortState.value = 0;
     dateIsSorted.value = false;
@@ -360,7 +360,7 @@ const findZhNames = () => {
             })           
         }
     })
-    console.log(matchedNames.value)
+    // console.log(matchedNames.value)
  };
 
 
@@ -485,7 +485,7 @@ const toggleNameSort = () => {
 //日期排序切換
 const toggleDateSort = () => {
   const decksToSort = seriesIsSelected.value ? cardDecks.value : originalDecks.value;
-  console.log(seriesIsSelected.value);
+//   console.log(seriesIsSelected.value);
   
   
   if (sortState.value === 0) {

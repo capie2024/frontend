@@ -80,7 +80,7 @@ export default {
         } else {
             try {
         const response = await axios.post(
-            "http://localhost:3000/auth/register",
+            `${API_URL}/auth/register`,
             {
             username: "User", 
             email: this.email,

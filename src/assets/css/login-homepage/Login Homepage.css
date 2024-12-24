@@ -602,6 +602,7 @@ a {
     left: 0;
     min-width: 100%;
     box-sizing: border-box;
+    top: 0;
     /* background-color: black; */
   }
 

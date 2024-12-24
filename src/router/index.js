@@ -185,11 +185,6 @@ const router = createRouter({
       component: Notice
     },
     {
-      path: "/notice",
-      name: "notice",
-      component: Notice
-    },
-    {
       path:"/notification",
       name:"notification",
       component: Notification

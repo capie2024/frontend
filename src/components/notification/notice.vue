@@ -87,7 +87,7 @@ export  default {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path>
                 </svg>
-                <span v-if="unreadCount > 0" data-v-3e737e76="" class="absolute -top-1 -right-1 text-xs rounded-full px-1 bg-red-500 text-white pb-[2px]">{{ unreadCount }}</span>
+                <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 text-xs rounded-full px-1 bg-red-500 text-white pb-[2px]">{{ unreadCount }}</span>
             </label>
             
             <div class="z-10 notice-grid">
@@ -100,7 +100,7 @@ export  default {
                     :class="[
                         'notice-item', 
                         notice.is_read ? 'read' : 'unread',                      
-                        'cursor-pointer p-4 text-white flex items-center gap-2 hover:bg-zinc-500/20'
+                        'cursor-pointer p-4 text-white flex items-center gap-2'
                     ]">                        
                         <div class="flex-none w-[3rem] h-[3rem] rounded-full bg-zinc-500/50 grid place-content-center">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7">
@@ -138,7 +138,7 @@ export  default {
 }
 
 .notice-item.unread {
-    background-color: #162128;   
+    background-color: #2d2d2d;   
 }
 
 .notice-grid-down-1{
@@ -175,7 +175,7 @@ export  default {
 
 .notice-icon:hover {
     background-color: #2a2727; 
-    opacity: 0.8;
+    /* opacity: 0.8; */
 }
 
 .notice-grid-up h2{
@@ -189,15 +189,16 @@ export  default {
     top: 120%;
     left: 50%;
     transform: translateX(-70%);
-    opacity: 0;
+    display: none;
     transition: opacity 0.3s ease, height 0.3s ease, transform 0.3s ease;
     z-index: 999;
     width: 350px;
-    height: 700px;
+    height: 500px;
+    z-index: 9999;
 }
 
 #notice-jump:checked ~ .notice-grid{
-    opacity: 1;
+    display: block;
 }
 
 #notice-jump{
@@ -208,7 +209,7 @@ export  default {
     background-color: #27272a;
     padding: 24px 16px 8px 16px;
     border-radius: 10px 10px 0px 0px;
-    position: sticky;
+    /* position: sticky; */
 }
 
 .notice-grid-down {
@@ -240,5 +241,11 @@ export  default {
     text-align: center;
     margin-top: 10px;
     line-height: 20px;
+}
+
+@media screen and (max-width: 1199px) {
+    .notice-wrapper{
+        display: none;
+    }
 }
 </style>

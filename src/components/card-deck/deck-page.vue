@@ -2244,5 +2244,10 @@ export default {
             text-overflow:ellipsis;
         }
     }
+    @media screen and (max-width: 576px) {
+        .toolbar-area2{
+            display: none;
+        }
+    }
 
 </style>

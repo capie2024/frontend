@@ -18,10 +18,7 @@
                             <h2>{{ deckData.deck_name }}</h2>
                         </div>
                         <div class="btn-area">
-                            <!-- <button class="social-btn-item social-btn1">
-                                <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path></svg>
-                                <div class="description-item description1">分享</div>
-                            </button> -->
+                           
                             <button class="social-btn-item social-btn2" @click="copyDeck" >
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"></path></svg>
                                 <div class="description-item description2">複製牌組</div>
@@ -49,8 +46,7 @@
                             
                             <button class="social-btn-item social-btn5">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"></path></svg>
-                                <!-- <div class="description-item description5">複製牌組</div> -->
-                                <!-- <div class="description-item description6">匯出牌組</div> -->
+                                
                             </button>
                         </div>
                     </header>
@@ -778,9 +774,7 @@ export default {
         display: flex;
     }
 
-    .rounded-full {
-        border-radius: 10px;
-    }
+    
 
     .bg-white {
         --tw-bg-opacity: 1;
@@ -1190,7 +1184,7 @@ export default {
 
     .bg-black {
         background-color: #000000;
-        width: calc(100% - 270px);
+        width: calc(100% - 278px);
         height: 72px;
         position: fixed;
         top:0;
@@ -1377,12 +1371,6 @@ export default {
         gap:8px;
         cursor: pointer;
     }
-
-    .user-btn:hover {
-        /* background-color: #87462D; */
-    }
-
-
     .btn-img img{
         width: 24px;
         height: 24px;
@@ -1415,7 +1403,7 @@ export default {
         overflow-y: scroll;
         scroll-behavior: smooth;
         border-radius: 20px 20px 0 0;
-        
+        width: calc(100% - 8px);
     }
 
 
@@ -2269,9 +2257,9 @@ export default {
         .toolbar{
             margin-left: 10px;
         }
-        .col-Sheet, .col-Info{
+        /* .col-Sheet, .col-Info{
             width: calc(100% - 235px);
-        }
+        } */
     }
 
 </style>

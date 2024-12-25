@@ -3,6 +3,14 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
 import SidebarGrid from '@/components/SidebarGrid.vue'
+import notice from '../notification/notice.vue';
+import NavLoginBtn from '../NavLoginBtn.vue';
+import MainFooter from '../MainFooter.vue';
+import RemitCard from "../Mycard/remit-card.vue";
+import { useDeckMakeStore } from "@/stores/deck-make";
+import { useCardSeriesStore } from '@/stores/card-series';
+
+
 
 const BASE_URL = import.meta.env.VITE_BASE_URL; 
 const API_URL = import.meta.env.VITE_API_URL
@@ -20,7 +28,11 @@ function getUserIdFromToken(token) {
 
 export default {
       components: {
-      SidebarGrid, 
+      SidebarGrid,
+      notice,
+      NavLoginBtn,
+      MainFooter,
+      RemitCard 
     },
     data() {
       return {
@@ -43,9 +55,12 @@ export default {
         toggleTableView: false,
         togglePriceView: false,
         article: null,
+        isVisible: false,
         deckData: {
           deck:[],
-        }, 
+        },
+        deckMakeStore: useDeckMakeStore(),
+        cardSeriesStore: useCardSeriesStore(), 
       };
     },
     mounted() {
@@ -146,6 +161,16 @@ export default {
         },
     },
     methods: {
+        hideModal() {
+        // 使用 Vue 的響應式來隱藏 RemitCard 和 overlay
+        this.isVisible = false;
+        },
+        toggleRemitCard() {
+            this.isVisible = !this.isVisible;
+        },
+        toggleVisibility() {
+        this.isVisible = !this.isVisible; // 切換 isVisible 的值
+        },
         togglePriceTableView() {
             this.togglePriceView = !this.togglePriceView;
         },
@@ -454,6 +479,26 @@ export default {
                 console.error('無法獲取資料:', error);
             }
         },
+        async copyDeck(){
+            this.deckMakeStore.selectedCards = this.deckData.deck
+            this.deckMakeStore.saveLastDeckEdit();
+            const cardCode = this.deckData.deck[0].seriesCode
+            
+            let seriesId = ''
+            try {
+                const response = await axios.get(`${API_URL}/api/series`)
+                seriesId = response.data.find((series)=> {
+                    if(series.code.includes(cardCode)){
+                        return series
+                    }
+                }).id
+                
+            } catch (error) {
+                return (error);
+            }            
+            this.cardSeriesStore.saveLastViewSeries(seriesId)
+            this.$router.push(`/card-series/${ seriesId }`)
+        }
     }
 }  
 </script>
@@ -463,6 +508,9 @@ export default {
         <SidebarGrid style="grid-area: sidebar;" />     
         <div class="bg-container">
             <main>
+            <div  v-if="isVisible">
+            <RemitCard  v-if="isVisible"/>
+            </div>
                 <div class="bg-black">
                     <header>
                         <div class="pagebtn-area">
@@ -475,30 +523,23 @@ export default {
                             <h2>{{ article.title }}</h2>
                         </div>
                         <div class="btn-area">
-                            <button class="social-btn-item social-btn1">
-                                <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path></svg>
-                                <div class="description-item description1">分享</div>
-                            </button>
-                            <button class="social-btn-item social-btn2">
+                            
+                            <button class="social-btn-item social-btn2" @click="copyDeck" >
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"></path></svg>
                                 <div class="description-item description2">複製牌組</div>
                             </button>
-                            <button class="social-btn-item social-btn3">
+                            <button class="social-btn-item social-btn3" @click="toggleRemitCard">
                                 
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
                                 <div class="description-item description3">匯出牌組</div>
                             </button>
                             <button class="social-btn-item social-btn4">
-                                <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
                                 <div class="description-item description4">通知</div>
+                                <notice/>
                             </button>
-                            <button class="user-btn">
-                                <div class="btn-img">
-                                    <img src="/src/img/麻衣.png" alt="">
-                                </div>                    
-                                <span>XXXX</span>
-                                <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-4 w-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path></svg>
-                            </button>
+                            <div class="user-btn">
+                                <NavLoginBtn/>
+                            </div>
                             <button class="social-btn-item social-btn5">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"></path></svg>
                                 <div class="description-item description5">複製牌組</div>
@@ -867,6 +908,7 @@ export default {
                     </div>
                 </div>
             </main>
+            <MainFooter/>
         </div>
     </div>
 </template>
@@ -1026,6 +1068,7 @@ export default {
     top: 580px;
     display: flex;
     flex-direction: column;
+    background: linear-gradient( transparent 500px,#121212) ;
     }
 
     .card-info-image {
@@ -1181,9 +1224,7 @@ export default {
         display: flex;
     }
 
-    .rounded-full {
-        border-radius: 10px;
-    }
+    
 
     .bg-white {
         --tw-bg-opacity: 1;
@@ -1680,21 +1721,17 @@ export default {
     }
 
     .user-btn {
-        width: 92px;
-        height: 32px;
+        /* width: 92px; */
+        /* height: 32px; */
         border: none;
-        background-color: #121212;
-        opacity: 0.6;
+        /* background-color:#ea6d2d; */
+        /* opacity: 0.6; */
         display: flex;
         justify-content: center;
         align-items: center;
         border-radius: 20px;
         gap:8px;
         cursor: pointer;
-    }
-
-    .user-btn:hover {
-        background-color: #87462D;
     }
 
 
@@ -1733,6 +1770,8 @@ export default {
         overflow-y: scroll;
         scroll-behavior: smooth;
         border-radius: 20px 20px 0 0;
+        scrollbar-width: none;
+
     }
 
 
@@ -1849,7 +1888,7 @@ export default {
 
     .data-item:nth-of-type(3){
         flex-wrap: wrap;
-        gap:10px;
+        
     }
 
     span svg {
@@ -1869,9 +1908,9 @@ export default {
     }
 
     .main-container-bg{
-        background: linear-gradient(rgba(59, 130, 246, 0.44) 100px, transparent 500px);
+        background: linear-gradient(rgba(59, 130, 246, 0.44) , transparent );
         width: 100%;
-        height: 500px;
+        height: 100%;
         position: absolute;
         top: 0;
         left: 0;
@@ -1943,7 +1982,7 @@ export default {
 
     .message {
         box-sizing: border-box;
-        width: 85%;
+        width: 87%;
         height: 48px;
         display: flex;
         justify-content: center;
@@ -2336,16 +2375,17 @@ export default {
         .pagebtn-area h2 {
             display: none;
         }
-
-        .social-btn5 {
-            display: block;
+        .user-btn{
+            display: none;
+        }
+        .btn-area{
+            right: 0px;
         }
 
         .social-btn2,
         .social-btn3,
-        .social-btn4,
-        .user-btn{
-            display: none;
+        .social-btn4{
+            display: block;
         }
 
         .carddeck-information {
@@ -2485,7 +2525,12 @@ export default {
 
         } 
     }
-
+    
+    @media screen and (max-width: 576px) {
+        .toolbar-area2{
+            display: none;
+        }
+    }
     @media screen and (max-width: 768px) {
         .col-Sheet, .col-Info {
             width: calc((100% - 10px) / 2);
@@ -2498,6 +2543,14 @@ export default {
             white-space:nowrap; 
             overflow: hidden; 
             text-overflow:ellipsis;
+        }
+    }
+    @media screen and (max-width: 375px){
+        .tool-btn1{
+            min-width: 62px;
+        }
+        .toolbar{
+            margin-left: 10px;
         }
     }
 

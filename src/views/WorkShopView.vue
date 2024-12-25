@@ -1,7 +1,7 @@
 <script setup>
 import MainFooter from '@/components/MainFooter.vue'
-import PageControl from '@/components/work-shop/PageControl.vue';
-import SidebarGrid from "@/components/SidebarGrid.vue";
+import PageControl from '@/components/work-shop/PageControl.vue'
+import SidebarGrid from '@/components/SidebarGrid.vue'
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 
@@ -38,37 +38,35 @@ const workShopData = [
   },
 ]
 
-
 const name = ref('')
 const email = ref('')
 const picture = ref('')
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL
 const token = localStorage.getItem('token')
 
 const isloggedIn = computed(() => !!token)
 
 const getAccount = async () => {
-  if (!isloggedIn.value) return;
+  if (!isloggedIn.value) return
 
   try {
     const res = await axios.get(`${API_URL}/users`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
 
     name.value = res.data.username
     email.value = res.data.email
     picture.value = res.data.picture
   } catch (error) {
-      console.error('獲取用戶資料失敗：', error)
+    console.error('獲取用戶資料失敗：', error)
   }
 }
 
-onMounted(async() => {
-  await getAccount();
+onMounted(async () => {
+  await getAccount()
 })
-
 </script>
 
 <template>
@@ -82,7 +80,7 @@ onMounted(async() => {
         <div class="user-nav">
           <router-link v-if="isloggedIn" to="/user" class="user-info-box">
             <div class="user-info-box-left-icon">
-              <img v-if="picture" :src="picture" alt="使用者頭像">
+              <img v-if="picture" :src="picture" alt="使用者頭像" />
               <i v-else class="fa-solid fa-user"></i>
             </div>
             <div href="#" class="user-info-box-left-login-content">
@@ -95,7 +93,7 @@ onMounted(async() => {
           </router-link>
           <router-link v-else to="/login" class="user-info-box">
             <div class="user-info-box-left-icon">
-              <img v-if="picture" :src="picture" alt="使用者頭像">
+              <img v-if="picture" :src="picture" alt="使用者頭像" />
               <i v-else class="fa-solid fa-user"></i>
             </div>
             <div href="#" class="user-info-box-left-login-content">
@@ -112,7 +110,9 @@ onMounted(async() => {
             </div>
             <div class="hero-member-box-left-login-content">
               <div class="hero-member-box-left-login-title">英雄榜</div>
-              <div class="hero-member-box-left-login-text">加入並成為專屬會員</div>
+              <div class="hero-member-box-left-login-text">
+                加入並成為專屬會員
+              </div>
             </div>
             <div class="hero-member-box-right">
               <i class="fa-solid fa-arrow-right"></i>
@@ -124,7 +124,11 @@ onMounted(async() => {
           <p>找到你要的工具，發掘更多玩法。</p>
         </div>
         <div class="work-shop-group">
-          <router-link :to="i.path" class="work-shop-outer" v-for="i in workShopData">
+          <router-link
+            :to="i.path"
+            class="work-shop-outer"
+            v-for="i in workShopData"
+          >
             <div class="work-shop-item">
               <img :src="i.imgUrl" alt="" />
               <div class="work-shop-item-content">
@@ -326,7 +330,7 @@ onMounted(async() => {
   overflow: hidden;
 }
 
-.work-shop-outer:hover .work-shop-item{
+.work-shop-outer:hover .work-shop-item {
   cursor: pointer;
   transform: scale(1.05);
   color: white;

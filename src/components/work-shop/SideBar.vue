@@ -285,7 +285,7 @@
 }
 
 .translate-btn::after {
-  content: "";
+  content: '';
   position: absolute;
   border-top: 1px solid #3f3f46;
   top: 50px;
@@ -312,7 +312,9 @@
     background-color: transparent;
     background-image: linear-gradient(
       to bottom,
-      transparent,rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 1),
+      transparent,
+      rgba(0, 0, 0, 0.85),
+      rgba(0, 0, 0, 1),
       rgba(0, 0, 0, 1)
     );
   }
@@ -368,7 +370,5 @@
   #sidebar-workshop {
     display: none;
   }
-
 }
-
 </style>

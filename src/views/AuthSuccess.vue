@@ -1,17 +1,17 @@
 <script setup>
-import { useRoute, useRouter } from 'vue-router';
-import Loading from '../components/Loading.vue';
+import { useRoute, useRouter } from 'vue-router'
+import Loading from '../components/Loading.vue'
 
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const router = useRouter()
 
-const token = route.query.token;
+const token = route.query.token
 
 if (token) {
-  localStorage.setItem('token', token);
-  router.push({ name: 'user' });
+  localStorage.setItem('token', token)
+  router.push({ name: 'user' })
 } else {
-  router.push({ name: 'login' });
+  router.push({ name: 'login' })
 }
 </script>
 

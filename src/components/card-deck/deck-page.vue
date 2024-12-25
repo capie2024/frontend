@@ -1,196 +1,6 @@
-<script>
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import { useDeckMakeStore } from "@/stores/deck-make";
-import { useCardSeriesStore } from '@/stores/card-series';
-import SidebarGrid from '../SidebarGrid.vue';
-import RemitCard from "../Mycard/remit-card.vue";
-
-const API_URL = import.meta.env.VITE_API_URL; 
-
-export default {
-    components: {
-        RemitCard,
-        SidebarGrid
-    },
-    data() {
-        return {
-            // 控制組件顯示或隱藏
-            isVisible: false,
-            deckData: {
-                deck: []
-            },  // 儲存從 API 獲得的牌組資料
-            sortBy: 'typeTranslate',
-            togglePriceView: false, // 用於切換價格表顯示
-            toggleTableView: false, // 用於切換顯示模式
-            deckMakeStore: useDeckMakeStore(),
-            cardSeriesStore: useCardSeriesStore(),
-        };
-    },
-    computed: {
-        totalPrice() {
-            if (!Array.isArray(this.deckData.deck)) {
-                return 0;
-            }
-            return this.deckData.deck.reduce((sum, card) => {
-                return sum + (card.price?.number || 0); // 確保價格存在
-            }, 0);
-        },
-        uniqueProductNames() {
-            const productNames = this.deckData.deck.map(card => card.productName);
-            return [...new Set(productNames)];
-        },
-        groupedCards() {
-            
-            let sorted = [];
-            if (this.sortBy === "level") {
-                sorted = [...this.deckData.deck].sort((a, b) => a.level - b.level);
-            } else if (this.sortBy === "color") {
-                const colorOrder = ["red", "yellow", "green", "blue"];
-                sorted = [...this.deckData.deck].sort((a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color));
-            } else if (this.sortBy === "typeTranslate") {
-                const typeOrder = ["角色", "事件", "名場"];
-                sorted = [...this.deckData.deck].sort((a, b) => typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate));
-            } else if (this.sortBy === "rare") {
-                sorted = [...this.deckData.deck].sort((a, b) => {
-                    if (a.rare.length !== b.rare.length) {
-                        return a.rare.length - b.rare.length;
-                    }
-                    return a.rare.localeCompare(b.rare, "en");
-                });
-            } else if (this.sortBy === "seriesCode") {
-                sorted = [...this.deckData.deck].sort((a, b) => a.seriesCode.localeCompare(b.seriesCode, "en"));
-            } else {
-                sorted = [...this.deckData.deck];
-            }
-
-            const grouped = sorted.reduce((acc, card) => {
-                let groupKey = card[this.sortBy];
-                
-                if (!acc[groupKey]) {
-                    acc[groupKey] = [];
-                }
-
-                acc[groupKey].push(card);
-                return acc;
-            }, {});
-
-            const colorMap = {
-                red: "紅色",
-                yellow: "黃色",
-                green: "綠色",
-                blue: "藍色",
-            };
-
-            const levelLabel = (level) => `${level}等`;
-
-            return Object.entries(grouped).map(([key, cards]) => ({
-                group: this.sortBy === "color" 
-                ? colorMap[key] || key 
-                : this.sortBy === "level" 
-                ? levelLabel(key) 
-                : key,
-                cards,
-            }));
-        }
-    },
-    mounted() {
-        this.fetchDeckData();
-    },
-    methods: {
-        confirmClose() {
-        Swal.fire({
-            title: '確定要離開嗎？',
-            text: '您的資料尚未完成，確定要離開嗎？',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: '離開',
-            cancelButtonText: '取消',
-            reverseButtons: true,
-        }).then((result) => {
-            if (result.isConfirmed) {
-            // 用戶確認離開，隱藏模態框
-            this.isVisible = false;
-            }
-        });
-        },
-        hideModal() {
-        // 使用 Vue 的響應式來隱藏 RemitCard 和 overlay
-        this.isVisible = false;
-        },
-        toggleVisibility() {
-        this.isVisible = !this.isVisible; // 切換 isVisible 的值
-        },
-        goToArticlePage() {
-            // 使用 Vue 的路由進行跳轉
-            const deckId = this.$route.params.deck_id;
-            this.$router.push(`/add/${deckId}`);
-        },
-        toggleRemitCard() {
-            this.isVisible = !this.isVisible;
-        },
-        async fetchDeckData() {
-            const deckId = this.$route.params.deck_id;
-            
-
-            try {
-                const response = await axios.get(`${API_URL}/api/deck-page/${deckId}`);
-                this.deckData = response.data;
-
-                if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
-                    console.error('回傳資料格式錯誤:', this.deckData);
-                    Swal.fire('錯誤', '無法獲取有效的資料', 'error');
-                    return;
-                }
-
-                if (!Array.isArray(this.deckData.deck)) {
-                    this.deckData.deck = [];
-                }
-            } catch (error) {
-                console.error('Error fetching deck data:', error);
-                Swal.fire('錯誤', '無法獲取資料', 'error');
-            }
-        },
-        togglePriceTableView() {
-            this.togglePriceView = !this.togglePriceView;
-        },
-        toggleViewMode() {
-            this.toggleTableView = !this.toggleTableView;
-        },
-        countSoulCards(cards) {
-            return cards.filter(card => card.trigger.includes('soul')).length;
-        },
-        setSortBy(property) {
-            this.sortBy = property; // 設定排序條件
-        },
-        async copyDeck(){
-            this.deckMakeStore.selectedCards = this.deckData.deck
-            this.deckMakeStore.saveLastDeckEdit();
-            const cardCode = this.deckData.deck[0].seriesCode
-            
-            let seriesId = ''
-            try {
-                const response = await axios.get(`${API_URL}/api/series`)
-                seriesId = response.data.find((series)=> {
-                    if(series.code.includes(cardCode)){
-                        return series
-                    }
-                }).id
-                
-            } catch (error) {
-                return (error);
-            }            
-            this.cardSeriesStore.saveLastViewSeries(seriesId)
-            this.$router.push(`/card-series/${ seriesId }`)
-        }
-    }
-};
-</script>
-
-
 <template>
     <div class="container">
-    <SidebarGrid style="grid-area: sidebar;" />  
+    <SidebarGrid />  
         <div class="bg-container">
             <main>
             <div  v-if="isVisible"  >
@@ -208,10 +18,10 @@ export default {
                             <h2>{{ deckData.deck_name }}</h2>
                         </div>
                         <div class="btn-area">
-                            <button class="social-btn-item social-btn1">
+                            <!-- <button class="social-btn-item social-btn1">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path></svg>
                                 <div class="description-item description1">分享</div>
-                            </button>
+                            </button> -->
                             <button class="social-btn-item social-btn2" @click="copyDeck" >
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"></path></svg>
                                 <div class="description-item description2">複製牌組</div>
@@ -229,16 +39,14 @@ export default {
                                 <div class="description-item description4">刪除牌組</div>
                             </button>
                             <button class="social-btn-item social-btn3">
-                                <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
+                                
                                 <div class="description-item description5">通知</div>
+                                <Notice/>
                             </button>
-                            <button class="user-btn">
-                                <div class="btn-img">
-                                    <img src="/src/img/麻衣.png" alt="">
-                                </div>                    
-                                <span>XXXX</span>
-                                <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-4 w-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path></svg>
-                            </button>
+                            <div class="user-btn">
+                                <NavLoginBtn/>
+                            </div>
+                            
                             <button class="social-btn-item social-btn5">
                                 <svg data-v-262b8d44="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"></path></svg>
                                 <!-- <div class="description-item description5">複製牌組</div> -->
@@ -446,9 +254,207 @@ export default {
                     </div>
                 </div>
             </main>
+            <MainFooter/>
         </div>
     </div>
 </template>
+
+<script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import { useDeckMakeStore } from "@/stores/deck-make";
+import { useCardSeriesStore } from '@/stores/card-series';
+import SidebarGrid from '../SidebarGrid.vue';
+import RemitCard from "../Mycard/remit-card.vue";
+import NavLoginBtn from '../NavLoginBtn.vue';
+import MainFooter from '../MainFooter.vue';
+import Notice from '../notification/notice.vue';
+
+
+
+const API_URL = import.meta.env.VITE_API_URL; 
+
+export default {
+    components: {
+        RemitCard,
+        SidebarGrid,
+        NavLoginBtn,
+        Notice,
+        MainFooter
+    },
+    data() {
+        return {
+            // 控制組件顯示或隱藏
+            isVisible: false,
+            deckData: {
+                deck: []
+            },  // 儲存從 API 獲得的牌組資料
+            sortBy: 'typeTranslate',
+            togglePriceView: false, // 用於切換價格表顯示
+            toggleTableView: false, // 用於切換顯示模式
+            deckMakeStore: useDeckMakeStore(),
+            cardSeriesStore: useCardSeriesStore(),
+        };
+    },
+    computed: {
+        totalPrice() {
+            if (!Array.isArray(this.deckData.deck)) {
+                return 0;
+            }
+            return this.deckData.deck.reduce((sum, card) => {
+                return sum + (card.price?.number || 0); // 確保價格存在
+            }, 0);
+        },
+        uniqueProductNames() {
+            const productNames = this.deckData.deck.map(card => card.productName);
+            return [...new Set(productNames)];
+        },
+        groupedCards() {
+            
+            let sorted = [];
+            if (this.sortBy === "level") {
+                sorted = [...this.deckData.deck].sort((a, b) => a.level - b.level);
+            } else if (this.sortBy === "color") {
+                const colorOrder = ["red", "yellow", "green", "blue"];
+                sorted = [...this.deckData.deck].sort((a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color));
+            } else if (this.sortBy === "typeTranslate") {
+                const typeOrder = ["角色", "事件", "名場"];
+                sorted = [...this.deckData.deck].sort((a, b) => typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate));
+            } else if (this.sortBy === "rare") {
+                sorted = [...this.deckData.deck].sort((a, b) => {
+                    if (a.rare.length !== b.rare.length) {
+                        return a.rare.length - b.rare.length;
+                    }
+                    return a.rare.localeCompare(b.rare, "en");
+                });
+            } else if (this.sortBy === "seriesCode") {
+                sorted = [...this.deckData.deck].sort((a, b) => a.seriesCode.localeCompare(b.seriesCode, "en"));
+            } else {
+                sorted = [...this.deckData.deck];
+            }
+
+            const grouped = sorted.reduce((acc, card) => {
+                let groupKey = card[this.sortBy];
+                
+                if (!acc[groupKey]) {
+                    acc[groupKey] = [];
+                }
+
+                acc[groupKey].push(card);
+                return acc;
+            }, {});
+
+            const colorMap = {
+                red: "紅色",
+                yellow: "黃色",
+                green: "綠色",
+                blue: "藍色",
+            };
+
+            const levelLabel = (level) => `${level}等`;
+
+            return Object.entries(grouped).map(([key, cards]) => ({
+                group: this.sortBy === "color" 
+                ? colorMap[key] || key 
+                : this.sortBy === "level" 
+                ? levelLabel(key) 
+                : key,
+                cards,
+            }));
+        }
+    },
+    mounted() {
+        this.fetchDeckData();
+    },
+    methods: {
+        confirmClose() {
+        Swal.fire({
+            title: '確定要離開嗎？',
+            text: '您的資料尚未完成，確定要離開嗎？',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '離開',
+            cancelButtonText: '取消',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+            // 用戶確認離開，隱藏模態框
+            this.isVisible = false;
+            }
+        });
+        },
+        hideModal() {
+        // 使用 Vue 的響應式來隱藏 RemitCard 和 overlay
+        this.isVisible = false;
+        },
+        toggleVisibility() {
+        this.isVisible = !this.isVisible; // 切換 isVisible 的值
+        },
+        goToArticlePage() {
+            // 使用 Vue 的路由進行跳轉
+            const deckId = this.$route.params.deck_id;
+            this.$router.push(`/add/${deckId}`);
+        },
+        toggleRemitCard() {
+            this.isVisible = !this.isVisible;
+        },
+        async fetchDeckData() {
+            const deckId = this.$route.params.deck_id;
+            
+
+            try {
+                const response = await axios.get(`${API_URL}/api/deck-page/${deckId}`);
+                this.deckData = response.data;
+
+                if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
+                    console.error('回傳資料格式錯誤:', this.deckData);
+                    Swal.fire('錯誤', '無法獲取有效的資料', 'error');
+                    return;
+                }
+
+                if (!Array.isArray(this.deckData.deck)) {
+                    this.deckData.deck = [];
+                }
+            } catch (error) {
+                console.error('Error fetching deck data:', error);
+                Swal.fire('錯誤', '無法獲取資料', 'error');
+            }
+        },
+        togglePriceTableView() {
+            this.togglePriceView = !this.togglePriceView;
+        },
+        toggleViewMode() {
+            this.toggleTableView = !this.toggleTableView;
+        },
+        countSoulCards(cards) {
+            return cards.filter(card => card.trigger.includes('soul')).length;
+        },
+        setSortBy(property) {
+            this.sortBy = property; // 設定排序條件
+        },
+        async copyDeck(){
+            this.deckMakeStore.selectedCards = this.deckData.deck
+            this.deckMakeStore.saveLastDeckEdit();
+            const cardCode = this.deckData.deck[0].seriesCode
+            
+            let seriesId = ''
+            try {
+                const response = await axios.get(`${API_URL}/api/series`)
+                seriesId = response.data.find((series)=> {
+                    if(series.code.includes(cardCode)){
+                        return series
+                    }
+                }).id
+                
+            } catch (error) {
+                return (error);
+            }            
+            this.cardSeriesStore.saveLastViewSeries(seriesId)
+            this.$router.push(`/card-series/${ seriesId }`)
+        }
+    }
+};
+</script>
 
 <style scoped>
     .modal {
@@ -615,6 +621,8 @@ export default {
     top: 250px;
     display: flex;
     flex-direction: column;
+    /* background-color: #121212; */
+    background: linear-gradient( transparent 500px,#121212) ;
     }
 
     .card-info-image {
@@ -1249,7 +1257,7 @@ export default {
         right: 28px;
         display: flex;
         gap:8px;
-        width: 311px;
+       
     }
 
 
@@ -1302,15 +1310,15 @@ export default {
 
 
     .description1 {
-        right:286px;
+        right:320px;
     }
 
     .description2 {
-        right:235px;
+        right:250px;
     }
 
     .description3 {
-        right:155px;
+        right:170px;
     }
 
     .description4 {
@@ -1318,11 +1326,11 @@ export default {
     }
 
     .description5 {
-        right: 91px;
+        right: 120px;
     }
 
     .description7 {
-        right: 193px;
+        right: 210px;
     }
 
     .description6 {
@@ -1357,11 +1365,11 @@ export default {
     }
 
     .user-btn {
-        width: 92px;
+        /* width: 92px; */
         height: 32px;
         border: none;
-        background-color: #121212;
-        opacity: 0.6;
+        /* background-color: #121212; */
+        /* opacity: 0.6; */
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1371,7 +1379,7 @@ export default {
     }
 
     .user-btn:hover {
-        background-color: #87462D;
+        /* background-color: #87462D; */
     }
 
 
@@ -1512,6 +1520,7 @@ export default {
     .data-item {
         display: flex;
         align-items: center;
+        white-space: nowrap;
     }
 
     span svg {
@@ -1996,6 +2005,7 @@ export default {
     }
     .btn-area{
         width: auto;
+        right: 0px;
     }
     .container{
         left: 0;
@@ -2237,6 +2247,12 @@ export default {
   }
     }
 
+    @media screen and (max-width: 576px) {
+        .toolbar-area2{
+            display: none;
+        }
+    }
+
     @media screen and (max-width: 410px) {
         .carddeck-name h1 {
             white-space:nowrap; /* 強制單行顯示 */
@@ -2244,9 +2260,17 @@ export default {
             text-overflow:ellipsis;
         }
     }
-    @media screen and (max-width: 576px) {
-        .toolbar-area2{
-            display: none;
+    
+    @media screen and (max-width: 375px){
+        
+        .tool-btn1{
+            min-width: 62px;
+        }
+        .toolbar{
+            margin-left: 10px;
+        }
+        .col-Sheet, .col-Info{
+            width: calc(100% - 235px);
         }
     }
 

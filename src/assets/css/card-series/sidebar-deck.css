@@ -499,3 +499,19 @@
   font-size: 12.8px;
   color: rgb(229, 231, 235);
 }
+
+@media screen and (width < 1200px)  {
+  .sidebar-deck {
+    width: 100%;
+    max-height: 100%;
+    margin: 0px;
+    color:white;
+    z-index:4;
+  }
+  .sidebar-header {
+    height: 80px;
+  }
+  .sidebar-deck-choice {
+    max-height: calc(100vh - 167px);
+  }
+}

@@ -1,6 +1,6 @@
 <template>
   <div class="work-shop-page-container">
-    <SidebarGrid style="grid-area: sidebar;" />
+    <SidebarGrid />
     <div class="work-shop-main-content-container">
       <header class="work-shop-header">
         <div class="header-container Top-bar">
@@ -237,7 +237,6 @@ const fetchCardSeries = async () => {
     try {
         const response = await axios.get(`${API_URL}/api/series`);
         originalSeries.value = response.data
-        console.log(originalSeries.value)
     }
     catch (err) {
         error.value = '獲取系列卡表資料失敗' + err.message
@@ -503,7 +502,6 @@ onMounted(() => {
 .work-shop-page-container {
   background-color: black;
   max-width: 100%;
-  max-height: 100vh;
   display: flex;
   box-sizing: border-box;
   overflow: hidden;
@@ -512,7 +510,7 @@ onMounted(() => {
 .work-shop-main-content-container {
   width: 100%;
   margin-top: 8px;
-  margin-right: 8px;
+  /* margin-right: 8px; */
   margin-bottom: 8px;
   color: white;
   border-radius: 16px;
@@ -776,20 +774,6 @@ onMounted(() => {
     line-height: 20px;
 }
 
-
-/* .page-control-status-btn {
-  max-width: 500px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  border-radius: 92px;
-  background-color: rgb(9, 9, 9, 0.8);
-  box-sizing: border-box;
-  padding: 0 4px;
-  transition: background-color 0.2s ease-in-out;
-} */
 
 .login {
     display: flex-end;
@@ -1142,7 +1126,6 @@ onMounted(() => {
     --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
     color: rgb(255 255 255 / var(--tw-text-opacity));
     --tw-shadow-color: rgba(14, 165, 233, .5);
-    /* --tw-shadow: var(--tw-shadow-colored); */
     color: white;
     width: 200px;
     height: 64px;
@@ -1430,8 +1413,10 @@ onMounted(() => {
 
 
     @media (width < 768px) {
-  
-    
+    .work-shop-page-container{
+        min-width: 100vw;
+    }
+
     .grid-card{
         grid-template-columns: repeat(2,minmax(0,1fr));
     }

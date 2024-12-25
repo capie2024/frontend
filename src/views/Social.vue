@@ -1,42 +1,142 @@
+<script>
+import axios from 'axios';
+import SidebarGrid from '../components/SidebarGrid.vue';
+
+const API_URL = import.meta.env.VITE_API_URL; 
+
+export default {
+    components: {
+    SidebarGrid,
+  },
+  data() {
+    return {
+      articles: [],
+      searchQuery: '',
+      filteredArticles:[],
+      socialHistory: JSON.parse(localStorage.getItem('socialHistory')) || [],
+      isScrolled: false,
+      intervalId: 123,
+    };
+  },
+  async created() {
+    try {
+      const response = await axios.get(`${API_URL}/api/articles`);
+      this.articles = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      this.filteredArticles = this.articles;
+    } catch (error) {
+      console.error('獲取文章列表失敗', error);
+    }
+  },
+  computed: {
+    searchResultCount() {
+      return this.filteredArticles.length;
+    },
+  },
+  methods:{
+    handleScroll() {
+      this.isScrolled = document.querySelector(".main").scrollTop > 0;      
+    },
+    startFunction() {
+      if(this.intervalId){
+        clearInterval(this.intervalId)
+      }
+      this.intervalId = setInterval(() => {
+        this.handleScroll()
+      }, 100);
+    },
+    formatDate(date) {
+        if (!date) {
+        return '';
+        }
+        return date.split('T')[0];
+    },
+    handleEnter() {
+      this.searchArticles();
+      this.addSearchHistory();
+      this.searchQuery = '';
+    },
+    addSearchHistory() {
+      if (this.searchQuery.trim()) {
+        const newHistory = { searchQuery: this.searchQuery.trim() };       
+        const existingIndex = this.socialHistory.findIndex(
+        (item) => item.searchQuery === newHistory.searchQuery
+        );
+
+        if (existingIndex !== -1) {
+        this.socialHistory.splice(existingIndex, 1);
+        }
+        this.socialHistory = [newHistory, ...this.socialHistory];
+        localStorage.setItem('socialHistory', JSON.stringify(this.socialHistory));
+        } 
+    },
+    
+    searchArticles() {
+      if (!this.searchQuery.trim()) {
+        this.filteredArticles = this.articles;
+      } else {
+      const query = this.searchQuery.toLowerCase();
+      this.filteredArticles = this.articles.filter(article =>
+        article.title.toLowerCase().includes(query) ||
+        article.content.toLowerCase().includes(query) ||
+        article.post_code.includes(query)
+      );
+      }
+    },
+    handleHistoryClick(searchQuery) {
+        this.searchQuery = searchQuery;
+        this.searchArticles(); 
+        this.addSearchHistory();
+    },
+    clearSearch() {
+        this.searchQuery = ''; 
+        this.filteredArticles = this.articles;
+    },
+  },
+  mounted() {
+      this.startFunction()       
+  },
+  beforeUnmount() {
+      window.removeEventListener("scroll", this.handleScroll);
+  },
+};
+</script>
 <template>
     <div class="container">
         <SidebarGrid />
         <div class="main">
-            <div class="social-container">
-                <div class="header-container">
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input v-model="searchQuery" @keyup.enter="handleEnter" class="search" type="text" placeholder="我想找找....?">
-                        <svg @click="clearSearch" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path></svg>
-                    </div>
-                    <button class="filter">
-                        <i class="fa-regular fa-window-restore"></i>
-                        篩選系列
-                        <i class="fa-solid fa-x"></i>
-                    </button>
-                    <button class="filter-hidden">
-                        <i class="fa-regular fa-window-restore"></i>
-                        CODE
-                        <i class="fa-solid fa-x"></i>
-                    </button>
-                    <div class="sign-container">
-                        <a :href="'/add'">
-                            <button class="add-article">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                                新增文章
-                            </button>
-                        </a>
-                        <button class="add-article-hidden">
+            <div class="header-container" :class="{'header-change': this.isScrolled}">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input v-model="searchQuery" @keyup.enter="handleEnter" class="search" type="text" placeholder="我想找找....?">
+                    <svg @click="clearSearch" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path></svg>
+                </div>
+                <button class="filter">
+                    <i class="fa-regular fa-window-restore"></i>
+                    篩選系列
+                    <i class="fa-solid fa-x"></i>
+                </button>
+                <button class="filter-hidden">
+                    <i class="fa-regular fa-window-restore"></i>
+                    CODE
+                    <i class="fa-solid fa-x"></i>
+                </button>
+                <div class="sign-container">
+                    <a :href="'/add'">
+                        <button class="add-article">
                             <i class="fa-solid fa-pen-to-square"></i>
+                            新增文章
                         </button>
-                        <div class="bell">
-                            <i class="fa-regular fa-bell"></i>
-                        </div>
-                        <div class="user-sign">
-                            <i class="fa-regular fa-user"></i>
-                            <span>登入</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
+                    </a>
+                    <button class="add-article-hidden">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <div class="bell">
+                        <i class="fa-regular fa-bell"></i>
+                    </div>
+                    <div class="user-sign">
+                        <i class="fa-regular fa-user"></i>
+                        <span>登入</span>
+                        <i class="fa-solid fa-chevron-down"></i>
                     </div>
                 </div>
             </div>
@@ -105,93 +205,10 @@
         </div>    
     </div>
 </template>
-<script>
-import axios from 'axios';
-import SidebarGrid from '../components/SidebarGrid.vue';
-
-const API_URL = import.meta.env.VITE_API_URL; 
-
-export default {
-    components: {
-    SidebarGrid,
-  },
-  data() {
-    return {
-      articles: [],
-      searchQuery: '',
-      filteredArticles:[],
-      socialHistory: JSON.parse(localStorage.getItem('socialHistory')) || [],
-    };
-  },
-  async created() {
-    try {
-      const response = await axios.get(`${API_URL}/api/articles`);
-      this.articles = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      this.filteredArticles = this.articles;
-    } catch (error) {
-      console.error('獲取文章列表失敗', error);
-    }
-  },
-  computed: {
-    searchResultCount() {
-      return this.filteredArticles.length;
-    },
-  },
-  methods:{
-    formatDate(date) {
-        if (!date) {
-        return '';
-        }
-        return date.split('T')[0];
-    },
-    handleEnter() {
-      this.searchArticles();
-      this.addSearchHistory();
-      this.searchQuery = '';
-    },
-    addSearchHistory() {
-      if (this.searchQuery.trim()) {
-        const newHistory = { searchQuery: this.searchQuery.trim() };       
-        const existingIndex = this.socialHistory.findIndex(
-        (item) => item.searchQuery === newHistory.searchQuery
-        );
-
-        if (existingIndex !== -1) {
-        this.socialHistory.splice(existingIndex, 1);
-        }
-        this.socialHistory = [newHistory, ...this.socialHistory];
-        localStorage.setItem('socialHistory', JSON.stringify(this.socialHistory));
-        } 
-    },
-    
-
-    searchArticles() {
-      if (!this.searchQuery.trim()) {
-        this.filteredArticles = this.articles;
-      } else {
-      const query = this.searchQuery.toLowerCase();
-      this.filteredArticles = this.articles.filter(article =>
-        article.title.toLowerCase().includes(query) ||
-        article.content.toLowerCase().includes(query) ||
-        article.post_code.includes(query)
-      );
-      }
-    },
-    handleHistoryClick(searchQuery) {
-        this.searchQuery = searchQuery;
-        this.searchArticles(); 
-        this.addSearchHistory();
-    },
-    clearSearch() {
-        this.searchQuery = ''; 
-        this.filteredArticles = this.articles;
-    },
-  },
-};
-</script>
 <style scoped>
     html,body {
         width: 100%;
+        height: 100vh;
     }
 
     a {
@@ -207,28 +224,24 @@ export default {
 
     .container {
         width: 100%;
-        display: block;
         position: relative;
     }
 
     .main {
+        height:calc(100vh - 16px);
+        border-radius: 1rem;
+        margin: 0.5rem;
         margin-left:270px;
-        height:100vh; 
         overflow: hidden;
-  
         overflow-y: scroll;
-        scrollbar-width: none;    
+        scrollbar-width: none;  
+        background-color: #121212;  
     }
 
-
-    .social-container {
-        width: 100%;
-        position: relative;
-        background-color: #121212;
-    }
 
     .header-container {
-        background-color: #020202;
+        background-color: rgba(0, 0, 0, 0);
+        transition: background-color 0.05s ease;
         width: 100%;
         min-width: 30%;
         height: 64px;
@@ -240,6 +253,10 @@ export default {
         z-index: 1;
     }
 
+    .header-change {
+        background-color: rgba(0, 0, 0, 1); 
+        transition: background-color 0.05s ease;
+    }
 
     .search-container {
         width: 271px;
@@ -335,6 +352,7 @@ export default {
         background-color: #D4D4D8;
         font-weight: 700;
         cursor: pointer;
+        border: none;
     }
 
     .add-article-hidden {
@@ -379,8 +397,8 @@ export default {
     .user-button {
         box-sizing: border-box;
         padding: 9px;
-        border: 1px solid #27272A;
-        background-color: rgb(24,24,17);
+        border: 1px solid #414142;
+        background-color: #27272A;
         color: #D4D4D8;
         width: 80px;
         border-radius: 10px;
@@ -414,7 +432,7 @@ export default {
         line-height: 1.75rem;
         color: #fff;
         text-align:start;
-        margin-bottom: 10px;
+        margin: 40px 0 16px 20px;
     }
 
     .subtitle {
@@ -660,12 +678,13 @@ export default {
     @media screen and (max-width: 1200px) {
         
         .main {
-            margin-left:0px;
+            margin:0px;
         }
 
         .sidebar-container {
             top:auto;
             bottom: 0;
+            background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
         }
 
 

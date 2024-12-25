@@ -453,117 +453,6 @@ header {
   z-index: 1;
 }
 
-.notice {
-  position: relative;
-}
-
-.notice-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 20px;
-  cursor: pointer;
-  border-radius: 50%;
-  padding: 6px;
-  background-color: transparent;
-  transition:
-    background-color 0.3s ease,
-    opacity 0.3s ease;
-}
-
-.notice-icon:hover {
-  background-color: #2a2727;
-  opacity: 0.8;
-}
-
-/* .notice:hover .notice-txt {
-    opacity: 1;
-} */
-
-.notice-grid-up h2 {
-  color: white;
-  font-weight: bolder;
-  font-size: 24px;
-}
-
-.notice-grid {
-  display: grid;
-  grid-template-columns: 352px;
-  grid-template-rows: 64px 416px;
-  position: absolute;
-  top: 120%;
-  left: 50%;
-  transform: translateX(-70%);
-  opacity: 0;
-  height: 0;
-  transition:
-    opacity 0.3s ease,
-    height 0.3s ease,
-    transform 0.3s ease;
-  z-index: 999;
-}
-
-#notice-jump:checked ~ .notice-grid {
-  opacity: 1;
-  height: 480px;
-}
-
-#notice-jump {
-  display: none;
-}
-
-.notice-grid-up {
-  grid-area: 1/1/2/2;
-  background-color: #27272a;
-  padding: 24px 16px 8px 16px;
-  border-radius: 10px 10px 0px 0px;
-}
-
-.notice-grid-down {
-  grid-area: 2/1/3/2;
-  background-color: #1f1f22;
-  border-radius: 0px 0px 10px 10px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.notice-grid-down img {
-  width: 240px;
-  height: 240px;
-  margin-bottom: 30px;
-}
-
-.notice-grid-down h2 {
-  font-size: 3rem;
-  font-weight: 700;
-  line-height: 1;
-  color: #f4f4f5;
-}
-
-.notice-grid-down p {
-  color: rgb(161 161 170);
-  font-size: 16px;
-  text-align: center;
-  margin-top: 10px;
-  line-height: 20px;
-}
-
-.login-btn {
-  display: flex;
-  align-items: center;
-}
-
-.login-btn > p {
-  color: white;
-  font-size: 16px;
-}
-
-.login-btn:hover {
-  background-color: #2a2727;
-}
-
 .background {
   height: calc(100vh - 1rem);
   width: calc(100% - 0.5rem);
@@ -709,14 +598,6 @@ header {
 
   .header-container {
     margin-top: 0;
-  }
-
-  .notice {
-    display: none;
-  }
-
-  .login-btn {
-    display: none;
   }
 
   .background {

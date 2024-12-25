@@ -215,9 +215,9 @@ export default {
         margin-left:270px;
         height:100vh; 
         overflow: hidden;
-  
         overflow-y: scroll;
-        scrollbar-width: none;    
+        scrollbar-width: none;  
+        background-color: #121212;  
     }
 
 
@@ -335,6 +335,7 @@ export default {
         background-color: #D4D4D8;
         font-weight: 700;
         cursor: pointer;
+        border: none;
     }
 
     .add-article-hidden {
@@ -379,8 +380,8 @@ export default {
     .user-button {
         box-sizing: border-box;
         padding: 9px;
-        border: 1px solid #27272A;
-        background-color: rgb(24,24,17);
+        border: 1px solid #414142;
+        background-color: #27272A;
         color: #D4D4D8;
         width: 80px;
         border-radius: 10px;
@@ -414,7 +415,7 @@ export default {
         line-height: 1.75rem;
         color: #fff;
         text-align:start;
-        margin-bottom: 10px;
+        margin: 40px 0 16px 20px;
     }
 
     .subtitle {
@@ -666,6 +667,7 @@ export default {
         .sidebar-container {
             top:auto;
             bottom: 0;
+            background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
         }
 
 

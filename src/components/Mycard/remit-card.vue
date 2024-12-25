@@ -363,6 +363,7 @@ methods: {
       background-color: rgb(18,18,18);
       border-radius:10px ;
       width: 551px;
+      
   }
   
   .modal-title {
@@ -629,6 +630,17 @@ methods: {
       .button-remit-div {
           width: 100%;
       }
+      .modal-content{
+      width: 80vw;
+      height: 60vh;
+    }
+  }
+  
+  @media screen and (max-width: 375px){
+    .modal-content{
+      width: 100vw;
+      height: 75vh;
+    }
   }
   
 </style>  

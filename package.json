@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:unit": "vitest",
-    "format": "prettier --write \"src/**/*.vue\""
+    "format": "prettier . --write"
   },
   "dependencies": {
     "@fancyapps/ui": "^5.0.36",

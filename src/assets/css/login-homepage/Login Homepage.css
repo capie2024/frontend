@@ -52,10 +52,10 @@ nav {
   padding: 16px 25px;
   position: fixed;
   /* fix */
-  width: calc(100% - 270px - .5rem);
+  width: calc(100% - 270px - 0.5rem);
   justify-content: flex-end;
   /* fix */
-  top: .5rem;
+  top: 0.5rem;
   left: 270px;
   z-index: 50;
   box-sizing: border-box;
@@ -103,7 +103,6 @@ nav {
   align-items: center;
   line-height: 32px;
   gap: 4px;
-
 }
 
 .search-bar-width {
@@ -242,7 +241,7 @@ nav {
 }
 
 .first-swiper-slide a::before {
-  content: "";
+  content: '';
   position: absolute;
   width: 100%;
   height: 20%;
@@ -573,7 +572,6 @@ nav {
   font-size: 0.875rem;
   font-weight: 700;
   overflow: hidden;
-  
 }
 .color-white {
   color: white;
@@ -636,7 +634,7 @@ a {
   .sidebar-menu::before {
     width: 100%;
     height: 100%;
-    content: "";
+    content: '';
     position: absolute;
     bottom: 0;
     left: 0;
@@ -682,8 +680,6 @@ a {
     font-size: 20px;
     line-height: 28px;
   }
-  
-
 }
 
 @media (width < 1024px) {

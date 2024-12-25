@@ -1,10 +1,10 @@
-import { nextTick } from 'vue';
-import Swiper from 'swiper/bundle';
-import 'swiper/css/bundle';
+import { nextTick } from 'vue'
+import Swiper from 'swiper/bundle'
+import 'swiper/css/bundle'
 
 nextTick(() => {
-  if (document.querySelector(".first-swiper-container")) {
-    const firstSwiper = new Swiper(".first-swiper-container", {
+  if (document.querySelector('.first-swiper-container')) {
+    const firstSwiper = new Swiper('.first-swiper-container', {
       direction: 'horizontal',
       loop: true,
       speed: 400,
@@ -31,22 +31,22 @@ nextTick(() => {
           slidesPerView: 1.2,
         },
       },
-    });
+    })
   }
 
-  if (document.querySelector(".second-swiper-container")) {
-    const secondSwiper = new Swiper(".second-swiper-container", {
+  if (document.querySelector('.second-swiper-container')) {
+    const secondSwiper = new Swiper('.second-swiper-container', {
       speed: 400,
       autoplay: {
         delay: 3000,
       },
       effect: 'cards',
       grabCursor: true,
-    });
+    })
   }
 
-  if (document.querySelector(".third-swiper-container")) {
-    const thirdSwiper = new Swiper(".third-swiper-container", {
+  if (document.querySelector('.third-swiper-container')) {
+    const thirdSwiper = new Swiper('.third-swiper-container', {
       direction: 'horizontal',
       loop: true,
       speed: 400,
@@ -76,6 +76,6 @@ nextTick(() => {
           spaceBetween: 15,
         },
       },
-    });
+    })
   }
-});
+})

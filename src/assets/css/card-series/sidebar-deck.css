@@ -8,29 +8,28 @@
   display: flex;
   flex-direction: column;
   border-radius: 17px;
-  overflow: hidden; 
-  background: linear-gradient(to bottom, #0C7266, #121212);
-  max-height: calc(100% - 16px); 
-  margin:8px 0 8px 8px;
-  color:white;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #0c7266, #121212);
+  max-height: calc(100% - 16px);
+  margin: 8px 0 8px 8px;
+  color: white;
   box-sizing: border-box;
   position: absolute;
-  top:0;
+  top: 0;
   bottom: 0;
 }
 
 .sidebar-header {
   height: 64px;
   display: flex;
-  justify-content: space-between; 
-  align-items: center; 
+  justify-content: space-between;
+  align-items: center;
   padding: 15px 20px;
   position: sticky;
-  background-color: #0C7266;
-  top:0;
+  background-color: #0c7266;
+  top: 0;
   box-sizing: border-box;
 }
-
 
 .sidebar-header > div:first-child > p:first-child {
   font-size: 20px;
@@ -44,8 +43,8 @@
 }
 
 .sidebar-header > div:last-child {
-  display: flex; 
-  justify-content: center; 
+  display: flex;
+  justify-content: center;
   align-items: center;
   gap: 10px;
 }
@@ -58,14 +57,14 @@
   padding: 0;
   border-radius: 50%;
   display: flex;
-  align-items: center; 
+  align-items: center;
   justify-content: center;
   cursor: pointer;
 }
 
 .icon i {
   color: white;
-  font-size: 20px; 
+  font-size: 20px;
 }
 
 .divder {
@@ -73,7 +72,7 @@
 }
 
 .del-btn:hover {
-  background-color: #EF4444;
+  background-color: #ef4444;
 }
 
 .xmark-btn:hover {
@@ -84,7 +83,6 @@
   color: black;
 }
 
-
 .sidebar-deck-choice {
   height: 54px;
   display: flex;
@@ -93,27 +91,47 @@
 }
 
 #type-btn-active {
-  background-image: linear-gradient(to right, rgb(132,204,24), rgb(8,183,211));
+  background-image: linear-gradient(
+    to right,
+    rgb(132, 204, 24),
+    rgb(8, 183, 211)
+  );
   box-shadow: 0px 0px 3px 0px white;
 }
 
 #color-btn-active {
-  background-image: linear-gradient(to right, rgb(132,204,24), rgb(8,183,211));
+  background-image: linear-gradient(
+    to right,
+    rgb(132, 204, 24),
+    rgb(8, 183, 211)
+  );
   box-shadow: 0px 0px 3px 0px white;
 }
 
 #level-btn-active {
-  background-image: linear-gradient(to right, rgb(132,204,24), rgb(8,183,211));
+  background-image: linear-gradient(
+    to right,
+    rgb(132, 204, 24),
+    rgb(8, 183, 211)
+  );
   box-shadow: 0px 0px 3px 0px white;
 }
 
 #rare-btn-active {
-  background-image: linear-gradient(to right, rgb(132,204,24), rgb(8,183,211));
+  background-image: linear-gradient(
+    to right,
+    rgb(132, 204, 24),
+    rgb(8, 183, 211)
+  );
   box-shadow: 0px 0px 3px 0px white;
 }
 
 #product-btn-active {
-  background-image: linear-gradient(to right, rgb(132,204,24), rgb(8,183,211));
+  background-image: linear-gradient(
+    to right,
+    rgb(132, 204, 24),
+    rgb(8, 183, 211)
+  );
   box-shadow: 0px 0px 3px 0px white;
 }
 
@@ -126,7 +144,7 @@
   gap: 5px;
   align-items: center;
   justify-content: center;
-  background-color: #27272A;
+  background-color: #27272a;
   border-radius: 7px;
   padding: 5px;
 }
@@ -146,7 +164,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #27272A;
+  background-color: #27272a;
   border-radius: 50%;
   padding: 5px;
 }
@@ -157,11 +175,11 @@
 .cash:hover::before {
   font-size: 13px;
   width: 70px;
-  content: "開啟價格";
-  padding:3px;
+  content: '開啟價格';
+  padding: 3px;
   background-color: #121212c3;
   position: absolute;
-  bottom:-27px;
+  bottom: -27px;
   border-radius: 9999px;
   z-index: 1;
 }
@@ -172,11 +190,11 @@
 .plus:hover::before {
   font-size: 13px;
   width: 90px;
-  content: "新增卡片模式";
-  padding:3px;
+  content: '新增卡片模式';
+  padding: 3px;
   background-color: #121212c3;
   position: absolute;
-  bottom:-27px;
+  bottom: -27px;
   border-radius: 9999px;
   z-index: 1;
 }
@@ -192,11 +210,11 @@
 .minus:hover::before {
   font-size: 13px;
   width: 90px;
-  content: "刪除卡片模式";
-  padding:3px;
+  content: '刪除卡片模式';
+  padding: 3px;
   background-color: #121212c3;
   position: absolute;
-  bottom:-27px;
+  bottom: -27px;
   border-radius: 9999px;
   z-index: 1;
 }
@@ -206,10 +224,9 @@
   background-color: rgb(239, 68, 68);
 }
 
-
 .card-content {
   padding: 10px 15px;
-  flex-grow: 1;  
+  flex-grow: 1;
   max-height: calc(100vh - 265px);
   overflow-y: scroll;
   scrollbar-width: none;
@@ -240,14 +257,14 @@
   display: flex;
   position: relative;
   object-fit: cover;
-  border-radius:10px ;
+  border-radius: 10px;
   overflow: hidden;
   margin: 5px;
   box-sizing: border-box;
 }
 
 .col-choice {
-  width:25%;
+  width: 25%;
   position: relative;
 }
 
@@ -286,10 +303,6 @@
   color: white;
 }
 
-
-
-
-
 .sidebar-footer {
   height: 87px;
   padding: 20px;
@@ -300,15 +313,15 @@
 }
 
 .sidebar-footer button {
-  width: 100%; 
-  background-color: #aa6e079a; 
-  color: white; 
-  border: none; 
-  padding: 10px 0; 
-  font-size: 18px; 
-  border-radius: 17px; 
+  width: 100%;
+  background-color: #aa6e079a;
+  color: white;
+  border: none;
+  padding: 10px 0;
+  font-size: 18px;
+  border-radius: 17px;
   text-align: center;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   opacity: 0.5;
 }
 
@@ -330,7 +343,7 @@
   gap: 3px;
 }
 
-.sidebar-footer button span svg{
+.sidebar-footer button span svg {
   display: inline;
   vertical-align: middle;
 }
@@ -359,7 +372,7 @@
   gap: 8px;
 }
 
-.deck-save-title-section p{
+.deck-save-title-section p {
   font-size: 14px;
 }
 
@@ -372,7 +385,7 @@
   font-weight: 700;
 }
 
-.deck-save-title-section input{
+.deck-save-title-section input {
   padding: 8px;
   border-radius: 12px;
   line-height: 24px;
@@ -380,11 +393,11 @@
   background-color: rgba(39, 39, 42, 0.7);
 }
 
-.deck-save-title-section input:focus{
+.deck-save-title-section input:focus {
   background-color: rgba(24, 24, 27, 0.5);
 }
 
-.deck-save-title-section input:hover{
+.deck-save-title-section input:hover {
   background-color: rgba(24, 24, 27, 0.5);
 }
 
@@ -404,7 +417,7 @@
   font-weight: 700;
 }
 
-.deck-save-content-section textarea{
+.deck-save-content-section textarea {
   background-color: rgba(39, 39, 42, 0.7);
   padding: 8px;
   border-radius: 12px;
@@ -412,14 +425,13 @@
   outline: none;
 }
 
-.deck-save-content-section textarea:focus{
+.deck-save-content-section textarea:focus {
   background-color: rgba(24, 24, 27, 0.5);
 }
 
-.deck-save-content-section textarea:hover{
+.deck-save-content-section textarea:hover {
   background-color: rgba(24, 24, 27, 0.5);
 }
-
 
 .deck-save-covercard-section {
   width: 100%;
@@ -445,10 +457,10 @@
   gap: 8px;
   box-sizing: border-box;
   border-radius: 12px;
-  border: 2px solid rgb(34,45,47);
+  border: 2px solid rgb(34, 45, 47);
 }
 
-.deck-save-covercard-section-content-card{
+.deck-save-covercard-section-content-card {
   max-width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -462,12 +474,12 @@
   background-color: rgb(21, 94, 117);
 }
 
-.deck-save-covercard-section-content-card:hover{
+.deck-save-covercard-section-content-card:hover {
   cursor: pointer;
   background-color: rgba(39, 39, 42, 0.7);
 }
 
-.deck-save-covercard-section-content-card img{
+.deck-save-covercard-section-content-card img {
   min-width: 64px;
   max-height: 64px;
   object-fit: cover;
@@ -491,9 +503,7 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   line-height: 24px;
-  
 }
-
 
 .deck-save-covercard-section-content-card p {
   font-size: 12.8px;

@@ -4,17 +4,15 @@ import NavLoginBtn from '@/components/NavLoginBtn.vue'
 import Notice from '@/components/notification/notice.vue'
 
 const goBack = () => {
-  router.go(-1);
+  router.go(-1)
 }
-
-
 </script>
 
 <template>
   <div class="page-control-container">
     <div class="page-control">
       <div class="page-control-left">
-        <button class="page-control-up-btn" @click="goBack" >
+        <button class="page-control-up-btn" @click="goBack">
           <i class="fa-solid fa-chevron-left"></i>
         </button>
       </div>

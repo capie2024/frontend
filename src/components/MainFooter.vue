@@ -9,7 +9,13 @@ const footerData = [
   },
   {
     title: '資源',
-    linkText: ['Bushi DeckLog', 'Bushi DeckLog EN', '遊々亭價格', '基本規則', '禁卡表'],
+    linkText: [
+      'Bushi DeckLog',
+      'Bushi DeckLog EN',
+      '遊々亭價格',
+      '基本規則',
+      '禁卡表',
+    ],
   },
   {
     title: '常用連結',
@@ -26,7 +32,10 @@ const footerData = [
           <li class="main-footer-flexbox-left-item-title">
             {{ item.title }}
           </li>
-          <li class="main-footer-flexbox-left-item-link" v-for="link in item.linkText">
+          <li
+            class="main-footer-flexbox-left-item-link"
+            v-for="link in item.linkText"
+          >
             <a
               href="#"
               :class="{

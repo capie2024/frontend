@@ -127,9 +127,11 @@ export default {
                             新增文章
                         </button>
                     </a>
-                    <button class="add-article-hidden">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
+                    <a :href="'/add'">
+                        <button class="add-article-hidden">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </a>
                     <div class="bell">
                         <i class="fa-regular fa-bell"></i>
                     </div>

@@ -29,7 +29,7 @@ import deckPage from "../components/card-deck/deck-page.vue";
 import AddPostDeck from "../components/card-deck/AddPostDeck.vue";
 import Notice from "../components/notification/notice.vue";
 import Notification from "../components/notification/notification.vue";
-
+import Team from "../views/Team.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -187,6 +187,11 @@ const router = createRouter({
       path:"/notification",
       name:"notification",
       component: Notification
+    },
+    {
+      path:"/team",
+      name:"Team",
+      component: Team
     }
   ],
 });

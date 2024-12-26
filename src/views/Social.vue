@@ -2,9 +2,10 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import SidebarGrid from '../components/SidebarGrid.vue';
-
-const API_URL = import.meta.env.VITE_API_URL;
-
+import NavLoginBtn from '../components/NavLoginBtn.vue';
+import Notice from '../components/notification/notice.vue';
+import MainFooter from '../components/MainFooter.vue';
+const API_URL = import.meta.env.VITE_API_URL; 
 
 const articles = ref([]);
 const searchQuery = ref('');
@@ -152,12 +153,10 @@ onBeforeUnmount(() => {
                         </button>
                     </a>
                     <div class="bell">
-                        <i class="fa-regular fa-bell"></i>
+                        <Notice/>
                     </div>
                     <div class="user-sign">
-                        <i class="fa-regular fa-user"></i>
-                        <span>登入</span>
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <NavLoginBtn/>
                     </div>
                 </div>
             </div>
@@ -221,8 +220,8 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
                 </a>     
-                    
             </section>
+                   <MainFooter/>
         </div>    
     </div>
 </template>

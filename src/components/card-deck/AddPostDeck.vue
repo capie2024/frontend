@@ -1,33 +1,123 @@
 <template>
-  <SidebarGrid />  
+  <SidebarGrid />
   <main>
     <div class="header-bg">
       <header>
         <div class="pagebtn-area">
           <button class="page-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              ></path>
+            </svg>
           </button>
           <button class="page-btn next-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              ></path>
+            </svg>
           </button>
           <h2>新增文章</h2>
         </div>
         <div class="btn-area">
           <button class="submit-btn" @click="submitArticle">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"></path></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none size-5 stroke-2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"
+              ></path>
+            </svg>
             <span>送出</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none size-5 stroke-2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+              ></path>
+            </svg>
           </button>
           <button class="bell">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="size-6 stroke-2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
+              ></path>
+            </svg>
             <div class="notice">通知</div>
           </button>
           <button class="user-btn">
-              <div class="btn-img">
-                  <img src="/src/img/麻衣.png" alt="">
-              </div>                    
-              <span>XXXX</span>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-4 w-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path></svg>
+            <div class="btn-img">
+              <img src="/src/img/麻衣.png" alt="" />
+            </div>
+            <span>XXXX</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="h-4 w-4 flex-none"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              ></path>
+            </svg>
           </button>
         </div>
       </header>
@@ -35,28 +125,104 @@
     <section class="title-area">
       <div class="title-area-container">
         <button class="upload-btn" @click="handleButtonClick" alt="">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-20 w-20"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
-          <img :src="deckData.deck_cover"  alt="">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="h-20 w-20"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+            ></path>
+          </svg>
+          <img :src="deckData.deck_cover" alt="" />
         </button>
         <div class="add-section">
           <div class="add-article">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="size-5 md:size-6 flex-none"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
+              ></path>
+            </svg>
             <p>新增文章</p>
           </div>
-          <input v-model="title" class="enter-title" type="text" >
+          <input v-model="title" class="enter-title" type="text" />
           <div class="card-select-area">
             <button class="card-select-btn" @click="toggleMenu">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
-              <p> {{ deckData.deck_name }} </p>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="size-5 md:size-6 flex-none"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                ></path>
+              </svg>
+              <p>{{ deckData.deck_name }}</p>
             </button>
-            <ul class="menu-area" v-show="menuExpanded" :style="{ height: menuHeight + 'px' }">
+            <ul
+              class="menu-area"
+              v-show="menuExpanded"
+              :style="{ height: menuHeight + 'px' }"
+            >
               <li class="menu-search">
-                <input v-model="searchQuery" @keyup="searchSeries" class="keyword" type="text" placeholder="Keyword">
+                <input
+                  v-model="searchQuery"
+                  @keyup="searchSeries"
+                  class="keyword"
+                  type="text"
+                  placeholder="Keyword"
+                />
                 <button @click="clearSearch">✖</button>
               </li>
-                    
-              <li class="menu" v-for="deck in filteredDecks" :key="deck.id" v-if="decks && decks.length" @click="selectDeck(deck)">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path></svg>
+
+              <li
+                class="menu"
+                v-for="deck in filteredDecks"
+                :key="deck.id"
+                v-if="decks && decks.length"
+                @click="selectDeck(deck)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="size-5 md:size-6 flex-none"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                  ></path>
+                </svg>
                 <p class="text-xs truncate">{{ deck.deck_name }}</p>
               </li>
             </ul>
@@ -67,136 +233,191 @@
         </div>
       </div>
     </section>
-      <section class="text-area">
-        <div class="edit-area">
-          <div class="message-tag">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="text-white/50 size-8"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"></path></svg>
-            <input type="text" placeholder="#Tag1#Tag2">
-          </div>
+    <section class="text-area">
+      <div class="edit-area">
+        <div class="message-tag">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="text-white/50 size-8"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+            ></path>
+          </svg>
+          <input type="text" placeholder="#Tag1#Tag2" />
+        </div>
 
-            <editor v-model="content"
-              :api-key = Tiny_API_KEY
-              :init="{
-                height: 415,
-                menubar: false,
-                plugins: 'lists link image',
-                toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
-                content_style: 'body { background-color: #222F3E ;color: #FFF; }' ,
-              }"
-            />
-          
-        </div>
-        <div class="message-area">
-          <div class="user-message">
-            <div class="message-user-img">
-              <img src="/src/img/麻衣.png" alt="">
-            </div>
-            <div class="message">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-7 default-transition text-zinc-300"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"></path></svg>
-              <input class="enter-message" type="text" placeholder="留言...">
-              <button>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"></path></svg>
-              </button>
-            </div>
-          </div>
-          <span class="message-count">0則留言</span>
-        </div>
-      </section>
-      <footer>
-        <MainFooter />
-      </footer>
-      
-      <div class="deck-container">
-          <div class="deck-img">
-              <img src="/src/img/麻衣.png" alt="">
-          </div>
-          <div class="deck-content">
-              <div class="line"></div>
-              <div class="total-cards">
-                  <h2>刪除 DG/S02-027R</h2>
-                  <span>牌組製作，共84張卡</span>
-              </div>
-              <div class="deckbtn-area">
-                  <button class="deck-btn">
-                      <i class="fa-regular fa-circle-up"></i>
-                  </button>
-                  <div class="pay-btn">
-                      <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
-                      <span>00000 ¥</span>
-                  </div>
-              </div>
-          </div>
+        <editor
+          v-model="content"
+          :api-key="Tiny_API_KEY"
+          :init="{
+            height: 415,
+            menubar: false,
+            plugins: 'lists link image',
+            toolbar:
+              'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
+            content_style: 'body { background-color: #222F3E ;color: #FFF; }',
+          }"
+        />
       </div>
-  </main>
+      <div class="message-area">
+        <div class="user-message">
+          <div class="message-user-img">
+            <img src="/src/img/麻衣.png" alt="" />
+          </div>
+          <div class="message">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none size-7 default-transition text-zinc-300"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
+              ></path>
+            </svg>
+            <input class="enter-message" type="text" placeholder="留言..." />
+            <button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <span class="message-count">0則留言</span>
+      </div>
+    </section>
+    <footer>
+      <MainFooter />
+    </footer>
 
+    <div class="deck-container">
+      <div class="deck-img">
+        <img src="/src/img/麻衣.png" alt="" />
+      </div>
+      <div class="deck-content">
+        <div class="line"></div>
+        <div class="total-cards">
+          <h2>刪除 DG/S02-027R</h2>
+          <span>牌組製作，共84張卡</span>
+        </div>
+        <div class="deckbtn-area">
+          <button class="deck-btn">
+            <i class="fa-regular fa-circle-up"></i>
+          </button>
+          <div class="pay-btn">
+            <svg
+              width="24px"
+              height="24px"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="size-6 flex-none"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              ></path>
+            </svg>
+            <span>00000 ¥</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import SidebarGrid from '../SidebarGrid.vue';
-import MainFooter from "@/components/MainFooter.vue";
-import Editor from '@tinymce/tinymce-vue';
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import SidebarGrid from '../SidebarGrid.vue'
+import MainFooter from '@/components/MainFooter.vue'
+import Editor from '@tinymce/tinymce-vue'
 
 const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY
-const router = useRouter();
-const route = useRoute();
+const router = useRouter()
+const route = useRoute()
 
-
-const token = ref(localStorage.getItem('token'));
+const token = ref(localStorage.getItem('token'))
 const deckData = reactive({
   deck_name: '',
   deck: [],
-});
-const title = ref('');
-const content = ref('');
-const decks = ref([]);
-const filteredDecks = ref([]);
-const menuExpanded = ref(false);
-const menuHeight = ref(0);
-const searchQuery = ref('');
-
+})
+const title = ref('')
+const content = ref('')
+const decks = ref([])
+const filteredDecks = ref([])
+const menuExpanded = ref(false)
+const menuHeight = ref(0)
+const searchQuery = ref('')
 
 const fetchDeckData = async () => {
-  const API_URL = import.meta.env.VITE_API_URL;
-  const deckId = route.params.deck_id;
+  const API_URL = import.meta.env.VITE_API_URL
+  const deckId = route.params.deck_id
   try {
-    const response = await axios.get(`${ API_URL }/api/deck-page/${ deckId }`);
-    title.value = response.data.deck_name || '';
-    deckData.deck_name = response.data.deck_name || '';
-    deckData.deck = Array.isArray(response.data.deck) ? response.data.deck : [];
-    deckData.deck_cover = response.data.deck_cover;
-    deckData.id = response.data.id;
+    const response = await axios.get(`${API_URL}/api/deck-page/${deckId}`)
+    title.value = response.data.deck_name || ''
+    deckData.deck_name = response.data.deck_name || ''
+    deckData.deck = Array.isArray(response.data.deck) ? response.data.deck : []
+    deckData.deck_cover = response.data.deck_cover
+    deckData.id = response.data.id
   } catch (error) {
-    console.error('獲取文章資料失敗', error);
+    console.error('獲取文章資料失敗', error)
   }
-};
-
+}
 
 const getUserDecks = async () => {
-  if (!token.value) return;
-  const API_URL = import.meta.env.VITE_API_URL;
+  if (!token.value) return
+  const API_URL = import.meta.env.VITE_API_URL
   try {
-    const res = await axios.get(`${ API_URL }/decks`, {
+    const res = await axios.get(`${API_URL}/decks`, {
       headers: { Authorization: `Bearer ${token.value}` },
-    });
-    decks.value = res.data.decks;
-    filteredDecks.value = res.data.decks;
+    })
+    decks.value = res.data.decks
+    filteredDecks.value = res.data.decks
   } catch (error) {
-    console.error('獲取牌組資料失敗', error);
+    console.error('獲取牌組資料失敗', error)
   }
-};
-
+}
 
 const submitArticle = async () => {
   try {
-
-    
-    const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = import.meta.env.VITE_API_URL
     const response = await axios.post(
-      `${ API_URL }/api/decks`,
+      `${API_URL}/api/decks`,
       {
         title: title.value,
         content: content.value,
@@ -206,9 +427,9 @@ const submitArticle = async () => {
       {
         headers: { Authorization: `Bearer ${token.value}` },
       }
-    );
+    )
 
-    const postCode = response.data.post_code;
+    const postCode = response.data.post_code
 
     Swal.fire({
       icon: 'success',
@@ -216,88 +437,148 @@ const submitArticle = async () => {
       showConfirmButton: false,
       timer: 1000,
     }).then(() => {
-      router.push(`/social/${postCode}`);
-    });
+      router.push(`/social/${postCode}`)
+    })
   } catch (error) {
     if (error.response && error.response.status === 403) {
-      const BASE_URL = import.meta.env.VITE_BASE_URL; 
+      const BASE_URL = import.meta.env.VITE_BASE_URL
       Swal.fire({
-        title: "請先登入",
-        text: "登入後才能發布文章",
-        icon: "warning",
-        confirmButtonText: "確定",
+        title: '請先登入',
+        text: '登入後才能發布文章',
+        icon: 'warning',
+        confirmButtonText: '確定',
       }).then(() => {
-        window.location.href = `${BASE_URL}/login`;
-      });
+        window.location.href = `${BASE_URL}/login`
+      })
     } else {
-
       Swal.fire({
         icon: 'error',
         title: '新增文章失敗',
-        text: error.message, 
-      });
+        text: error.message,
+      })
     }
   }
-};
-
+}
 
 const toggleMenu = () => {
-  menuExpanded.value = !menuExpanded.value;
-  if (menuExpanded.value) calculateMenuHeight();
-};
-
+  menuExpanded.value = !menuExpanded.value
+  if (menuExpanded.value) calculateMenuHeight()
+}
 
 const calculateMenuHeight = () => {
-  menuHeight.value = 45 + filteredDecks.value.length * 35;
-};
-
+  menuHeight.value = 45 + filteredDecks.value.length * 35
+}
 
 const selectDeck = (deck) => {
-  title.value = deck.deck_name;
-  deckData.deck_name = deck.deck_name;
-  deckData.deck_cover = deck.deck_cover;
-  deckData.id = deck.id;
-  menuExpanded.value = false;
-};
-
+  title.value = deck.deck_name
+  deckData.deck_name = deck.deck_name
+  deckData.deck_cover = deck.deck_cover
+  deckData.id = deck.id
+  menuExpanded.value = false
+}
 
 const searchSeries = () => {
-  const query = searchQuery.value.trim().toLowerCase();
+  const query = searchQuery.value.trim().toLowerCase()
   filteredDecks.value = query
-    ? decks.value.filter((deck) => deck.deck_name?.toLowerCase().includes(query))
-    : decks.value;
-  calculateMenuHeight();
-};
-
+    ? decks.value.filter((deck) =>
+        deck.deck_name?.toLowerCase().includes(query)
+      )
+    : decks.value
+  calculateMenuHeight()
+}
 
 const clearSearch = () => {
-  searchQuery.value = '';
-  filteredDecks.value = decks.value;
-  calculateMenuHeight();
-};
-
+  searchQuery.value = ''
+  filteredDecks.value = decks.value
+  calculateMenuHeight()
+}
 
 onMounted(() => {
-  fetchDeckData();
-  getUserDecks();
-});
-
+  fetchDeckData()
+  getUserDecks()
+})
 </script>
 
 <style scoped>
-div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
   margin: 0;
   padding: 0;
   border: 0;
@@ -306,21 +587,34 @@ time, mark, audio, video {
   vertical-align: baseline;
 }
 
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
   display: block;
 }
 body {
   line-height: 1;
 }
-ol, ul {
+ol,
+ul {
   list-style: none;
 }
-blockquote, q {
+blockquote,
+q {
   quotes: none;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
   content: '';
   content: none;
 }
@@ -329,9 +623,9 @@ table {
   border-spacing: 0;
 }
 
-  a {
+a {
   text-decoration: none;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .sidebar-container {
@@ -343,7 +637,7 @@ table {
   position: relative;
   width: 20%;
   height: 64px;
-  background-color: #32C9FF;
+  background-color: #32c9ff;
   min-width: 195px;
   display: flex;
   align-items: center;
@@ -383,13 +677,13 @@ table {
   position: absolute;
   right: 30px;
   display: flex;
-  gap:8px;
+  gap: 8px;
 }
 
 .notice {
   width: 30px;
   height: 25px;
-  background-color: #2D7894;
+  background-color: #2d7894;
   color: white;
   border-radius: 15px;
   font-size: 15px;
@@ -399,12 +693,12 @@ table {
   align-items: center;
   text-align: center;
   padding: 0 8px 0 8px;
-  position:absolute;
-  right:105px;
-  top:35px;
+  position: absolute;
+  right: 105px;
+  top: 35px;
   opacity: 0;
   visibility: hidden;
-  transition:ease 0.3s;
+  transition: ease 0.3s;
 }
 
 .submit-btn {
@@ -420,8 +714,8 @@ table {
   cursor: pointer;
 }
 
-.submit-btn:hover{
-  background-color: #F59E0B;
+.submit-btn:hover {
+  background-color: #f59e0b;
   color: white;
   stroke: white;
 }
@@ -451,7 +745,7 @@ table {
   height: 32px;
   border-radius: 50%;
   border: none;
-  background-color: rgba(0,0,0,0);
+  background-color: rgba(0, 0, 0, 0);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -459,10 +753,10 @@ table {
 }
 
 .bell:hover {
-  background-color: #2D7894;
+  background-color: #2d7894;
 }
 
-.bell:hover .notice{
+.bell:hover .notice {
   opacity: 1;
   visibility: visible;
 }
@@ -475,21 +769,20 @@ table {
 
 .user-btn {
   border: none;
-  background-color:#19647F;
+  background-color: #19647f;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 20px;
-  gap:8px;
+  gap: 8px;
   cursor: pointer;
 }
 
 .user-btn:hover {
-  background-color: #2D7894;
+  background-color: #2d7894;
 }
 
-
-.btn-img img{
+.btn-img img {
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -510,7 +803,7 @@ main {
   /* width: 100%; */
   width: calc(100% - 278px);
   /* height: calc(100vh - 16px); */
-  background-color: #32C9FF;
+  background-color: #32c9ff;
   scroll-behavior: smooth;
 }
 
@@ -519,12 +812,12 @@ main {
   width: calc(100% - 278px);
   height: 72px;
   position: fixed;
-  top:0;
+  top: 0;
   z-index: 4;
 }
 
 header {
-  background-color: #32C9FF;
+  background-color: #32c9ff;
   border-radius: 20px 20px 0 0;
   width: 100%;
   position: absolute;
@@ -568,8 +861,6 @@ header {
   top: 0;
 }
 
-
-
 .upload-btn svg {
   width: 85px;
   height: 85px;
@@ -595,7 +886,7 @@ header {
   margin-bottom: 8px;
 }
 
-.add-article svg{
+.add-article svg {
   width: 24px;
   height: 24px;
   color: white;
@@ -609,8 +900,7 @@ header {
   color: white;
 }
 
-
-.enter-title  {
+.enter-title {
   box-sizing: border-box;
   color: white;
   padding: 6px;
@@ -619,12 +909,12 @@ header {
   width: 90%;
   font-size: 80px;
   height: 105px;
-  background-color: #32C9FF;
-  border-bottom: 1px solid #99E4FF;
+  background-color: #32c9ff;
+  border-bottom: 1px solid #99e4ff;
 }
 
 .enter-title:focus {
-  outline:none;
+  outline: none;
 }
 
 .enter-title::placeholder {
@@ -632,22 +922,21 @@ header {
   font-weight: 900;
 }
 
-
 .menu {
   display: flex;
   align-items: center;
-  padding: 5px 10px ;
+  padding: 5px 10px;
   color: white;
   cursor: pointer;
   gap: 5px;
 }
 
 .menu-area {
-  display:grid;
+  display: grid;
   position: absolute;
   background-color: #20567a;
   border-radius: 7px;
-  width:270px;
+  width: 270px;
   margin-top: 45px;
   margin-left: 5px;
   overflow: hidden;
@@ -658,34 +947,33 @@ header {
 .menu-search {
   display: flex;
   align-items: center;
-  padding: 10px ;
+  padding: 10px;
   color: white;
   position: relative;
-  width:250px;
+  width: 250px;
 }
 
-.keyword  {
+.keyword {
   box-sizing: border-box;
   color: white;
   padding: 4px 8px;
   border: 1px solid gray;
-  border-radius:10px;
+  border-radius: 10px;
   display: flex;
   background-color: transparent;
   outline: none;
-  width:250px;
+  width: 250px;
 }
 
 .menu-search button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    color: white;
-    position: absolute;
-    right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: white;
+  position: absolute;
+  right: 12px;
 }
-
 
 .card-select-area {
   width: 100%;
@@ -702,7 +990,7 @@ header {
   justify-content: center;
   align-items: center;
   border: none;
-  background-color: #2FB7E7;
+  background-color: #2fb7e7;
   cursor: pointer;
   gap: 5px;
 }
@@ -714,10 +1002,11 @@ header {
 }
 
 .card-select-btn:hover {
-  background-color: #2D7894;
+  background-color: #2d7894;
 }
 
-.card-select-btn svg, .menu svg {
+.card-select-btn svg,
+.menu svg {
   width: 24px;
   height: 24px;
   stroke: white;
@@ -739,7 +1028,7 @@ header {
   box-sizing: border-box;
   height: 520px;
   display: flex;
-  background:linear-gradient(to bottom, #20637A, #131617);
+  background: linear-gradient(to bottom, #20637a, #131617);
 }
 
 .edit-area {
@@ -747,7 +1036,7 @@ header {
   height: 456px;
   padding: 8px;
   box-sizing: border-box;
-  background-color: #1C3D4B;
+  background-color: #1c3d4b;
   margin: 32px 0 0 24px;
   border-radius: 10px;
 }
@@ -757,15 +1046,15 @@ header {
   border-radius: 10px;
   height: 392px;
   width: calc(100% - 8px);
-  background-color: #222F3E;
+  background-color: #222f3e;
   border: 2px solid black;
 }
 
 .message-tag {
   width: 50%;
-  background-color: #1C3D4B;
+  background-color: #1c3d4b;
   display: flex;
-  gap:8px;
+  gap: 8px;
 }
 
 .message-tag svg {
@@ -781,13 +1070,12 @@ header {
   border: none;
   color: rgb(116, 112, 112);
   font-size: 16px;
-  border-bottom: 2px solid rgb(116, 112, 112);;
+  border-bottom: 2px solid rgb(116, 112, 112);
 }
 
 .message-tag input:focus {
   outline: none;
 }
-
 
 .message-area {
   width: 45%;
@@ -815,7 +1103,7 @@ header {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  background-color: #1C3D4B;
+  background-color: #1c3d4b;
   border-radius: 10px;
   padding: 8px;
 }
@@ -824,7 +1112,7 @@ header {
   background-color: black;
 }
 
-.message-user-img img{
+.message-user-img img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -839,11 +1127,10 @@ header {
 .message-count {
   color: white;
   position: absolute;
-  top:56px;
+  top: 56px;
   right: 40px;
   font-weight: bold;
 }
-
 
 .enter-message {
   width: 100%;
@@ -851,7 +1138,7 @@ header {
   background-color: transparent;
   border: none;
   font-size: 16px;
-  transform: translate(-5px,1px);
+  transform: translate(-5px, 1px);
   color: white;
 }
 
@@ -866,7 +1153,7 @@ header {
 .message button {
   width: 32px;
   height: 32px;
-  background-color: #3F3F46;
+  background-color: #3f3f46;
   border-radius: 50%;
   border: none;
   cursor: pointer;
@@ -881,7 +1168,7 @@ header {
 }
 
 footer {
-  background-color: #222F3E;
+  background-color: #222f3e;
   width: 100%;
   height: 401px;
   color: white;
@@ -891,10 +1178,10 @@ footer {
   width: 100%;
   height: 66px;
   display: flex;
-  background-color: #0D0B0C;
+  background-color: #0d0b0c;
   position: fixed;
   bottom: 0;
-  display: none;    
+  display: none;
 }
 
 .nav-link {
@@ -917,14 +1204,13 @@ footer {
   stroke: #b1afaf;
 }
 
-.link-word{
+.link-word {
   font-size: 9px;
   margin-top: 8px;
   color: #b1afaf;
 }
 
-
-.nav-link:hover svg{
+.nav-link:hover svg {
   stroke: white;
 }
 
@@ -932,14 +1218,13 @@ footer {
   color: white;
 }
 
-.social-icon svg{
+.social-icon svg {
   stroke: white;
 }
 
 .social-icon span {
   color: white;
 }
-
 
 .deck-container {
   width: 99%;
@@ -964,7 +1249,6 @@ footer {
   object-fit: cover;
 }
 
-
 .deck-content {
   width: 92%;
   height: 56px;
@@ -980,8 +1264,15 @@ footer {
   position: absolute;
   bottom: 52px;
   width: 96%;
-  border-top:4px solid;
-  border-image: linear-gradient(to right, rgb(234, 179, 8) 0%, rgb(234, 179, 8) 89.0476%, rgb(34, 197, 94) 94.0476%, rgb(34, 197, 94) 95%) 5 / 1 / 0 stretch;
+  border-top: 4px solid;
+  border-image: linear-gradient(
+      to right,
+      rgb(234, 179, 8) 0%,
+      rgb(234, 179, 8) 89.0476%,
+      rgb(34, 197, 94) 94.0476%,
+      rgb(34, 197, 94) 95%
+    )
+    5 / 1 / 0 stretch;
 }
 
 .total-cards {
@@ -1016,7 +1307,7 @@ footer {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  color: #F0F0F0;
+  color: #f0f0f0;
   background-color: rgba(86, 68, 10, 0.9);
   display: flex;
   flex-direction: row;
@@ -1042,7 +1333,7 @@ footer {
   width: 86px;
   min-width: 94px;
   height: 32px;
-  background-color: #DAA61E;
+  background-color: #daa61e;
   display: flex;
   align-items: center;
   color: #dad7d7;
@@ -1061,88 +1352,89 @@ footer {
 
 @media screen and (max-width: 1200px) {
   body {
-      min-width: 100%;
+    min-width: 100%;
   }
 
   .sidebar-container {
-      top:auto;
+    top: auto;
   }
 
   main {
-      margin-left: 0;
-      width: 100%;
+    margin-left: 0;
+    width: 100%;
   }
 
   .header-bg {
-      background-color: #000000;
-      width: 100%;
-      height: 64px;
+    background-color: #000000;
+    width: 100%;
+    height: 64px;
   }
 
   header {
-      border-radius: 0;
-      width: 100%;
-      position: static;
+    border-radius: 0;
+    width: 100%;
+    position: static;
   }
 
   .next-btn {
-      display: none;
+    display: none;
   }
 
-  .bell,.user-btn{
-      display: none;
+  .bell,
+  .user-btn {
+    display: none;
   }
 
   .title-area {
-      width: 100%;
-      margin-top: 0;
-      margin-left: 0;
-      height: 560px;
+    width: 100%;
+    margin-top: 0;
+    margin-left: 0;
+    height: 560px;
   }
 
   .title-area-container {
-      height: 560px;
-      display: flex;
-      flex-direction: column;
-      margin-left: 0;
-      margin-top: 80px;
+    height: 560px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 0;
+    margin-top: 80px;
   }
 
   .upload-btn {
-      width: 288px;
-      height: 288px;
-      margin: 0 auto;
+    width: 288px;
+    height: 288px;
+    margin: 0 auto;
   }
 
   .upload-btn img {
-      width:288px;
+    width: 288px;
   }
 
   .add-section {
-      width: 100%;
-      margin-top: 25px;
+    width: 100%;
+    margin-top: 25px;
   }
 
-  .enter-title  {
-      padding: 0;
-      width: 90%;
-      font-size: 35px;
-      height: 40px;
+  .enter-title {
+    padding: 0;
+    width: 90%;
+    font-size: 35px;
+    height: 40px;
   }
 
   .enter-title::placeholder {
-      font-size: 35px;
-      font-weight: 900;
+    font-size: 35px;
+    font-weight: 900;
   }
 
   .card-select-area {
-      gap: 5px;
-      flex-direction: column;
+    gap: 5px;
+    flex-direction: column;
   }
 
   .card-select-btn {
-      justify-content: start;
-      width: 90%;
+    justify-content: start;
+    width: 90%;
   }
 
   .menu-area {
@@ -1154,7 +1446,7 @@ footer {
   }
 
   .menu-search button {
-    right:40px;
+    right: 40px;
   }
 
   .keyword {
@@ -1162,61 +1454,58 @@ footer {
   }
 
   .cannot-change p {
-      font-size: 20px;
+    font-size: 20px;
   }
 
   .text-area {
-      box-sizing: border-box;
-      width: 100%;
-      height: 650px;
-      flex-direction: column;
+    box-sizing: border-box;
+    width: 100%;
+    height: 650px;
+    flex-direction: column;
   }
-  
 
   .edit-area {
-      width: 95%;
-      box-sizing: border-box;
-      background-color: #1C3D4B;
-      margin:16px auto;
+    width: 95%;
+    box-sizing: border-box;
+    background-color: #1c3d4b;
+    margin: 16px auto;
   }
 
-  .message-user-img img{
-      width: 50px;
-      height: 50px;
+  .message-user-img img {
+    width: 50px;
+    height: 50px;
   }
 
   .enter-message {
-      width: 100%;
+    width: 100%;
   }
 
   .message-area {
-      width: 95%;
-      height: 40px;
-      margin-top: 36px;
-      margin-left: 16px;
+    width: 95%;
+    height: 40px;
+    margin-top: 36px;
+    margin-left: 16px;
   }
-  
 
   .message {
-      width: 90%;
-      height: 50px;
-      gap: 8px;
-      background-color: #2a2a2b;
+    width: 90%;
+    height: 50px;
+    gap: 8px;
+    background-color: #2a2a2b;
   }
 
   .message-count {
-      position: absolute;
-      top:70px;
-      right: 20px;
+    position: absolute;
+    top: 70px;
+    right: 20px;
   }
-  
+
   .footer-nav {
-      display: flex;    
+    display: flex;
   }
 
   .deck-container {
-      display: flex;
+    display: flex;
   }
 }
 </style>
-  

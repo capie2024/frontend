@@ -1,6 +1,9 @@
 <script setup>
 import { ref,onMounted } from 'vue'
 import axios from 'axios';
+import notice from './notification/notice.vue';
+import NavLoginBtn from './NavLoginBtn.vue';
+import MainFooter from './MainFooter.vue';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const API_DATA =async ()=>{
   try {
@@ -100,11 +103,11 @@ onMounted(async() => {
               <i class="fa-solid fa-xmark"></i>
             </div>
           </div>
-          <div class="icon"><i class="fa-regular fa-bell"></i></div>
+          <div class="icon">
+          <notice/>
+          </div>
           <div class="login" id="login">
-            <span><i class="fa-regular fa-user"></i></span>
-            <span>登入</span>
-            <span><i class="fa-solid fa-chevron-down"></i></span>
+            <NavLoginBtn/>
           </div>
         </div>
       </div>
@@ -128,7 +131,7 @@ onMounted(async() => {
           每日卡
           <a :href="`${BASE_URL}/daily-card`" class="title-a">
             <svg
-              data-v-0ed588ef=""
+              
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -144,7 +147,7 @@ onMounted(async() => {
                 d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
               ></path>
             </svg>
-            <span data-v-0ed588ef="" class="text">回顧歷史紀錄</span>
+            <span  class="text">回顧歷史紀錄</span>
           </a>
         </h2>
         <div class="card2">
@@ -228,7 +231,7 @@ onMounted(async() => {
           <a :href="`${BASE_URL}/products`" class="title-a2">最新商品</a>
           <a :href="`${BASE_URL}/products`" class="title-a3">
             閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+            <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
             </svg>
           </a>
@@ -255,7 +258,7 @@ onMounted(async() => {
           <a :href="`${BASE_URL}/series`" class="title-a2">卡片系列</a>
           <a :href="`${BASE_URL}/series`" class="title-a3">
             閱讀更多 
-            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+            <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
             </svg>
           </a>
@@ -267,7 +270,7 @@ onMounted(async() => {
                   </div>
                   <div class="card-text">
                       <div class="flex">
-                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
+                          <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
                               <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
                               </path>
                               <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
@@ -281,185 +284,7 @@ onMounted(async() => {
           </a>
       </section>
 
-        <footer class="hero-member-footer">
-          <div class="work-shop-footer">
-            <div class="work-shop-footer-flexbox">
-              <div class="work-shop-footer-flexbox-left">
-                <ul class="work-shop-footer-flexbox-left-item">
-                  <li class="work-shop-footer-flexbox-left-item-title">簡介</li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      關於我們
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      與我聯絡
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      Weiβ Schwarz
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      V2新版介紹
-                    </a>
-                  </li>
-                </ul>
-                <ul class="work-shop-footer-flexbox-left-item">
-                  <li class="work-shop-footer-flexbox-left-item-title">資源</li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      Bushi DeckLog
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      Bushi DeckLog EN
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      遊々亭價格
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      基本規則
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      禁卡表
-                    </a>
-                  </li>
-                </ul>
-                <ul class="work-shop-footer-flexbox-left-item">
-                  <li class="work-shop-footer-flexbox-left-item-title">
-                    常用連結
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      卡片問答集
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      我的專頁
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      偏好設定
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text text-color-red"
-                      id="footer-logout"
-                    >
-                      登出帳號
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-flexbox-left-item-link">
-                    <a
-                      href="#"
-                      class="work-shop-footer-flexbox-left-item-link-text"
-                    >
-                      英雄榜
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div class="work-shop-footer-flexbox-right">
-                <div class="work-shop-footer-flexbox-right-group">
-                  <a class="work-shop-footer-flexbox-right-item" href="#">
-                    <span class="work-shop-footer-flexbox-right-item-icon">
-                      <i class="fa-solid fa-gift"></i>
-                    </span>
-                    <span class="work-shop-footer-flexbox-right-item-text"
-                      >用一杯咖啡讓工程師罐罐休息一下</span
-                    >
-                  </a>
-                  <div class="work-shop-footer-flexbox-right-icon-list">
-                    <a href="#">
-                      <i class="fa-brands fa-google-play"></i>
-                    </a>
-                    <a href="#">
-                      <i class="fa-brands fa-apple"></i>
-                    </a>
-                    <a href="#">
-                      <i class="fa-brands fa-facebook-f"></i>
-                    </a>
-                    <a href="#">
-                      <i class="fa-brands fa-discord"></i>
-                    </a>
-                    <a href="#">
-                      <i class="fa-solid fa-envelope"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <hr class="work-shop-footer-hr" />
-            <div class="work-shop-footer-copyright">
-              <ul class="work-shop-footer-copyright-left">
-                <li class="work-shop-footer-copyright-left-item">
-                  <a href="#">隱私權政策 </a>
-                </li>
-                <li class="work-shop-footer-copyright-left-item">
-                  <a href="#">服務條款</a>
-                </li>
-                <li class="work-shop-footer-copyright-left-item">
-                  <a href="#">商業合作</a>
-                </li>
-              </ul>
-              <div class="work-shop-footer-copyright-right">
-                <span>卡片資料來源 Weiβ Schwarz.</span>
-                <span>Copyright @ 2023 BottleNeko</span>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <MainFooter/>
       </div>
 
       <!-- fix -->

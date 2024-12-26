@@ -327,7 +327,8 @@
   position: relative;
 }
 
-.hero-member-main-function-section-content-item-description-box-innerbox > span {
+.hero-member-main-function-section-content-item-description-box-innerbox
+  > span {
   display: inline-block;
   line-height: 24px;
   color: rgb(229, 231, 235);
@@ -361,7 +362,8 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.hero-member-main-function-section-content-item-description-box-innerbox-close-btn i {
+.hero-member-main-function-section-content-item-description-box-innerbox-close-btn
+  i {
   width: 24px;
   height: 24px;
   font-size: 24px;
@@ -380,7 +382,8 @@
   padding: 48px;
 }
 
-.hero-member-main-function-section-content-item-description-box-innerbox-gifbox-text > p {
+.hero-member-main-function-section-content-item-description-box-innerbox-gifbox-text
+  > p {
   font-size: 20px;
   font-weight: 700;
   color: rgb(229, 231, 235);
@@ -391,7 +394,8 @@
   width: 100%;
 }
 
-.hero-member-main-function-section-content-item-description-box-innerbox-gifbox-img img {
+.hero-member-main-function-section-content-item-description-box-innerbox-gifbox-img
+  img {
   width: 100%;
   height: 100%;
   border-radius: 16px;
@@ -611,7 +615,12 @@
   height: 100%;
   bottom: 0;
   left: 0;
-  background-image: linear-gradient(to bottom, rgba(18, 18, 18), transparent, rgba(18, 18, 18));
+  background-image: linear-gradient(
+    to bottom,
+    rgba(18, 18, 18),
+    transparent,
+    rgba(18, 18, 18)
+  );
   /* z-index: -1; */
 }
 
@@ -843,7 +852,12 @@
   height: 100%;
   bottom: 0;
   left: 0;
-  background-image: linear-gradient(to bottom, rgba(18, 18, 18), transparent, rgba(18, 18, 18));
+  background-image: linear-gradient(
+    to bottom,
+    rgba(18, 18, 18),
+    transparent,
+    rgba(18, 18, 18)
+  );
   /* z-index: -1; */
 }
 
@@ -1006,7 +1020,7 @@
   position: relative;
   transition: transform 0.2s ease-in-out;
   margin-right: 20px;
-  background-color: rgba(0, 0, 0, 0.3)
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .hero-member-main-stores-about-section-content-item:hover {

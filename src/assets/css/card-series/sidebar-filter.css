@@ -3,29 +3,28 @@
   display: flex;
   flex-direction: column;
   border-radius: 17px;
-  overflow: hidden; 
+  overflow: hidden;
   background: linear-gradient(to bottom, #037083, #121212);
-  max-height: calc(100% - 16px); 
-  margin:8px 0 8px 8px;
-  color:white;
+  max-height: calc(100% - 16px);
+  margin: 8px 0 8px 8px;
+  color: white;
   box-sizing: border-box;
   position: absolute;
-  top:0;
+  top: 0;
   bottom: 0;
 }
 
 .sidebar-filter-header {
   height: 64px;
   display: flex;
-  justify-content: space-between; 
-  align-items: center; 
+  justify-content: space-between;
+  align-items: center;
   padding: 15px 20px;
   position: sticky;
   background-color: #047083;
-  top:0;
+  top: 0;
   box-sizing: border-box;
 }
-
 
 .sidebar-filter-header > div:first-child > p:first-child {
   font-size: 20px;
@@ -39,12 +38,11 @@
 }
 
 .sidebar-filter-header > div:last-child {
-  display: flex; 
-  justify-content: center; 
+  display: flex;
+  justify-content: center;
   align-items: center;
   gap: 10px;
 }
-
 
 .icon {
   width: 35px;
@@ -53,15 +51,15 @@
   background: black;
   padding: 0;
   border-radius: 50%;
-  display:flex;
-  align-items: center; 
+  display: flex;
+  align-items: center;
   justify-content: center;
   cursor: pointer;
 }
 
 .icon i {
   color: white;
-  font-size: 20px; 
+  font-size: 20px;
 }
 
 .xmark-btn:hover {
@@ -73,7 +71,7 @@
 }
 
 .sidebar-filter-content {
-  flex-grow: 1;  
+  flex-grow: 1;
   height: calc(100vh - 182px);
   overflow-y: scroll;
   scrollbar-width: none;
@@ -83,15 +81,15 @@
   padding: 10px;
 }
 
-.whole-menu:nth-of-type(n+2) {
-  border-top:0.5px solid rgba(255, 255, 255, 0.132) ;
+.whole-menu:nth-of-type(n + 2) {
+  border-top: 0.5px solid rgba(255, 255, 255, 0.132);
 }
 
 .menu {
   display: flex;
   gap: 10px;
   align-items: center;
-  position:relative;
+  position: relative;
   border-radius: 7px;
   padding: 15px 10px;
   cursor: pointer;
@@ -103,25 +101,24 @@
 }
 
 .menu:hover {
-  background-color: #16383F;
+  background-color: #16383f;
 }
 
-.menu-inner{
+.menu-inner {
   padding: 10px;
 }
 
 .menu-inner > div {
   display: flex;
   flex-direction: column;
-  gap:10px;
+  gap: 10px;
 }
 
 .open i {
-  transition: transform 0.3s ease; 
+  transition: transform 0.3s ease;
   color: white;
-  font-size: 20px; 
+  font-size: 20px;
 }
-
 
 .menu-inner span {
   font-size: 14px;
@@ -129,51 +126,51 @@
 }
 
 .plus-btn-used {
-  background-color:#bbf7d0 ;
+  background-color: #bbf7d0;
   border: none;
   padding: 4px;
   border-radius: 50%;
   cursor: pointer;
   width: 35px;
   height: 35px;
-  display:flex;
-  align-items: center; 
+  display: flex;
+  align-items: center;
   justify-content: center;
   cursor: pointer;
 }
 
 .plus-btn-used i {
-  color:#15803D;
+  color: #15803d;
 }
 
 .input-keyword {
   padding: 4px 8px;
   display: flex;
   border-radius: 12px;
-  background-color: #27272A;
-  gap:5px;
+  background-color: #27272a;
+  gap: 5px;
   align-items: center;
   box-sizing: border-box;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .input-keyword-haveValue {
-  background-color:  rgb(186, 230, 253);
+  background-color: rgb(186, 230, 253);
   color: rgb(107, 114, 128);
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
-.input-keyword-haveValue:hover{
-  background-color:  rgb(125, 211, 252);
-  transition: all .2s ease-in-out;
+.input-keyword-haveValue:hover {
+  background-color: rgb(125, 211, 252);
+  transition: all 0.2s ease-in-out;
 }
 
 .input-keyword div {
   display: flex;
-  gap:5px;
+  gap: 5px;
 }
 
-.input-keyword div button{
+.input-keyword div button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -197,20 +194,19 @@
 }
 
 .input-keyword div button:first-of-type:hover {
-  background-color: #FED7AA;
+  background-color: #fed7aa;
 }
 
 .input-keyword div button:first-of-type:hover span {
-  color:#B43412;
+  color: #b43412;
 }
-
 
 /* #and-btn {
   background-color: #FED7AA;
 } */
 
 .plus-btn {
-  background-color:#bbf7d079 ;
+  background-color: #bbf7d079;
   border: none;
   padding: 4px;
   border-radius: 50%;
@@ -218,22 +214,22 @@
   width: 35px;
   height: 35px;
   padding: 0;
-  display:flex;
-  align-items: center; 
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
 .plus-btn:hover {
-  background-color:#bbf7d0 ;
+  background-color: #bbf7d0;
 }
 
 .plus-btn i {
-  color:#15803c8a;
+  color: #15803c8a;
   font-size: 16px;
 }
 
 .plus-btn:hover i {
-  color:#15803D;
+  color: #15803d;
 }
 
 .open {
@@ -243,19 +239,21 @@
   background: black;
   padding: 0;
   border-radius: 50%;
-  display:flex;
-  align-items: center; 
+  display: flex;
+  align-items: center;
   justify-content: center;
   cursor: pointer;
   position: absolute;
-  right:10px;
+  right: 10px;
 }
 
-.open-btn:hover, .open:hover {
+.open-btn:hover,
+.open:hover {
   background-color: orange;
 }
 
-.check, .del {
+.check,
+.del {
   position: absolute;
   right: 55px;
 }
@@ -264,12 +262,12 @@
   background-color: green;
 }
 
-.del-btn:hover, .del:hover {
-  background-color: #EF4444;
+.del-btn:hover,
+.del:hover {
+  background-color: #ef4444;
 }
 
 .keyword-below {
-  
 }
 
 /* .keyword-below p {
@@ -290,9 +288,8 @@
   gap: 5px;
 }
 
-
 .menu-inner-slider-btn button {
-  width:calc((100% - 20px)/5);
+  width: calc((100% - 20px) / 5);
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -304,12 +301,12 @@
 .btn-default-bg {
   background-color: #27272a;
   color: white;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .btn-default-bg:hover {
-  background-color: #3F3F46;
-  transition: all .2s ease-in-out;
+  background-color: #3f3f46;
+  transition: all 0.2s ease-in-out;
 }
 
 .btn-active-bg {
@@ -322,11 +319,11 @@
 }
 
 .slider-btn {
-  width:16px;
-  height:16px;
+  width: 16px;
+  height: 16px;
   padding: 4px;
   border-radius: 50%;
-  background-color: #3F3F46;
+  background-color: #3f3f46;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -338,12 +335,12 @@
 
 .arrow-up {
   transform: rotate(0deg);
-  transition: all .2s ease-in-out;  
+  transition: all 0.2s ease-in-out;
 }
 
 .arrow-down {
   transform: rotate(180deg);
-  transition: all .2s ease-in-out;  
+  transition: all 0.2s ease-in-out;
 }
 
 .menu-inner-btn {
@@ -353,7 +350,7 @@
 }
 
 .menu-inner-btn button {
-  width:calc((100% - 20px)/5);
+  width: calc((100% - 20px) / 5);
   padding: 8px;
   gap: 4px;
   border-radius: 12px;
@@ -361,13 +358,13 @@
   justify-content: center;
 }
 
-.menu-inner-char-btn{
+.menu-inner-char-btn {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
 }
 
-.menu-inner-char-btn button{
+.menu-inner-char-btn button {
   background-color: #27272a;
   border-radius: 7px;
   padding: 4px 8px;
@@ -376,8 +373,9 @@
   justify-content: center;
 }
 
-.menu-inner-char-btn button:nth-of-type(-n+5),.menu-inner-char-btn button:nth-of-type(n+8) {
-  width:calc((100% - 20px)/5);
+.menu-inner-char-btn button:nth-of-type(-n + 5),
+.menu-inner-char-btn button:nth-of-type(n + 8) {
+  width: calc((100% - 20px) / 5);
 }
 
 .menu-inner-product-btn {
@@ -407,15 +405,15 @@
 }
 
 .sidebar-filter-footer button {
-  width: 100%; 
-  border: none; 
-  padding: 10px 0; 
-  font-size: 18px; 
-  border-radius: 17px; 
+  width: 100%;
+  border: none;
+  padding: 10px 0;
+  font-size: 18px;
+  border-radius: 17px;
   text-align: center;
-  box-sizing: border-box; 
-  background-color: #274A84; 
-  color: white; 
+  box-sizing: border-box;
+  background-color: #274a84;
+  color: white;
 }
 
 .apply-btn {
@@ -442,19 +440,19 @@
 }
 
 .keyword-button-item {
-  min-width:calc((100% - 20px)/5);
+  min-width: calc((100% - 20px) / 5);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px 12px;
   border-radius: 12px;
   background-color: #27272a;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .keyword-button-item:hover {
-  background-color: #3F3F46;
-  transition: all .2s ease-in-out;
+  background-color: #3f3f46;
+  transition: all 0.2s ease-in-out;
 }
 
 .myfilter-button-group {
@@ -464,22 +462,22 @@
 }
 
 .myfilter-button-item {
-  min-width:calc((100% - 20px)/5);
+  min-width: calc((100% - 20px) / 5);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px 12px;
   border-radius: 12px;
   background-color: #27272a;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .myfilter-button-item:hover {
-  background-color: #3F3F46;
-  transition: all .2s ease-in-out;
+  background-color: #3f3f46;
+  transition: all 0.2s ease-in-out;
 }
 
-@media screen and (width < 1200px)  {
+@media screen and (width < 1200px) {
   .sidebar-filter {
     width: 100%;
     max-height: 100%;
@@ -495,6 +493,6 @@
   }
 
   .menu-inner-slider-btn button {
-    width:calc((100% - 20px)/3);
+    width: calc((100% - 20px) / 3);
   }
 }

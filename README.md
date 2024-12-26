@@ -13,17 +13,17 @@
 
 ## 取得專案
 
-git clone https://github.com/bottleneko2-0/vue
+git clone https://github.com/bottleneko2-0/frontend
 
 ## 移動到專案內
 
-```以下將會引導你如何安裝此專案到你的電腦上。
-cd vue
+```
+cd frontend
 ```
 
 ## 安裝套件
 
-```以下將會引導你如何安裝此專案到你的電腦上。
+```
 npm install
 ```
 
@@ -42,15 +42,6 @@ npm run dev
 
 ```sh
 http://localhost:5173/
-```
-## 環境變數說明
-
-```env
-VITE_API_URL= # API位置
-VITE_PAYPAL_CLIENT_ID=
-VITE_BASE_URL= # 自訂變數
-VITE_Tiny_API_Key=
-
 ```
 
 ## 資料夾說明

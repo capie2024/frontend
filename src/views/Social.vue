@@ -349,8 +349,8 @@ export default {
         width: 96px;
         height: 36px;
         border-radius: 20px;
-        background-color: #D4D4D8;
-        font-weight: 700;
+        background-color: #FFFFFF;
+        font-weight: 900;
         cursor: pointer;
         border: none;
     }
@@ -388,7 +388,6 @@ export default {
         padding-left: 20px;
         height: 62px;
         border-radius: 20px;
-        /* position: absolute; */
         margin-top: 80px;
         gap: 16px;
     }
@@ -398,7 +397,7 @@ export default {
         box-sizing: border-box;
         padding: 9px;
         border: 1px solid #414142;
-        background-color: #27272A;
+        background-color: #18181B;
         color: #D4D4D8;
         width: 80px;
         border-radius: 10px;

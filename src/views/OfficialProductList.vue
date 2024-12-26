@@ -286,8 +286,6 @@
           </div>
         </div>
       </footer>
-    </div>
-  </div>
 </template>
 
 <script setup>

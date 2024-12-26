@@ -1,6 +1,4 @@
-import { Fancybox } from "@fancyapps/ui";
-import "@fancyapps/ui/dist/fancybox/fancybox.css";
+import { Fancybox } from '@fancyapps/ui'
+import '@fancyapps/ui/dist/fancybox/fancybox.css'
 
-Fancybox.bind('[data-fancybox="card-list"]', {
-    
-});
+Fancybox.bind('[data-fancybox="card-list"]', {})

@@ -131,6 +131,7 @@ onMounted(async() => {
           每日卡
           <a :href="`${BASE_URL}/daily-card`" class="title-a">
             <svg
+              data-v-0ed588ef=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -146,7 +147,7 @@ onMounted(async() => {
                 d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
               ></path>
             </svg>
-            <span  class="text">回顧歷史紀錄</span>
+            <span data-v-0ed588ef="" class="text">回顧歷史紀錄</span>
           </a>
         </h2>
         <div class="card2">
@@ -230,7 +231,7 @@ onMounted(async() => {
           <a :href="`${BASE_URL}/products`" class="title-a2">最新商品</a>
           <a :href="`${BASE_URL}/products`" class="title-a3">
             閱讀更多 
-            <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
             </svg>
           </a>
@@ -257,7 +258,7 @@ onMounted(async() => {
           <a :href="`${BASE_URL}/series`" class="title-a2">卡片系列</a>
           <a :href="`${BASE_URL}/series`" class="title-a3">
             閱讀更多 
-            <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
+            <svg data-v-0ed588ef="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
             </svg>
           </a>
@@ -269,7 +270,7 @@ onMounted(async() => {
                   </div>
                   <div class="card-text">
                       <div class="flex">
-                          <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
+                          <svg data-v-09f2b439="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="icon-size flex-none color-a1">
                               <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
                               </path>
                               <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">

@@ -1,110 +1,3 @@
-<template>
-    <div class="container">
-        <SidebarGrid />
-        <div class="main">
-            <div class="social-container">
-                <div class="header-container">
-                    <div class="search-container">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input v-model="searchQuery" @keyup.enter="handleEnter" class="search" type="text" placeholder="我想找找....?">
-                        <svg @click="clearSearch" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path></svg>
-                    </div>
-                    <button class="filter">
-                        <i class="fa-regular fa-window-restore"></i>
-                        篩選系列
-                        <i class="fa-solid fa-x"></i>
-                    </button>
-                    <button class="filter-hidden">
-                        <i class="fa-regular fa-window-restore"></i>
-                        CODE
-                        <i class="fa-solid fa-x"></i>
-                    </button>
-                    <div class="sign-container">
-                        <a :href="'/add'">
-                            <button class="add-article">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                                新增文章
-                            </button>
-                        </a>
-                        <button class="add-article-hidden">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <div class="bell">
-                            <i class="fa-regular fa-bell"></i>
-                        </div>
-                        <div class="user-sign">
-                            <i class="fa-regular fa-user"></i>
-                            <span>登入</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <section class="flex-item-hidden">
-                <button  
-                    v-for="(item, index) in socialHistory"
-                    :key="index" 
-                    class="user-button" 
-                    @click="handleHistoryClick(item.searchQuery)"
-                >
-                    <a href="#">
-                        <div class="user-link">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <span>{{ item.searchQuery }}</span>
-                        </div>
-                        <div class="user-link">
-                            <i class="fa-regular fa-window-restore"></i>
-                            <span>-</span>
-                        </div>
-                    </a>
-                </button>
-            </section>
-            <h2 class="title">
-                搜尋結果
-                <br>
-                <span class="subtitle">一共有 {{ searchResultCount }} 結果</span>
-            </h2>
-            <section class="card-area">
-                <a v-for="article in filteredArticles" 
-                    :key="article.post_code" 
-                    :href="'/social/' + article.post_code" 
-                    class="card-link"
-                >
-                    <div class="card-img">
-                        <img 
-                        :src="article && article.post_picture ? article.post_picture : 'https://bottleneko.app/images/cover.png'" 
-                        :alt="article && article.title ? article.title : 'Default Title'"
-                        >
-                    </div>
-                    <div class="card-user">
-                        <div class="card-user-flex">
-                            <div class="card-user-img">
-                                <img :src="article.users.picture" alt="用戶頭像">
-                            </div>
-                            <div class="card-user-p">
-                                <p>{{ article.users.username }}</p>
-                                <div class="date-container">
-                                    <p class="date">{{ formatDate(article.created_at) }}</p>
-                                    <i class="fa-solid fa-globe"></i>
-                                    <p class="card-code">{{ article.post_code }}</p>
-                                    <div class="chat">
-                                        <i class="fa-regular fa-comment"></i>
-                                        <p>1</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-name">
-                            <h2>{{ article.title }}</h2>
-                            <p v-html="article.content"></p>
-                        </div>
-                    </div>
-                </a>     
-                    
-            </section>
-        </div>    
-    </div>
-</template>
 <script>
 import axios from 'axios';
 import SidebarGrid from '../components/SidebarGrid.vue';
@@ -121,6 +14,8 @@ export default {
       searchQuery: '',
       filteredArticles:[],
       socialHistory: JSON.parse(localStorage.getItem('socialHistory')) || [],
+      isScrolled: false,
+      intervalId: 123,
     };
   },
   async created() {
@@ -138,6 +33,17 @@ export default {
     },
   },
   methods:{
+    handleScroll() {
+      this.isScrolled = document.querySelector(".main").scrollTop > 0;      
+    },
+    startFunction() {
+      if(this.intervalId){
+        clearInterval(this.intervalId)
+      }
+      this.intervalId = setInterval(() => {
+        this.handleScroll()
+      }, 100);
+    },
     formatDate(date) {
         if (!date) {
         return '';
@@ -164,7 +70,6 @@ export default {
         } 
     },
     
-
     searchArticles() {
       if (!this.searchQuery.trim()) {
         this.filteredArticles = this.articles;
@@ -187,11 +92,151 @@ export default {
         this.filteredArticles = this.articles;
     },
   },
+  mounted() {
+      this.startFunction()       
+  },
+  beforeUnmount() {
+      window.removeEventListener("scroll", this.handleScroll);
+  },
 };
 </script>
+<template>
+  <div class="container">
+    <SidebarGrid />
+    <div class="main">
+      <div class="social-container">
+        <div class="header-container">
+          <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+              v-model="searchQuery"
+              @keyup.enter="handleEnter"
+              class="search"
+              type="text"
+              placeholder="我想找找....?"
+            />
+            <svg
+              @click="clearSearch"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </div>
+          <button class="filter">
+            <i class="fa-regular fa-window-restore"></i>
+            篩選系列
+            <i class="fa-solid fa-x"></i>
+          </button>
+          <button class="filter-hidden">
+            <i class="fa-regular fa-window-restore"></i>
+            CODE
+            <i class="fa-solid fa-x"></i>
+          </button>
+          <div class="sign-container">
+            <a :href="'/add'">
+              <button class="add-article">
+                <i class="fa-solid fa-pen-to-square"></i>
+                新增文章
+              </button>
+            </a>
+            <button class="add-article-hidden">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <div class="bell">
+              <i class="fa-regular fa-bell"></i>
+            </div>
+            <div class="user-sign">
+              <i class="fa-regular fa-user"></i>
+              <span>登入</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <section class="flex-item-hidden">
+        <button
+          v-for="(item, index) in socialHistory"
+          :key="index"
+          class="user-button"
+          @click="handleHistoryClick(item.searchQuery)"
+        >
+          <a href="#">
+            <div class="user-link">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>{{ item.searchQuery }}</span>
+            </div>
+            <div class="user-link">
+              <i class="fa-regular fa-window-restore"></i>
+              <span>-</span>
+            </div>
+          </a>
+        </button>
+      </section>
+      <h2 class="title">
+        搜尋結果
+        <br />
+        <span class="subtitle">一共有 {{ searchResultCount }} 結果</span>
+      </h2>
+      <section class="card-area">
+        <a
+          v-for="article in filteredArticles"
+          :key="article.post_code"
+          :href="'/social/' + article.post_code"
+          class="card-link"
+        >
+          <div class="card-img">
+            <img
+              :src="
+                article && article.post_picture
+                  ? article.post_picture
+                  : 'https://bottleneko.app/images/cover.png'
+              "
+              :alt="article && article.title ? article.title : 'Default Title'"
+            />
+          </div>
+          <div class="card-user">
+            <div class="card-user-flex">
+              <div class="card-user-img">
+                <img :src="article.users.picture" alt="用戶頭像" />
+              </div>
+              <div class="card-user-p">
+                <p>{{ article.users.username }}</p>
+                <div class="date-container">
+                  <p class="date">{{ formatDate(article.created_at) }}</p>
+                  <i class="fa-solid fa-globe"></i>
+                  <p class="card-code">{{ article.post_code }}</p>
+                  <div class="chat">
+                    <i class="fa-regular fa-comment"></i>
+                    <p>1</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-name">
+              <h2>{{ article.title }}</h2>
+              <p v-html="article.content"></p>
+            </div>
+          </div>
+        </a>
+      </section>
+    </div>
+  </div>
+</template>
 <style scoped>
     html,body {
         width: 100%;
+        height: 100vh;
     }
 
     a {
@@ -207,28 +252,24 @@ export default {
 
     .container {
         width: 100%;
-        display: block;
         position: relative;
     }
 
     .main {
+        height:calc(100vh - 16px);
+        border-radius: 1rem;
+        margin: 0.5rem;
         margin-left:270px;
-        height:100vh; 
         overflow: hidden;
-  
         overflow-y: scroll;
-        scrollbar-width: none;    
+        scrollbar-width: none;  
+        background-color: #121212;  
     }
 
-
-    .social-container {
-        width: 100%;
-        position: relative;
-        background-color: #121212;
-    }
 
     .header-container {
-        background-color: #020202;
+        background-color: rgba(0, 0, 0, 0);
+        transition: background-color 0.05s ease;
         width: 100%;
         min-width: 30%;
         height: 64px;
@@ -240,6 +281,10 @@ export default {
         z-index: 1;
     }
 
+    .header-change {
+        background-color: rgba(0, 0, 0, 1); 
+        transition: background-color 0.05s ease;
+    }
 
     .search-container {
         width: 271px;
@@ -335,6 +380,7 @@ export default {
         background-color: #D4D4D8;
         font-weight: 700;
         cursor: pointer;
+        border: none;
     }
 
     .add-article-hidden {
@@ -379,8 +425,8 @@ export default {
     .user-button {
         box-sizing: border-box;
         padding: 9px;
-        border: 1px solid #27272A;
-        background-color: rgb(24,24,17);
+        border: 1px solid #414142;
+        background-color: #27272A;
         color: #D4D4D8;
         width: 80px;
         border-radius: 10px;
@@ -414,7 +460,7 @@ export default {
         line-height: 1.75rem;
         color: #fff;
         text-align:start;
-        margin-bottom: 10px;
+        margin: 40px 0 16px 20px;
     }
 
     .subtitle {
@@ -660,12 +706,13 @@ export default {
     @media screen and (max-width: 1200px) {
         
         .main {
-            margin-left:0px;
+            margin:0px;
         }
 
         .sidebar-container {
             top:auto;
             bottom: 0;
+            background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
         }
 
 

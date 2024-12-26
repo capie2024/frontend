@@ -1,7 +1,9 @@
 <template>
-    <div class="fixed top-0 left-0 w-screen h-screen z-[100] grid overflow-y-auto overflow-x-hidden md:overflow-hidden backdrop-blur place-content-center">
-        <div class="loader"></div>
-    </div>
+  <div
+    class="fixed top-0 left-0 w-screen h-screen z-[100] grid overflow-y-auto overflow-x-hidden md:overflow-hidden backdrop-blur place-content-center"
+  >
+    <div class="loader"></div>
+  </div>
 </template>
 
 <style scoped>
@@ -23,18 +25,33 @@
     var(--c) 36px 0px,
     var(--b) 50px 31px,
     var(--c) 47px 43px,
-    var(--b) 31px 48px,     */
-    #f6d353; 
-  background-size: 15px 15px,6px 6px;
+    var(--b) 31px 48px,     */ #f6d353;
+  background-size:
+    15px 15px,
+    6px 6px;
   animation: l4 3s infinite;
 }
 @keyframes l4 {
-  0%     {-webkit-mask:conic-gradient(#0000 0     ,#000 0)}
-  16.67% {-webkit-mask:conic-gradient(#0000 60deg ,#000 0)}
-  33.33% {-webkit-mask:conic-gradient(#0000 120deg,#000 0)}
-  50%    {-webkit-mask:conic-gradient(#0000 180deg,#000 0)}
-  66.67% {-webkit-mask:conic-gradient(#0000 240deg,#000 0)}
-  83.33% {-webkit-mask:conic-gradient(#0000 300deg,#000 0)}
-  100%   {-webkit-mask:conic-gradient(#0000 360deg,#000 0)}
+  0% {
+    -webkit-mask: conic-gradient(#0000 0, #000 0);
+  }
+  16.67% {
+    -webkit-mask: conic-gradient(#0000 60deg, #000 0);
+  }
+  33.33% {
+    -webkit-mask: conic-gradient(#0000 120deg, #000 0);
+  }
+  50% {
+    -webkit-mask: conic-gradient(#0000 180deg, #000 0);
+  }
+  66.67% {
+    -webkit-mask: conic-gradient(#0000 240deg, #000 0);
+  }
+  83.33% {
+    -webkit-mask: conic-gradient(#0000 300deg, #000 0);
+  }
+  100% {
+    -webkit-mask: conic-gradient(#0000 360deg, #000 0);
+  }
 }
 </style>

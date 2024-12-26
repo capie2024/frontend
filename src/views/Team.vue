@@ -1,7 +1,5 @@
 <script setup>
 import SidebarGrid from '../components/SidebarGrid.vue';
-import NavLoginBtn from '../components/NavLoginBtn.vue';
-import notice from '../components/notification/notice.vue';
 import MainFooter from '../components/MainFooter.vue';
 
 </script>
@@ -246,6 +244,7 @@ import MainFooter from '../components/MainFooter.vue';
     font-weight: 900;
     text-align: center;
     margin-bottom: 2rem;
+    width: 200px;
 }
 
 .question-area > div {
@@ -343,5 +342,11 @@ import MainFooter from '../components/MainFooter.vue';
 #question8:checked ~ .answer {
     height: auto;
     
+}
+@media screen and (width < 1200px) {
+    .team{
+        width: 100%;
+        left: 0;
+    }
 }
 </style>

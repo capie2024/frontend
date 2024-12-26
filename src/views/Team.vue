@@ -1,7 +1,6 @@
 <script setup>
 import SidebarGrid from '../components/SidebarGrid.vue';
 import MainFooter from '../components/MainFooter.vue';
-
 </script>
 
 <template>

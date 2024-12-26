@@ -189,7 +189,7 @@ const router = createRouter({
       component: Notification
     },
     {
-      path:"/Team",
+      path:"/team",
       name:"Team",
       component: Team
     }

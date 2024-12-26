@@ -18,7 +18,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="h-6 w-6"
+                  class="w-6 h-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -36,7 +36,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="h-6 w-6"
+                  class="w-6 h-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -57,7 +57,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-6 stroke-2"
+                  class="stroke-2 size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -81,7 +81,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-6 stroke-2"
+                  class="stroke-2 size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -103,7 +103,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-6 stroke-2"
+                  class="stroke-2 size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -122,7 +122,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-6 stroke-2 red"
+                  class="stroke-2 size-6 red"
                 >
                   <path
                     stroke-linecap="round"
@@ -149,7 +149,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-6 stroke-2"
+                  class="stroke-2 size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -176,7 +176,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-5 md:size-6 flex-none"
+                  class="flex-none size-5 md:size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -214,7 +214,7 @@
                     stroke="currentColor"
                     aria-hidden="true"
                     data-slot="icon"
-                    class="size-5 md:size-6 flex-none"
+                    class="flex-none size-5 md:size-6"
                   >
                     <path
                       stroke-linecap="round"
@@ -232,7 +232,7 @@
                     stroke="currentColor"
                     aria-hidden="true"
                     data-slot="icon"
-                    class="size-5 md:size-6 flex-none"
+                    class="flex-none size-5 md:size-6"
                   >
                     <path
                       stroke-linecap="round"
@@ -254,7 +254,7 @@
                     stroke="currentColor"
                     aria-hidden="true"
                     data-slot="icon"
-                    class="size-5 md:size-6 flex-none"
+                    class="flex-none size-5 md:size-6"
                   >
                     <path
                       stroke-linecap="round"
@@ -314,7 +314,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="flex-none size-6 stroke-2"
+                  class="flex-none stroke-2 size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -337,7 +337,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="flex-none size-6 stroke-2"
+                  class="flex-none stroke-2 size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -360,7 +360,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="flex-none size-6 stroke-2"
+                  class="flex-none stroke-2 size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -384,7 +384,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="flex-none size-6 stroke-2"
+                  class="flex-none stroke-2 size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -407,7 +407,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="flex-none size-6 stroke-2"
+                  class="flex-none stroke-2 size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -506,7 +506,7 @@
                 </h2>
                 <div class="group-count">
                   <img src="https://bottleneko.app/soul.gif" class="size-4" />
-                  <span class="font-mono flex-none">{{
+                  <span class="flex-none font-mono">{{
                     countSoulCards(group.cards)
                   }}</span>
                 </div>
@@ -564,7 +564,7 @@
                             stroke="currentColor"
                             aria-hidden="true"
                             data-slot="icon"
-                            class="size-7 text-white stroke-2"
+                            class="text-white stroke-2 size-7"
                           >
                             <path
                               stroke-linecap="round"
@@ -709,7 +709,7 @@
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-6 flex-none"
+                  class="flex-none size-6"
                 >
                   <path
                     stroke-linecap="round"

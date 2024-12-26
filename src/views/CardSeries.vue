@@ -1,5 +1,7 @@
 <script setup>
 import SidebarGrid from '../components/SidebarGrid.vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue';
+import notice from '../components/notification/notice.vue';
 import {
   ref,
   computed,
@@ -1896,92 +1898,12 @@ onBeforeUnmount(() => {
               ></path>
             </svg>
           </button>
-          <div class="w-full min-w-0 text-lg font-bold text-white md:text-2xl">
-            <!-- <div class="flex items-center gap-4"> -->
-            <h2 class="text-2xl font-bold truncate">{{ seriesInfo.name }}</h2>
-            <!-- </div> -->
+          <div class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
+            <h2 class="truncate text-2xl font-bold">{{ seriesInfo.name }}</h2>
           </div>
-          <div class="z-10 notice">
-            <input type="checkbox" id="notice-jump" />
-            <label
-              for="notice-jump"
-              class="inline-flex items-center p-1 text-center text-white rounded-full default-transition hover:bg-zinc-800/50"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-                data-slot="icon"
-                class="stroke-2 size-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                ></path>
-              </svg>
-            </label>
-            <div class="z-10 notice-grid">
-              <div class="notice-grid-up">
-                <h2>通知(0)</h2>
-              </div>
-              <div class="notice-grid-down">
-                <img
-                  src="https://bottleneko.app/images/status/empty.png"
-                  alt="no-data"
-                />
-                <h2>沒東西</h2>
-                <p>
-                  你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴
-                </p>
-              </div>
-            </div>
-          </div>
-          <div
-            class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50"
-          >
-            <div class="flex flex-col items-center gap-1 p-1 rounded-full">
-              <div class="flex-none rounded-full size-6 bg-black/70">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="m-1 text-zinc-200"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-            <span class="text-sm flex-none max-w-[8rem] truncate">登入</span>
-            <div class="p-1 rounded-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-                data-slot="icon"
-                class="flex-none w-4 h-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
-            </div>
+          <notice/>
+          <div class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50">            
+            <NavLoginBtn/>
           </div>
         </header>
         <button @click="toggleSidebar('open-filter')" class="toggle-filter">
@@ -2725,24 +2647,24 @@ onBeforeUnmount(() => {
       </section>
 
       <div class="deck-container" @click="toggleFilter('open-deck')" v-if="selectedCards.length > 0">
-        <div class="deck-img">
-            <img src="/src/img/麻衣.png" alt="">
-        </div>
         <div class="deck-content">
-            <div class="line"></div>
-            <div class="total-cards">
-                <h2>刪除 DG/S02-027R</h2>
-                <span>牌組製作，共{{ selectedCards.length }}張卡</span>
-            </div>
-            <div class="deckbtn-area">
-                <button class="deck-btn">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
-                </button>
-                <div class="pay-btn">
-                    <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
-                    <span>{{ countDeck }} </span><span>¥</span>
-                </div>
-            </div>
+          <div class="deck-img">
+            <img src="../img/capie-icon.png" alt="">
+          </div>
+          <div class="line"></div>
+          <div class="total-cards">
+              <h2>刪除 DG/S02-027R</h2>
+              <span>牌組製作，共{{ selectedCards.length }}張卡</span>
+          </div>
+          <div class="deckbtn-area">
+              <button class="deck-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
+              </button>
+              <div class="pay-btn">
+                  <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
+                  <span>{{ countDeck }} </span><span>¥</span>
+              </div>
+          </div>
         </div>
       </div>
     </div>

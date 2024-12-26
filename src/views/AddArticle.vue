@@ -1,3 +1,158 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import SidebarGrid from '../components/SidebarGrid.vue'
+import Editor from '@tinymce/tinymce-vue';
+
+const router = useRouter();
+const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY;
+
+const token = ref(localStorage.getItem('token'));
+const title = ref('');
+const content = ref('');
+const imageUrl = ref(null);
+const uploadedImage = ref(null);
+const deckId = ref(null);
+const decks = ref([]);
+const filteredDecks = ref([]);
+const menuExpanded = ref(false);
+const menuHeight = ref(0);
+const searchQuery = ref('');
+const seriesName = ref('選擇牌組');
+
+const submitArticle = async () => {
+  try {
+    const formData = new FormData();
+    formData.append('title', title.value);
+    formData.append('content', content.value);
+    formData.append('deck_id', parseInt(deckId.value, 10));
+
+    if (uploadedImage.value) {
+      formData.append('picture', uploadedImage.value);
+    } else if (imageUrl.value) {
+      formData.append('post_picture', imageUrl.value);
+    }
+    const API_URL = import.meta.env.VITE_API_URL;
+    const response = await axios.post(
+      `${API_URL}/api/articles`,
+      formData,
+      {
+        headers: {
+          'Authorization': `Bearer ${token.value}`,
+        },
+      }
+    );
+
+    const postCode = response.data.post_code;
+
+    Swal.fire({
+      icon: 'success',
+      title: '成功',
+      showConfirmButton: false,
+      timer: 1000,
+    }).then(() => {
+      router.push(`/social/${postCode}`);
+    });
+  } catch (error) {
+    if (error.response && error.response.status === 403) {
+      const BASE_URL = import.meta.env.VITE_BASE_URL;
+      Swal.fire({
+        title: '請先登入',
+        text: '登入後才能發布文章',
+        icon: 'warning',
+        confirmButtonText: '確定',
+      }).then(() => {
+        window.location.href = `${BASE_URL}/login`;
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: '新增文章失敗',
+        text: error.message,
+      });
+    }
+  }
+};
+
+const handleButtonClick = (event) => {
+  if (imageUrl.value) {
+    imageUrl.value = null;
+    uploadedImage.value = null;
+    event.target.value = ''; // 重置 input 的值
+    event.preventDefault(); 
+  }
+};
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    uploadedImage.value = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imageUrl.value = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const getUserDecks = async () => {
+  if (!token.value) return;
+  const API_URL = import.meta.env.VITE_API_URL;
+  try {
+    const res = await axios.get(`${ API_URL }/decks`, {
+      headers: { Authorization: `Bearer ${token.value}` },
+    });
+    decks.value = res.data.decks;
+    filteredDecks.value = res.data.decks;
+  } catch (error) {
+    console.error('獲取牌組資料失敗', error);
+  }
+};
+
+const selectDeck = (deck) => {
+  title.value = deck.deck_name;
+  seriesName.value = deck.deck_name;
+  imageUrl.value = deck.deck_cover;
+  deckId.value = deck.id;
+  menuExpanded.value = false;
+};
+
+const toggleMenu = () => {
+  menuExpanded.value = !menuExpanded.value;
+  if (menuExpanded.value)  calculateMenuHeight();
+};
+
+const calculateMenuHeight = () => {
+  menuHeight.value = 45 + filteredDecks.value.length * 35;
+};
+
+const searchSeries = () => {
+  if (!searchQuery.value.trim()) {
+    filteredDecks.value = decks.value;
+  } else {
+    const query = searchQuery.value.toLowerCase();
+    filteredDecks.value = decks.value.filter(deck =>
+      deck.deck_name?.toLowerCase().includes(query)
+    );
+  }
+  calculateMenuHeight();
+};
+
+const clearSearch = () => {
+  searchQuery.value = '';
+  filteredDecks.value = decks.value;
+  calculateMenuHeight();
+};
+
+
+onMounted(() => {
+  getUserDecks();
+});
+
+</script>
+
 <template>
   <SidebarGrid style="grid-area: sidebar" />
   <main>
@@ -401,164 +556,6 @@
   </main>
 </template>
 
-<script>
-import axios from 'axios'
-import Swal from 'sweetalert2'
-import SidebarGrid from '../components/SidebarGrid.vue'
-import Editor from '@tinymce/tinymce-vue'
-
-const API_URL = import.meta.env.VITE_API_URL
-const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY
-
-export default {
-  components: {
-    SidebarGrid,
-    Editor,
-  },
-  data() {
-    return {
-      token: null,
-      title: '',
-      content: '',
-      imageUrl: null,
-      uploadedImage: null,
-      deckId: null,
-      decks: [],
-      filteredDecks: [],
-      menuExpanded: false,
-      menuHeight: 0,
-      searchQuery: '',
-      seriesName: '選擇牌組',
-    }
-  },
-  mounted() {
-    this.token = localStorage.getItem('token')
-    this.getUserDecks()
-  },
-  methods: {
-    async submitArticle() {
-      try {
-        const formData = new FormData()
-        formData.append('title', this.title)
-        formData.append('content', this.content)
-        formData.append('deck_id', parseInt(this.deckId, 10))
-
-        if (this.uploadedImage) {
-          formData.append('picture', this.uploadedImage)
-        } else if (this.imageUrl) {
-          formData.append('post_picture', this.imageUrl)
-        }
-
-        const response = await axios.post(`${API_URL}/api/articles`, formData, {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
-        })
-
-        Swal.fire({
-          icon: 'success',
-          title: '成功',
-          showConfirmButton: false,
-          timer: 1000,
-        })
-
-        this.title = ''
-        this.content = ''
-        this.imageUrl = null
-        this.uploadedImage = null
-        this.seriesName = '選擇牌組'
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: '新增文章失敗',
-        })
-      }
-    },
-
-    handleButtonClick() {
-      if (this.imageUrl) {
-        this.imageUrl = null
-        this.uploadedImage = null
-        this.$refs.fileInput.value = '' // 重置 input 的值
-        event.preventDefault()
-      }
-    },
-
-    handleFileUpload(event) {
-      const file = event.target.files[0]
-      if (file) {
-        this.uploadedImage = file
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          this.imageUrl = e.target.result // 設置圖片 URL
-        }
-        reader.readAsDataURL(file)
-      }
-    },
-
-    async getUserDecks() {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        return
-      }
-
-      try {
-        const res = await axios.get(`${API_URL}/decks`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-
-        this.decks = res.data.decks
-        this.filteredDecks = res.data.decks
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: '獲取用戶牌組失敗',
-          text: error.response?.data?.message || '請稍後重試',
-        })
-      }
-    },
-
-    selectDeck(deck) {
-      this.title = deck.deck_name
-      this.seriesName = deck.deck_name
-      this.imageUrl = deck.deck_cover
-      this.deckId = deck.id
-      this.menuExpanded = false
-    },
-
-    toggleMenu() {
-      this.menuExpanded = !this.menuExpanded
-      if (this.menuExpanded) {
-        this.calculateMenuHeight()
-      }
-    },
-
-    calculateMenuHeight() {
-      this.menuHeight = 45 + this.filteredDecks.length * 35
-    },
-
-    searchSeries() {
-      if (!this.searchQuery.trim()) {
-        this.filteredDecks = this.decks
-      } else {
-        const query = this.searchQuery.toLowerCase()
-        this.filteredDecks = this.decks.filter((deck) =>
-          deck.deck_name?.toLowerCase().includes(query)
-        )
-      }
-      this.calculateMenuHeight()
-    },
-
-    clearSearch() {
-      this.searchQuery = ''
-      this.filteredDecks = this.decks
-      this.calculateMenuHeight()
-    },
-  },
-}
-</script>
 <style scoped>
 div,
 span,

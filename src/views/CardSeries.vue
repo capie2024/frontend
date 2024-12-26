@@ -1,27 +1,31 @@
 <script setup>
-import SidebarGrid from "../components/SidebarGrid.vue";
+import SidebarGrid from '../components/SidebarGrid.vue'
 import NavLoginBtn from '../components/NavLoginBtn.vue';
 import notice from '../components/notification/notice.vue';
-import { ref, computed, onMounted, onBeforeUnmount, onBeforeMount, watch, nextTick } from "vue";
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  onBeforeMount,
+  watch,
+  nextTick,
+} from 'vue'
 import router from '../router/index'
-import { storeToRefs } from "pinia";
-import { useCardSeriesStore } from "@/stores/card-series";
-import { useDeckMakeStore } from "@/stores/deck-make";
-import { useCardInfoStore } from "@/stores/card-info";
+import { storeToRefs } from 'pinia'
+import { useCardSeriesStore } from '@/stores/card-series'
+import { useDeckMakeStore } from '@/stores/deck-make'
+import { useCardInfoStore } from '@/stores/card-info'
 import Swal from 'sweetalert2'
-import { useCardFilterStore } from "@/stores/card-filter"
+import { useCardFilterStore } from '@/stores/card-filter'
 import { useRoute } from 'vue-router'
 
-
 // 引入CardFilterStore並使用
-const cardFilterStore = useCardFilterStore();
-const { 
-  applyBtnStatus,
-  keyWordGroup,
-  myFiltersGroup
-} = storeToRefs(cardFilterStore);
+const cardFilterStore = useCardFilterStore()
+const { applyBtnStatus, keyWordGroup, myFiltersGroup } =
+  storeToRefs(cardFilterStore)
 const filterVaribleSet = cardFilterStore.filterVaribleSet
-const useFilters = cardFilterStore.useFilters;
+const useFilters = cardFilterStore.useFilters
 const changeReplaceKeyWord = cardFilterStore.changeReplaceKeyWord
 const changeFilterStatus = cardFilterStore.changeFilterStatus
 const resetFilter = cardFilterStore.resetFilter
@@ -35,31 +39,36 @@ const saveMyFilters = cardFilterStore.saveMyFilters
 const deleteMyFilters = cardFilterStore.deleteMyFilters
 
 // 引入CardSeriesStore並使用
-const cardSeriesStore = useCardSeriesStore();
-const { 
-    seriesCardList,
-    seriesInfo,
-    seriesCardListLength
-  } = storeToRefs(cardSeriesStore);
-const getLastViewSeries = cardSeriesStore.getLastViewSeries;
-const saveLastViewSeries = cardSeriesStore.saveLastViewSeries;
+const cardSeriesStore = useCardSeriesStore()
+const { seriesCardList, seriesInfo, seriesCardListLength } =
+  storeToRefs(cardSeriesStore)
+const getLastViewSeries = cardSeriesStore.getLastViewSeries
+const saveLastViewSeries = cardSeriesStore.saveLastViewSeries
 
 // 引入DeckMakeStore並使用
-const deckMakeStore = useDeckMakeStore();
-const { selectedCards, countDeck, editType, showCardPrice, sortedDeck, sortedTitle, sortStatus } = storeToRefs(deckMakeStore);
+const deckMakeStore = useDeckMakeStore()
+const {
+  selectedCards,
+  countDeck,
+  editType,
+  showCardPrice,
+  sortedDeck,
+  sortedTitle,
+  sortStatus,
+} = storeToRefs(deckMakeStore)
 const addCard = deckMakeStore.addCard
-const clearSelectedCards = deckMakeStore.clearSelectedCards;
-const getLastDeckEdit = deckMakeStore.getLastDeckEdit;
-const changeTypeToAdd = deckMakeStore.changeTypeToAdd;
-const changeTypeToDelete = deckMakeStore.changeTypeToDelete;
+const clearSelectedCards = deckMakeStore.clearSelectedCards
+const getLastDeckEdit = deckMakeStore.getLastDeckEdit
+const changeTypeToAdd = deckMakeStore.changeTypeToAdd
+const changeTypeToDelete = deckMakeStore.changeTypeToDelete
 const checkTypeAndRunFunction = deckMakeStore.checkTypeAndRunFunction
 const switchSortMode = deckMakeStore.switchSortMode
 const handleSwitchBtnClick = deckMakeStore.handleSwitchBtnClick
 const sendDeckToDatabase = deckMakeStore.sendDeckToDatabase
 
 // 引入CardInfoStore並使用
-const cardInfoStore = useCardInfoStore();
-const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow;
+const cardInfoStore = useCardInfoStore()
+const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow
 
 // 定義一些狀態
 const sidebarSelectedStatus = ref(true)
@@ -85,12 +94,12 @@ const priceOrder = computed(() => {
   })
   return index + 1
 })
-const replaceWord = computed(()=> {
+const replaceWord = computed(() => {
   return filterVaribleSet.replaceKeyWord ? 'OR' : 'AND'
 })
 
 // 清除牌組並回到第一步編輯牌組的狀態
-const clearDeckAndBacktoFirstStep = async() => {
+const clearDeckAndBacktoFirstStep = async () => {
   const res = await Swal.fire({
     icon: 'question',
     title: '清除牌組',
@@ -99,12 +108,11 @@ const clearDeckAndBacktoFirstStep = async() => {
     showCancelButton: true,
     cancelButtonText: '取消',
   })
-  if(res.isConfirmed){
+  if (res.isConfirmed) {
     clearSelectedCards()
     settingDeckStatus.value = false
     sidebarSelectedStatus.value = true
   }
-  
 }
 
 // 新增刪除完牌組後前往下一步
@@ -114,30 +122,34 @@ const nextStep = () => {
 }
 
 // 結束編輯牌組，新增牌組到牌組資料庫，跳轉至新製作的牌組頁面
-const finalStep = async() => {
-  const coverCard = selectedCards.value.find((card)=> {
+const finalStep = async () => {
+  const coverCard = selectedCards.value.find((card) => {
     return card.id == chooseCoverCard.value
   })
-  
-  if(deckName.value.trim() != '' && deckDescription.value.trim() != '' && chooseCoverCard.value.trim() != '') {
+
+  if (
+    deckName.value.trim() != '' &&
+    deckDescription.value.trim() != '' &&
+    chooseCoverCard.value.trim() != ''
+  ) {
     const deckData = {
       deckName: deckName.value,
       deckDescription: deckDescription.value,
       deck: selectedCards.value,
-      deckCover: coverCard.cover
+      deckCover: coverCard.cover,
     }
-    const res = await sendDeckToDatabase(deckData);
-    
-    if(res == undefined){
+    const res = await sendDeckToDatabase(deckData)
+
+    if (res == undefined) {
       await Swal.fire({
-                icon: 'error',
-                title: '錯誤',
-                text: '請重新登入'
-              })
+        icon: 'error',
+        title: '錯誤',
+        text: '請重新登入',
+      })
       router.push('/login')
     }
 
-    if(res.status == 200){        
+    if (res.status == 200) {
       settingDeckStatus.value = false
       sidebarSelectedStatus.value = true
       deckName.value = ''
@@ -145,74 +157,73 @@ const finalStep = async() => {
       chooseCoverCard.value = ''
       clearSelectedCards()
       await Swal.fire({
-                icon: 'success',
-                title: '成功',
-                text: '成功創建牌組'
-              })
-      router.push(`/deck/${ res.data.data.deck_id }`)
-    }else if(res.status == 403){
+        icon: 'success',
+        title: '成功',
+        text: '成功創建牌組',
+      })
+      router.push(`/deck/${res.data.data.deck_id}`)
+    } else if (res.status == 403) {
       await Swal.fire({
-                icon: 'error',
-                title: '錯誤',
-                text: '請重新登入'
-              })
+        icon: 'error',
+        title: '錯誤',
+        text: '請重新登入',
+      })
       router.push('/login')
-    }else{
+    } else {
       Swal.fire({
-                icon: 'error',
-                title: '錯誤',
-                text: '創建牌組失敗'
-              })
+        icon: 'error',
+        title: '錯誤',
+        text: '創建牌組失敗',
+      })
     }
-  }else{
-    if(deckName.value.trim() == '') {
+  } else {
+    if (deckName.value.trim() == '') {
       Swal.fire({
-                  icon: 'error',
-                  title: '錯誤',
-                  text: '需填寫牌組名'
-              })
-    }else if(deckDescription.value.trim() == '') {
+        icon: 'error',
+        title: '錯誤',
+        text: '需填寫牌組名',
+      })
+    } else if (deckDescription.value.trim() == '') {
       Swal.fire({
-                  icon: 'error',
-                  title: '錯誤',
-                  text: '需填寫牌組描述'
-              })
-    }else if(chooseCoverCard.value.trim() == '') {
+        icon: 'error',
+        title: '錯誤',
+        text: '需填寫牌組描述',
+      })
+    } else if (chooseCoverCard.value.trim() == '') {
       Swal.fire({
-                  icon: 'error',
-                  title: '錯誤',
-                  text: '未選擇封面卡'
-              })
+        icon: 'error',
+        title: '錯誤',
+        text: '未選擇封面卡',
+      })
     }
   }
 }
 
 // 篩選、排序數量
-const filterCount = ref(0);
-const sortCount = ref(0);
-
+const filterCount = ref(0)
+const sortCount = ref(0)
 
 // 關鍵字篩選的狀態
 const handleKeyWord = () => {
-  if(filterVaribleSet.keyWord.trim() != ''){
+  if (filterVaribleSet.keyWord.trim() != '') {
     applyBtnStatus.value = true
-  }else if(filterVaribleSet.keyWord.trim() == ''){
-      checkHaveFilterOrSort();
+  } else if (filterVaribleSet.keyWord.trim() == '') {
+    checkHaveFilterOrSort()
   }
 }
 
 // 按下apply按鈕後執行篩選功能
-const handleApplyStatus = async() => {
-  if(applyBtnStatus.value === true){
-    await useFilters(filterVaribleSet.keyWord.trim());
+const handleApplyStatus = async () => {
+  if (applyBtnStatus.value === true) {
+    await useFilters(filterVaribleSet.keyWord.trim())
   }
 
-  filterCount.value = 0;
-  sortCount.value = 0;
+  filterCount.value = 0
+  sortCount.value = 0
   Object.keys(filterVaribleSet).forEach((item) => {
-    if(
-      item != 'replaceKeyWord' || 
-      item != 'levelUpsort' || 
+    if (
+      item != 'replaceKeyWord' ||
+      item != 'levelUpsort' ||
       item != 'levelDownSort' ||
       item != 'colorUpSort' ||
       item != 'colorDownSort' ||
@@ -221,15 +232,15 @@ const handleApplyStatus = async() => {
       item != 'typeCharacter' ||
       item != 'typeScene' ||
       item != 'typeEvent'
-    ){
-      if(filterVaribleSet[item] === true){
+    ) {
+      if (filterVaribleSet[item] === true) {
         filterCount.value++
       }
     }
 
-    if(
-      item == 'replaceKeyWord' || 
-      item == 'levelUpsort' || 
+    if (
+      item == 'replaceKeyWord' ||
+      item == 'levelUpsort' ||
       item == 'levelDownSort' ||
       item == 'colorUpSort' ||
       item == 'colorDownSort' ||
@@ -238,8 +249,8 @@ const handleApplyStatus = async() => {
       item == 'typeCharacter' ||
       item == 'typeScene' ||
       item == 'typeEvent'
-    ){
-      if(filterVaribleSet[item] === true){
+    ) {
+      if (filterVaribleSet[item] === true) {
         sortCount.value++
       }
     }
@@ -250,7 +261,7 @@ const handleApplyStatus = async() => {
 // 按下關鍵字按鈕
 const handleUseKeyWordBtn = (keyWord) => {
   filterVaribleSet.keyWord = keyWord
-  handleKeyWord();
+  handleKeyWord()
 }
 
 // 按下常用篩選按鈕
@@ -259,401 +270,974 @@ const handleUseMyFiltersBtn = (myFilter) => {
   applyBtnStatus.value = true
 }
 
+const currentSidebar = ref('')
+const sidebarFilterWidth = ref(490)
+const sidebarDeckWidth = ref(490)
+const extraOffset = ref(262)
+const isLargeScreen = ref(window.innerWidth > 1200)
+const view = ref('card-info')
+const currentMain = ref(null)
+const filters = ref([
+  {
+    name: '常用',
+    checked: true,
+    icon: 'fa-solid fa-star',
+    checkButton: false,
+    delButton: false,
+    filterTag: [''],
+  },
+  {
+    name: '關鍵字',
+    checked: true,
+    icon: 'fa-solid fa-magnifying-glass',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['keyWord'],
+  },
+  {
+    name: '排序',
+    checked: true,
+    icon: 'fa-solid fa-sliders',
+    checkButton: false,
+    delButton: true,
+    filterTag: [
+      'levelDownSort',
+      'levelUpSort',
+      'colorDownSort',
+      'colorUpSort',
+      'priceDownSort',
+      'priceUpSort',
+    ],
+  },
+  {
+    name: '類型',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['typeCharacter', 'typeScene', 'typeEvent'],
+  },
+  {
+    name: '等級',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['levelFilter0', 'levelFilter1', 'levelFilter2', 'levelFilter3'],
+  },
+  {
+    name: '顏色',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['colorFilterRed', 'colorFilterBlue', 'colorFilterYellow'],
+  },
+  {
+    name: '費用',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['costFilter0', 'costFilter1', 'costFilter2'],
+  },
+  {
+    name: '魂傷',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['soulFilter0', 'soulFilter1', 'soulFilter2'],
+  },
+  {
+    name: '攻擊力',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: [
+      'attackFilter0',
+      'attackFilter500',
+      'attackFilter1000',
+      'attackFilter1500',
+      'attackFilter2000',
+      'attackFilter2500',
+      'attackFilter3000',
+      'attackFilter3500',
+      'attackFilter4000',
+      'attackFilter4500',
+      'attackFilter5000',
+      'attackFilter5500',
+      'attackFilter6000',
+      'attackFilter6500',
+      'attackFilter7000',
+      'attackFilter7500',
+      'attackFilter8000',
+      'attackFilter8500',
+      'attackFilter9000',
+      'attackFilter9500',
+      'attackFilter10000',
+      'attackFilter10500',
+      'attackFilter11000',
+    ],
+  },
+  {
+    name: '稀有度',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: [
+      'rareFilterRR',
+      'rareFilterSSP',
+      'rareFilterLRR',
+      'rareFilterR',
+      'rareFilterSR',
+      'rareFilterOFR',
+      'rareFilterU',
+      'rareFilterC',
+      'rareFilterCR',
+      'rareFilterRRR',
+      'rareFilterCC',
+      'rareFilterPR',
+      'rareFilterTD',
+      'rareFilterSP',
+      'rareFilterN',
+      'rareFilterLRP',
+      'rareFilterSIR',
+    ],
+  },
+  // { name: '判定', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+  // { name: '特徵', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+  // { name: '商品', checked: true, icon: 'fa-solid fa-filter', checkButton: true }
+])
 
-  const currentSidebar = ref('');
-  const sidebarFilterWidth = ref(490);
-  const sidebarDeckWidth = ref(490);
-  const extraOffset = ref(262);
-  const isLargeScreen = ref(window.innerWidth > 1200);
-  const view = ref('card-info');
-  const currentMain = ref(null);
-  const filters = ref([
-    { 
-      name: '常用',
-      checked: true,
-      icon: 'fa-solid fa-star',
-      checkButton: false,
-      delButton: false,
-      filterTag: ['']
-    },
-    { 
-      name: '關鍵字',
-      checked: true,
-      icon: 'fa-solid fa-magnifying-glass',
-      checkButton: false,
-      delButton: true,
-      filterTag: ['keyWord']
-    },
-    { 
-      name: '排序',
-      checked: true,
-      icon: 'fa-solid fa-sliders',
-      checkButton: false,
-      delButton: true,
-      filterTag: [
-        'levelDownSort',
-        'levelUpSort',
-        'colorDownSort',
-        'colorUpSort',
-        'priceDownSort',
-        'priceUpSort'
-      ]
-    },
-    { 
-      name: '類型',
-      checked: true,
-      icon: 'fa-solid fa-filter',
-      checkButton: false,
-      delButton: true,
-      filterTag: [
-        'typeCharacter',
-        'typeScene',
-        'typeEvent'
-      ]
-    },
-    { 
-      name: '等級',
-      checked: true,
-      icon: 'fa-solid fa-filter',
-      checkButton: false,
-      delButton: true,
-      filterTag: [
-        'levelFilter0',
-        'levelFilter1',
-        'levelFilter2',
-        'levelFilter3'
-      ]
-    },
-    { 
-      name: '顏色',
-      checked: true,
-      icon: 'fa-solid fa-filter',
-      checkButton: false,
-      delButton: true,
-      filterTag: [
-        'colorFilterRed',
-        'colorFilterBlue',
-        'colorFilterYellow'
-      ]
-    },
-    { 
-      name: '費用',
-      checked: true,
-      icon: 'fa-solid fa-filter',
-      checkButton: false,
-      delButton: true,
-      filterTag: [
-        'costFilter0',
-        'costFilter1',
-        'costFilter2'
-      ]
-    },
-    { 
-      name: '魂傷',
-      checked: true,
-      icon: 'fa-solid fa-filter',
-      checkButton: false,
-      delButton: true,
-      filterTag: [
-        'soulFilter0',
-        'soulFilter1',
-        'soulFilter2'
-      ]
-    },
-    { 
-      name: '攻擊力',
-      checked: true,
-      icon: 'fa-solid fa-filter',
-      checkButton: false,
-      delButton: true,
-      filterTag: [
-        'attackFilter0',
-        'attackFilter500',
-        'attackFilter1000',
-        'attackFilter1500',
-        'attackFilter2000',
-        'attackFilter2500',
-        'attackFilter3000',
-        'attackFilter3500',
-        'attackFilter4000',
-        'attackFilter4500',
-        'attackFilter5000',
-        'attackFilter5500',
-        'attackFilter6000',
-        'attackFilter6500',
-        'attackFilter7000',
-        'attackFilter7500',
-        'attackFilter8000',
-        'attackFilter8500',
-        'attackFilter9000',
-        'attackFilter9500',
-        'attackFilter10000',
-        'attackFilter10500',
-        'attackFilter11000'
-      ]
-    },
-    { 
-      name: '稀有度',
-      checked: true,
-      icon: 'fa-solid fa-filter',
-      checkButton: false,
-      delButton: true,
-      filterTag: [
-        'rareFilterRR',
-        'rareFilterSSP',
-        'rareFilterLRR',
-        'rareFilterR',
-        'rareFilterSR',
-        'rareFilterOFR',
-        'rareFilterU',
-        'rareFilterC',
-        'rareFilterCR',
-        'rareFilterRRR',
-        'rareFilterCC',
-        'rareFilterPR',
-        'rareFilterTD',
-        'rareFilterSP',
-        'rareFilterN',
-        'rareFilterLRP',
-        'rareFilterSIR'
-      ]
-    },
-    // { name: '判定', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    // { name: '特徵', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
-    // { name: '商品', checked: true, icon: 'fa-solid fa-filter', checkButton: true }
-  ]);
-  
-  const sidebarMarginLeft = computed(() => {
-    if (!isLargeScreen.value) return 0;
-    if (currentSidebar.value === 'open-filter') {
-      return sidebarFilterWidth.value - extraOffset.value;
-    } else if (currentSidebar.value === 'open-deck') {
-      return sidebarDeckWidth.value - extraOffset.value;
-    }
-    return 0;
-  });
-    
-  function toggleSidebar(sidebar) {
-    currentSidebar.value = currentSidebar.value === sidebar ? '' : sidebar;
+const sidebarMarginLeft = computed(() => {
+  if (!isLargeScreen.value) return 0
+  if (currentSidebar.value === 'open-filter') {
+    return sidebarFilterWidth.value - extraOffset.value
+  } else if (currentSidebar.value === 'open-deck') {
+    return sidebarDeckWidth.value - extraOffset.value
   }
-  
-  function toggleFilter(value) {
-    if (!isLargeScreen.value) {
-      currentSidebar.value = '';
-    }
-    currentMain.value = currentMain.value === value ? null : value;
-  }
-  
-  function MenuFilter(index) {
-    filters.value[index].checked = !filters.value[index].checked;
-  }
-  
-  function closeSidebar() {
-    currentSidebar.value = '';
-    currentMain.value = '';
+  return 0
+})
 
-    settingDeckStatus.value = false
-    sidebarSelectedStatus.value = true
-    deckName.value = ''
-    deckDescription.value = ''
-    chooseCoverCard.value = ''
+function toggleSidebar(sidebar) {
+  currentSidebar.value = currentSidebar.value === sidebar ? '' : sidebar
+}
+
+function toggleFilter(value) {
+  if (!isLargeScreen.value) {
+    currentSidebar.value = ''
   }
-  
-  function updateScreenSize() {
-    isLargeScreen.value = window.innerWidth > 1200;
-    if (!isLargeScreen.value) {
-      closeSidebar();
-    } else {
-      currentMain.value = '';
-    }
+  currentMain.value = currentMain.value === value ? null : value
+}
+
+function MenuFilter(index) {
+  filters.value[index].checked = !filters.value[index].checked
+}
+
+function closeSidebar() {
+  currentSidebar.value = ''
+  currentMain.value = ''
+
+  settingDeckStatus.value = false
+  sidebarSelectedStatus.value = true
+  deckName.value = ''
+  deckDescription.value = ''
+  chooseCoverCard.value = ''
+}
+
+function updateScreenSize() {
+  isLargeScreen.value = window.innerWidth > 1200
+  if (!isLargeScreen.value) {
+    closeSidebar()
+  } else {
+    currentMain.value = ''
   }
-  onBeforeMount(async()=> {
-    const route = useRoute();
-    const seriesId = route.params.series_id;
-    saveLastViewSeries(seriesId)
-    await getLastViewSeries();
-  })
-  // Lifecycle hooks
-  onMounted(async() => {
-    getLastDeckEdit();
-    switchSortMode();
-    window.addEventListener('resize', updateScreenSize);
-  });
-  
-  onBeforeUnmount(() => {
-    window.removeEventListener('resize', updateScreenSize);
-  });
+}
+onBeforeMount(async () => {
+  const route = useRoute()
+  const seriesId = route.params.series_id
+  saveLastViewSeries(seriesId)
+  await getLastViewSeries()
+})
+// Lifecycle hooks
+onMounted(async () => {
+  getLastDeckEdit()
+  switchSortMode()
+  window.addEventListener('resize', updateScreenSize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateScreenSize)
+})
 </script>
 <template>
-<div class="bg-black overflow-hidden root-container">
-    
+  <div class="overflow-hidden bg-black root-container">
     <nav class="sidebar-container">
 
       <SidebarGrid :class="{ hidden: currentMain === 'open-filter' || currentMain === 'open-deck'}" />
 
       <section v-show="currentSidebar === 'open-filter'" class="sidebar-filter">
         <header class="sidebar-filter-header">
-          <div class = "flex-col">
+          <div class="flex-col">
             <p>卡片篩選</p>
-            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ (filterVaribleSet.keyWord.trim()) }}"</p>
+            <p>
+              {{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{
+                filterVaribleSet.keyWord.trim()
+              }}"
+            </p>
           </div>
           <div>
-            <button class="icon del-btn" @click="resetAllFilter" ><i class="fa-solid fa-trash"></i></button>
-            <button class="icon open-btn"><i class="fa-solid fa-chevron-down"></i></button>
-            <button @click="closeSidebar" class="icon xmark-btn"><i class="fa-solid fa-xmark"></i></button>
+            <button class="icon del-btn" @click="resetAllFilter">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+            <button class="icon open-btn">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <button @click="closeSidebar" class="icon xmark-btn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </header>
-        
+
         <div class="sidebar-filter-content">
-          <div class="whole-menu" v-for="(filter, index) in filters" :key="index">
+          <div
+            class="whole-menu"
+            v-for="(filter, index) in filters"
+            :key="index"
+          >
             <div class="menu" @click="MenuFilter(index)">
               <i :class="[filter.icon]"></i>
               <p>{{ filter.name }}</p>
-              <button class="icon del" v-if="filter.delButton" @click.stop="resetFilter(filter.filterTag)" >
+              <button
+                class="icon del"
+                v-if="filter.delButton"
+                @click.stop="resetFilter(filter.filterTag)"
+              >
                 <i class="fa-solid fa-trash"></i>
               </button>
-              <button class="icon check" v-if="filter.checkButton" >
+              <button class="icon check" v-if="filter.checkButton">
                 <i class="fa-regular fa-circle-check"></i>
               </button>
               <button class="open">
-                <i class="fa fa-chevron-down" :style="{ transform: filter.checked ? 'rotate(180deg)' : '' }"></i>
+                <i
+                  class="fa fa-chevron-down"
+                  :style="{ transform: filter.checked ? 'rotate(180deg)' : '' }"
+                ></i>
               </button>
             </div>
             <div class="menu-inner" v-show="filter.checked">
               <div v-if="filter.name === '常用'">
-                <span>"+" 按鈕可以儲存當下篩選內容，長按儲存篩選可以進行刪除。</span>
-                <div class="myfilter-button-group" >
-                  <button class="plus-btn-used" @click="saveMyFilters" ><i class="fa-solid fa-plus"></i></button>
-                  <button class="myfilter-button-item" v-for="(myfilter, index) in myFiltersGroup" :key="index" @click="handleUseMyFiltersBtn(myfilter)" @mousedown="countMouseUp" @mouseup="deleteMyFilters(myfilter)" >{{ myfilter.name }}</button>
+                <span
+                  >"+"
+                  按鈕可以儲存當下篩選內容，長按儲存篩選可以進行刪除。</span
+                >
+                <div class="myfilter-button-group">
+                  <button class="plus-btn-used" @click="saveMyFilters">
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                  <button
+                    class="myfilter-button-item"
+                    v-for="(myfilter, index) in myFiltersGroup"
+                    :key="index"
+                    @click="handleUseMyFiltersBtn(myfilter)"
+                    @mousedown="countMouseUp"
+                    @mouseup="deleteMyFilters(myfilter)"
+                  >
+                    {{ myfilter.name }}
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '關鍵字'">
-                <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
-                  <br>當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
+                <span
+                  >可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
+                  <br />當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
                 </span>
-                <div class="input-keyword" :class="{ 'input-keyword-haveValue': filterVaribleSet.keyWord.trim() != '' }">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
-                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="filterVaribleSet.keyWord" @input="handleKeyWord" >
+                <div
+                  class="input-keyword"
+                  :class="{
+                    'input-keyword-haveValue':
+                      filterVaribleSet.keyWord.trim() != '',
+                  }"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    data-slot="icon"
+                    class="flex-none size-4"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                    ></path>
+                  </svg>
+                  <input
+                    class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none"
+                    type="text"
+                    placeholder="關鍵字搜尋"
+                    v-model="filterVaribleSet.keyWord"
+                    @input="handleKeyWord"
+                  />
                   <div>
-                    <button @click="changeReplaceKeyWord" ><span>{{ replaceWord }}</span></button>
+                    <button @click="changeReplaceKeyWord">
+                      <span>{{ replaceWord }}</span>
+                    </button>
                     <!-- <button><span>OR</span></button> -->
-                    <button class="plus-btn" @click="saveKeyWord" ><i class="fa-solid fa-plus"></i></button>
+                    <button class="plus-btn" @click="saveKeyWord">
+                      <i class="fa-solid fa-plus"></i>
+                    </button>
                   </div>
                 </div>
-                <p class="keyword-below">"+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
+                <p class="keyword-below">
+                  "+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
                 </p>
-                <span v-if="keyWordGroup.length === 0" >無資料</span>
-                <div class="keyword-button-group" >
-                  <button class="keyword-button-item" v-for="(keyWord, index) in keyWordGroup" :key="index" @click="handleUseKeyWordBtn(keyWord)" @mousedown="countMouseUp" @mouseup="deleteKeyWord(keyWord)" >{{ keyWord }}</button>
+                <span v-if="keyWordGroup.length === 0">無資料</span>
+                <div class="keyword-button-group">
+                  <button
+                    class="keyword-button-item"
+                    v-for="(keyWord, index) in keyWordGroup"
+                    :key="index"
+                    @click="handleUseKeyWordBtn(keyWord)"
+                    @mousedown="countMouseUp"
+                    @mouseup="deleteKeyWord(keyWord)"
+                  >
+                    {{ keyWord }}
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '排序'">
                 <div class="menu-inner-slider-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelDownSort || !filterVaribleSet.levelUpSort, 'btn-active-bg': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" @click="changeSortStatus('level')" >
-                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" >
+                  <button
+                    :class="{
+                      'btn-default-bg':
+                        !filterVaribleSet.levelDownSort ||
+                        !filterVaribleSet.levelUpSort,
+                      'btn-active-bg':
+                        filterVaribleSet.levelDownSort ||
+                        filterVaribleSet.levelUpSort,
+                    }"
+                    @click="changeSortStatus('level')"
+                  >
+                    <div
+                      class="slider-btn"
+                      :class="{
+                        'slider-btn-active':
+                          filterVaribleSet.levelDownSort ||
+                          filterVaribleSet.levelUpSort,
+                      }"
+                    >
                       {{ levelOrder > 0 ? levelOrder : '' }}
                     </div>
                     等級
-                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.levelUpSort ,'arrow-down': filterVaribleSet.levelUpSort}" ></i>
+                    <i
+                      class="fa-solid fa-arrow-up"
+                      :class="{
+                        'arrow-up': !filterVaribleSet.levelUpSort,
+                        'arrow-down': filterVaribleSet.levelUpSort,
+                      }"
+                    ></i>
                   </button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.colorDownSort || !filterVaribleSet.colorUpSort, 'btn-active-bg': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" @click="changeSortStatus('color')" >
-                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" >
+                  <button
+                    :class="{
+                      'btn-default-bg':
+                        !filterVaribleSet.colorDownSort ||
+                        !filterVaribleSet.colorUpSort,
+                      'btn-active-bg':
+                        filterVaribleSet.colorDownSort ||
+                        filterVaribleSet.colorUpSort,
+                    }"
+                    @click="changeSortStatus('color')"
+                  >
+                    <div
+                      class="slider-btn"
+                      :class="{
+                        'slider-btn-active':
+                          filterVaribleSet.colorDownSort ||
+                          filterVaribleSet.colorUpSort,
+                      }"
+                    >
                       {{ colorOrder > 0 ? colorOrder : '' }}
                     </div>
                     顏色
-                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.colorUpSort ,'arrow-down': filterVaribleSet.colorUpSort}" ></i>
+                    <i
+                      class="fa-solid fa-arrow-up"
+                      :class="{
+                        'arrow-up': !filterVaribleSet.colorUpSort,
+                        'arrow-down': filterVaribleSet.colorUpSort,
+                      }"
+                    ></i>
                   </button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.priceDownSort || !filterVaribleSet.priceUpSort, 'btn-active-bg': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" @click="changeSortStatus('price')" >
-                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" >
+                  <button
+                    :class="{
+                      'btn-default-bg':
+                        !filterVaribleSet.priceDownSort ||
+                        !filterVaribleSet.priceUpSort,
+                      'btn-active-bg':
+                        filterVaribleSet.priceDownSort ||
+                        filterVaribleSet.priceUpSort,
+                    }"
+                    @click="changeSortStatus('price')"
+                  >
+                    <div
+                      class="slider-btn"
+                      :class="{
+                        'slider-btn-active':
+                          filterVaribleSet.priceDownSort ||
+                          filterVaribleSet.priceUpSort,
+                      }"
+                    >
                       {{ priceOrder > 0 ? priceOrder : '' }}
                     </div>
                     價格
-                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.priceUpSort ,'arrow-down': filterVaribleSet.priceUpSort}" ></i>
+                    <i
+                      class="fa-solid fa-arrow-up"
+                      :class="{
+                        'arrow-up': !filterVaribleSet.priceUpSort,
+                        'arrow-down': filterVaribleSet.priceUpSort,
+                      }"
+                    ></i>
                   </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '類型'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.typeCharacter, 'btn-active-bg': filterVaribleSet.typeCharacter }" @click="changeFilterStatus('typeCharacter')" >角色</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.typeEvent, 'btn-active-bg': filterVaribleSet.typeEvent }" @click="changeFilterStatus('typeEvent')" >事件</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.typeScene, 'btn-active-bg': filterVaribleSet.typeScene }" @click="changeFilterStatus('typeScene')" >名場</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.typeCharacter,
+                      'btn-active-bg': filterVaribleSet.typeCharacter,
+                    }"
+                    @click="changeFilterStatus('typeCharacter')"
+                  >
+                    角色
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.typeEvent,
+                      'btn-active-bg': filterVaribleSet.typeEvent,
+                    }"
+                    @click="changeFilterStatus('typeEvent')"
+                  >
+                    事件
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.typeScene,
+                      'btn-active-bg': filterVaribleSet.typeScene,
+                    }"
+                    @click="changeFilterStatus('typeScene')"
+                  >
+                    名場
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '等級'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter0, 'btn-active-bg': filterVaribleSet.levelFilter0 }" @click="changeFilterStatus('levelFilter0')" >0</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter1, 'btn-active-bg': filterVaribleSet.levelFilter1 }" @click="changeFilterStatus('levelFilter1')" >1</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter2, 'btn-active-bg': filterVaribleSet.levelFilter2 }" @click="changeFilterStatus('levelFilter2')" >2</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter3, 'btn-active-bg': filterVaribleSet.levelFilter3 }" @click="changeFilterStatus('levelFilter3')" >3</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter0,
+                      'btn-active-bg': filterVaribleSet.levelFilter0,
+                    }"
+                    @click="changeFilterStatus('levelFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter1,
+                      'btn-active-bg': filterVaribleSet.levelFilter1,
+                    }"
+                    @click="changeFilterStatus('levelFilter1')"
+                  >
+                    1
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter2,
+                      'btn-active-bg': filterVaribleSet.levelFilter2,
+                    }"
+                    @click="changeFilterStatus('levelFilter2')"
+                  >
+                    2
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter3,
+                      'btn-active-bg': filterVaribleSet.levelFilter3,
+                    }"
+                    @click="changeFilterStatus('levelFilter3')"
+                  >
+                    3
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '顏色'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterYellow, 'btn-active-bg': filterVaribleSet.colorFilterYellow }"@click="changeFilterStatus('colorFilterYellow')" >黃色</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterRed, 'btn-active-bg': filterVaribleSet.colorFilterRed }"@click="changeFilterStatus('colorFilterRed')" >紅色</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterBlue, 'btn-active-bg': filterVaribleSet.colorFilterBlue }"@click="changeFilterStatus('colorFilterBlue')" >藍色</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.colorFilterYellow,
+                      'btn-active-bg': filterVaribleSet.colorFilterYellow,
+                    }"
+                    @click="changeFilterStatus('colorFilterYellow')"
+                  >
+                    黃色
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.colorFilterRed,
+                      'btn-active-bg': filterVaribleSet.colorFilterRed,
+                    }"
+                    @click="changeFilterStatus('colorFilterRed')"
+                  >
+                    紅色
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.colorFilterBlue,
+                      'btn-active-bg': filterVaribleSet.colorFilterBlue,
+                    }"
+                    @click="changeFilterStatus('colorFilterBlue')"
+                  >
+                    藍色
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '費用'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter0, 'btn-active-bg': filterVaribleSet.costFilter0 }"@click="changeFilterStatus('costFilter0')"  >0</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter1, 'btn-active-bg': filterVaribleSet.costFilter1 }"@click="changeFilterStatus('costFilter1')"  >1</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter2, 'btn-active-bg': filterVaribleSet.costFilter2 }"@click="changeFilterStatus('costFilter2')"  >2</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.costFilter0,
+                      'btn-active-bg': filterVaribleSet.costFilter0,
+                    }"
+                    @click="changeFilterStatus('costFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.costFilter1,
+                      'btn-active-bg': filterVaribleSet.costFilter1,
+                    }"
+                    @click="changeFilterStatus('costFilter1')"
+                  >
+                    1
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.costFilter2,
+                      'btn-active-bg': filterVaribleSet.costFilter2,
+                    }"
+                    @click="changeFilterStatus('costFilter2')"
+                  >
+                    2
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '魂傷'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter0, 'btn-active-bg': filterVaribleSet.soulFilter0 }"@click="changeFilterStatus('soulFilter0')" >0</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter1, 'btn-active-bg': filterVaribleSet.soulFilter1 }"@click="changeFilterStatus('soulFilter1')" >1</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter2, 'btn-active-bg': filterVaribleSet.soulFilter2 }"@click="changeFilterStatus('soulFilter2')" >2</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.soulFilter0,
+                      'btn-active-bg': filterVaribleSet.soulFilter0,
+                    }"
+                    @click="changeFilterStatus('soulFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.soulFilter1,
+                      'btn-active-bg': filterVaribleSet.soulFilter1,
+                    }"
+                    @click="changeFilterStatus('soulFilter1')"
+                  >
+                    1
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.soulFilter2,
+                      'btn-active-bg': filterVaribleSet.soulFilter2,
+                    }"
+                    @click="changeFilterStatus('soulFilter2')"
+                  >
+                    2
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '攻擊力'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter0, 'btn-active-bg': filterVaribleSet.attackFilter0 }"@click="changeFilterStatus('attackFilter0')" >0</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter500, 'btn-active-bg': filterVaribleSet.attackFilter500 }"@click="changeFilterStatus('attackFilter500')" >500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1000, 'btn-active-bg': filterVaribleSet.attackFilter1000 }"@click="changeFilterStatus('attackFilter1000')" >1000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1500, 'btn-active-bg': filterVaribleSet.attackFilter1500 }"@click="changeFilterStatus('attackFilter1500')" >1500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2000, 'btn-active-bg': filterVaribleSet.attackFilter2000 }"@click="changeFilterStatus('attackFilter2000')" >2000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2500, 'btn-active-bg': filterVaribleSet.attackFilter2500 }"@click="changeFilterStatus('attackFilter2500')" >2500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3000, 'btn-active-bg': filterVaribleSet.attackFilter3000 }"@click="changeFilterStatus('attackFilter3000')" >3000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3500, 'btn-active-bg': filterVaribleSet.attackFilter3500 }"@click="changeFilterStatus('attackFilter3500')" >3500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4000, 'btn-active-bg': filterVaribleSet.attackFilter4000 }"@click="changeFilterStatus('attackFilter4000')" >4000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4500, 'btn-active-bg': filterVaribleSet.attackFilter4500 }"@click="changeFilterStatus('attackFilter4500')" >4500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5000, 'btn-active-bg': filterVaribleSet.attackFilter5000 }"@click="changeFilterStatus('attackFilter5000')" >5000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5500, 'btn-active-bg': filterVaribleSet.attackFilter5500 }"@click="changeFilterStatus('attackFilter5500')" >5500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6000, 'btn-active-bg': filterVaribleSet.attackFilter6000 }"@click="changeFilterStatus('attackFilter6000')" >6000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6500, 'btn-active-bg': filterVaribleSet.attackFilter6500 }"@click="changeFilterStatus('attackFilter6500')" >6500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7000, 'btn-active-bg': filterVaribleSet.attackFilter7000 }"@click="changeFilterStatus('attackFilter7000')" >7000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7500, 'btn-active-bg': filterVaribleSet.attackFilter7500 }"@click="changeFilterStatus('attackFilter7500')" >7500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8000, 'btn-active-bg': filterVaribleSet.attackFilter8000 }"@click="changeFilterStatus('attackFilter8000')" >8000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8500, 'btn-active-bg': filterVaribleSet.attackFilter8500 }"@click="changeFilterStatus('attackFilter8500')" >8500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9000, 'btn-active-bg': filterVaribleSet.attackFilter9000 }"@click="changeFilterStatus('attackFilter9000')" >9000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9500, 'btn-active-bg': filterVaribleSet.attackFilter9500 }"@click="changeFilterStatus('attackFilter9500')" >9500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10000, 'btn-active-bg': filterVaribleSet.attackFilter10000 }"@click="changeFilterStatus('attackFilter10000')" >10000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10500, 'btn-active-bg': filterVaribleSet.attackFilter10500 }"@click="changeFilterStatus('attackFilter10500')" >10500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter11000, 'btn-active-bg': filterVaribleSet.attackFilter11000 }"@click="changeFilterStatus('attackFilter11000')" >11000</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter0,
+                      'btn-active-bg': filterVaribleSet.attackFilter0,
+                    }"
+                    @click="changeFilterStatus('attackFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter500,
+                      'btn-active-bg': filterVaribleSet.attackFilter500,
+                    }"
+                    @click="changeFilterStatus('attackFilter500')"
+                  >
+                    500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter1000,
+                      'btn-active-bg': filterVaribleSet.attackFilter1000,
+                    }"
+                    @click="changeFilterStatus('attackFilter1000')"
+                  >
+                    1000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter1500,
+                      'btn-active-bg': filterVaribleSet.attackFilter1500,
+                    }"
+                    @click="changeFilterStatus('attackFilter1500')"
+                  >
+                    1500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter2000,
+                      'btn-active-bg': filterVaribleSet.attackFilter2000,
+                    }"
+                    @click="changeFilterStatus('attackFilter2000')"
+                  >
+                    2000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter2500,
+                      'btn-active-bg': filterVaribleSet.attackFilter2500,
+                    }"
+                    @click="changeFilterStatus('attackFilter2500')"
+                  >
+                    2500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter3000,
+                      'btn-active-bg': filterVaribleSet.attackFilter3000,
+                    }"
+                    @click="changeFilterStatus('attackFilter3000')"
+                  >
+                    3000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter3500,
+                      'btn-active-bg': filterVaribleSet.attackFilter3500,
+                    }"
+                    @click="changeFilterStatus('attackFilter3500')"
+                  >
+                    3500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter4000,
+                      'btn-active-bg': filterVaribleSet.attackFilter4000,
+                    }"
+                    @click="changeFilterStatus('attackFilter4000')"
+                  >
+                    4000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter4500,
+                      'btn-active-bg': filterVaribleSet.attackFilter4500,
+                    }"
+                    @click="changeFilterStatus('attackFilter4500')"
+                  >
+                    4500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter5000,
+                      'btn-active-bg': filterVaribleSet.attackFilter5000,
+                    }"
+                    @click="changeFilterStatus('attackFilter5000')"
+                  >
+                    5000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter5500,
+                      'btn-active-bg': filterVaribleSet.attackFilter5500,
+                    }"
+                    @click="changeFilterStatus('attackFilter5500')"
+                  >
+                    5500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter6000,
+                      'btn-active-bg': filterVaribleSet.attackFilter6000,
+                    }"
+                    @click="changeFilterStatus('attackFilter6000')"
+                  >
+                    6000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter6500,
+                      'btn-active-bg': filterVaribleSet.attackFilter6500,
+                    }"
+                    @click="changeFilterStatus('attackFilter6500')"
+                  >
+                    6500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter7000,
+                      'btn-active-bg': filterVaribleSet.attackFilter7000,
+                    }"
+                    @click="changeFilterStatus('attackFilter7000')"
+                  >
+                    7000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter7500,
+                      'btn-active-bg': filterVaribleSet.attackFilter7500,
+                    }"
+                    @click="changeFilterStatus('attackFilter7500')"
+                  >
+                    7500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter8000,
+                      'btn-active-bg': filterVaribleSet.attackFilter8000,
+                    }"
+                    @click="changeFilterStatus('attackFilter8000')"
+                  >
+                    8000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter8500,
+                      'btn-active-bg': filterVaribleSet.attackFilter8500,
+                    }"
+                    @click="changeFilterStatus('attackFilter8500')"
+                  >
+                    8500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter9000,
+                      'btn-active-bg': filterVaribleSet.attackFilter9000,
+                    }"
+                    @click="changeFilterStatus('attackFilter9000')"
+                  >
+                    9000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter9500,
+                      'btn-active-bg': filterVaribleSet.attackFilter9500,
+                    }"
+                    @click="changeFilterStatus('attackFilter9500')"
+                  >
+                    9500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter10000,
+                      'btn-active-bg': filterVaribleSet.attackFilter10000,
+                    }"
+                    @click="changeFilterStatus('attackFilter10000')"
+                  >
+                    10000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter10500,
+                      'btn-active-bg': filterVaribleSet.attackFilter10500,
+                    }"
+                    @click="changeFilterStatus('attackFilter10500')"
+                  >
+                    10500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter11000,
+                      'btn-active-bg': filterVaribleSet.attackFilter11000,
+                    }"
+                    @click="changeFilterStatus('attackFilter11000')"
+                  >
+                    11000
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '稀有度'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRR, 'btn-active-bg': filterVaribleSet.rareFilterRR }"@click="changeFilterStatus('rareFilterRR')" >RR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSSP, 'btn-active-bg': filterVaribleSet.rareFilterSSP }"@click="changeFilterStatus('rareFilterSSP')" >SSP</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRR, 'btn-active-bg': filterVaribleSet.rareFilterLRR }"@click="changeFilterStatus('rareFilterLRR')" >LRR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilteR, 'btn-active-bg': filterVaribleSet.rareFilterR}"@click="changeFilterStatus('rareFilterR')" >R</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSR, 'btn-active-bg': filterVaribleSet.rareFilterSR }"@click="changeFilterStatus('rareFilterSR')" >SR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterOFR, 'btn-active-bg': filterVaribleSet.rareFilterOFR }"@click="changeFilterStatus('rareFilterOFR')" >OFR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterU, 'btn-active-bg': filterVaribleSet.rareFilterU }"@click="changeFilterStatus('rareFilterU')" >U</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterC, 'btn-active-bg': filterVaribleSet.rareFilterC }"@click="changeFilterStatus('rareFilterC')" >C</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCR, 'btn-active-bg': filterVaribleSet.rareFilterCR }"@click="changeFilterStatus('rareFilterCR')" >CR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRRR, 'btn-active-bg': filterVaribleSet.rareFilterRRR }"@click="changeFilterStatus('rareFilterRRR')" >RRR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCC, 'btn-active-bg': filterVaribleSet.rareFilterCC }"@click="changeFilterStatus('rareFilterCC')" >CC</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterPR, 'btn-active-bg': filterVaribleSet.rareFilterPR }"@click="changeFilterStatus('rareFilterPR')" >PR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterTD, 'btn-active-bg': filterVaribleSet.rareFilterTD }"@click="changeFilterStatus('rareFilterTD')" >TD</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSP, 'btn-active-bg': filterVaribleSet.rareFilterSP }"@click="changeFilterStatus('rareFilterSP')" >SP</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterN, 'btn-active-bg': filterVaribleSet.rareFilterN }"@click="changeFilterStatus('rareFilterN')" >N</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRP, 'btn-active-bg': filterVaribleSet.rareFilterLRP }"@click="changeFilterStatus('rareFilterLRP')" >LRP</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSIR, 'btn-active-bg': filterVaribleSet.rareFilterSIR }"@click="changeFilterStatus('rareFilterSIR')" >SIR</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterRR,
+                      'btn-active-bg': filterVaribleSet.rareFilterRR,
+                    }"
+                    @click="changeFilterStatus('rareFilterRR')"
+                  >
+                    RR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSSP,
+                      'btn-active-bg': filterVaribleSet.rareFilterSSP,
+                    }"
+                    @click="changeFilterStatus('rareFilterSSP')"
+                  >
+                    SSP
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterLRR,
+                      'btn-active-bg': filterVaribleSet.rareFilterLRR,
+                    }"
+                    @click="changeFilterStatus('rareFilterLRR')"
+                  >
+                    LRR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilteR,
+                      'btn-active-bg': filterVaribleSet.rareFilterR,
+                    }"
+                    @click="changeFilterStatus('rareFilterR')"
+                  >
+                    R
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSR,
+                      'btn-active-bg': filterVaribleSet.rareFilterSR,
+                    }"
+                    @click="changeFilterStatus('rareFilterSR')"
+                  >
+                    SR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterOFR,
+                      'btn-active-bg': filterVaribleSet.rareFilterOFR,
+                    }"
+                    @click="changeFilterStatus('rareFilterOFR')"
+                  >
+                    OFR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterU,
+                      'btn-active-bg': filterVaribleSet.rareFilterU,
+                    }"
+                    @click="changeFilterStatus('rareFilterU')"
+                  >
+                    U
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterC,
+                      'btn-active-bg': filterVaribleSet.rareFilterC,
+                    }"
+                    @click="changeFilterStatus('rareFilterC')"
+                  >
+                    C
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterCR,
+                      'btn-active-bg': filterVaribleSet.rareFilterCR,
+                    }"
+                    @click="changeFilterStatus('rareFilterCR')"
+                  >
+                    CR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterRRR,
+                      'btn-active-bg': filterVaribleSet.rareFilterRRR,
+                    }"
+                    @click="changeFilterStatus('rareFilterRRR')"
+                  >
+                    RRR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterCC,
+                      'btn-active-bg': filterVaribleSet.rareFilterCC,
+                    }"
+                    @click="changeFilterStatus('rareFilterCC')"
+                  >
+                    CC
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterPR,
+                      'btn-active-bg': filterVaribleSet.rareFilterPR,
+                    }"
+                    @click="changeFilterStatus('rareFilterPR')"
+                  >
+                    PR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterTD,
+                      'btn-active-bg': filterVaribleSet.rareFilterTD,
+                    }"
+                    @click="changeFilterStatus('rareFilterTD')"
+                  >
+                    TD
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSP,
+                      'btn-active-bg': filterVaribleSet.rareFilterSP,
+                    }"
+                    @click="changeFilterStatus('rareFilterSP')"
+                  >
+                    SP
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterN,
+                      'btn-active-bg': filterVaribleSet.rareFilterN,
+                    }"
+                    @click="changeFilterStatus('rareFilterN')"
+                  >
+                    N
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterLRP,
+                      'btn-active-bg': filterVaribleSet.rareFilterLRP,
+                    }"
+                    @click="changeFilterStatus('rareFilterLRP')"
+                  >
+                    LRP
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSIR,
+                      'btn-active-bg': filterVaribleSet.rareFilterSIR,
+                    }"
+                    @click="changeFilterStatus('rareFilterSIR')"
+                  >
+                    SIR
+                  </button>
                 </div>
               </div>
               <!-- <div v-else-if="filter.name === '判定'">
@@ -682,168 +1266,636 @@ const handleUseMyFiltersBtn = (myFilter) => {
               </div>
               <div v-else-if="filter.name === '商品'">
                 <div class="menu-inner-product-btn">
-                  <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>リコリス・リコイル</button>
-                  <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>PRカード【Wサイド】</button>
-                  <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>[TD]リコリス・リコイル</button>
+                  <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="flex-none size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>リコリス・リコイル</button>
+                  <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="flex-none size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>PRカード【Wサイド】</button>
+                  <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="flex-none size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>[TD]リコリス・リコイル</button>
                 </div>
               </div> -->
             </div>
           </div>
         </div>
-    
+
         <footer class="sidebar-filter-footer">
-          <button :class="{ 'apply-btn' : !applyBtnStatus, 'apply-btn-active' : applyBtnStatus}" @click="handleApplyStatus" ><span>Apply</span></button>
+          <button
+            :class="{
+              'apply-btn': !applyBtnStatus,
+              'apply-btn-active': applyBtnStatus,
+            }"
+            @click="handleApplyStatus"
+          >
+            <span>Apply</span>
+          </button>
         </footer>
       </section>
-      
+
       <section v-show="currentSidebar === 'open-deck'" class="sidebar-deck">
         <header class="sidebar-header">
           <div>
             <p>牌組製作</p>
-            <p>已選擇 {{ selectedCards.length }} 張卡片，總價 ¥{{ countDeck }}</p>
+            <p>
+              已選擇 {{ selectedCards.length }} 張卡片，總價 ¥{{ countDeck }}
+            </p>
           </div>
           <div>
-            <button class="icon del-btn" @click="clearDeckAndBacktoFirstStep" ><i class="fa-solid fa-trash"></i></button>
-            <button @click="closeSidebar" class="icon xmark-btn"><i class="fa-solid fa-xmark"></i></button>
+            <button class="icon del-btn" @click="clearDeckAndBacktoFirstStep">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+            <button @click="closeSidebar" class="icon xmark-btn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </header>
-    
-          <div class="sidebar-deck-choice" v-if="sidebarSelectedStatus === true" >
-            <button id="type-btn-active" v-if="sortStatus === 'TYPE'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              類型
-            </button>
-            <button @click="handleSwitchBtnClick('TYPE')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              類型
-            </button>
-            <button id="color-btn-active" v-if="sortStatus === 'COLOR'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              顏色
-            </button>
-            <button @click="handleSwitchBtnClick('COLOR')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              顏色
-            </button>
-            <button id="level-btn-active" v-if="sortStatus === 'LEVEL'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              等級
-            </button>
-            <button @click="handleSwitchBtnClick('LEVEL')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              等級
-            </button>
-            <button id="rare-btn-active" v-if="sortStatus === 'RARE'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              稀有度
-            </button>
-            <button @click="handleSwitchBtnClick('RARE')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              稀有度
-            </button>
-            <button id="product-btn-active" v-if="sortStatus === 'PRODUCT'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              商品
-            </button>
-            <button @click="handleSwitchBtnClick('PRODUCT')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              商品
-            </button>
-          </div>
-          <div class="sidebar-deck-control" v-if="sidebarSelectedStatus === true" >
-            <button class="cash" @click="showCardPrice = !showCardPrice" ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg></button>
-            <span class="divder font-mono flex-none text-zinc-500/50"> | </span>
-            
-            <button id="plus-active" @click="changeTypeToAdd" v-if="editType === 'ADD_CARD'" ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg></button>
-            <button class="plus" @click="changeTypeToAdd" v-else="editType === 'CHECK_INFO'"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg></button>
 
-            <button id="minus-active" @click="changeTypeToDelete" v-if="editType === 'DELETE_CARD'"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"></path></svg></button>
-            <button class="minus" @click="changeTypeToDelete" v-else ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"></path></svg></button>
-
-          </div>
-          <div class="card-content" v-if="sidebarSelectedStatus === true" >
-            <div class="card-section" v-for="(title, sortedTitleIndex) in sortedTitle" :key="sortedTitleIndex" >
-              <h3>{{ title }} - {{ sortedDeck[sortedTitleIndex].length }}</h3>
-              <div class="card-choiced">
-                <div class="row">
-                  <div class="col-choice" v-for="(card, index) in sortedDeck[sortedTitleIndex]" :key="index" @click="checkTypeAndRunFunction(card, index, sortedTitleIndex)" >
-                    <div class="card-price" v-if="showCardPrice">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
-                      <span>{{ card.price.number }}</span>
-                      <span>{{ card.rare }}</span>
-                    </div>
-                    <div class="card-image">
-                      <img :src="card.cover">
-                    </div>
-                    <!-- <div :class="{'card-count': true,'card-count-white': editType === 'CHECK_INFO', 'card-count-green': editType === 'ADD_CARD', 'card-count-red': editType === 'DELETE_CARD',}">1</div> -->
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="deck-save" v-if="settingDeckStatus === true">
-            <div class="deck-save-title-section">
-              <div class="deck-save-title-section-top">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
-                <h2>標題：</h2>
-              </div>
-              <input type="text" placeholder="輸入牌組名稱" name="deckName" id="deckName" v-model="deckName">
-              <p>設定預設牌組名稱，前往<a href="#">偏好設定</a></p>
-            </div>
-            <div class="deck-save-content-section">
-              <div class="deck-save-content-section-top">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
-                <h2>內容：</h2>
-              </div>
-              <textarea name="" id="" cols="30" rows="4" placeholder="用一段話介紹一下你的牌組" v-model="deckDescription" ></textarea>
-            </div>
-            <div class="deck-save-covercard-section" v-if="selectedCards.length > 0" >
-              <div class="deck-save-covercard-section-top">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
-                <h2>封面卡：</h2>
-              </div>
-              <div class="deck-save-covercard-section-content">
-                <div :class="{'deck-save-covercard-section-content-card': true, 'cover-card-selected': card.id === chooseCoverCard }" v-for="card in selectedCards" :key="card.id" @click="chooseCoverCard = card.id">
-                  <img :src="card.cover">
-                  <div class="deck-save-covercard-section-content-card-info">
-                    <h3>{{ card.title }}</h3>
-                    <p>{{ card.id}}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-    
-    
-        <footer class="sidebar-footer">
-          <button id="sidebar-footer-active" v-if="selectedCards.length > 0 && settingDeckStatus === false" @click="nextStep">
-            <span>下一步<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
+        <div class="sidebar-deck-choice" v-if="sidebarSelectedStatus === true">
+          <button id="type-btn-active" v-if="sortStatus === 'TYPE'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            類型
           </button>
-          <div class="sidebar-footer-box" v-else-if="settingDeckStatus === true">
-            <button id="sidebar-footer-active"  @click="finalStep">
-              <span>完成<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
+          <button @click="handleSwitchBtnClick('TYPE')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            類型
+          </button>
+          <button id="color-btn-active" v-if="sortStatus === 'COLOR'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            顏色
+          </button>
+          <button @click="handleSwitchBtnClick('COLOR')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            顏色
+          </button>
+          <button id="level-btn-active" v-if="sortStatus === 'LEVEL'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            等級
+          </button>
+          <button @click="handleSwitchBtnClick('LEVEL')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            等級
+          </button>
+          <button id="rare-btn-active" v-if="sortStatus === 'RARE'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            稀有度
+          </button>
+          <button @click="handleSwitchBtnClick('RARE')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            稀有度
+          </button>
+          <button id="product-btn-active" v-if="sortStatus === 'PRODUCT'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            商品
+          </button>
+          <button @click="handleSwitchBtnClick('PRODUCT')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            商品
+          </button>
+        </div>
+        <div class="sidebar-deck-control" v-if="sidebarSelectedStatus === true">
+          <button class="cash" @click="showCardPrice = !showCardPrice">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24"
+              height="24"
+              aria-hidden="true"
+              data-slot="icon"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
+              ></path>
+            </svg>
+          </button>
+          <span class="flex-none font-mono divder text-zinc-500/50"> | </span>
+
+          <button
+            id="plus-active"
+            @click="changeTypeToAdd"
+            v-if="editType === 'ADD_CARD'"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24"
+              height="24"
+              aria-hidden="true"
+              data-slot="icon"
+              class=""
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              ></path>
+            </svg>
+          </button>
+          <button
+            class="plus"
+            @click="changeTypeToAdd"
+            v-else="editType === 'CHECK_INFO'"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24"
+              height="24"
+              aria-hidden="true"
+              data-slot="icon"
+              class=""
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              ></path>
+            </svg>
+          </button>
+
+          <button
+            id="minus-active"
+            @click="changeTypeToDelete"
+            v-if="editType === 'DELETE_CARD'"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24"
+              height="24"
+              aria-hidden="true"
+              data-slot="icon"
+              class=""
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 12h14"
+              ></path>
+            </svg>
+          </button>
+          <button class="minus" @click="changeTypeToDelete" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24"
+              height="24"
+              aria-hidden="true"
+              data-slot="icon"
+              class=""
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 12h14"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div class="card-content" v-if="sidebarSelectedStatus === true">
+          <div
+            class="card-section"
+            v-for="(title, sortedTitleIndex) in sortedTitle"
+            :key="sortedTitleIndex"
+          >
+            <h3>{{ title }} - {{ sortedDeck[sortedTitleIndex].length }}</h3>
+            <div class="card-choiced">
+              <div class="row">
+                <div
+                  class="col-choice"
+                  v-for="(card, index) in sortedDeck[sortedTitleIndex]"
+                  :key="index"
+                  @click="
+                    checkTypeAndRunFunction(card, index, sortedTitleIndex)
+                  "
+                >
+                  <div class="card-price" v-if="showCardPrice">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="size-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                      ></path>
+                    </svg>
+                    <span>{{ card.price.number }}</span>
+                    <span>{{ card.rare }}</span>
+                  </div>
+                  <div class="card-image">
+                    <img :src="card.cover" />
+                  </div>
+                  <!-- <div :class="{'card-count': true,'card-count-white': editType === 'CHECK_INFO', 'card-count-green': editType === 'ADD_CARD', 'card-count-red': editType === 'DELETE_CARD',}">1</div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="deck-save" v-if="settingDeckStatus === true">
+          <div class="deck-save-title-section">
+            <div class="deck-save-title-section-top">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="stroke-2 size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
+                ></path>
+              </svg>
+              <h2>標題：</h2>
+            </div>
+            <input
+              type="text"
+              placeholder="輸入牌組名稱"
+              name="deckName"
+              id="deckName"
+              v-model="deckName"
+            />
+            <p>設定預設牌組名稱，前往<a href="#">偏好設定</a></p>
+          </div>
+          <div class="deck-save-content-section">
+            <div class="deck-save-content-section-top">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="stroke-2 size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
+                ></path>
+              </svg>
+              <h2>內容：</h2>
+            </div>
+            <textarea
+              name=""
+              id=""
+              cols="30"
+              rows="4"
+              placeholder="用一段話介紹一下你的牌組"
+              v-model="deckDescription"
+            ></textarea>
+          </div>
+          <div
+            class="deck-save-covercard-section"
+            v-if="selectedCards.length > 0"
+          >
+            <div class="deck-save-covercard-section-top">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="stroke-2 size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
+                ></path>
+              </svg>
+              <h2>封面卡：</h2>
+            </div>
+            <div class="deck-save-covercard-section-content">
+              <div
+                :class="{
+                  'deck-save-covercard-section-content-card': true,
+                  'cover-card-selected': card.id === chooseCoverCard,
+                }"
+                v-for="card in selectedCards"
+                :key="card.id"
+                @click="chooseCoverCard = card.id"
+              >
+                <img :src="card.cover" />
+                <div class="deck-save-covercard-section-content-card-info">
+                  <h3>{{ card.title }}</h3>
+                  <p>{{ card.id }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="sidebar-footer">
+          <button
+            id="sidebar-footer-active"
+            v-if="selectedCards.length > 0 && settingDeckStatus === false"
+            @click="nextStep"
+          >
+            <span
+              >下一步<svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                ></path></svg
+            ></span>
+          </button>
+          <div
+            class="sidebar-footer-box"
+            v-else-if="settingDeckStatus === true"
+          >
+            <button id="sidebar-footer-active" @click="finalStep">
+              <span
+                >完成<svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="size-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                  ></path></svg
+              ></span>
             </button>
           </div>
           <button v-else>
-            <span>下一步<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg></span>
+            <span
+              >下一步<svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                ></path></svg
+            ></span>
           </button>
         </footer>
       </section>
-
     </nav>
 
-
     <div class="main" :style="{ marginLeft: sidebarMarginLeft + 'px' }">
-      <div class="main-info">  
+      <div class="main-info">
         <header class="main-info-header">
-          <button class="flex-none p-1 rounded-full bg-black/50 text-white default-transition hover:bg-zinc-800/50">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"></path>
+          <button
+            class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              ></path>
             </svg>
           </button>
-          <button class="hidden md:block flex-none p-1 rounded-full bg-black/50 text-white default-transition hover:bg-zinc-800/50 disabled:opacity-30" disabled="">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+          <button
+            class="flex-none hidden p-1 text-white rounded-full md:block bg-black/50 default-transition hover:bg-zinc-800/50 disabled:opacity-30"
+            disabled=""
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              ></path>
             </svg>
           </button>
           <div class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
@@ -855,98 +1907,332 @@ const handleUseMyFiltersBtn = (myFilter) => {
           </div>
         </header>
         <button @click="toggleSidebar('open-filter')" class="toggle-filter">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#155E75" aria-hidden="true" data-slot="icon" ><path fill-rule="evenodd" d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z" clip-rule="evenodd"></path></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="#155E75"
+            aria-hidden="true"
+            data-slot="icon"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
         </button>
         <button @click="toggleSidebar('open-deck')" class="toggle-deck">
           <div class="toggle-deck-content">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#C3D7D5" aria-hidden="true" data-slot="icon" ><path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"></path><path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"></path></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="#C3D7D5"
+              aria-hidden="true"
+              data-slot="icon"
+            >
+              <path
+                d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"
+              ></path>
+              <path
+                d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"
+              ></path>
+            </svg>
             <p>{{ selectedCards.length }}</p>
           </div>
         </button>
         <section class="info-container">
-          <img :src="seriesInfo.cover">
+          <img :src="seriesInfo.cover" />
           <div flex-col class="inner-info-container">
-            <span><i class="fa-regular fa-clone"></i> <span v-for="(code, index) in seriesInfo.code" :key="index" >{{ code }}{{ index == seriesInfo.code.length - 1 ? '' : ', '  }}</span></span>
+            <span
+              ><i class="fa-regular fa-clone"></i>
+              <span v-for="(code, index) in seriesInfo.code" :key="index"
+                >{{ code
+                }}{{ index == seriesInfo.code.length - 1 ? '' : ', ' }}</span
+              ></span
+            >
             <h1>{{ seriesInfo.name }}</h1>
             <div>
-              <div v-if="seriesInfo.sellAt" >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布{{ seriesInfo.sellAt[seriesInfo.sellAt.length - 1] }}</span>
+              <div v-if="seriesInfo.sellAt">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentcolor"
+                  width="20"
+                  height="20"
+                  class="icon-scale size-5 md:size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
+                  ></path></svg
+                ><span
+                  >最新發布{{
+                    seriesInfo.sellAt[seriesInfo.sellAt.length - 1]
+                  }}</span
+                >
               </div>
-              <div v-else >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" width="20" height="20" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg><span>最新發布</span>
+              <div v-else>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentcolor"
+                  width="20"
+                  height="20"
+                  class="icon-scale size-5 md:size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
+                  ></path></svg
+                ><span>最新發布</span>
               </div>
-              <div v-if="seriesCardListLength > 0" >
-                <i class="fa-regular fa-clone" ></i><span>總數{{ seriesCardListLength }}張</span>
+              <div v-if="seriesCardListLength > 0">
+                <i class="fa-regular fa-clone"></i
+                ><span>總數{{ seriesCardListLength }}張</span>
               </div>
-              <div v-else >
+              <div v-else>
                 <i class="fa-regular fa-clone"></i><span>總數 0 張</span>
               </div>
               <div>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16" aria-hidden="true" data-slot="icon" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"></path></svg><span>篩選出{{ seriesCardList.length }}張</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="icon-scale size-5 md:size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+                  ></path></svg
+                ><span>篩選出{{ seriesCardList.length }}張</span>
               </div>
             </div>
           </div>
         </section>
-        
+
         <section class="info-container-filter">
           <div class="card-control">
-            <p>請在<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16" aria-hidden="true" data-slot="icon" class="icon-scale size-5 md:size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"></path></svg>新增常用篩選</p>
+            <p>
+              請在<svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                width="16"
+                height="16"
+                aria-hidden="true"
+                data-slot="icon"
+                class="icon-scale size-5 md:size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+                ></path></svg
+              >新增常用篩選
+            </p>
             <div>
-              <button @click="toggleFilter('open-filter')" class="toggle-inner-filter">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                stroke="white" stroke-width="2" aria-hidden="true" data-slot="icon" class="size-6"><path fill-rule="evenodd" d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z" clip-rule="evenodd"></path></svg>
+              <button
+                @click="toggleFilter('open-filter')"
+                class="toggle-inner-filter"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="size-6"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
               </button>
-              <button @click="view = 'card-sheet'" :class="{ active: view === 'card-sheet' }" class="icon-control change-sheet"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"></path></svg></button>
-              <button @click="view = 'card-info'" :class="{ active: view === 'card-info' }" class="icon-control change-info"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0 1 20.25 6v12A2.25 2.25 0 0 1 18 20.25H6A2.25 2.25 0 0 1 3.75 18V6A2.25 2.25 0 0 1 6 3.75h1.5m9 0h-9"></path></svg></button>
+              <button
+                @click="view = 'card-sheet'"
+                :class="{ active: view === 'card-sheet' }"
+                class="icon-control change-sheet"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+                  ></path>
+                </svg>
+              </button>
+              <button
+                @click="view = 'card-info'"
+                :class="{ active: view === 'card-info' }"
+                class="icon-control change-info"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0 1 20.25 6v12A2.25 2.25 0 0 1 18 20.25H6A2.25 2.25 0 0 1 3.75 18V6A2.25 2.25 0 0 1 6 3.75h1.5m9 0h-9"
+                  ></path>
+                </svg>
+              </button>
             </div>
           </div>
           <div v-if="view === 'card-sheet'" class="card-sheet">
             <div class="row">
-              <div class="col-Sheet" v-for="(card, index) in seriesCardList" :key="card.id" @click.stop="getCardInfoAndShow(card)">
+              <div
+                class="col-Sheet"
+                v-for="(card, index) in seriesCardList"
+                :key="card.id"
+                @click.stop="getCardInfoAndShow(card)"
+              >
                 <div class="card-image">
-                  <img :src="card.cover">
+                  <img :src="card.cover" />
                   <div>
                     <p>{{ card.id }}</p>
                     <h3>{{ card.title }}</h3>
                   </div>
-                  <button @click.stop="addCard(card)" class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"><svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
+                  <button
+                    @click.stop="addCard(card)"
+                    class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      width="24"
+                      height="24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="text-white stroke-2 size-7"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"
+                      ></path>
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-          <div v-if="seriesCardList.length > 0 && view === 'card-info'" class="card-info">
+          <div
+            v-if="seriesCardList.length > 0 && view === 'card-info'"
+            class="card-info"
+          >
             <div class="row">
-              <div class="col-Info" v-for="(card, index) in seriesCardList" :key="index" @click.stop="addCard(card)" >
+              <div
+                class="col-Info"
+                v-for="(card, index) in seriesCardList"
+                :key="index"
+                @click.stop="addCard(card)"
+              >
                 <div class="card-info-image">
-                  <img :src="card.cover">
-                  <div class="card-inner-info" @click.stop="getCardInfoAndShow(card)" >
+                  <img :src="card.cover" />
+                  <div
+                    class="card-inner-info"
+                    @click.stop="getCardInfoAndShow(card)"
+                  >
                     <div class="card-inner-info-header">
                       <p>{{ card.id }}</p>
                       <p>{{ card.rare }}</p>
                     </div>
                     <h3>{{ card.title }}</h3>
                     <div class="details">
-                      <div><span :class="`bg-${card.color}`" >類型</span>{{ card.typeTranslate }}</div>
-                      <div><span :class="`bg-${card.color}`" >魂傷</span>{{ card.soul }}</div>
-                      <div><span :class="`bg-${card.color}`" >等級</span>{{ card.level }}</div>
-                      <div><span :class="`bg-${card.color}`" >攻擊</span>{{ card.attack }}</div>
-                      <div><span :class="`bg-${card.color}`" >費用</span>{{ card.cost }}</div>
+                      <div>
+                        <span :class="`bg-${card.color}`">類型</span
+                        >{{ card.typeTranslate }}
+                      </div>
+                      <div>
+                        <span :class="`bg-${card.color}`">魂傷</span
+                        >{{ card.soul }}
+                      </div>
+                      <div>
+                        <span :class="`bg-${card.color}`">等級</span
+                        >{{ card.level }}
+                      </div>
+                      <div>
+                        <span :class="`bg-${card.color}`">攻擊</span
+                        >{{ card.attack }}
+                      </div>
+                      <div>
+                        <span :class="`bg-${card.color}`">費用</span
+                        >{{ card.cost }}
+                      </div>
                     </div>
                     <div class="price-download">
                       <p>${{ card.price.number }}</p>
-                      <button @click.stop="addCard(card)" ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-7 text-white stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"></path></svg></button>
+                      <button @click.stop="addCard(card)">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                          data-slot="icon"
+                          class="text-white stroke-2 size-7"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"
+                          ></path>
+                        </svg>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div v-else class="card-info-empty" >
+          <div v-else class="card-info-empty">
             <div class="card-info-empty-content">
               <div class="card-info-empty-content-box">
-                <img src="https://bottleneko.app/images/status/empty.png" alt="">
+                <img
+                  src="https://bottleneko.app/images/status/empty.png"
+                  alt=""
+                />
                 <h2>沒東西</h2>
-                <p>你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴</p>
+                <p>
+                  你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴
+                </p>
               </div>
             </div>
           </div>
@@ -959,25 +2245,38 @@ const handleUseMyFiltersBtn = (myFilter) => {
             <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ (filterVaribleSet.keyWord.trim()) }}"</p>
           </div>
           <div>
-            <button class="icon del-btn" @click="resetAllFilter"><i class="fa-solid fa-trash"></i></button>
-            <button class="icon open-btn"><i class="fa-solid fa-chevron-down"></i></button>
-            <button @click="closeSidebar" class="icon xmark-btn"><i class="fa-solid fa-xmark"></i></button>
+            <button class="icon del-btn">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+            <button class="icon open-btn">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <button @click="closeSidebar" class="icon xmark-btn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </header>
-      
+
         <div class="sidebar-filter-content">
-          <div class="whole-menu" v-for="(filter, index) in filters" :key="index">
+          <div
+            class="whole-menu"
+            v-for="(filter, index) in filters"
+            :key="index"
+          >
             <div class="menu" @click="MenuFilter(index)">
               <i :class="[filter.icon]"></i>
               <p>{{ filter.name }}</p>
               <button class="icon del" v-if="filter.delButton" @click.stop="resetFilter(filter.filterTag)">
                 <i class="fa-solid fa-trash"></i>
               </button>
-              <button class="icon check" v-if="filter.checkButton" >
+              <button class="icon check" v-if="filter.checkButton">
                 <i class="fa-regular fa-circle-check"></i>
               </button>
               <button class="open">
-                <i class="fa fa-chevron-down" :style="{ transform: filter.checked ? 'rotate(180deg)' : '' }"></i>
+                <i
+                  class="fa fa-chevron-down"
+                  :style="{ transform: filter.checked ? 'rotate(180deg)' : '' }"
+                ></i>
               </button>
             </div>
             <div class="menu-inner" v-show="filter.checked">
@@ -1143,15 +2442,72 @@ const handleUseMyFiltersBtn = (myFilter) => {
               </div>
               <div v-else-if="filter.name === '商品'">
                 <div class="menu-inner-product-btn">
-                  <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>リコリス・リコイル</button>
-                  <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>PRカード【Wサイド】</button>
-                  <button><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-5 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"></path></svg>[TD]リコリス・リコイル</button>
+                  <button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      width="24"
+                      height="24"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="flex-none size-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"
+                      ></path></svg
+                    >リコリス・リコイル
+                  </button>
+                  <button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      width="24"
+                      height="24"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="flex-none size-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"
+                      ></path></svg
+                    >PRカード【Wサイド】
+                  </button>
+                  <button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      width="24"
+                      height="24"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="flex-none size-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"
+                      ></path></svg
+                    >[TD]リコリス・リコイル
+                  </button>
                 </div>
               </div> -->
             </div>
           </div>
         </div>
-    
+
         <footer class="sidebar-filter-footer">
           <button :class="{ 'apply-btn' : !applyBtnStatus, 'apply-btn-active' : applyBtnStatus}" @click="handleApplyStatus"><span>Apply</span></button>
         </footer>
@@ -1170,49 +2526,49 @@ const handleUseMyFiltersBtn = (myFilter) => {
     
           <div class="sidebar-deck-choice" v-if="sidebarSelectedStatus === true" >
             <button id="type-btn-active" v-if="sortStatus === 'TYPE'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               <span class="text-sm font-bold whitespace-nowrap">類型</span>
             </button>
             <button @click="handleSwitchBtnClick('TYPE')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               <span class="text-sm font-bold whitespace-nowrap">類型</span>
             </button>
             <button id="color-btn-active" v-if="sortStatus === 'COLOR'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               <span class="text-sm font-bold whitespace-nowrap">顏色</span>
             </button>
             <button @click="handleSwitchBtnClick('COLOR')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               <span class="text-sm font-bold whitespace-nowrap">顏色</span>
             </button>
             <button id="level-btn-active" v-if="sortStatus === 'LEVEL'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
-              <span class="text-sm font-bold whitespace-nowrap select-none">等級</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <span class="text-sm font-bold select-none whitespace-nowrap">等級</span>
             </button>
             <button @click="handleSwitchBtnClick('LEVEL')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               <span class="text-sm font-bold whitespace-nowrap">等級</span>
             </button>
             <button id="rare-btn-active" v-if="sortStatus === 'RARE'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               <span class="text-sm font-bold whitespace-nowrap">稀有度</span>
             </button>
             <button @click="handleSwitchBtnClick('RARE')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               <span class="text-sm font-bold whitespace-nowrap">稀有度</span>
             </button>
             <button id="product-btn-active" v-if="sortStatus === 'PRODUCT'" >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               <span class="text-sm font-bold whitespace-nowrap">商品</span>
             </button>
             <button @click="handleSwitchBtnClick('PRODUCT')" v-else>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" width="24" height="24" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none stroke-2 size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"></path></svg>
               <span class="text-sm font-bold whitespace-nowrap">商品</span>
             </button>
           </div>
           <div class="sidebar-deck-control" v-if="sidebarSelectedStatus === true" >
             <button class="cash" @click="showCardPrice = !showCardPrice" ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg></button>
-            <span class="divder font-mono flex-none text-zinc-500/50"> | </span>
+            <span class="flex-none font-mono divder text-zinc-500/50"> | </span>
             
             <button id="plus-active" @click="changeTypeToAdd" v-if="editType === 'ADD_CARD'" ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg></button>
             <button class="plus" @click="changeTypeToAdd" v-else="editType === 'CHECK_INFO'"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24" aria-hidden="true" data-slot="icon" class=""><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg></button>
@@ -1244,7 +2600,7 @@ const handleUseMyFiltersBtn = (myFilter) => {
           <div class="deck-save" v-if="settingDeckStatus === true">
             <div class="deck-save-title-section">
               <div class="deck-save-title-section-top">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
                 <h2>標題：</h2>
               </div>
               <input type="text" placeholder="輸入牌組名稱" name="deckName" id="deckName" v-model="deckName">
@@ -1252,14 +2608,14 @@ const handleUseMyFiltersBtn = (myFilter) => {
             </div>
             <div class="deck-save-content-section">
               <div class="deck-save-content-section-top">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
                 <h2>內容：</h2>
               </div>
               <textarea name="" id="" cols="30" rows="4" placeholder="用一段話介紹一下你的牌組" v-model="deckDescription" ></textarea>
             </div>
             <div class="deck-save-covercard-section" v-if="selectedCards.length > 0" >
               <div class="deck-save-covercard-section-top">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 stroke-2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="stroke-2 size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"></path></svg>
                 <h2>封面卡：</h2>
               </div>
               <div class="deck-save-covercard-section-content">
@@ -1291,29 +2647,28 @@ const handleUseMyFiltersBtn = (myFilter) => {
       </section>
 
       <div class="deck-container" @click="toggleFilter('open-deck')" v-if="selectedCards.length > 0">
-        <div class="deck-img">
-            <img src="/src/img/麻衣.png" alt="">
-        </div>
         <div class="deck-content">
-            <div class="line"></div>
-            <div class="total-cards">
-                <h2>刪除 DG/S02-027R</h2>
-                <span>牌組製作，共{{ selectedCards.length }}張卡</span>
-            </div>
-            <div class="deckbtn-area">
-                <button class="deck-btn">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
-                </button>
-                <div class="pay-btn">
-                    <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
-                    <span>{{ countDeck }} </span><span>¥</span>
-                </div>
-            </div>
+          <div class="deck-img">
+            <img src="../img/capie-icon.png" alt="">
+          </div>
+          <div class="line"></div>
+          <div class="total-cards">
+              <h2>刪除 DG/S02-027R</h2>
+              <span>牌組製作，共{{ selectedCards.length }}張卡</span>
+          </div>
+          <div class="deckbtn-area">
+              <button class="deck-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path></svg>
+              </button>
+              <div class="pay-btn">
+                  <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path></svg>
+                  <span>{{ countDeck }} </span><span>¥</span>
+              </div>
+          </div>
         </div>
       </div>
     </div>
-
-</div>
+  </div>
 </template>
 <style src="@/assets/base.css" scoped></style>
 <style src="@/assets/css/card-series/main-content.css" scoped></style>

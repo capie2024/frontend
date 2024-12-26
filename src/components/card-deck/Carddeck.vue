@@ -472,11 +472,7 @@ export default {
                 if (result.isConfirmed) {
                     try {
                         const userToken = localStorage.getItem("token");    
-                        if (!userToken) {
-                            Swal.fire("錯誤", "登入憑證無效，請重新登入。", "error");
-                            this.$router.push("/login");
-                            return;
-                        }
+                        
                         const response = await axios.delete(`${API_URL}/api/articles/${postCode}`, {
                             headers: {
                                 Authorization: `Bearer ${userToken}`,
@@ -488,8 +484,23 @@ export default {
                             this.$router.push("/social"); 
                         }
                     } catch (error) {
-                    console.error("刪除文章失敗", error);
-                    Swal.fire("錯誤", "刪除失敗，請稍後再試。", "error");
+                        if (error.response && error.response.status === 403) {
+                            const BASE_URL = import.meta.env.VITE_BASE_URL;
+                            Swal.fire({
+                                title: '請先登入',
+                                text: '登入後才能刪除文章',
+                                icon: 'warning',
+                                confirmButtonText: '確定',
+                            }).then(() => {
+                                window.location.href = `${BASE_URL}/login`;
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '刪除文章失敗',
+                                text: error.message,
+                            });
+                        }
                     }
                 }
             });

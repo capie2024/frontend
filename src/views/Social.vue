@@ -121,109 +121,139 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-    <div class="container">
-        <SidebarGrid />
-        <div class="main">
-            <div class="header-container" :class="{'header-change': isScrolled}">
-                <div class="search-container">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input v-model="searchQuery" @keyup.enter="handleEnter" class="search" type="text" placeholder="我想找找....?">
-                    <svg @click="clearSearch" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path></svg>
-                </div>
-                <button class="filter">
-                    <i class="fa-regular fa-window-restore"></i>
-                    篩選系列
-                    <i class="fa-solid fa-x"></i>
-                </button>
-                <button class="filter-hidden">
-                    <i class="fa-regular fa-window-restore"></i>
-                    CODE
-                    <i class="fa-solid fa-x"></i>
-                </button>
-                <div class="sign-container">
-                    <a :href="'/add'">
-                        <button class="add-article">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                            新增文章
-                        </button>
-                    </a>
-                    <a :href="'/add'">
-                        <button class="add-article-hidden">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                    </a>
-                    <div class="bell">
-                        <Notice/>
-                    </div>
-                    <div class="user-sign">
-                        <NavLoginBtn/>
-                    </div>
-                </div>
+  <div class="container">
+    <SidebarGrid />
+    <div class="main">
+      <div
+        class="header-container"
+        :class="{ 'header-change': this.isScrolled }"
+      >
+        <div class="search-container">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            v-model="searchQuery"
+            @keyup.enter="handleEnter"
+            class="search"
+            type="text"
+            placeholder="我想找找....?"
+          />
+          <svg
+            @click="clearSearch"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18 18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </div>
+        <button class="filter">
+          <i class="fa-regular fa-window-restore"></i>
+          篩選系列
+          <i class="fa-solid fa-x"></i>
+        </button>
+        <button class="filter-hidden">
+          <i class="fa-regular fa-window-restore"></i>
+          CODE
+          <i class="fa-solid fa-x"></i>
+        </button>
+        <div class="sign-container">
+          <a :href="'/add'">
+            <button class="add-article">
+              <i class="fa-solid fa-pen-to-square"></i>
+              新增文章
+            </button>
+          </a>
+          <a :href="'/add'">
+            <button class="add-article-hidden">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+          </a>
+          <div class="bell">
+            <Notice />
+          </div>
+          <div class="user-sign">
+            <NavLoginBtn />
+          </div>
+        </div>
+      </div>
+      <section class="flex-item-hidden">
+        <button
+          v-for="(item, index) in socialHistory"
+          :key="index"
+          class="user-button"
+          @click="handleHistoryClick(item.searchQuery)"
+        >
+          <a href="#">
+            <div class="user-link">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>{{ item.searchQuery }}</span>
             </div>
-            <section class="flex-item-hidden">
-                <button  
-                    v-for="(item, index) in socialHistory"
-                    :key="index" 
-                    class="user-button" 
-                    @click="handleHistoryClick(item.searchQuery)"
-                >
-                    <a href="#">
-                        <div class="user-link">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <span>{{ item.searchQuery }}</span>
-                        </div>
-                        <div class="user-link">
-                            <i class="fa-regular fa-window-restore"></i>
-                            <span>-</span>
-                        </div>
-                    </a>
-                </button>
-            </section>
-            <h2 class="title">
-                搜尋結果
-                <br>
-                <span class="subtitle">一共有 {{ searchResultCount }} 結果</span>
-            </h2>
-            <section class="card-area">
-                <a v-for="article in filteredArticles" 
-                    :key="article.post_code" 
-                    :href="'/social/' + article.post_code" 
-                    class="card-link"
-                >
-                    <div class="card-img">
-                        <img 
-                        :src="article && article.post_picture ? article.post_picture : 'https://bottleneko.app/images/cover.png'" 
-                        :alt="article && article.title ? article.title : 'Default Title'"
-                        >
-                    </div>
-                    <div class="card-user">
-                        <div class="card-user-flex">
-                            <div class="card-user-img">
-                                <img :src="article.users.picture" alt="用戶頭像">
-                            </div>
-                            <div class="card-user-p">
-                                <p>{{ article.users.username }}</p>
-                                <div class="date-container">
-                                    <p class="date">{{ formatDate(article.created_at) }}</p>
-                                    <i class="fa-solid fa-globe"></i>
-                                    <p class="card-code">{{ article.post_code }}</p>
-                                    <div class="chat">
-                                        <i class="fa-regular fa-comment"></i>
-                                        <p>1</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-name">
-                            <h2>{{ article.title }}</h2>
-                            <p v-html="article.content"></p>
-                        </div>
-                    </div>
-                </a>     
-            </section>
-                   <MainFooter/>
-        </div>    
+            <div class="user-link">
+              <i class="fa-regular fa-window-restore"></i>
+              <span>-</span>
+            </div>
+          </a>
+        </button>
+      </section>
+      <h2 class="title">
+        搜尋結果
+        <br />
+        <span class="subtitle">一共有 {{ searchResultCount }} 結果</span>
+      </h2>
+      <section class="card-area">
+        <a
+          v-for="article in filteredArticles"
+          :key="article.post_code"
+          :href="'/social/' + article.post_code"
+          class="card-link"
+        >
+          <div class="card-img">
+            <img
+              :src="
+                article && article.post_picture
+                  ? article.post_picture
+                  : 'https://bottleneko.app/images/cover.png'
+              "
+              :alt="article && article.title ? article.title : 'Default Title'"
+            />
+          </div>
+          <div class="card-user">
+            <div class="card-user-flex">
+              <div class="card-user-img">
+                <img :src="article.users.picture" alt="用戶頭像" />
+              </div>
+              <div class="card-user-p">
+                <p>{{ article.users.username }}</p>
+                <div class="date-container">
+                  <p class="date">{{ formatDate(article.created_at) }}</p>
+                  <i class="fa-solid fa-globe"></i>
+                  <p class="card-code">{{ article.post_code }}</p>
+                  <div class="chat">
+                    <i class="fa-regular fa-comment"></i>
+                    <p>1</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-name">
+              <h2>{{ article.title }}</h2>
+              <p v-html="article.content"></p>
+            </div>
+          </div>
+        </a>
+      </section>
+      <MainFooter />
     </div>
+  </div>
 </template>
 <style scoped>
 html,

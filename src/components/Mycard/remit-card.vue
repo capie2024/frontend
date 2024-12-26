@@ -26,7 +26,7 @@
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="h-6 w-6"
+              class="w-6 h-6"
             >
               <path
                 stroke-linecap="round"
@@ -38,7 +38,7 @@
         </div>
 
         <div class="modal-body">
-          <h3 class="topic my-4">
+          <h3 class="my-4 topic">
             選擇牌組
             <span class="subtitle">選擇你的牌組來源</span>
           </h3>
@@ -48,7 +48,7 @@
           <button
             :class="{ active: buttons[0] }"
             @click="toggleActive(0)"
-            class="button-remit item z-20 focus-button"
+            class="z-20 button-remit item focus-button"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -66,7 +66,7 @@
                 d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
               ></path>
             </svg>
-            <span class="text-sm font-mono">牌組編號</span>
+            <span class="font-mono text-sm">牌組編號</span>
           </button>
 
           <div class="input-item-2">
@@ -119,7 +119,7 @@
                 ></path>
               </svg>
             </div>
-            <span class="font-mono truncate text-green-500">找到牌組</span>
+            <span class="font-mono text-green-500 truncate">找到牌組</span>
           </div>
 
           <!-- 當 deckId 沒有對應的牌組時顯示紅色提示 -->
@@ -143,11 +143,11 @@
           </div>
         </div>
         <div class="modal-body">
-          <h3 class="topic my-4">
+          <h3 class="my-4 topic">
             匯出設定
             <span class="subtitle">選擇你的匯出格式內容</span>
           </h3>
-          <h3 class="topic my-4">選擇匯出格式</h3>
+          <h3 class="my-4 topic">選擇匯出格式</h3>
         </div>
 
         <div class="input-button">
@@ -172,13 +172,13 @@
                 d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
               ></path>
             </svg>
-            <span class="text-sm font-mono">PDF</span>
+            <span class="font-mono text-sm">PDF</span>
           </button>
         </div>
 
         <div class="seeting">
           <button
-            class="item justify-center default-transition gray setting-text"
+            class="justify-center item default-transition gray setting-text"
             id="setting-text"
             @click="exportToPDF"
             :disabled="!allButtonsActive"
@@ -200,7 +200,7 @@
                 d="m4.5 12.75 6 6 9-13.5"
               ></path>
             </svg>
-            <span class="text-sm font-mono input-text" id="input-text">
+            <span class="font-mono text-sm input-text" id="input-text">
               設定完成
             </span>
           </button>

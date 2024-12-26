@@ -137,7 +137,7 @@ export default {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"
+            class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
           >
             <path
               stroke-linecap="round"

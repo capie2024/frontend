@@ -455,16 +455,15 @@ export default {
             }
         },
     }
+    
 }  
 </script>
 
 <template>
     <div class="container">
         <SidebarGrid style="grid-area: sidebar;" />     
-        <div class="bg-container">
-            <main>
-                <div class="bg-black">
-                    <header>
+        <main>
+            <header>
                         <div class="pagebtn-area">
                             <button class="page-btn">
                                 <svg data-v-3e737e76="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
@@ -505,9 +504,8 @@ export default {
                                 <div class="description-item description6">匯出牌組</div>
                             </button>
                         </div>
-                    </header>
-                </div>
-                <section class="carddeck-information">
+            </header>
+            <section class="carddeck-information">
                     <div class="information-container">
                         <div class="carddeck-img">
                             <img 
@@ -546,11 +544,11 @@ export default {
                             </div>
                         </div>
                     </div>
-                </section>
-                <section class="main-container">
-                    <div class="main-container-bg"></div>
+            </section>
+            <section class="main-container">
                     <div class="article-area">
-                        <div class="text-container">
+                        <div class="article-container">
+                            <div class="text-container">
                             <div class="article-title">
                                 <svg data-v-5634e853="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="text-white/50 size-8"><path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97ZM6.75 8.25a.75.75 0 0 1 .75-.75h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H7.5Z" clip-rule="evenodd"></path></svg>
                                 <span>文章內容</span>
@@ -558,9 +556,9 @@ export default {
                             <div class="article-content">
                                 <p v-html="article.content"></p>
                             </div>
-                        </div>
-                        <!-- 留言區域 -->
-                        <div class="message-area">
+                            </div>
+                            <!-- 留言區域 -->
+                            <div class="message-area">
                             <!-- 留言輸入 -->
                             <div class="user-message">
                                 <div class="message-user-img">
@@ -749,9 +747,9 @@ export default {
                                     </div>
                                 </div>
                             </section>
+                            </div>
                         </div>
-                    </div>
-                    <nav class="toolbar" v-if="groupedCards.length > 0">
+                        <nav class="toolbar" v-if="groupedCards.length > 0">
                         <div class="toolbar-area1">
                             <button class="tool-btn1" @click="setSortBy('typeTranslate')"
                             :class="{'active': sortBy === 'typeTranslate'}">
@@ -797,7 +795,8 @@ export default {
                                 <div class="func-text func-text6">卡片資訊</div>
                             </button>
                         </div>
-                    </nav>
+                        </nav>
+                    </div>
 
                     <div class="card-info">
                         <div class="row" v-for="group in groupedCards" :key="group.group">
@@ -843,9 +842,9 @@ export default {
                             </div>
                         </div>
                     </div>
-                </section>
+            </section>
     
-                <div class="deck-container">
+            <div class="deck-container">
                     <div class="deck-img">
                         <img src="/src/img/麻衣.png" alt="">
                     </div>
@@ -865,9 +864,8 @@ export default {
                             </div>
                         </div>
                     </div>
-                </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
 </template>
 
@@ -1526,14 +1524,20 @@ export default {
     }
 
     header {
-        background: linear-gradient(to right, #E7B00A, #EA6532);
+        background: linear-gradient(to right, rgba(231, 176, 10, 1), rgba(234, 101, 50, 1));
+        transition: 0.05s ease;
         border-radius: 20px 20px 0 0;
-        position: absolute;
+        position: fixed;
         top: 8px;
-        width: 100%;
+        width: calc(100% - 278px);
         height: 64px;
         display: flex;
         align-items: center;
+        z-index: 20;
+    }
+
+    .header-change {
+        background: linear-gradient(to right, rgba(231, 176, 10, 1), rgba(234, 101, 50, 1));
     }
 
     .pagebtn-area {
@@ -1571,7 +1575,7 @@ export default {
         font-weight: 900;
         color: white;
         white-space: nowrap; /* 強制單行顯示 */
-        overflow: hidden; /* 隱藏超出部分 */
+        overflow: hidden; 
         text-overflow: ellipsis;
     }
 
@@ -1632,7 +1636,8 @@ export default {
 
 
     .description1 {
-        right:206px;
+        width: 30px;
+        right:35px;
     }
 
     .description2 {
@@ -1714,25 +1719,16 @@ export default {
         stroke: white;
     }
 
-    /* -- */
-
-
-    .bg-container {
-        margin-left: 270px;
-        width: calc(100% - 270px);
-        padding-bottom: 1rem; 
-        background-color: #121212;
-    }
-
     main {
-        width: calc(100% - 8px);
-        margin-top: 8px;
+        background-color: #121212;
+        width: calc(100% - 278px);
+        height: calc(100vh - 16px);;
+        margin: 0.5rem 0.5rem 0.5rem 270px;
         position: relative;
-        height: auto;
         overflow: hidden;
         overflow-y: scroll;
         scroll-behavior: smooth;
-        border-radius: 20px 20px 0 0;
+        border-radius: 20px;
     }
 
 
@@ -1849,14 +1845,12 @@ export default {
 
     .data-item:nth-of-type(3){
         flex-wrap: wrap;
-        gap:10px;
     }
 
     span svg {
         width: 24px;
         height: 24px;
     }
-    /* -- */
 
     .main-container {
         width: 100%;
@@ -1868,17 +1862,13 @@ export default {
         position: relative;
     }
 
-    .main-container-bg{
-        background: linear-gradient(rgba(59, 130, 246, 0.44) 100px, transparent 500px);
+    .article-area {
         width: 100%;
-        height: 500px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        /* z-index: -1; */
+        background: linear-gradient(rgba(59, 130, 246, 0.44) 50px, transparent 600px);
     }
 
-    .article-area {
+    .article-container {
+        width: 100%;
         display: flex;
     }
 
@@ -2009,16 +1999,15 @@ export default {
         width: 100%;
         display: flex;
         margin-left: 24px;
-        position: absolute; 
-        top: 550px;  
-        /* display: none; */
+        margin-top: 100px;
+        position: sticky;  
+        left: 0; 
     }
 
     .toolbar-area1 {
         width: 50%;
         display: flex;
         gap: 20px;
-        /* display: none; */
     }
 
     .tool-btn1 {
@@ -2272,12 +2261,11 @@ export default {
             background: linear-gradient(to top, #000, rgba(0, 0, 0, 0.9), transparent);
         }
         .toolbar {
-            position: absolute;
-            top: 930px;
+            margin-top: 300px;
         }
 
         .card-info{
-            margin-top: 400px;
+            margin-top: 300px;
         }
 
         .tool-btn1 span{
@@ -2297,20 +2285,13 @@ export default {
             align-items: center !important;
         }
 
-        .bg-container {
-            margin-left: 0;
-            width: 100%;
-            padding-bottom: 0px !important;
-            
-        }
-        
         main {
             margin-top: 0;
+            margin-left: 0;
+            margin-right: 0;
             width: 100%;
-            /* scroll-behavior: smooth; */
             height: 100vh;
             overflow-y: auto;
-            
         }
 
         .bg-black {
@@ -2399,6 +2380,7 @@ export default {
 
         .data-container {
             width: 100%;
+            margin-bottom: 1rem;
             flex-direction: column;
             flex-wrap: wrap;
             align-items: start;
@@ -2413,6 +2395,11 @@ export default {
         .article-area {
             width: 100%;
             height: 50vh;
+            background: linear-gradient(rgba(59, 130, 246, 0.44) 50px, transparent 430px);
+            flex-direction: column;
+        }
+
+        .article-container {
             flex-direction: column;
         }
 

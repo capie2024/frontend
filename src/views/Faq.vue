@@ -20,9 +20,9 @@ const getQAList = async () => {
     // 收集所有處理過的 relations 結果，只顯示共同的部分
     qaList.value = data.map((qa) => ({
       ...qa,
-      processedRelation: qa.relations ? findSeries(qa.relations) : ''
+      processedRelation: qa.relations ? findSeries(qa.relations) : '',
     }))
-    console.log(qaList.value); // 檢查處理後的數據
+    console.log(qaList.value) // 檢查處理後的數據
   } catch (error) {
     console.error(error)
   }
@@ -120,24 +120,34 @@ const search = () => {
       const q = qa.q?.toLowerCase() || ''
       const a = qa.a?.toLowerCase() || ''
       // 檢查 relations 陣列中的每個元素
-      const hasMatchingRelation = qa.relations?.some(relationPath => {
-        // 檢查完整的 relation 路徑
-        return relationPath.toLowerCase().includes(query)
-      }) || false
+      const hasMatchingRelation =
+        qa.relations?.some((relationPath) => {
+          // 檢查完整的 relation 路徑
+          return relationPath.toLowerCase().includes(query)
+        }) || false
 
       // 檢查共同標籤
-      const commonLabelMatch = findSeries(qa.relations)?.toLowerCase().includes(query)
+      const commonLabelMatch = findSeries(qa.relations)
+        ?.toLowerCase()
+        .includes(query)
       console.log('檢查項目:', {
         relations: qa.relations,
         commonLabel: findSeries(qa.relations),
-        hasMatchingRelation: qa.relations?.some(r => r.toLowerCase().includes(query))
+        hasMatchingRelation: qa.relations?.some((r) =>
+          r.toLowerCase().includes(query)
+        ),
       })
-      return q.includes(query) || a.includes(query) || hasMatchingRelation || commonLabelMatch
+      return (
+        q.includes(query) ||
+        a.includes(query) ||
+        hasMatchingRelation ||
+        commonLabelMatch
+      )
     })
   }
 }
 
-const clearSearch= () => {
+const clearSearch = () => {
   searchQuery.value = ''
   filteredData.value = sortedData.value
 }
@@ -224,9 +234,11 @@ onMounted(async () => {
               type="text"
               class="w-full min-w-0 p-0 text-sm bg-transparent border-none focus:ring-0 placeholder:text-zinc-500 placeholder:font-light"
               placeholder="想問什麼？"
-              v-model="searchQuery" @keyup="search"
+              v-model="searchQuery"
+              @keyup="search"
             />
-            <svg @click="clearSearch"
+            <svg
+              @click="clearSearch"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -247,7 +259,7 @@ onMounted(async () => {
             @click="toggleSort"
             class="flex items-center flex-none gap-1 p-2 font-bold bg-white rounded-full shadow text-zinc-700 shadow-zinc-900/50"
           >
-          <svg
+            <svg
               v-if="sortOrder === 'desc'"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -359,7 +371,8 @@ onMounted(async () => {
                     d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
                   ></path>
                 </svg>
-                關聯 {{ qa.relations.length }} 張<span v-if="qa.relations.length != 0"
+                關聯 {{ qa.relations.length }} 張<span
+                  v-if="qa.relations.length != 0"
                   >，包含
                   <span class="px-1 text-white rounded-lg bg-cyan-500">{{
                     qa.processedRelation

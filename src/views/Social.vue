@@ -1,110 +1,129 @@
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import SidebarGrid from '../components/SidebarGrid.vue';
 
-const API_URL = import.meta.env.VITE_API_URL; 
+const API_URL = import.meta.env.VITE_API_URL;
 
-export default {
-    components: {
-    SidebarGrid,
-  },
-  data() {
-    return {
-      articles: [],
-      searchQuery: '',
-      filteredArticles:[],
-      socialHistory: JSON.parse(localStorage.getItem('socialHistory')) || [],
-      isScrolled: false,
-      intervalId: 123,
-    };
-  },
-  async created() {
-    try {
-      const response = await axios.get(`${API_URL}/api/articles`);
-      this.articles = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      this.filteredArticles = this.articles;
-    } catch (error) {
-      console.error('獲取文章列表失敗', error);
-    }
-  },
-  computed: {
-    searchResultCount() {
-      return this.filteredArticles.length;
-    },
-  },
-  methods:{
-    handleScroll() {
-      this.isScrolled = document.querySelector(".main").scrollTop > 0;      
-    },
-    startFunction() {
-      if(this.intervalId){
-        clearInterval(this.intervalId)
-      }
-      this.intervalId = setInterval(() => {
-        this.handleScroll()
-      }, 100);
-    },
-    formatDate(date) {
-        if (!date) {
-        return '';
-        }
-        return date.split('T')[0];
-    },
-    handleEnter() {
-      this.searchArticles();
-      this.addSearchHistory();
-      this.searchQuery = '';
-    },
-    addSearchHistory() {
-      if (this.searchQuery.trim()) {
-        const newHistory = { searchQuery: this.searchQuery.trim() };       
-        const existingIndex = this.socialHistory.findIndex(
-        (item) => item.searchQuery === newHistory.searchQuery
-        );
 
-        if (existingIndex !== -1) {
-        this.socialHistory.splice(existingIndex, 1);
-        }
-        this.socialHistory = [newHistory, ...this.socialHistory];
-        localStorage.setItem('socialHistory', JSON.stringify(this.socialHistory));
-        } 
-    },
-    
-    searchArticles() {
-      if (!this.searchQuery.trim()) {
-        this.filteredArticles = this.articles;
-      } else {
-      const query = this.searchQuery.toLowerCase();
-      this.filteredArticles = this.articles.filter(article =>
+const articles = ref([]);
+const searchQuery = ref('');
+const filteredArticles = ref([]);
+const socialHistory = ref(
+  JSON.parse(localStorage.getItem('socialHistory')) || []
+);
+const isScrolled = ref(false);
+let intervalId = null;
+
+
+const fetchArticles = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/articles`);
+    articles.value = response.data.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+    filteredArticles.value = articles.value;
+  } catch (error) {
+    console.error('獲取文章列表失敗', error);
+  }
+};
+
+
+const formatDate = (date) => {
+  if (!date) return '';
+  return date.split('T')[0];
+};
+
+
+const searchArticles = () => {
+  if (!searchQuery.value.trim()) {
+    filteredArticles.value = articles.value;
+  } else {
+    const query = searchQuery.value.toLowerCase();
+    filteredArticles.value = articles.value.filter(
+      (article) =>
         article.title.toLowerCase().includes(query) ||
         article.content.toLowerCase().includes(query) ||
         article.post_code.includes(query)
-      );
-      }
-    },
-    handleHistoryClick(searchQuery) {
-        this.searchQuery = searchQuery;
-        this.searchArticles(); 
-        this.addSearchHistory();
-    },
-    clearSearch() {
-        this.searchQuery = ''; 
-        this.filteredArticles = this.articles;
-    },
-  },
-  mounted() {
-      this.startFunction()       
-  },
-  beforeUnmount() {
-      window.removeEventListener("scroll", this.handleScroll);
-  },
+    );
+  }
 };
+
+
+const addSearchHistory = () => {
+  if (searchQuery.value.trim()) {
+    const newHistory = { searchQuery: searchQuery.value.trim() };
+    const existingIndex = socialHistory.value.findIndex(
+      (item) => item.searchQuery === newHistory.searchQuery
+    );
+
+    if (existingIndex !== -1) {
+      socialHistory.value.splice(existingIndex, 1);
+    }
+    socialHistory.value = [newHistory, ...socialHistory.value];
+    localStorage.setItem(
+      'socialHistory',
+      JSON.stringify(socialHistory.value)
+    );
+  }
+};
+
+
+const handleEnter = () => {
+  searchArticles();
+  addSearchHistory();
+  searchQuery.value = '';
+};
+
+
+const handleHistoryClick = (query) => {
+  searchQuery.value = query;
+  searchArticles();
+  addSearchHistory();
+};
+
+
+const clearSearch = () => {
+  searchQuery.value = '';
+  filteredArticles.value = articles.value;
+};
+
+
+const handleScroll = () => {
+  const mainElement = document.querySelector('.main');
+  isScrolled.value = mainElement && mainElement.scrollTop > 0;
+};
+
+
+const startFunction = () => {
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
+  intervalId = setInterval(() => {
+    handleScroll();
+  }, 100);
+};
+
+
+const searchResultCount = computed(() => filteredArticles.value.length);
+
+
+onMounted(() => {
+  fetchArticles();
+  startFunction();
+});
+
+onBeforeUnmount(() => {
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
+});
 </script>
 <template>
     <div class="container">
         <SidebarGrid />
         <div class="main">
-            <div class="header-container" :class="{'header-change': this.isScrolled}">
+            <div class="header-container" :class="{'header-change': isScrolled}">
                 <div class="search-container">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input v-model="searchQuery" @keyup.enter="handleEnter" class="search" type="text" placeholder="我想找找....?">

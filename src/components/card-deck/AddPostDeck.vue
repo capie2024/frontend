@@ -1,3 +1,144 @@
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import SidebarGrid from '../SidebarGrid.vue'
+import MainFooter from '@/components/MainFooter.vue'
+import Editor from '@tinymce/tinymce-vue'
+
+const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY
+const router = useRouter()
+const route = useRoute()
+
+const token = ref(localStorage.getItem('token'))
+const deckData = reactive({
+  deck_name: '',
+  deck: [],
+})
+const title = ref('')
+const content = ref('')
+const decks = ref([])
+const filteredDecks = ref([])
+const menuExpanded = ref(false)
+const menuHeight = ref(0)
+const searchQuery = ref('')
+
+const fetchDeckData = async () => {
+  const API_URL = import.meta.env.VITE_API_URL
+  const deckId = route.params.deck_id
+  try {
+    const response = await axios.get(`${API_URL}/api/deck-page/${deckId}`)
+    title.value = response.data.deck_name || ''
+    deckData.deck_name = response.data.deck_name || ''
+    deckData.deck = Array.isArray(response.data.deck) ? response.data.deck : []
+    deckData.deck_cover = response.data.deck_cover
+    deckData.id = response.data.id
+  } catch (error) {
+    console.error('獲取文章資料失敗', error)
+  }
+}
+
+const getUserDecks = async () => {
+  if (!token.value) return
+  const API_URL = import.meta.env.VITE_API_URL
+  try {
+    const res = await axios.get(`${API_URL}/decks`, {
+      headers: { Authorization: `Bearer ${token.value}` },
+    })
+    decks.value = res.data.decks
+    filteredDecks.value = res.data.decks
+  } catch (error) {
+    console.error('獲取牌組資料失敗', error)
+  }
+}
+
+const submitArticle = async () => {
+  try {
+    const API_URL = import.meta.env.VITE_API_URL
+    const response = await axios.post(
+      `${API_URL}/api/decks`,
+      {
+        title: title.value,
+        content: content.value,
+        deck_id: deckData.id,
+        post_picture: deckData.deck_cover,
+      },
+      {
+        headers: { Authorization: `Bearer ${token.value}` },
+      }
+    )
+
+    const postCode = response.data.post_code
+
+    Swal.fire({
+      icon: 'success',
+      title: '成功',
+      showConfirmButton: false,
+      timer: 1000,
+    }).then(() => {
+      router.push(`/social/${postCode}`)
+    })
+  } catch (error) {
+    if (error.response && error.response.status === 403) {
+      const BASE_URL = import.meta.env.VITE_BASE_URL
+      Swal.fire({
+        title: '請先登入',
+        text: '登入後才能發布文章',
+        icon: 'warning',
+        confirmButtonText: '確定',
+      }).then(() => {
+        window.location.href = `${BASE_URL}/login`
+      })
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: '新增文章失敗',
+        text: error.message,
+      })
+    }
+  }
+}
+
+const toggleMenu = () => {
+  menuExpanded.value = !menuExpanded.value
+  if (menuExpanded.value) calculateMenuHeight()
+}
+
+const calculateMenuHeight = () => {
+  menuHeight.value = 45 + filteredDecks.value.length * 35
+}
+
+const selectDeck = (deck) => {
+  title.value = deck.deck_name
+  deckData.deck_name = deck.deck_name
+  deckData.deck_cover = deck.deck_cover
+  deckData.id = deck.id
+  menuExpanded.value = false
+}
+
+const searchSeries = () => {
+  const query = searchQuery.value.trim().toLowerCase()
+  filteredDecks.value = query
+    ? decks.value.filter((deck) =>
+        deck.deck_name?.toLowerCase().includes(query)
+      )
+    : decks.value
+  calculateMenuHeight()
+}
+
+const clearSearch = () => {
+  searchQuery.value = ''
+  filteredDecks.value = decks.value
+  calculateMenuHeight()
+}
+
+onMounted(() => {
+  fetchDeckData()
+  getUserDecks()
+})
+</script>
+
 <template>
   <SidebarGrid />
   <main>
@@ -357,147 +498,6 @@
     </div>
   </main>
 </template>
-
-<script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import axios from 'axios'
-import Swal from 'sweetalert2'
-import SidebarGrid from '../SidebarGrid.vue'
-import MainFooter from '@/components/MainFooter.vue'
-import Editor from '@tinymce/tinymce-vue'
-
-const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY
-const router = useRouter()
-const route = useRoute()
-
-const token = ref(localStorage.getItem('token'))
-const deckData = reactive({
-  deck_name: '',
-  deck: [],
-})
-const title = ref('')
-const content = ref('')
-const decks = ref([])
-const filteredDecks = ref([])
-const menuExpanded = ref(false)
-const menuHeight = ref(0)
-const searchQuery = ref('')
-
-const fetchDeckData = async () => {
-  const API_URL = import.meta.env.VITE_API_URL
-  const deckId = route.params.deck_id
-  try {
-    const response = await axios.get(`${API_URL}/api/deck-page/${deckId}`)
-    title.value = response.data.deck_name || ''
-    deckData.deck_name = response.data.deck_name || ''
-    deckData.deck = Array.isArray(response.data.deck) ? response.data.deck : []
-    deckData.deck_cover = response.data.deck_cover
-    deckData.id = response.data.id
-  } catch (error) {
-    console.error('獲取文章資料失敗', error)
-  }
-}
-
-const getUserDecks = async () => {
-  if (!token.value) return
-  const API_URL = import.meta.env.VITE_API_URL
-  try {
-    const res = await axios.get(`${API_URL}/decks`, {
-      headers: { Authorization: `Bearer ${token.value}` },
-    })
-    decks.value = res.data.decks
-    filteredDecks.value = res.data.decks
-  } catch (error) {
-    console.error('獲取牌組資料失敗', error)
-  }
-}
-
-const submitArticle = async () => {
-  try {
-    const API_URL = import.meta.env.VITE_API_URL
-    const response = await axios.post(
-      `${API_URL}/api/decks`,
-      {
-        title: title.value,
-        content: content.value,
-        deck_id: deckData.id,
-        post_picture: deckData.deck_cover,
-      },
-      {
-        headers: { Authorization: `Bearer ${token.value}` },
-      }
-    )
-
-    const postCode = response.data.post_code
-
-    Swal.fire({
-      icon: 'success',
-      title: '成功',
-      showConfirmButton: false,
-      timer: 1000,
-    }).then(() => {
-      router.push(`/social/${postCode}`)
-    })
-  } catch (error) {
-    if (error.response && error.response.status === 403) {
-      const BASE_URL = import.meta.env.VITE_BASE_URL
-      Swal.fire({
-        title: '請先登入',
-        text: '登入後才能發布文章',
-        icon: 'warning',
-        confirmButtonText: '確定',
-      }).then(() => {
-        window.location.href = `${BASE_URL}/login`
-      })
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: '新增文章失敗',
-        text: error.message,
-      })
-    }
-  }
-}
-
-const toggleMenu = () => {
-  menuExpanded.value = !menuExpanded.value
-  if (menuExpanded.value) calculateMenuHeight()
-}
-
-const calculateMenuHeight = () => {
-  menuHeight.value = 45 + filteredDecks.value.length * 35
-}
-
-const selectDeck = (deck) => {
-  title.value = deck.deck_name
-  deckData.deck_name = deck.deck_name
-  deckData.deck_cover = deck.deck_cover
-  deckData.id = deck.id
-  menuExpanded.value = false
-}
-
-const searchSeries = () => {
-  const query = searchQuery.value.trim().toLowerCase()
-  filteredDecks.value = query
-    ? decks.value.filter((deck) =>
-        deck.deck_name?.toLowerCase().includes(query)
-      )
-    : decks.value
-  calculateMenuHeight()
-}
-
-const clearSearch = () => {
-  searchQuery.value = ''
-  filteredDecks.value = decks.value
-  calculateMenuHeight()
-}
-
-onMounted(() => {
-  fetchDeckData()
-  getUserDecks()
-})
-</script>
 
 <style scoped>
 div,

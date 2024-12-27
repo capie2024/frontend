@@ -350,7 +350,7 @@ a {
   align-items: center;
   position: absolute;
   top: 14px;
-  right: 300px;
+  right: 322px;
 }
 
 .bell i::before,

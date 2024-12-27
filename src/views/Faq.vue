@@ -8,7 +8,6 @@ import NavLoginBtn from '../components/NavLoginBtn.vue'
 import MainFooter from '../components/MainFooter.vue'
 
 const qaList = ref([])
-const relations = ref([])
 const sortOrder = ref('desc')
 const searchQuery = ref('')
 const filteredData = ref([])
@@ -17,7 +16,13 @@ const API_URL = import.meta.env.VITE_API_URL
 const getQAList = async () => {
   try {
     const { data } = await axios.get(`${API_URL}/qa`)
-    qaList.value.push(...data)
+    // qaList.value.push(...data)
+    // 收集所有處理過的 relations 結果，只顯示共同的部分
+    qaList.value = data.map((qa) => ({
+      ...qa,
+      processedRelation: qa.relations ? findSeries(qa.relations) : ''
+    }))
+    console.log(qaList.value); // 檢查處理後的數據
   } catch (error) {
     console.error(error)
   }
@@ -76,19 +81,10 @@ const findSeries = (arr) => {
   return baseSegment
 }
 
-qaList.value.forEach((qa) => {
-  if (qa.relations) {
-    relations.value.push(...qa.relations)
-  }
-})
-
-
 // 將共同的部分存在 commonLabel
-const commonLabel = computed(() => {
-  return findSeries(relations)
-})
-console.log(commonLabel);
-
+// const commonLabel = computed(() => {
+//   return findSeries(relations)
+// })
 
 const goBack = () => {
   router.go(-1)
@@ -366,7 +362,7 @@ onMounted(async () => {
                 關聯 {{ qa.relations.length }} 張<span v-if="qa.relations.length != 0"
                   >，包含
                   <span class="px-1 text-white rounded-lg bg-cyan-500">{{
-                    commonLabel.value
+                    qa.processedRelation
                   }}</span></span
                 >
               </p>

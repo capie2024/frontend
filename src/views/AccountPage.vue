@@ -7,6 +7,7 @@ import Loading from '../components/Loading.vue'
 import SideBar from '../components/SidebarGrid.vue'
 import Notice from '../components/notification/notice.vue'
 import Login from '../components/NavLoginBtn.vue'
+import MainFooter from '../components/MainFooter.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 const router = useRouter()
@@ -296,26 +297,6 @@ onBeforeUnmount(() => {
               stroke-linecap="round"
               stroke-linejoin="round"
               d="M15.75 19.5 8.25 12l7.5-7.5"
-            ></path>
-          </svg>
-        </button>
-        <button
-          class="arrow-right flex-none p-1 rounded-full bg-black/50 text-white default-transition hover:bg-zinc-800/50 disabled:opacity-30"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            class="h-6 w-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m8.25 4.5 7.5 7.5-7.5 7.5"
             ></path>
           </svg>
         </button>
@@ -875,197 +856,8 @@ onBeforeUnmount(() => {
               </section>
             </div>
           </div>
-          <footer>
-            <div class="work-shop-footer">
-              <div class="work-shop-footer-flexbox">
-                <div class="work-shop-footer-flexbox-left">
-                  <ul class="work-shop-footer-flexbox-left-item">
-                    <li class="work-shop-footer-flexbox-left-item-title">
-                      簡介
-                    </li>
-                    <li class="work-shop-footer-flexbox-left-item-link">
-                      <a
-                        href="https://bottleneko.app/about"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        關於我們
-                      </a>
-                      <a
-                        href="https://bottleneko.app/contact"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        與我聯絡
-                      </a>
-                      <a
-                        href="https://ws-tcg.com/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        Weiβ Schwarz
-                      </a>
-                      <a
-                        href="https://jasonxddd.notion.site/V2-56de4919639442f4af617ef3cb0b89fc"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        V2新版介紹
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="work-shop-footer-flexbox-left-item">
-                    <li class="work-shop-footer-flexbox-left-item-title">
-                      資源
-                    </li>
-                    <li class="work-shop-footer-flexbox-left-item-link">
-                      <a
-                        href="https://decklog.bushiroad.com/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        Bushi DeckLog
-                      </a>
-                      <a
-                        href="https://ws-tcg.com/rules/deck_rule/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        Bushi DeckLog EN
-                      </a>
-                      <a
-                        href="https://yuyu-tei.jp/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        遊々亭價格
-                      </a>
-                      <a
-                        href="https://ws-tcg.com/rules/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        基本規則
-                      </a>
-                      <a
-                        href="https://ws-tcg.com/rules/deck_rule/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        禁卡表
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="work-shop-footer-flexbox-left-item">
-                    <li class="work-shop-footer-flexbox-left-item-title">
-                      常用連結
-                    </li>
-                    <li class="work-shop-footer-flexbox-left-item-link">
-                      <a
-                        href="https://bottleneko.app/qa"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        卡片問答集
-                      </a>
-                      <a
-                        href="login"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        我的專業
-                      </a>
-                      <a
-                        href="login"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        偏好設定
-                      </a>
-                      <a
-                        href="login"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        登出帳號
-                      </a>
-                      <a
-                        href="#"
-                        style="color: red"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        英雄榜
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="work-shop-footer-flexbox-right">
-                  <div class="work-shop-footer-flexbox-right-group">
-                    <a class="work-shop-footer-flexbox-right-item" href="#">
-                      <span class="work-shop-footer-flexbox-right-item-icon">
-                        <i class="fa-solid fa-gift"></i>
-                      </span>
-                      <span class="work-shop-footer-flexbox-right-item-text"
-                        >用一杯咖啡讓工程師罐罐休息一下</span
-                      >
-                    </a>
-                    <div class="work-shop-footer-flexbox-right-icon-list">
-                      <a
-                        href="https://play.google.com/store/apps/details?id=app.bottleneko.twa&pli=1"
-                        target="_blank"
-                      >
-                        <i class="fa-brands fa-google-play"></i>
-                      </a>
-                      <a
-                        href="https://play.google.com/store/apps/details?id=app.bottleneko.twa&pli=1"
-                        target="_blank"
-                      >
-                        <i class="fa-brands fa-apple"></i>
-                      </a>
-                      <a
-                        href="https://www.facebook.com/BottleNeko"
-                        target="_blank"
-                      >
-                        <i class="fa-brands fa-facebook-f"></i>
-                      </a>
-                      <a
-                        href="https://discord.com/invite/GKuxTzpB2A"
-                        target="_blank"
-                      >
-                        <i class="fa-brands fa-discord"></i>
-                      </a>
-                      <a href="#">
-                        <i class="fa-solid fa-envelope"></i>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <hr class="work-shop-footer-hr" />
-              <div class="work-shop-footer-copyright">
-                <ul class="work-shop-footer-copyright-left">
-                  <li class="work-shop-footer-copyright-left-item">
-                    <a href="https://bottleneko.app/policy" target="_blank">
-                      隱私權政策
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-copyright-left-item">
-                    <a href="https://bottleneko.app/eula" target="_blank">
-                      服務條款
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-copyright-left-item">
-                    <a href="https://bottleneko.app/contact" target="_blank">
-                      商業合作
-                    </a>
-                  </li>
-                </ul>
-                <div class="work-shop-footer-copyright-right">
-                  <span>卡片資料來源 Weiβ Schwarz.</span>
-                  <span>Copyright @ 2023 BottleNeko</span>
-                </div>
-              </div>
-            </div>
-          </footer>
         </div>
+        <MainFooter />
       </main>
     </div>
   </div>

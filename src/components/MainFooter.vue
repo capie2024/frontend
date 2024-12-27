@@ -1,25 +1,36 @@
 <script setup>
-// import '@fortawesome/fontawesome-free/css/all.css'
-// import '@fortawesome/fontawesome-free/js/all.js'
+const BASE_URL = import.meta.env.VITE_BASE_URL
 
 const footerData = [
   {
     title: '簡介',
-    linkText: ['關於我們', '與我聯絡', 'Weiβ Schwarz', 'V2新版介紹'],
+    linkText: ['關於我們', '與我聯絡', 'Weiβ Schwarz'],
+    url : [
+      '',
+      `${BASE_URL}/contact`, 
+      'https://ws-tcg.com/']
   },
   {
     title: '資源',
     linkText: [
-      'Bushi DeckLog',
-      'Bushi DeckLog EN',
       '遊々亭價格',
       '基本規則',
       '禁卡表',
     ],
+    url:[
+    'https://yuyu-tei.jp/', 
+    'https://ws-tcg.com/rules/', 
+    'https://ws-tcg.com/rules/deck_rule/'
+    ]
   },
   {
     title: '常用連結',
-    linkText: ['卡片問答集', '我的專頁', '偏好設定', '登出帳號', '英雄榜'],
+    linkText: ['卡片問答集', '我的專頁', '英雄榜'],
+    url:[
+      '',
+      `${BASE_URL}/login`,
+      `${BASE_URL}/hero-member`
+    ]
   },
 ]
 </script>
@@ -34,72 +45,36 @@ const footerData = [
           </li>
           <li
             class="main-footer-flexbox-left-item-link"
-            v-for="link in item.linkText"
-          >
-            <a
-              href="#"
-              :class="{
-                'main-footer-flexbox-left-item-link-text': true,
-                'text-color-red': link === '登出帳號',
-              }"
+            v-for="(link, index) in item.linkText" 
+            :key="index"          
+            >
+            <a class="main-footer-flexbox-left-item-link-text"
+              :href="item.url[index]" 
             >
               {{ link }}
             </a>
           </li>
         </ul>
       </div>
-      <div class="main-footer-flexbox-right">
-        <div class="main-footer-flexbox-right-group">
-          <a class="main-footer-flexbox-right-item" href="#">
-            <span class="main-footer-flexbox-right-item-icon">
-              <i class="fa-solid fa-gift"></i>
-            </span>
-            <span class="main-footer-flexbox-right-item-text"
-              >用一杯咖啡讓工程師罐罐休息一下</span
-            >
-          </a>
-          <div class="main-footer-flexbox-right-icon-list">
-            <a href="#">
-              <i class="fa-brands fa-google-play"></i>
-            </a>
-            <a href="#">
-              <i class="fa-brands fa-apple"></i>
-            </a>
-            <a href="#">
-              <i class="fa-brands fa-facebook-f"></i>
-            </a>
-            <a href="#">
-              <i class="fa-brands fa-discord"></i>
-            </a>
-            <a href="#">
-              <i class="fa-solid fa-envelope"></i>
-            </a>
-          </div>
-        </div>
-      </div>
     </div>
     <hr class="main-footer-hr" />
     <div class="main-footer-copyright">
       <ul class="main-footer-copyright-left">
         <li class="main-footer-copyright-left-item">
-          <a href="#">隱私權政策 </a>
-        </li>
-        <li class="main-footer-copyright-left-item">
-          <a href="#">服務條款</a>
-        </li>
-        <li class="main-footer-copyright-left-item">
-          <a href="#">商業合作</a>
+          <a href="#">感謝貓罐子 BottleNeko 遊戲卡牌網站</a>
         </li>
       </ul>
       <div class="main-footer-copyright-right">
         <span>卡片資料來源 Weiβ Schwarz.</span>
-        <span>Copyright @ 2023 BottleNeko</span>
+        <span>Copyright @ 2024 Capie</span>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+@import '@/assets/css/footer/main-footer-rwd.css';
+
 .main-footer {
   max-width: 100%;
   padding: 80px 32px 64px;
@@ -245,11 +220,6 @@ const footerData = [
   width: 100%;
 }
 
-.main-footer-copyright-left-item a:hover {
-  color: white;
-  cursor: pointer;
-}
-
 .main-footer-copyright-right {
   color: #6d6d76;
   font-size: 14px;
@@ -267,4 +237,3 @@ const footerData = [
   color: red;
 }
 </style>
-<style src="@/assets/css/footer/main-footer-rwd.css" scoped></style>

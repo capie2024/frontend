@@ -1,99 +1,86 @@
-<script>
-import dayjs from 'dayjs'
-import axios from 'axios'
-import SideBar from '../SidebarGrid.vue'
-import Notice from './notice.vue'
-import Footer from '../MainFooter.vue'
-import Login from '../NavLoginBtn.vue'
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import dayjs from 'dayjs';
+import axios from 'axios';
+import SideBar from '../SidebarGrid.vue';
+import Notice from './notice.vue';
+import Footer from '../MainFooter.vue';
+import Login from '../NavLoginBtn.vue';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL
-const API_URL = import.meta.env.VITE_API_URL
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
-export default {
-  components: {
-    SideBar,
-    Notice,
-    Footer,
-    Login,
-  },
-  data() {
-    return {
-      unreadCount: '',
-      notices: [],
+const unreadCount = ref('');
+const notices = ref([]);
+
+const formattedTime = (createdAt) => {
+  if (!createdAt) return '未知時間';
+  return dayjs(createdAt).format('YYYY-MM-DD');
+};
+
+const fetchNotices = async () => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch(`${API_URL}/api/notices`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    notices.value = (data.notices || []).sort((a, b) => {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+    // 初始加載時，設定正確的未讀通知數量
+    unreadCount.value = data.unreadCount || 0;
+  } catch (error) {
+    console.error('Error fetching notices:', error);
+  }
+};
+
+const markAsRead = async (noticeId, postCode) => {
+  try {
+    // 先找到通知
+    const notice = notices.value.find((n) => n.id === noticeId);
+
+    // 如果通知已經是已讀狀態，直接返回，不再執行減少未讀計數
+    if (notice && notice.is_read) {
+      goToPost(postCode);
+      return;
     }
-  },
-  mounted() {
-    this.fetchNotices()
-  },
-  computed: {
-    formattedTime() {
-      return (createdAt) => {
-        if (!createdAt) return '未知時間'
-        return dayjs(createdAt).format('YYYY-MM-DD')
+
+    // 向後端發送請求，標記為已讀
+    const response = await axios.post(
+      `${API_URL}/api/mark-as-read`,
+      { noticeId },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       }
-    },
-  },
-  methods: {
-    async markAsRead(noticeId, postCode) {
-      try {
-        // 先找到通知
-        const notice = this.notices.find((n) => n.id === noticeId)
+    );
 
-        // 如果通知已經是已讀狀態，直接返回，不再執行減少未讀計數
-        if (notice && notice.is_read) {
-          this.goToPost(postCode)
-          return
-        }
-
-        // 向後端發送請求，標記為已讀
-
-        const response = await axios.post(
-          `${API_URL}/api/mark-as-read`,
-          { noticeId },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          }
-        )
-
-        if (response.data.is_read) {
-          // 成功標記為已讀，更新通知狀態
-          if (notice) {
-            notice.is_read = true
-          }
-          // 減少未讀計數
-          this.unreadCount -= 1
-
-          this.goToPost(postCode)
-        }
-      } catch (error) {
-        console.error('Error marking as read:', error)
+    if (response.data.is_read) {
+      // 成功標記為已讀，更新通知狀態
+      if (notice) {
+        notice.is_read = true;
       }
-    },
-    goToPost(postCode) {
-      window.location.href = `${BASE_URL}/social/${postCode}`
-    },
-    async fetchNotices() {
-      const token = localStorage.getItem('token')
-      try {
-        const response = await fetch(`${API_URL}/api/notices`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        const data = await response.json()
-        this.notices = (data.notices || []).sort((a, b) => {
-          return new Date(b.created_at) - new Date(a.created_at)
-        })
-        // 初始加載時，設定正確的未讀通知數量
-        this.unreadCount = data.unreadCount || 0
-      } catch (error) {
-        console.error('Error fetching notices:', error)
-      }
-    },
-  },
-}
+      // 減少未讀計數
+      unreadCount.value -= 1;
+
+      goToPost(postCode);
+    }
+  } catch (error) {
+    console.error('Error marking as read:', error);
+  }
+};
+
+const goToPost = (postCode) => {
+  window.location.href = `${BASE_URL}/social/${postCode}`;
+};
+
+onMounted(() => {
+  fetchNotices();
+});
 </script>
 
 <template>
@@ -146,7 +133,7 @@ export default {
         </div>
 
         <Notice class="notice-mobile-hidden" />
-        <Login />
+        <Login class="login-mobile-hidden"/>
       </nav>
     </header>
     <div class="background scrollbar">
@@ -392,6 +379,10 @@ header {
 }
 
 @media screen and (width < 1200px) {
+  .login-mobile-hidden {
+    display: none;
+  }
+
   .notice-mobile-hidden {
     display: none;
   }

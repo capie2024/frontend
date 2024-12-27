@@ -1,12 +1,13 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import Loading from '../components/Loading.vue'
 import SideBar from '../components/SidebarGrid.vue'
 import Notice from '../components/notification/notice.vue'
 import Login from '../components/NavLoginBtn.vue'
+import MainFooter from '../components/MainFooter.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 const router = useRouter()
@@ -238,7 +239,7 @@ const getUserArticles = async () => {
 const formatDate = (datetime) => {
   const date = new Date(datetime)
   const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0') // 月份從0开始，需要加1
+  const month = String(date.getMonth() + 1).padStart(2, '0') // 月份從 0 開始，需要加 1
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
@@ -276,11 +277,11 @@ onBeforeUnmount(() => {
 <template>
   <div class="layout">
     <SideBar />
-    <header class="h-16 z-10" :class="{ scrolled: isScrolled }">
+    <header class="z-10 h-16" :class="{ scrolled: isScrolled }">
       <nav class="header-container">
         <button
           @click="handleBack"
-          class="flex-none p-1 rounded-full bg-black/50 text-white default-transition hover:bg-zinc-800/50"
+          class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -290,7 +291,7 @@ onBeforeUnmount(() => {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            class="h-6 w-6"
+            class="w-6 h-6"
           >
             <path
               stroke-linecap="round"
@@ -300,7 +301,7 @@ onBeforeUnmount(() => {
           </svg>
         </button>
         <button
-          class="arrow-right flex-none p-1 rounded-full bg-black/50 text-white default-transition hover:bg-zinc-800/50 disabled:opacity-30"
+          class="flex-none p-1 text-white rounded-full arrow-right bg-black/50 default-transition hover:bg-zinc-800/50 disabled:opacity-30"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -310,7 +311,7 @@ onBeforeUnmount(() => {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            class="h-6 w-6"
+            class="w-6 h-6"
           >
             <path
               stroke-linecap="round"
@@ -319,8 +320,8 @@ onBeforeUnmount(() => {
             ></path>
           </svg>
         </button>
-        <div class="w-full min-w-0 font-bold text-white justify-start">
-          <h2 class="header-title truncate text-2xl font-bold">帳號管理</h2>
+        <div class="justify-start w-full min-w-0 font-bold text-white">
+          <h2 class="text-2xl font-bold truncate header-title">帳號管理</h2>
         </div>
         <div class="icons">
           <button class="logout" @click="logout">
@@ -332,7 +333,7 @@ onBeforeUnmount(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="size-6 stroke-2"
+              class="stroke-2 size-6"
             >
               <path
                 stroke-linecap="round"
@@ -359,7 +360,7 @@ onBeforeUnmount(() => {
               accept="image/*"
               class="hidden"
             />
-            <label class="upload cursor-pointer group" @click.stop="uploadPic">
+            <label class="cursor-pointer upload group" @click.stop="uploadPic">
               <Loading v-if="isUploading" />
               <div
                 class="rounded-full relative h-full w-full shadow-[0_4px_60px_rgba(0,0,0,.5)] overflow-hidden"
@@ -369,7 +370,7 @@ onBeforeUnmount(() => {
                   v-if="picture"
                   :src="picture"
                   alt="使用者頭像"
-                  class="w-full h-full object-cover"
+                  class="object-cover w-full h-full"
                 />
                 <svg
                   v-else
@@ -390,7 +391,7 @@ onBeforeUnmount(() => {
                 </svg>
               </div>
               <div
-                class="group-hover:opacity-100 opacity-0 default-transition absolute inset-0 text-white bg-black/50 grid place-content-center rounded-full"
+                class="absolute inset-0 grid text-white rounded-full opacity-0 group-hover:opacity-100 default-transition bg-black/50 place-content-center"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -400,7 +401,7 @@ onBeforeUnmount(() => {
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="h-20 w-20"
+                  class="w-20 h-20"
                 >
                   <path
                     stroke="currentColor"
@@ -421,7 +422,7 @@ onBeforeUnmount(() => {
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-5 md:size-6 flex-none"
+                  class="flex-none size-5 md:size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -457,14 +458,14 @@ onBeforeUnmount(() => {
                   <input
                     id="editName"
                     v-model="name"
-                    class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500 md:mb-2 text-3xl md:text-7xl font-bold leading-relaxed line-clamp-2 break-all placeholder:text-cyan-600"
+                    class="w-full p-0 text-3xl font-bold leading-relaxed break-all bg-transparent border-none focus:ring-0 placeholder:text-zinc-500 md:mb-2 md:text-7xl line-clamp-2 placeholder:text-cyan-600"
                     type="text"
                     placeholder="請輸入名稱"
                   />
                 </div>
                 <button
                   @click="saveName"
-                  class="rounded-full p-1 flex-none btn btn-sm bg-green-400/70 hover:bg-green-400 text-white cursor-pointer"
+                  class="flex-none p-1 text-white rounded-full cursor-pointer btn btn-sm bg-green-400/70 hover:bg-green-400"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -485,7 +486,7 @@ onBeforeUnmount(() => {
                 </button>
                 <button
                   @click="cancelEdit"
-                  class="rounded-full p-1 flex-none btn btn-sm bg-red-400/70 hover:bg-red-400 text-white cursor-pointer"
+                  class="flex-none p-1 text-white rounded-full cursor-pointer btn btn-sm bg-red-400/70 hover:bg-red-400"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -515,7 +516,7 @@ onBeforeUnmount(() => {
                     stroke="currentColor"
                     aria-hidden="true"
                     data-slot="icon"
-                    class="size-5 md:size-6 flex-none"
+                    class="flex-none size-5 md:size-6"
                   >
                     <path
                       stroke-linecap="round"
@@ -534,7 +535,7 @@ onBeforeUnmount(() => {
                     stroke="currentColor"
                     aria-hidden="true"
                     data-slot="icon"
-                    class="size-5 md:size-6 flex-none"
+                    class="flex-none size-5 md:size-6"
                   >
                     <path
                       stroke-linecap="round"
@@ -550,24 +551,25 @@ onBeforeUnmount(() => {
           <div class="main">
             <div class="main-inside scroll-smooth">
               <section class="main-card-area">
-                <h2 class="main-card-area-h2 text-2xl font-bold pb-2 pt-6">
+                <h2 class="pt-6 pb-2 text-2xl font-bold main-card-area-h2">
                   <a href="">我的牌組</a>
-                  <span class="text-sm text-zinc-400 font-normal"
+                  <span class="text-sm font-normal text-zinc-400"
                     >一共有 {{ deckCount }} 結果</span
                   >
                 </h2>
                 <section class="show-card scrollbar-y">
-                  <a
+                  <a :href="'/deck/' + deck.deck_id"
                     v-if="decks"
                     v-for="deck in decks"
+                    :key="deck.deck_id"
                     class="will-change-[background] transition-colors cursor-pointer min-w-[8rem] snap-center flex flex-col"
                   >
                     <div
-                      class="mx-auto m-0 w-full relative rounded-xl shadow-xl grid place-content-center overflow-hidden"
+                      class="relative grid w-full m-0 mx-auto overflow-hidden shadow-xl rounded-xl place-content-center"
                     >
                       <img
                         :src="deck.deck_cover"
-                        class="shadow-lg h-full w-full aspect-square object-top object-cover select-none rounded-xl overflow-hidden"
+                        class="object-cover object-top w-full h-full overflow-hidden shadow-lg select-none aspect-square rounded-xl"
                       />
                     </div>
                     <div class="mt-2 md:mt-4 min-h-0 md:min-h-[62px]">
@@ -578,7 +580,7 @@ onBeforeUnmount(() => {
                           fill="currentColor"
                           aria-hidden="true"
                           data-slot="icon"
-                          class="size-4 flex-none"
+                          class="flex-none size-4"
                         >
                           <path
                             fill-rule="evenodd"
@@ -594,7 +596,7 @@ onBeforeUnmount(() => {
                         {{ deck.deck_name }}
                       </p>
                       <p
-                        class="text-xs md:text-sm font-mono text-zinc-400 truncate"
+                        class="font-mono text-xs truncate md:text-sm text-zinc-400"
                       >
                         {{ deck.build_time.substring(0, 10) }}
                       </p>
@@ -602,7 +604,7 @@ onBeforeUnmount(() => {
                   </a>
                   <a
                     href="/mycard"
-                    class="url transition-colors overflow-hidden"
+                    class="overflow-hidden transition-colors url"
                   >
                     <div class="read-more-area">
                       <div class="read-more">
@@ -649,24 +651,25 @@ onBeforeUnmount(() => {
                 </section>
               </section>
               <section class="main-article-area scrollbar-y">
-                <h2 class="main-card-area-h2 text-2xl font-bold pb-2 pt-6">
+                <h2 class="pt-6 pb-2 text-2xl font-bold main-card-area-h2">
                   <a href="">我的文章</a>
-                  <span class="text-sm text-zinc-400 font-normal"
+                  <span class="text-sm font-normal text-zinc-400"
                     >一共有 {{ postCount }} 結果</span
                   >
                 </h2>
                 <section class="show-card">
-                  <a
+                  <a :href="'/social/' + post.post_code"
                     v-if="posts"
                     v-for="post in posts"
+                    :key="post.post_code"
                     class="will-change-[background] transition-colors cursor-pointer min-w-[8rem] snap-center flex flex-col"
                   >
                     <div
-                      class="mx-auto m-0 w-full relative rounded-xl shadow-xl grid place-content-center overflow-hidden"
+                      class="relative grid w-full m-0 mx-auto overflow-hidden shadow-xl rounded-xl place-content-center"
                     >
                       <img
                         src="https://bottleneko.app/images/cover.png"
-                        class="shadow-lg h-full w-full aspect-square object-top object-cover select-none rounded-xl overflow-hidden"
+                        class="object-cover object-top w-full h-full overflow-hidden shadow-lg select-none aspect-square rounded-xl"
                       />
                     </div>
                     <div class="mt-2 md:mt-4 min-h-0 md:min-h-[62px]">
@@ -677,7 +680,7 @@ onBeforeUnmount(() => {
                           fill="currentColor"
                           aria-hidden="true"
                           data-slot="icon"
-                          class="size-4 flex-none"
+                          class="flex-none size-4"
                         >
                           <path
                             fill-rule="evenodd"
@@ -693,7 +696,7 @@ onBeforeUnmount(() => {
                         {{ post.title }}
                       </p>
                       <p
-                        class="text-xs md:text-sm font-mono text-zinc-400 truncate"
+                        class="font-mono text-xs truncate md:text-sm text-zinc-400"
                       >
                         {{ post.created_at.substring(0, 10) }}
                       </p>
@@ -701,7 +704,7 @@ onBeforeUnmount(() => {
                   </a>
                   <a
                     href="/social/my"
-                    class="url transition-colors overflow-hidden"
+                    class="overflow-hidden transition-colors url"
                   >
                     <div class="read-more-area">
                       <div class="read-more">
@@ -747,9 +750,9 @@ onBeforeUnmount(() => {
                 </section>
               </section>
               <section class="main-setting-area">
-                <h2 class="text-2xl font-bold pb-2 pt-6">
+                <h2 class="pt-6 pb-2 text-2xl font-bold">
                   設定
-                  <span class="text-xs text-zinc-400 font-normal"
+                  <span class="text-xs font-normal text-zinc-400"
                     >根據喜好設定，只有您看的到</span
                   >
                 </h2>
@@ -761,7 +764,7 @@ onBeforeUnmount(() => {
                       fill="currentColor"
                       aria-hidden="true"
                       data-slot="icon"
-                      class="size-6 flex-none text-yellow-500"
+                      class="flex-none text-yellow-500 size-6"
                     >
                       <path
                         fill-rule="evenodd"
@@ -771,7 +774,7 @@ onBeforeUnmount(() => {
                     </svg>
                     <span>輸入英雄代碼</span>
                   </button>
-                  <button>
+                  <!-- <button>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -794,7 +797,7 @@ onBeforeUnmount(() => {
                       ></path>
                     </svg>
                     <span>偏好設定</span>
-                  </button>
+                  </button> -->
                   <button @click="logout">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -833,7 +836,7 @@ onBeforeUnmount(() => {
                     </svg>
                     <span>重新整理</span>
                   </button>
-                  <button>
+                  <!-- <button>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -851,8 +854,8 @@ onBeforeUnmount(() => {
                       ></path>
                     </svg>
                     <span>管理封鎖名單</span>
-                  </button>
-                  <button>
+                  </button> -->
+                  <!-- <button>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -870,201 +873,12 @@ onBeforeUnmount(() => {
                       ></path>
                     </svg>
                     <span>刪除帳號</span>
-                  </button>
+                  </button> -->
                 </div>
               </section>
             </div>
           </div>
-          <footer>
-            <div class="work-shop-footer">
-              <div class="work-shop-footer-flexbox">
-                <div class="work-shop-footer-flexbox-left">
-                  <ul class="work-shop-footer-flexbox-left-item">
-                    <li class="work-shop-footer-flexbox-left-item-title">
-                      簡介
-                    </li>
-                    <li class="work-shop-footer-flexbox-left-item-link">
-                      <a
-                        href="https://bottleneko.app/about"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        關於我們
-                      </a>
-                      <a
-                        href="https://bottleneko.app/contact"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        與我聯絡
-                      </a>
-                      <a
-                        href="https://ws-tcg.com/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        Weiβ Schwarz
-                      </a>
-                      <a
-                        href="https://jasonxddd.notion.site/V2-56de4919639442f4af617ef3cb0b89fc"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        V2新版介紹
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="work-shop-footer-flexbox-left-item">
-                    <li class="work-shop-footer-flexbox-left-item-title">
-                      資源
-                    </li>
-                    <li class="work-shop-footer-flexbox-left-item-link">
-                      <a
-                        href="https://decklog.bushiroad.com/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        Bushi DeckLog
-                      </a>
-                      <a
-                        href="https://ws-tcg.com/rules/deck_rule/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        Bushi DeckLog EN
-                      </a>
-                      <a
-                        href="https://yuyu-tei.jp/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        遊々亭價格
-                      </a>
-                      <a
-                        href="https://ws-tcg.com/rules/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        基本規則
-                      </a>
-                      <a
-                        href="https://ws-tcg.com/rules/deck_rule/"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        禁卡表
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="work-shop-footer-flexbox-left-item">
-                    <li class="work-shop-footer-flexbox-left-item-title">
-                      常用連結
-                    </li>
-                    <li class="work-shop-footer-flexbox-left-item-link">
-                      <a
-                        href="https://bottleneko.app/qa"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        卡片問答集
-                      </a>
-                      <a
-                        href="login"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        我的專業
-                      </a>
-                      <a
-                        href="login"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        偏好設定
-                      </a>
-                      <a
-                        href="login"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        登出帳號
-                      </a>
-                      <a
-                        href="#"
-                        style="color: red"
-                        target="_blank"
-                        class="work-shop-footer-flexbox-left-item-link-text"
-                      >
-                        英雄榜
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="work-shop-footer-flexbox-right">
-                  <div class="work-shop-footer-flexbox-right-group">
-                    <a class="work-shop-footer-flexbox-right-item" href="#">
-                      <span class="work-shop-footer-flexbox-right-item-icon">
-                        <i class="fa-solid fa-gift"></i>
-                      </span>
-                      <span class="work-shop-footer-flexbox-right-item-text"
-                        >用一杯咖啡讓工程師罐罐休息一下</span
-                      >
-                    </a>
-                    <div class="work-shop-footer-flexbox-right-icon-list">
-                      <a
-                        href="https://play.google.com/store/apps/details?id=app.bottleneko.twa&pli=1"
-                        target="_blank"
-                      >
-                        <i class="fa-brands fa-google-play"></i>
-                      </a>
-                      <a
-                        href="https://play.google.com/store/apps/details?id=app.bottleneko.twa&pli=1"
-                        target="_blank"
-                      >
-                        <i class="fa-brands fa-apple"></i>
-                      </a>
-                      <a
-                        href="https://www.facebook.com/BottleNeko"
-                        target="_blank"
-                      >
-                        <i class="fa-brands fa-facebook-f"></i>
-                      </a>
-                      <a
-                        href="https://discord.com/invite/GKuxTzpB2A"
-                        target="_blank"
-                      >
-                        <i class="fa-brands fa-discord"></i>
-                      </a>
-                      <a href="#">
-                        <i class="fa-solid fa-envelope"></i>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <hr class="work-shop-footer-hr" />
-              <div class="work-shop-footer-copyright">
-                <ul class="work-shop-footer-copyright-left">
-                  <li class="work-shop-footer-copyright-left-item">
-                    <a href="https://bottleneko.app/policy" target="_blank">
-                      隱私權政策
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-copyright-left-item">
-                    <a href="https://bottleneko.app/eula" target="_blank">
-                      服務條款
-                    </a>
-                  </li>
-                  <li class="work-shop-footer-copyright-left-item">
-                    <a href="https://bottleneko.app/contact" target="_blank">
-                      商業合作
-                    </a>
-                  </li>
-                </ul>
-                <div class="work-shop-footer-copyright-right">
-                  <span>卡片資料來源 Weiβ Schwarz.</span>
-                  <span>Copyright @ 2023 BottleNeko</span>
-                </div>
-              </div>
-            </div>
-          </footer>
+          <MainFooter />
         </div>
       </main>
     </div>

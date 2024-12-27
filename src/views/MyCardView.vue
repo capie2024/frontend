@@ -2,6 +2,12 @@
   <div class="work-shop-page-container">
     <SidebarGrid />
     <div class="work-shop-main-content-container">
+      <div v-if="firstVisible">
+        <RemitCard v-if="firstVisible" />
+      </div>
+      <div v-if="secondVisible">
+        <FindCard v-if="secondVisible" />
+      </div>
       <header class="work-shop-header">
         <div class="header-container Top-bar">
           <div class="input-svg-container">
@@ -79,26 +85,7 @@
           </div>
           <div class="w-full login">
             <div class="notice">
-              <input type="checkbox" id="notice-jump" />
-              <label for="notice-jump" class="notice-jump">
-                <svg
-                  class="notice-icon"
-                  data-v-3e737e76=""
-                  xmlns="http://www.w3.org/2000/svg"
-                  stroke="white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                  data-slot="icon"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                  ></path>
-                </svg>
-              </label>
+              <Notice />
               <p class="notice-txt">通知</p>
             </div>
             <button
@@ -106,41 +93,7 @@
               data-bs-toggle="modal"
               data-bs-target="#login"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                stroke="white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                aria-higit
-                dden="true"
-                data-slot="icon"
-                class="m-1 text-zinc-200"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                ></path>
-              </svg>
-              <p>登入</p>
-              <svg
-                data-v-3e737e76=""
-                xmlns="http://www.w3.org/2000/svg"
-                stroke="white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                aria-hidden="true"
-                data-slot="icon"
-                class="flex-none w-4 h-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
+              <NavLoginBtn />
             </button>
           </div>
         </div>
@@ -198,7 +151,12 @@
         <div class="work-shop-title">
           <h2>實用工具</h2>
           <section class="show-container">
-            <a href="#" class="button a-button" type="button" id="#looking">
+            <button
+              class="button a-button"
+              type="button"
+              id="#looking"
+              @click="toggleFindCard"
+            >
               <div
                 class="shadow out-div"
                 style="
@@ -216,7 +174,6 @@
                       aria-hidden="true"
                       data-slot="icon"
                       class="flex-none size-6 md:size-8"
-                      data-v-f025b9fc=""
                     >
                       <path
                         stroke-linecap="round"
@@ -229,10 +186,10 @@
                   </p>
                 </div>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="#"
+            <button
+              @click="toggleRemitCard"
               class="button a-button"
               type="button"
               data-bs-toggle="modal"
@@ -263,11 +220,11 @@
                            7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
                       ></path>
                     </svg>
-                    <span data-v-f025b9fc="">匯出牌組</span>
+                    <span>匯出牌組</span>
                   </p>
                 </div>
               </div>
-            </a>
+            </button>
           </section>
         </div>
         <div class="work-shop-title">
@@ -278,7 +235,7 @@
         <section class="show-card grid-card">
           <a
             v-for="cardDeck in cardDecks"
-            href="#"
+            :href="`deck/${cardDeck.deck_id}`"
             class="hover:bg-[rgb(39,39,42)] url gap15 transition-colors"
           >
             <div class="img-btn">
@@ -291,11 +248,9 @@
                 alt=""
               />
               <button
-                data-v-6e6279af=""
                 class="bottom-0 right-0 p-1 m-1 text-white rounded-full bg-zinc-800"
               >
                 <svg
-                  data-v-6e6279af=""
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -317,7 +272,6 @@
             <div class="card-text">
               <div class="flex">
                 <svg
-                  data-v-09f2b439=""
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
@@ -352,9 +306,21 @@ import MainFooter from '@/components/MainFooter.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import { onMounted, ref, computed } from 'vue'
 import axios from 'axios'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import Notice from '../components/notification/notice.vue'
+import RemitCard from '../components/Mycard/remit-card.vue'
+import FindCard from '../components/Mycard/find-card.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 
+const firstVisible = ref(false)
+const secondVisible = ref(false)
+const toggleRemitCard = () => {
+  firstVisible.value = !firstVisible.value
+}
+const toggleFindCard = () => {
+  secondVisible.value = !secondVisible.value
+}
 // 日期晚>早排序
 const dateSort = (a, b) => {
   const dateA = a.build_time ? new Date(a.build_time) : null
@@ -938,7 +904,6 @@ onMounted(() => {
   margin-top: 10px;
   line-height: 20px;
 }
-
 
 .login {
   display: flex-end;
@@ -1567,6 +1532,11 @@ onMounted(() => {
   .url img {
     border-radius: 10%;
     width: 100%;
+  }
+}
+@media (width < 375px) {
+  .login-btn {
+    display: none;
   }
 }
 </style>

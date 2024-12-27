@@ -1534,5 +1534,10 @@ onMounted(() => {
     width: 100%;
   }
 }
+@media (width < 375px) {
+  .login-btn {
+    display: none;
+  }
+}
 </style>
 <style src="../assets/css/work-shop/work-shop-rwd.css" scoped></style>

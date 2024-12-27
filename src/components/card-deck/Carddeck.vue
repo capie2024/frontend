@@ -1376,7 +1376,6 @@ export default {
         top: 0;
         --tw-ring-opacity: 0.05;
         overflow-y: auto;
-        /* z-index: 10 !important; */
         min-width: 100% ;
         padding: .2rem;
     }
@@ -1779,11 +1778,7 @@ export default {
     }
 
     .user-btn {
-        /* width: 92px; */
-        /* height: 32px; */
         border: none;
-        /* background-color:#ea6d2d; */
-        /* opacity: 0.6; */
         display: flex;
         justify-content: center;
         align-items: center;

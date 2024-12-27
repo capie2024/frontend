@@ -3,6 +3,8 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import MainFooter from '@/components/MainFooter.vue'
+import notice from '../components/notification/notice.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import Editor from '@tinymce/tinymce-vue';
 
@@ -156,8 +158,7 @@ onMounted(() => {
 <template>
   <SidebarGrid style="grid-area: sidebar" />
   <main>
-    <div class="header-bg">
-      <header>
+    <header>
         <div class="pagebtn-area">
           <button class="page-btn">
             <svg
@@ -235,29 +236,10 @@ onMounted(() => {
               ></path>
             </svg>
           </button>
-          <button class="bell">
-            <svg
-              data-v-3e737e76=""
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="size-6 stroke-2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-              ></path>
-            </svg>
-            <div class="notice">通知</div>
-          </button>
+          <notice />
           <button class="user-btn">
             <div class="btn-img">
-              <img src="/src/img/麻衣.png" alt="" />
+              <img src="/src/img/avatar.png" alt="" />
             </div>
             <span>XXXX</span>
             <svg
@@ -279,8 +261,7 @@ onMounted(() => {
             </svg>
           </button>
         </div>
-      </header>
-    </div>
+    </header>
     <section class="title-area">
       <div class="title-area-container">
         <button class="upload-btn" @click="handleButtonClick">
@@ -470,7 +451,7 @@ onMounted(() => {
       <div class="message-area">
         <div class="user-message">
           <div class="message-user-img">
-            <img src="/src/img/麻衣.png" alt="" />
+            <img src="/src/img/avatar.png" alt="" />
           </div>
           <div class="message">
             <svg
@@ -512,7 +493,9 @@ onMounted(() => {
         <span class="message-count">0則留言</span>
       </div>
     </section>
-    <footer>123</footer>
+    <footer>
+      <MainFooter />
+    </footer>
 
     <div class="deck-container">
       <div class="deck-img">
@@ -842,32 +825,6 @@ a {
   font-weight: 900;
 }
 
-.bell {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background-color: rgba(0, 0, 0, 0);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.bell:hover {
-  background-color: #2d7894;
-}
-
-.bell:hover .notice {
-  opacity: 1;
-  visibility: visible;
-}
-
-.bell svg {
-  width: 24px;
-  height: 24px;
-  stroke: white;
-}
 
 .user-btn {
   border: none;
@@ -901,29 +858,27 @@ a {
 }
 
 main {
-  margin-left: 270px;
+  overflow: hidden;
+  margin: 0.5rem;
+  margin-left:270px;
   width: calc(100% - 278px);
+  height:calc(100vh - 16px);
+  border-radius: 20px;
   background-color: #32c9ff;
   scroll-behavior: smooth;
-}
-
-.header-bg {
-  background-color: #000000;
-  width: calc(100% - 278px);
-  height: 72px;
-  position: fixed;
-  top: 0;
-  z-index: 4;
+  overflow-y: scroll;
+  scrollbar-width: none;  
 }
 
 header {
   background-color: #32c9ff;
   border-radius: 20px 20px 0 0;
-  width: 100%;
-  position: absolute;
-  top: 8px;
+  width: calc(100% - 278px);
   height: 64px;
   display: flex;
+  position: fixed;
+  top: 8px;
+  z-index: 4;
   align-items: center;
 }
 
@@ -1136,7 +1091,7 @@ header {
   box-sizing: border-box;
   height: 520px;
   display: flex;
-  background: linear-gradient(to bottom, #20637a, #131617);
+  background: linear-gradient(to bottom, rgb(32, 99, 122) 100px, rgb(19, 22, 23) 450px);
 }
 
 .edit-area {
@@ -1276,10 +1231,12 @@ header {
 }
 
 footer {
-  background-color: #222f3e;
+  background: linear-gradient(to bottom, rgb(19, 22, 23)  100px, rgb(32, 99, 122)300px);
   width: 100%;
-  height: 401px;
-  color: white;
+}
+
+.main-footer {
+  background: linear-gradient(to bottom, rgb(19, 22, 23) , #121212);
 }
 
 .footer-nav {
@@ -1472,23 +1429,17 @@ footer {
     width: 100%;
   }
 
-  .header-bg {
-    background-color: #000000;
-    width: 100%;
-    height: 64px;
-  }
 
   header {
     border-radius: 0;
     width: 100%;
-    position: static;
+    top: 0;
   }
 
   .next-btn {
     display: none;
   }
 
-  .bell,
   .user-btn {
     display: none;
   }
@@ -1558,8 +1509,13 @@ footer {
     width: 97%;
   }
 
+  .cannot-change {
+    width: calc(100% - 16px);
+  }
+
   .cannot-change p {
     font-size: 20px;
+    width: calc(100% - 16px);
   }
 
   .text-area {

@@ -13,7 +13,7 @@
 
 ## 取得專案
 
-git clone https://github.com/bottleneko2-0/frontend
+git clone https://github.com/capie2024/frontend
 
 ## 移動到專案內
 

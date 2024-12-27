@@ -6,48 +6,44 @@ import Swal from 'sweetalert2';
 import MainFooter from '@/components/MainFooter.vue'
 import notice from '../components/notification/notice.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
-import Editor from '@tinymce/tinymce-vue';
+import Editor from '@tinymce/tinymce-vue'
 
-const router = useRouter();
-const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY;
+const router = useRouter()
+const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY
 
-const token = ref(localStorage.getItem('token'));
-const title = ref('');
-const content = ref('');
-const imageUrl = ref(null);
-const uploadedImage = ref(null);
-const deckId = ref(null);
-const decks = ref([]);
-const filteredDecks = ref([]);
-const menuExpanded = ref(false);
-const menuHeight = ref(0);
-const searchQuery = ref('');
-const seriesName = ref('選擇牌組');
+const token = ref(localStorage.getItem('token'))
+const title = ref('')
+const content = ref('')
+const imageUrl = ref(null)
+const uploadedImage = ref(null)
+const deckId = ref(null)
+const decks = ref([])
+const filteredDecks = ref([])
+const menuExpanded = ref(false)
+const menuHeight = ref(0)
+const searchQuery = ref('')
+const seriesName = ref('選擇牌組')
 
 const submitArticle = async () => {
   try {
-    const formData = new FormData();
-    formData.append('title', title.value);
-    formData.append('content', content.value);
-    formData.append('deck_id', parseInt(deckId.value, 10));
+    const formData = new FormData()
+    formData.append('title', title.value)
+    formData.append('content', content.value)
+    formData.append('deck_id', parseInt(deckId.value, 10))
 
     if (uploadedImage.value) {
-      formData.append('picture', uploadedImage.value);
+      formData.append('picture', uploadedImage.value)
     } else if (imageUrl.value) {
-      formData.append('post_picture', imageUrl.value);
+      formData.append('post_picture', imageUrl.value)
     }
-    const API_URL = import.meta.env.VITE_API_URL;
-    const response = await axios.post(
-      `${API_URL}/api/articles`,
-      formData,
-      {
-        headers: {
-          'Authorization': `Bearer ${token.value}`,
-        },
-      }
-    );
+    const API_URL = import.meta.env.VITE_API_URL
+    const response = await axios.post(`${API_URL}/api/articles`, formData, {
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    })
 
-    const postCode = response.data.post_code;
+    const postCode = response.data.post_code
 
     Swal.fire({
       icon: 'success',
@@ -55,104 +51,102 @@ const submitArticle = async () => {
       showConfirmButton: false,
       timer: 1000,
     }).then(() => {
-      router.push(`/social/${postCode}`);
-    });
+      router.push(`/social/${postCode}`)
+    })
   } catch (error) {
     if (error.response && error.response.status === 403) {
-      const BASE_URL = import.meta.env.VITE_BASE_URL;
+      const BASE_URL = import.meta.env.VITE_BASE_URL
       Swal.fire({
         title: '請先登入',
         text: '登入後才能發布文章',
         icon: 'warning',
         confirmButtonText: '確定',
       }).then(() => {
-        window.location.href = `${BASE_URL}/login`;
-      });
+        window.location.href = `${BASE_URL}/login`
+      })
     } else {
       Swal.fire({
         icon: 'error',
         title: '新增文章失敗',
         text: error.message,
-      });
+      })
     }
   }
-};
+}
 
 const handleButtonClick = (event) => {
   if (imageUrl.value) {
-    imageUrl.value = null;
-    uploadedImage.value = null;
-    event.target.value = ''; // 重置 input 的值
-    event.preventDefault(); 
+    imageUrl.value = null
+    uploadedImage.value = null
+    event.target.value = '' // 重置 input 的值
+    event.preventDefault()
   }
-};
+}
 
 const handleFileUpload = (event) => {
-  const file = event.target.files[0];
+  const file = event.target.files[0]
   if (file) {
-    uploadedImage.value = file;
-    const reader = new FileReader();
+    uploadedImage.value = file
+    const reader = new FileReader()
     reader.onload = (e) => {
-      imageUrl.value = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      imageUrl.value = e.target.result
+    }
+    reader.readAsDataURL(file)
   }
-};
+}
 
 const getUserDecks = async () => {
-  if (!token.value) return;
-  const API_URL = import.meta.env.VITE_API_URL;
+  if (!token.value) return
+  const API_URL = import.meta.env.VITE_API_URL
   try {
-    const res = await axios.get(`${ API_URL }/decks`, {
+    const res = await axios.get(`${API_URL}/decks`, {
       headers: { Authorization: `Bearer ${token.value}` },
-    });
-    decks.value = res.data.decks;
-    filteredDecks.value = res.data.decks;
+    })
+    decks.value = res.data.decks
+    filteredDecks.value = res.data.decks
   } catch (error) {
-    console.error('獲取牌組資料失敗', error);
+    console.error('獲取牌組資料失敗', error)
   }
-};
+}
 
 const selectDeck = (deck) => {
-  title.value = deck.deck_name;
-  seriesName.value = deck.deck_name;
-  imageUrl.value = deck.deck_cover;
-  deckId.value = deck.id;
-  menuExpanded.value = false;
-};
+  title.value = deck.deck_name
+  seriesName.value = deck.deck_name
+  imageUrl.value = deck.deck_cover
+  deckId.value = deck.id
+  menuExpanded.value = false
+}
 
 const toggleMenu = () => {
-  menuExpanded.value = !menuExpanded.value;
-  if (menuExpanded.value)  calculateMenuHeight();
-};
+  menuExpanded.value = !menuExpanded.value
+  if (menuExpanded.value) calculateMenuHeight()
+}
 
 const calculateMenuHeight = () => {
-  menuHeight.value = 45 + filteredDecks.value.length * 35;
-};
+  menuHeight.value = 45 + filteredDecks.value.length * 35
+}
 
 const searchSeries = () => {
   if (!searchQuery.value.trim()) {
-    filteredDecks.value = decks.value;
+    filteredDecks.value = decks.value
   } else {
-    const query = searchQuery.value.toLowerCase();
-    filteredDecks.value = decks.value.filter(deck =>
+    const query = searchQuery.value.toLowerCase()
+    filteredDecks.value = decks.value.filter((deck) =>
       deck.deck_name?.toLowerCase().includes(query)
-    );
+    )
   }
-  calculateMenuHeight();
-};
+  calculateMenuHeight()
+}
 
 const clearSearch = () => {
-  searchQuery.value = '';
-  filteredDecks.value = decks.value;
-  calculateMenuHeight();
-};
-
+  searchQuery.value = ''
+  filteredDecks.value = decks.value
+  calculateMenuHeight()
+}
 
 onMounted(() => {
-  getUserDecks();
-});
-
+  getUserDecks()
+})
 </script>
 
 <template>
@@ -162,7 +156,6 @@ onMounted(() => {
         <div class="pagebtn-area">
           <button class="page-btn">
             <svg
-              data-v-3e737e76=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -181,7 +174,6 @@ onMounted(() => {
           </button>
           <button class="page-btn next-btn">
             <svg
-              data-v-3e737e76=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -243,7 +235,6 @@ onMounted(() => {
             </div>
             <span>XXXX</span>
             <svg
-              data-v-3e737e76=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -267,7 +258,6 @@ onMounted(() => {
         <button class="upload-btn" @click="handleButtonClick">
           <svg
             v-if="!imageUrl"
-            data-v-b086c574=""
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -316,7 +306,6 @@ onMounted(() => {
         <div class="add-section">
           <div class="add-article">
             <svg
-              data-v-b086c574=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -343,7 +332,6 @@ onMounted(() => {
           <div class="card-select-area">
             <button class="card-select-btn" @click="toggleMenu">
               <svg
-                data-v-b086c574=""
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -385,7 +373,6 @@ onMounted(() => {
                 @click="selectDeck(deck)"
               >
                 <svg
-                  data-v-b086c574=""
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -424,7 +411,6 @@ onMounted(() => {
             aria-hidden="true"
             data-slot="icon"
             class="text-white/50 size-8"
-            data-v-b086c574=""
           >
             <path
               stroke-linecap="round"
@@ -493,9 +479,7 @@ onMounted(() => {
         <span class="message-count">0則留言</span>
       </div>
     </section>
-    <footer>
-      <MainFooter />
-    </footer>
+    <MainFooter />
 
     <div class="deck-container">
       <div class="deck-img">
@@ -515,7 +499,6 @@ onMounted(() => {
             <svg
               width="24px"
               height="24px"
-              data-v-c2dbc95b=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"

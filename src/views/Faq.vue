@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import axios from 'axios'
 import SidebarGrid from '@/components/SidebarGrid.vue'
 import router from '../router'
@@ -8,13 +8,21 @@ import NavLoginBtn from '../components/NavLoginBtn.vue'
 import MainFooter from '../components/MainFooter.vue'
 
 const qaList = ref([])
-const relations = ref([])
+const sortOrder = ref('desc')
+const searchQuery = ref('')
+const filteredData = ref([])
 const API_URL = import.meta.env.VITE_API_URL
 
 const getQAList = async () => {
   try {
     const { data } = await axios.get(`${API_URL}/qa`)
-    qaList.value.push(...data)
+    // qaList.value.push(...data)
+    // 收集所有處理過的 relations 結果，只顯示共同的部分
+    qaList.value = data.map((qa) => ({
+      ...qa,
+      processedRelation: qa.relations ? findSeries(qa.relations) : ''
+    }))
+    console.log(qaList.value); // 檢查處理後的數據
   } catch (error) {
     console.error(error)
   }
@@ -73,12 +81,10 @@ const findSeries = (arr) => {
   return baseSegment
 }
 
-qaList.value.forEach(({ relations }) => relations)
-
 // 將共同的部分存在 commonLabel
-const commonLabel = computed(() => {
-  return findSeries(relations)
-})
+// const commonLabel = computed(() => {
+//   return findSeries(relations)
+// })
 
 const goBack = () => {
   router.go(-1)
@@ -88,8 +94,61 @@ const goAhead = () => {
   router.go(+1)
 }
 
+// 排序
+const toggleSort = () => {
+  sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc'
+}
+
+const sortedData = computed(() => {
+  return [...qaList.value].sort((a, b) => {
+    if (sortOrder.value === 'desc') {
+      return b.id - a.id
+    } else {
+      return a.id - b.id
+    }
+  })
+})
+
+// 搜尋
+const search = () => {
+  if (!searchQuery.value.trim()) {
+    filteredData.value = sortedData.value
+  } else {
+    const query = searchQuery.value.toLowerCase()
+    console.log('搜尋關鍵字:', query)
+    filteredData.value = sortedData.value.filter((qa) => {
+      const q = qa.q?.toLowerCase() || ''
+      const a = qa.a?.toLowerCase() || ''
+      // 檢查 relations 陣列中的每個元素
+      const hasMatchingRelation = qa.relations?.some(relationPath => {
+        // 檢查完整的 relation 路徑
+        return relationPath.toLowerCase().includes(query)
+      }) || false
+
+      // 檢查共同標籤
+      const commonLabelMatch = findSeries(qa.relations)?.toLowerCase().includes(query)
+      console.log('檢查項目:', {
+        relations: qa.relations,
+        commonLabel: findSeries(qa.relations),
+        hasMatchingRelation: qa.relations?.some(r => r.toLowerCase().includes(query))
+      })
+      return q.includes(query) || a.includes(query) || hasMatchingRelation || commonLabelMatch
+    })
+  }
+}
+
+const clearSearch= () => {
+  searchQuery.value = ''
+  filteredData.value = sortedData.value
+}
+
+watch(searchQuery, () => {
+  search()
+})
+
 onMounted(async () => {
   await getQAList()
+  search()
 })
 </script>
 
@@ -165,8 +224,9 @@ onMounted(async () => {
               type="text"
               class="w-full min-w-0 p-0 text-sm bg-transparent border-none focus:ring-0 placeholder:text-zinc-500 placeholder:font-light"
               placeholder="想問什麼？"
+              v-model="searchQuery" @keyup="search"
             />
-            <svg
+            <svg @click="clearSearch"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -184,9 +244,11 @@ onMounted(async () => {
             </svg>
           </div>
           <button
+            @click="toggleSort"
             class="flex items-center flex-none gap-1 p-2 font-bold bg-white rounded-full shadow text-zinc-700 shadow-zinc-900/50"
           >
-            <svg
+          <svg
+              v-if="sortOrder === 'desc'"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -200,6 +262,23 @@ onMounted(async () => {
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25"
+              ></path>
+            </svg>
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-5 text-zinc-700 default-transition"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12"
               ></path>
             </svg>
           </button>
@@ -225,7 +304,7 @@ onMounted(async () => {
         <section class="grid grid-cols-1 gap-4 p-6 md:grid-cols-4">
           <div
             class="flex flex-col cursor-pointer group"
-            v-for="qa in qaList"
+            v-for="qa in filteredData"
             :key="qa.id"
           >
             <div
@@ -280,10 +359,10 @@ onMounted(async () => {
                     d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
                   ></path>
                 </svg>
-                關聯 {{ qa.relations.length }} 張<span v-if="commonLabel"
+                關聯 {{ qa.relations.length }} 張<span v-if="qa.relations.length != 0"
                   >，包含
                   <span class="px-1 text-white rounded-lg bg-cyan-500">{{
-                    commonLabel
+                    qa.processedRelation
                   }}</span></span
                 >
               </p>

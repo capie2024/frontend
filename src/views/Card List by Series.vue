@@ -1,11 +1,11 @@
 <script setup>
-import SidebarGrid from '../components/SidebarGrid.vue';
-import NavLoginBtn from '../components/NavLoginBtn.vue';
-import notice from '../components/notification/notice.vue';
-import MainFooter from '../components/MainFooter.vue';
-import { useCardSeriesStore } from "@/stores/card-series";
-import { ref, computed, onMounted } from 'vue';
-import axios from "axios";
+import SidebarGrid from '../components/SidebarGrid.vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import notice from '../components/notification/notice.vue'
+import MainFooter from '../components/MainFooter.vue'
+import { useCardSeriesStore } from '@/stores/card-series'
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 import { useRouter } from 'vue-router'
 const API_URL = import.meta.env.VITE_API_URL
 

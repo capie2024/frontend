@@ -559,7 +559,8 @@ onBeforeUnmount(() => {
                   >
                 </h2>
                 <section class="show-card scrollbar-y">
-                  <a :href="'/deck/' + deck.deck_id"
+                  <a
+                    :href="'/deck/' + deck.deck_id"
                     v-if="decks"
                     v-for="deck in decks"
                     :key="deck.deck_id"
@@ -659,7 +660,8 @@ onBeforeUnmount(() => {
                   >
                 </h2>
                 <section class="show-card">
-                  <a :href="'/social/' + post.post_code"
+                  <a
+                    :href="'/social/' + post.post_code"
                     v-if="posts"
                     v-for="post in posts"
                     :key="post.post_code"

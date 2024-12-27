@@ -1,8 +1,12 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import SideBar from '@/components/SidebarGrid.vue';
 import Notice from '@/components/notification/notice.vue';
 import Footer from '@/components/MainFooter.vue';
 import Login from '@/components/NavLoginBtn.vue';
+
+const router = useRouter()
+const BASE_URL = import.meta.env.VITE_BASE_URL
 
 const handleBack = () => {
   if (window.history.length > 1) {
@@ -56,7 +60,9 @@ const handleBack = () => {
                     <p class="mt-2 text-center">無論您有任何問題、意見與建議，歡迎透過以下方式與我聯絡！</p>
                 </div>
                 <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <a class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-[#0866ff50] to-zinc-700 hover:shadow-lg hover:shadow-zinc-700/50" href="" target="_blank">
+                    <a class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-[#0866ff50] to-zinc-700 hover:shadow-lg hover:shadow-zinc-700/50" 
+                    :href="`${BASE_URL}/team`"                    
+                    target="_blank">
                         <div class="capie-img">
                             <img src="../img/capie-user.png">
                         </div>

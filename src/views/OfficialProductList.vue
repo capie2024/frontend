@@ -1,3 +1,25 @@
+<script setup>
+import SidebarGrid from '../components/SidebarGrid.vue';
+import NavLoginBtn from '../components/NavLoginBtn.vue';
+import Notice from '../components/notification/notice.vue';
+import MainFooter from '../components/MainFooter.vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+// 定義資料變數，將 product 改為 products 陣列
+const products = ref([])
+
+// 當組件掛載時請求資料
+onMounted(async () => {
+try {
+  const response = await axios.get('/api/product') // 更新 API URL
+  products.value = response.data // 設置資料
+} catch (err) {
+  console.error('獲取產品資料失敗:', err.message)
+}
+})
+</script>
+
 <template>
   <div class="All">
       <SidebarGrid/>
@@ -14,7 +36,7 @@
                   <h2>官方商品列表</h2>
               </div>
               <div class="icons">
-                <notice/>
+                <Notice/>
                 <NavLoginBtn/>
               </div>
           </div>
@@ -46,27 +68,6 @@
     </div>
 </template>
 
-<script setup>
-import SidebarGrid from '../components/SidebarGrid.vue';
-import NavLoginBtn from '../components/NavLoginBtn.vue';
-import notice from '../components/notification/notice.vue';
-import MainFooter from '../components/MainFooter.vue';
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
-
-// 定義資料變數，將 product 改為 products 陣列
-const products = ref([])
-
-// 當組件掛載時請求資料
-onMounted(async () => {
-try {
-  const response = await axios.get('/api/product') // 更新 API URL
-  products.value = response.data // 設置資料
-} catch (err) {
-  console.error('獲取產品資料失敗:', err.message)
-}
-})
-</script>
 <style scoped>
 .All {
 display: flex;

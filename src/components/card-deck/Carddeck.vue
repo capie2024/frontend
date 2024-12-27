@@ -64,10 +64,9 @@ export default {
       };
     },
     mounted() {
-        this.fetchArticleId();
+        this.fetchArticles();
         this.fetchCurrentUser();
         this.fetchDeck();
-        this.fetchDeckData()
     },
 
     async created() {
@@ -148,15 +147,15 @@ export default {
             }));        
         },    
         totalPrice() {
-            if (!Array.isArray(this.deckData.deck)) {
+            if (!Array.isArray(this.cards)) {
                 return 0;
             }
-            return this.deckData.deck.reduce((sum, card) => {
+            return this.cards.reduce((sum, card) => {
                 return sum + (card.price?.number || 0); 
             }, 0);
         },
         uniqueProductNames() {
-            const productNames = this.deckData.deck.map(card => card.productName);
+            const productNames = this.cards.map(card => card.productName);
             return [...new Set(productNames)];
         },
     },
@@ -192,7 +191,7 @@ export default {
                 this.cards = deckList.deck;  
                 this.deckId = deckList.deck_id;
 
-                await this.fetchDeckData(); 
+                // await this.fetchDeckData(); 
             } catch (error) {
                 console.error('Failed to fetch specific deck:', error);
             }
@@ -218,18 +217,17 @@ export default {
                 console.error('Failed to fetch current user:', error);
             }
         },
-        async fetchArticleId() {
+
+        async fetchArticles() {
             const postCode = this.$route.params.post_code;  
             if (!postCode) {
                 console.error("Error: postCode is not available in route params");
                 return;
             }
             try {
-                // 根據 post_code 查詢對應的 article_id
                 const response = await axios.get(`${API_URL}/api/article-id/${postCode}`);
-                this.articleId = response.data.article_id;  // 從後端獲取 article_id
-
-                // 確保在獲取 articleId 後再獲取其他資料
+                this.articleId = response.data.article_id;
+                console.log(this.articleId)
                 await this.fetchMessages();  
             } catch (error) {
                 console.error("Error fetching article_id:", error);
@@ -294,7 +292,7 @@ export default {
                 }
                 try {
 
-                    const response = await axios.post('$API_URL/api/send-message', {newMessage},{
+                    const response = await axios.post(`${API_URL}/api/send-message`, {newMessage},{
                         headers:{
                             Authorization: `Bearer ${userToken}`,
                         },
@@ -460,24 +458,6 @@ export default {
             }
             return date.split('T')[0];
         },
-        async fetchDeckData() {
-            try {
-                const response = await axios.get(`${API_URL}/api/deck-page/${this.deckId}`);
-                this.deckData = response.data;
-                if (!this.deckData || !this.deckData.users || !this.deckData.users.username || !this.deckData.deck) {
-                    console.error('回傳資料格式錯誤:', this.deckData);
-                    Swal.fire('錯誤', '無法獲取有效的資料', 'error');
-                    return; 
-                }
-
-
-                if (!Array.isArray(this.deckData.deck)) {
-                    this.deckData.deck = [];
-                }
-            } catch (error) {
-                console.error('無法獲取資料:', error);
-            }
-        },
 
         isMyArticle(article) {
             return article.user_id === this.loggedInUserId;
@@ -531,10 +511,10 @@ export default {
             });
         },
         async copyDeck(){
-            this.deckMakeStore.selectedCards = this.deckData.deck
+            this.deckMakeStore.selectedCards = this.cards
             this.deckMakeStore.saveLastDeckEdit();
-            const cardCode = this.deckData.deck[0].seriesCode
-            
+            const cardCode = this.cards[0].seriesCode
+            // console.log(this.deckData.deck)
             let seriesId = ''
             try {
                 const response = await axios.get(`${API_URL}/api/series`)
@@ -562,7 +542,7 @@ export default {
             <div  v-if="isVisible">
             <RemitCard  v-if="isVisible"/>
             </div>
-                <div class="bg-black">
+                <div v-if="article" class="bg-black">
                     <header>
                         <div class="pagebtn-area">
                             <button class="page-btn">
@@ -605,7 +585,7 @@ export default {
                         </div>
                     </header>
                 </div>
-                <section class="carddeck-information">
+                <section v-if="article" class="carddeck-information">
                     <div class="information-container">
                         <div class="carddeck-img">
                             <img 
@@ -629,14 +609,14 @@ export default {
                                 </div>
                                 <span class="data-item">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none" ><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>&nbsp;
-                                    總數{{deckData.deck.length}}張
+                                    總數{{cards.length}}張
                                 </span>
                                 <span class="data-item">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none" ><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"></path></svg>&nbsp;
                                     總價
                                     <span>{{ totalPrice }}円</span>
                                 </span>
-                                <span class="data-item" v-if="deckData.deck && deckData.deck.length > 0">
+                                <span class="data-item" v-if="cards && cards.length > 0">
                                     <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5 md:size-6 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"></path></svg>&nbsp;
                                     系列包含
                                     <a v-for="(product, index) in uniqueProductNames" :key="index" href="#">{{ product }}</a>
@@ -645,7 +625,7 @@ export default {
                         </div>
                     </div>
                 </section>
-                <section class="main-container">
+                <section v-if="article" class="main-container">
                     <div class="main-container-bg"></div>
                     <div class="article-area">
                         <div class="text-container">

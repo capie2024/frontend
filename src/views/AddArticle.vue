@@ -499,44 +499,6 @@ onMounted(() => {
     </section>
     <footer>123</footer>
 
-    <div class="deck-container">
-      <div class="deck-img">
-        <img src="/src/img/麻衣.png" alt="" />
-      </div>
-      <div class="deck-content">
-        <div class="line"></div>
-        <div class="total-cards">
-          <h2>刪除 DG/S02-027R</h2>
-          <span>牌組製作，共84張卡</span>
-        </div>
-        <div class="deckbtn-area">
-          <button class="deck-btn">
-            <i class="fa-regular fa-circle-up"></i>
-          </button>
-          <div class="pay-btn">
-            <svg
-              width="24px"
-              height="24px"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="size-6 flex-none"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-              ></path>
-            </svg>
-            <span>00000 ¥</span>
-          </div>
-        </div>
-      </div>
-    </div>
   </main>
 </template>
 
@@ -1318,129 +1280,7 @@ footer {
   color: white;
 }
 
-.deck-container {
-  width: 99%;
-  padding-right: 8px;
-  height: 56px;
-  position: fixed;
-  bottom: 66px;
-  display: flex;
-  display: none;
-}
 
-.deck-img {
-  overflow: hidden;
-  border-radius: 10px;
-  transform: translateX(8px);
-  z-index: 1;
-}
-
-.deck-img img {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-}
-
-.deck-content {
-  width: 92%;
-  height: 56px;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  padding-left: 8px;
-  border-radius: 0 10px 10px 0;
-  align-items: center;
-  position: relative;
-}
-
-.line {
-  position: absolute;
-  bottom: 52px;
-  width: 96%;
-  border-top: 4px solid;
-  border-image: linear-gradient(
-      to right,
-      rgb(234, 179, 8) 0%,
-      rgb(234, 179, 8) 89.0476%,
-      rgb(34, 197, 94) 94.0476%,
-      rgb(34, 197, 94) 95%
-    )
-    5 / 1 / 0 stretch;
-}
-
-.total-cards {
-  width: 80%;
-  padding-top: 8px;
-  padding-left: 8px;
-}
-
-.total-cards h2 {
-  font-size: 15px;
-  font-weight: 00;
-  color: #fff;
-  margin-bottom: 2px;
-}
-
-.total-cards span {
-  font-size: 13px;
-  color: #dad7d7;
-  font-weight: 700;
-}
-
-.deckbtn-area {
-  display: flex;
-  align-items: center;
-  width: 20%;
-  position: relative;
-  padding-left: 8px;
-}
-
-.deck-btn {
-  all: unset;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  color: #f0f0f0;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  right: 120px;
-  cursor: pointer;
-}
-
-.deck-btn:hover {
-  background-color: #42ebeb;
-}
-
-.deck-btn i::before {
-  font-size: 24px;
-}
-
-.pay-btn {
-  padding-left: 5px;
-  position: absolute;
-  right: 8px;
-  width: 86px;
-  min-width: 94px;
-  height: 32px;
-  background-color: #daa61e;
-  display: flex;
-  align-items: center;
-  color: #dad7d7;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.pay-btn:hover {
-  background-color: #e27637;
-}
-
-.pay-btn span {
-  font-size: 14px;
-  margin-left: 5px;
-}
 
 @media screen and (max-width: 1200px) {
   body {
@@ -1633,8 +1473,5 @@ footer {
     display: flex;
   }
 
-  .deck-container {
-    display: flex;
-  }
 }
 </style>

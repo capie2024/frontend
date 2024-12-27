@@ -1,354 +1,1657 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
-import Swal from 'sweetalert2'
 import SidebarGrid from '../components/SidebarGrid.vue'
-import Editor from '@tinymce/tinymce-vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue';
+import notice from '../components/notification/notice.vue';
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  onBeforeMount,
+  watch,
+  nextTick,
+} from 'vue'
+import router from '../router/index'
+import { storeToRefs } from 'pinia'
+import { useCardSeriesStore } from '@/stores/card-series'
+import { useDeckMakeStore } from '@/stores/deck-make'
+import { useCardInfoStore } from '@/stores/card-info'
+import Swal from 'sweetalert2'
+import { useCardFilterStore } from '@/stores/card-filter'
+import { useRoute } from 'vue-router'
 
-const router = useRouter()
-const Tiny_API_KEY = import.meta.env.VITE_Tiny_API_KEY
+// 引入CardFilterStore並使用
+const cardFilterStore = useCardFilterStore()
+const { applyBtnStatus, keyWordGroup, myFiltersGroup } =
+  storeToRefs(cardFilterStore)
+const filterVaribleSet = cardFilterStore.filterVaribleSet
+const useFilters = cardFilterStore.useFilters
+const changeReplaceKeyWord = cardFilterStore.changeReplaceKeyWord
+const changeFilterStatus = cardFilterStore.changeFilterStatus
+const resetFilter = cardFilterStore.resetFilter
+const changeSortStatus = cardFilterStore.changeSortStatus
+const resetAllFilter = cardFilterStore.resetAllFilter
+const checkHaveFilterOrSort = cardFilterStore.checkHaveFilterOrSort
+const saveKeyWord = cardFilterStore.saveKeyWord
+const countMouseUp = cardFilterStore.countMouseUp
+const deleteKeyWord = cardFilterStore.deleteKeyWord
+const saveMyFilters = cardFilterStore.saveMyFilters
+const deleteMyFilters = cardFilterStore.deleteMyFilters
 
-const token = ref(localStorage.getItem('token'))
-const title = ref('')
-const content = ref('')
-const imageUrl = ref(null)
-const uploadedImage = ref(null)
-const deckId = ref(null)
-const decks = ref([])
-const filteredDecks = ref([])
-const menuExpanded = ref(false)
-const menuHeight = ref(0)
-const searchQuery = ref('')
-const seriesName = ref('選擇牌組')
+// 引入CardSeriesStore並使用
+const cardSeriesStore = useCardSeriesStore()
+const { seriesCardList, seriesInfo, seriesCardListLength } =
+  storeToRefs(cardSeriesStore)
+const getLastViewSeries = cardSeriesStore.getLastViewSeries
+const saveLastViewSeries = cardSeriesStore.saveLastViewSeries
 
-const submitArticle = async () => {
-  try {
-    const formData = new FormData()
-    formData.append('title', title.value)
-    formData.append('content', content.value)
-    formData.append('deck_id', parseInt(deckId.value, 10))
+// 引入DeckMakeStore並使用
+const deckMakeStore = useDeckMakeStore()
+const {
+  selectedCards,
+  countDeck,
+  editType,
+  showCardPrice,
+  sortedDeck,
+  sortedTitle,
+  sortStatus,
+} = storeToRefs(deckMakeStore)
+const addCard = deckMakeStore.addCard
+const clearSelectedCards = deckMakeStore.clearSelectedCards
+const getLastDeckEdit = deckMakeStore.getLastDeckEdit
+const changeTypeToAdd = deckMakeStore.changeTypeToAdd
+const changeTypeToDelete = deckMakeStore.changeTypeToDelete
+const checkTypeAndRunFunction = deckMakeStore.checkTypeAndRunFunction
+const switchSortMode = deckMakeStore.switchSortMode
+const handleSwitchBtnClick = deckMakeStore.handleSwitchBtnClick
+const sendDeckToDatabase = deckMakeStore.sendDeckToDatabase
 
-    if (uploadedImage.value) {
-      formData.append('picture', uploadedImage.value)
-    } else if (imageUrl.value) {
-      formData.append('post_picture', imageUrl.value)
+// 引入CardInfoStore並使用
+const cardInfoStore = useCardInfoStore()
+const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow
+
+// 定義一些狀態
+const sidebarSelectedStatus = ref(true)
+const chooseCoverCard = ref('')
+const deckName = ref('LL牌組')
+const deckDescription = ref('這是測試牌組')
+const settingDeckStatus = ref(false)
+const levelOrder = computed(() => {
+  const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+    return item === 'levelUpSort' || item === 'levelDownSort'
+  })
+  return index + 1
+})
+const colorOrder = computed(() => {
+  const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+    return item === 'colorUpSort' || item === 'colorDownSort'
+  })
+  return index + 1
+})
+const priceOrder = computed(() => {
+  const index = filterVaribleSet.upDownSortArray.findIndex((item) => {
+    return item === 'priceUpSort' || item === 'priceDownSort'
+  })
+  return index + 1
+})
+const replaceWord = computed(() => {
+  return filterVaribleSet.replaceKeyWord ? 'OR' : 'AND'
+})
+
+// 清除牌組並回到第一步編輯牌組的狀態
+const clearDeckAndBacktoFirstStep = async () => {
+  const res = await Swal.fire({
+    icon: 'question',
+    title: '清除牌組',
+    text: '確定要清除牌組嗎?',
+    confirmButtonText: '確定',
+    showCancelButton: true,
+    cancelButtonText: '取消',
+  })
+  if (res.isConfirmed) {
+    clearSelectedCards()
+    settingDeckStatus.value = false
+    sidebarSelectedStatus.value = true
+  }
+}
+
+// 新增刪除完牌組後前往下一步
+const nextStep = () => {
+  sidebarSelectedStatus.value = false
+  settingDeckStatus.value = true
+}
+
+// 結束編輯牌組，新增牌組到牌組資料庫，跳轉至新製作的牌組頁面
+const finalStep = async () => {
+  const coverCard = selectedCards.value.find((card) => {
+    return card.id == chooseCoverCard.value
+  })
+
+  if (
+    deckName.value.trim() != '' &&
+    deckDescription.value.trim() != '' &&
+    chooseCoverCard.value.trim() != ''
+  ) {
+    const deckData = {
+      deckName: deckName.value,
+      deckDescription: deckDescription.value,
+      deck: selectedCards.value,
+      deckCover: coverCard.cover,
     }
-    const API_URL = import.meta.env.VITE_API_URL
-    const response = await axios.post(`${API_URL}/api/articles`, formData, {
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
-    })
+    const res = await sendDeckToDatabase(deckData)
 
-    const postCode = response.data.post_code
-
-    Swal.fire({
-      icon: 'success',
-      title: '成功',
-      showConfirmButton: false,
-      timer: 1000,
-    }).then(() => {
-      router.push(`/social/${postCode}`)
-    })
-  } catch (error) {
-    if (error.response && error.response.status === 403) {
-      const BASE_URL = import.meta.env.VITE_BASE_URL
-      Swal.fire({
-        title: '請先登入',
-        text: '登入後才能發布文章',
-        icon: 'warning',
-        confirmButtonText: '確定',
-      }).then(() => {
-        window.location.href = `${BASE_URL}/login`
+    if (res == undefined) {
+      await Swal.fire({
+        icon: 'error',
+        title: '錯誤',
+        text: '請重新登入',
       })
+      router.push('/login')
+    }
+
+    if (res.status == 200) {
+      settingDeckStatus.value = false
+      sidebarSelectedStatus.value = true
+      deckName.value = ''
+      deckDescription.value = ''
+      chooseCoverCard.value = ''
+      clearSelectedCards()
+      await Swal.fire({
+        icon: 'success',
+        title: '成功',
+        text: '成功創建牌組',
+      })
+      router.push(`/deck/${res.data.data.deck_id}`)
+    } else if (res.status == 403) {
+      await Swal.fire({
+        icon: 'error',
+        title: '錯誤',
+        text: '請重新登入',
+      })
+      router.push('/login')
     } else {
       Swal.fire({
         icon: 'error',
-        title: '新增文章失敗',
-        text: error.message,
+        title: '錯誤',
+        text: '創建牌組失敗',
+      })
+    }
+  } else {
+    if (deckName.value.trim() == '') {
+      Swal.fire({
+        icon: 'error',
+        title: '錯誤',
+        text: '需填寫牌組名',
+      })
+    } else if (deckDescription.value.trim() == '') {
+      Swal.fire({
+        icon: 'error',
+        title: '錯誤',
+        text: '需填寫牌組描述',
+      })
+    } else if (chooseCoverCard.value.trim() == '') {
+      Swal.fire({
+        icon: 'error',
+        title: '錯誤',
+        text: '未選擇封面卡',
       })
     }
   }
 }
 
-const handleButtonClick = (event) => {
-  if (imageUrl.value) {
-    imageUrl.value = null
-    uploadedImage.value = null
-    event.target.value = '' // 重置 input 的值
-    event.preventDefault()
+// 篩選、排序數量
+const filterCount = ref(0)
+const sortCount = ref(0)
+
+// 關鍵字篩選的狀態
+const handleKeyWord = () => {
+  if (filterVaribleSet.keyWord.trim() != '') {
+    applyBtnStatus.value = true
+  } else if (filterVaribleSet.keyWord.trim() == '') {
+    checkHaveFilterOrSort()
   }
 }
 
-const handleFileUpload = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    uploadedImage.value = file
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      imageUrl.value = e.target.result
+// 按下apply按鈕後執行篩選功能
+const handleApplyStatus = async () => {
+  if (applyBtnStatus.value === true) {
+    await useFilters(filterVaribleSet.keyWord.trim())
+  }
+
+  filterCount.value = 0
+  sortCount.value = 0
+  Object.keys(filterVaribleSet).forEach((item) => {
+    if (
+      item != 'replaceKeyWord' ||
+      item != 'levelUpsort' ||
+      item != 'levelDownSort' ||
+      item != 'colorUpSort' ||
+      item != 'colorDownSort' ||
+      item != 'priceUpSort' ||
+      item != 'priceDownSort' ||
+      item != 'typeCharacter' ||
+      item != 'typeScene' ||
+      item != 'typeEvent'
+    ) {
+      if (filterVaribleSet[item] === true) {
+        filterCount.value++
+      }
     }
-    reader.readAsDataURL(file)
+
+    if (
+      item == 'replaceKeyWord' ||
+      item == 'levelUpsort' ||
+      item == 'levelDownSort' ||
+      item == 'colorUpSort' ||
+      item == 'colorDownSort' ||
+      item == 'priceUpSort' ||
+      item == 'priceDownSort' ||
+      item == 'typeCharacter' ||
+      item == 'typeScene' ||
+      item == 'typeEvent'
+    ) {
+      if (filterVaribleSet[item] === true) {
+        sortCount.value++
+      }
+    }
+  })
+  currentMain.value = '';
+}
+
+// 按下關鍵字按鈕
+const handleUseKeyWordBtn = (keyWord) => {
+  filterVaribleSet.keyWord = keyWord
+  handleKeyWord()
+}
+
+// 按下常用篩選按鈕
+const handleUseMyFiltersBtn = (myFilter) => {
+  Object.assign(filterVaribleSet, myFilter.filters)
+  applyBtnStatus.value = true
+}
+
+const currentSidebar = ref('')
+const sidebarFilterWidth = ref(490)
+const sidebarDeckWidth = ref(490)
+const extraOffset = ref(262)
+const isLargeScreen = ref(window.innerWidth > 1200)
+const view = ref('card-info')
+const currentMain = ref(null)
+const filters = ref([
+  {
+    name: '常用',
+    checked: true,
+    icon: 'fa-solid fa-star',
+    checkButton: false,
+    delButton: false,
+    filterTag: [''],
+  },
+  {
+    name: '關鍵字',
+    checked: true,
+    icon: 'fa-solid fa-magnifying-glass',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['keyWord'],
+  },
+  {
+    name: '排序',
+    checked: true,
+    icon: 'fa-solid fa-sliders',
+    checkButton: false,
+    delButton: true,
+    filterTag: [
+      'levelDownSort',
+      'levelUpSort',
+      'colorDownSort',
+      'colorUpSort',
+      'priceDownSort',
+      'priceUpSort',
+    ],
+  },
+  {
+    name: '類型',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['typeCharacter', 'typeScene', 'typeEvent'],
+  },
+  {
+    name: '等級',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['levelFilter0', 'levelFilter1', 'levelFilter2', 'levelFilter3'],
+  },
+  {
+    name: '顏色',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['colorFilterRed', 'colorFilterBlue', 'colorFilterYellow'],
+  },
+  {
+    name: '費用',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['costFilter0', 'costFilter1', 'costFilter2'],
+  },
+  {
+    name: '魂傷',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: ['soulFilter0', 'soulFilter1', 'soulFilter2'],
+  },
+  {
+    name: '攻擊力',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: [
+      'attackFilter0',
+      'attackFilter500',
+      'attackFilter1000',
+      'attackFilter1500',
+      'attackFilter2000',
+      'attackFilter2500',
+      'attackFilter3000',
+      'attackFilter3500',
+      'attackFilter4000',
+      'attackFilter4500',
+      'attackFilter5000',
+      'attackFilter5500',
+      'attackFilter6000',
+      'attackFilter6500',
+      'attackFilter7000',
+      'attackFilter7500',
+      'attackFilter8000',
+      'attackFilter8500',
+      'attackFilter9000',
+      'attackFilter9500',
+      'attackFilter10000',
+      'attackFilter10500',
+      'attackFilter11000',
+    ],
+  },
+  {
+    name: '稀有度',
+    checked: true,
+    icon: 'fa-solid fa-filter',
+    checkButton: false,
+    delButton: true,
+    filterTag: [
+      'rareFilterRR',
+      'rareFilterSSP',
+      'rareFilterLRR',
+      'rareFilterR',
+      'rareFilterSR',
+      'rareFilterOFR',
+      'rareFilterU',
+      'rareFilterC',
+      'rareFilterCR',
+      'rareFilterRRR',
+      'rareFilterCC',
+      'rareFilterPR',
+      'rareFilterTD',
+      'rareFilterSP',
+      'rareFilterN',
+      'rareFilterLRP',
+      'rareFilterSIR',
+    ],
+  },
+  // { name: '判定', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+  // { name: '特徵', checked: true, icon: 'fa-solid fa-filter', checkButton: true },
+  // { name: '商品', checked: true, icon: 'fa-solid fa-filter', checkButton: true }
+])
+
+const sidebarMarginLeft = computed(() => {
+  if (!isLargeScreen.value) return 0
+  if (currentSidebar.value === 'open-filter') {
+    return sidebarFilterWidth.value - extraOffset.value
+  } else if (currentSidebar.value === 'open-deck') {
+    return sidebarDeckWidth.value - extraOffset.value
   }
+  return 0
+})
+
+function toggleSidebar(sidebar) {
+  currentSidebar.value = currentSidebar.value === sidebar ? '' : sidebar
 }
 
-const getUserDecks = async () => {
-  if (!token.value) return
-  const API_URL = import.meta.env.VITE_API_URL
-  try {
-    const res = await axios.get(`${API_URL}/decks`, {
-      headers: { Authorization: `Bearer ${token.value}` },
-    })
-    decks.value = res.data.decks
-    filteredDecks.value = res.data.decks
-  } catch (error) {
-    console.error('獲取牌組資料失敗', error)
+function toggleFilter(value) {
+  if (!isLargeScreen.value) {
+    currentSidebar.value = ''
   }
+  currentMain.value = currentMain.value === value ? null : value
 }
 
-const selectDeck = (deck) => {
-  title.value = deck.deck_name
-  seriesName.value = deck.deck_name
-  imageUrl.value = deck.deck_cover
-  deckId.value = deck.id
-  menuExpanded.value = false
+function MenuFilter(index) {
+  filters.value[index].checked = !filters.value[index].checked
 }
 
-const toggleMenu = () => {
-  menuExpanded.value = !menuExpanded.value
-  if (menuExpanded.value) calculateMenuHeight()
+function closeSidebar() {
+  currentSidebar.value = ''
+  currentMain.value = ''
+
+  settingDeckStatus.value = false
+  sidebarSelectedStatus.value = true
+  deckName.value = ''
+  deckDescription.value = ''
+  chooseCoverCard.value = ''
 }
 
-const calculateMenuHeight = () => {
-  menuHeight.value = 45 + filteredDecks.value.length * 35
-}
-
-const searchSeries = () => {
-  if (!searchQuery.value.trim()) {
-    filteredDecks.value = decks.value
+function updateScreenSize() {
+  isLargeScreen.value = window.innerWidth > 1200
+  if (!isLargeScreen.value) {
+    closeSidebar()
   } else {
-    const query = searchQuery.value.toLowerCase()
-    filteredDecks.value = decks.value.filter((deck) =>
-      deck.deck_name?.toLowerCase().includes(query)
-    )
+    currentMain.value = ''
   }
-  calculateMenuHeight()
 }
+onBeforeMount(async () => {
+  const route = useRoute()
+  const seriesId = route.params.series_id
+  saveLastViewSeries(seriesId)
+  await getLastViewSeries()
+})
+// Lifecycle hooks
+onMounted(async () => {
+  getLastDeckEdit()
+  switchSortMode()
+  window.addEventListener('resize', updateScreenSize)
+})
 
-const clearSearch = () => {
-  searchQuery.value = ''
-  filteredDecks.value = decks.value
-  calculateMenuHeight()
-}
-
-onMounted(() => {
-  getUserDecks()
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateScreenSize)
 })
 </script>
-
 <template>
-  <SidebarGrid style="grid-area: sidebar" />
-  <main>
-    <div class="header-bg">
-      <header>
-        <div class="pagebtn-area">
-          <button class="page-btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15.75 19.5 8.25 12l7.5-7.5"
-              ></path>
-            </svg>
-          </button>
-          <button class="page-btn next-btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              ></path>
-            </svg>
-          </button>
-          <h2>新增文章</h2>
-        </div>
-        <div class="btn-area">
-          <button class="submit-btn" @click="submitArticle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none stroke-2 size-5"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"
-              ></path>
-            </svg>
-            <span>送出</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none stroke-2 size-5"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-              ></path>
-            </svg>
-          </button>
-          <button class="bell">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="stroke-2 size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-              ></path>
-            </svg>
-            <div class="notice">通知</div>
-          </button>
-          <button class="user-btn">
-            <div class="btn-img">
-              <img src="/src/img/麻衣.png" alt="" />
-            </div>
-            <span>XXXX</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none w-4 h-4"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m19.5 8.25-7.5 7.5-7.5-7.5"
-              ></path>
-            </svg>
-          </button>
-        </div>
-      </header>
-    </div>
-    <section class="title-area">
-      <div class="title-area-container">
-        <button class="upload-btn" @click="handleButtonClick">
-          <svg
-            v-if="!imageUrl"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            class="w-20 h-20"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-            ></path>
-          </svg>
+  <div class="overflow-hidden bg-black root-container">
+    <nav class="sidebar-container">
 
-          <img
-            v-if="imageUrl"
-            :src="imageUrl"
-            alt="預覽圖片"
-            class="preview-image"
-          />
-          <input
-            type="file"
-            class="file-input"
-            @change="handleFileUpload"
-            accept="image/*"
-            ref="fileInput"
-          />
-          <svg
-            v-if="imageUrl"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
+      <SidebarGrid :class="{ hidden: currentMain === 'open-filter' || currentMain === 'open-deck'}" />
+
+      <section v-show="currentSidebar === 'open-filter'" class="sidebar-filter">
+        <header class="sidebar-filter-header">
+          <div class="flex-col">
+            <p>卡片篩選</p>
+            <p>
+              {{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{
+                filterVaribleSet.keyWord.trim()
+              }}"
+            </p>
+          </div>
+          <div>
+            <button class="icon del-btn" @click="resetAllFilter">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+            <button class="icon open-btn">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <button @click="closeSidebar" class="icon xmark-btn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="sidebar-filter-content">
+          <div
+            class="whole-menu"
+            v-for="(filter, index) in filters"
+            :key="index"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            ></path>
-          </svg>
-        </button>
-        <div class="add-section">
-          <div class="add-article">
+            <div class="menu" @click="MenuFilter(index)">
+              <i :class="[filter.icon]"></i>
+              <p>{{ filter.name }}</p>
+              <button
+                class="icon del"
+                v-if="filter.delButton"
+                @click.stop="resetFilter(filter.filterTag)"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+              <button class="icon check" v-if="filter.checkButton">
+                <i class="fa-regular fa-circle-check"></i>
+              </button>
+              <button class="open">
+                <i
+                  class="fa fa-chevron-down"
+                  :style="{ transform: filter.checked ? 'rotate(180deg)' : '' }"
+                ></i>
+              </button>
+            </div>
+            <div class="menu-inner" v-show="filter.checked">
+              <div v-if="filter.name === '常用'">
+                <span
+                  >"+"
+                  按鈕可以儲存當下篩選內容，長按儲存篩選可以進行刪除。</span
+                >
+                <div class="myfilter-button-group">
+                  <button class="plus-btn-used" @click="saveMyFilters">
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                  <button
+                    class="myfilter-button-item"
+                    v-for="(myfilter, index) in myFiltersGroup"
+                    :key="index"
+                    @click="handleUseMyFiltersBtn(myfilter)"
+                    @mousedown="countMouseUp"
+                    @mouseup="deleteMyFilters(myfilter)"
+                  >
+                    {{ myfilter.name }}
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '關鍵字'">
+                <span
+                  >可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
+                  <br />當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
+                </span>
+                <div
+                  class="input-keyword"
+                  :class="{
+                    'input-keyword-haveValue':
+                      filterVaribleSet.keyWord.trim() != '',
+                  }"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    data-slot="icon"
+                    class="flex-none size-4"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                    ></path>
+                  </svg>
+                  <input
+                    class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none"
+                    type="text"
+                    placeholder="關鍵字搜尋"
+                    v-model="filterVaribleSet.keyWord"
+                    @input="handleKeyWord"
+                  />
+                  <div>
+                    <button @click="changeReplaceKeyWord">
+                      <span>{{ replaceWord }}</span>
+                    </button>
+                    <!-- <button><span>OR</span></button> -->
+                    <button class="plus-btn" @click="saveKeyWord">
+                      <i class="fa-solid fa-plus"></i>
+                    </button>
+                  </div>
+                </div>
+                <p class="keyword-below">
+                  "+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
+                </p>
+                <span v-if="keyWordGroup.length === 0">無資料</span>
+                <div class="keyword-button-group">
+                  <button
+                    class="keyword-button-item"
+                    v-for="(keyWord, index) in keyWordGroup"
+                    :key="index"
+                    @click="handleUseKeyWordBtn(keyWord)"
+                    @mousedown="countMouseUp"
+                    @mouseup="deleteKeyWord(keyWord)"
+                  >
+                    {{ keyWord }}
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '排序'">
+                <div class="menu-inner-slider-btn">
+                  <button
+                    :class="{
+                      'btn-default-bg':
+                        !filterVaribleSet.levelDownSort ||
+                        !filterVaribleSet.levelUpSort,
+                      'btn-active-bg':
+                        filterVaribleSet.levelDownSort ||
+                        filterVaribleSet.levelUpSort,
+                    }"
+                    @click="changeSortStatus('level')"
+                  >
+                    <div
+                      class="slider-btn"
+                      :class="{
+                        'slider-btn-active':
+                          filterVaribleSet.levelDownSort ||
+                          filterVaribleSet.levelUpSort,
+                      }"
+                    >
+                      {{ levelOrder > 0 ? levelOrder : '' }}
+                    </div>
+                    等級
+                    <i
+                      class="fa-solid fa-arrow-up"
+                      :class="{
+                        'arrow-up': !filterVaribleSet.levelUpSort,
+                        'arrow-down': filterVaribleSet.levelUpSort,
+                      }"
+                    ></i>
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg':
+                        !filterVaribleSet.colorDownSort ||
+                        !filterVaribleSet.colorUpSort,
+                      'btn-active-bg':
+                        filterVaribleSet.colorDownSort ||
+                        filterVaribleSet.colorUpSort,
+                    }"
+                    @click="changeSortStatus('color')"
+                  >
+                    <div
+                      class="slider-btn"
+                      :class="{
+                        'slider-btn-active':
+                          filterVaribleSet.colorDownSort ||
+                          filterVaribleSet.colorUpSort,
+                      }"
+                    >
+                      {{ colorOrder > 0 ? colorOrder : '' }}
+                    </div>
+                    顏色
+                    <i
+                      class="fa-solid fa-arrow-up"
+                      :class="{
+                        'arrow-up': !filterVaribleSet.colorUpSort,
+                        'arrow-down': filterVaribleSet.colorUpSort,
+                      }"
+                    ></i>
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg':
+                        !filterVaribleSet.priceDownSort ||
+                        !filterVaribleSet.priceUpSort,
+                      'btn-active-bg':
+                        filterVaribleSet.priceDownSort ||
+                        filterVaribleSet.priceUpSort,
+                    }"
+                    @click="changeSortStatus('price')"
+                  >
+                    <div
+                      class="slider-btn"
+                      :class="{
+                        'slider-btn-active':
+                          filterVaribleSet.priceDownSort ||
+                          filterVaribleSet.priceUpSort,
+                      }"
+                    >
+                      {{ priceOrder > 0 ? priceOrder : '' }}
+                    </div>
+                    價格
+                    <i
+                      class="fa-solid fa-arrow-up"
+                      :class="{
+                        'arrow-up': !filterVaribleSet.priceUpSort,
+                        'arrow-down': filterVaribleSet.priceUpSort,
+                      }"
+                    ></i>
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '類型'">
+                <div class="menu-inner-btn">
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.typeCharacter,
+                      'btn-active-bg': filterVaribleSet.typeCharacter,
+                    }"
+                    @click="changeFilterStatus('typeCharacter')"
+                  >
+                    角色
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.typeEvent,
+                      'btn-active-bg': filterVaribleSet.typeEvent,
+                    }"
+                    @click="changeFilterStatus('typeEvent')"
+                  >
+                    事件
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.typeScene,
+                      'btn-active-bg': filterVaribleSet.typeScene,
+                    }"
+                    @click="changeFilterStatus('typeScene')"
+                  >
+                    名場
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '等級'">
+                <div class="menu-inner-btn">
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter0,
+                      'btn-active-bg': filterVaribleSet.levelFilter0,
+                    }"
+                    @click="changeFilterStatus('levelFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter1,
+                      'btn-active-bg': filterVaribleSet.levelFilter1,
+                    }"
+                    @click="changeFilterStatus('levelFilter1')"
+                  >
+                    1
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter2,
+                      'btn-active-bg': filterVaribleSet.levelFilter2,
+                    }"
+                    @click="changeFilterStatus('levelFilter2')"
+                  >
+                    2
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter3,
+                      'btn-active-bg': filterVaribleSet.levelFilter3,
+                    }"
+                    @click="changeFilterStatus('levelFilter3')"
+                  >
+                    3
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '顏色'">
+                <div class="menu-inner-btn">
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.colorFilterYellow,
+                      'btn-active-bg': filterVaribleSet.colorFilterYellow,
+                    }"
+                    @click="changeFilterStatus('colorFilterYellow')"
+                  >
+                    黃色
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.colorFilterRed,
+                      'btn-active-bg': filterVaribleSet.colorFilterRed,
+                    }"
+                    @click="changeFilterStatus('colorFilterRed')"
+                  >
+                    紅色
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.colorFilterBlue,
+                      'btn-active-bg': filterVaribleSet.colorFilterBlue,
+                    }"
+                    @click="changeFilterStatus('colorFilterBlue')"
+                  >
+                    藍色
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '費用'">
+                <div class="menu-inner-btn">
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.costFilter0,
+                      'btn-active-bg': filterVaribleSet.costFilter0,
+                    }"
+                    @click="changeFilterStatus('costFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.costFilter1,
+                      'btn-active-bg': filterVaribleSet.costFilter1,
+                    }"
+                    @click="changeFilterStatus('costFilter1')"
+                  >
+                    1
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.costFilter2,
+                      'btn-active-bg': filterVaribleSet.costFilter2,
+                    }"
+                    @click="changeFilterStatus('costFilter2')"
+                  >
+                    2
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '魂傷'">
+                <div class="menu-inner-btn">
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.soulFilter0,
+                      'btn-active-bg': filterVaribleSet.soulFilter0,
+                    }"
+                    @click="changeFilterStatus('soulFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.soulFilter1,
+                      'btn-active-bg': filterVaribleSet.soulFilter1,
+                    }"
+                    @click="changeFilterStatus('soulFilter1')"
+                  >
+                    1
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.soulFilter2,
+                      'btn-active-bg': filterVaribleSet.soulFilter2,
+                    }"
+                    @click="changeFilterStatus('soulFilter2')"
+                  >
+                    2
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '攻擊力'">
+                <div class="menu-inner-btn">
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter0,
+                      'btn-active-bg': filterVaribleSet.attackFilter0,
+                    }"
+                    @click="changeFilterStatus('attackFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter500,
+                      'btn-active-bg': filterVaribleSet.attackFilter500,
+                    }"
+                    @click="changeFilterStatus('attackFilter500')"
+                  >
+                    500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter1000,
+                      'btn-active-bg': filterVaribleSet.attackFilter1000,
+                    }"
+                    @click="changeFilterStatus('attackFilter1000')"
+                  >
+                    1000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter1500,
+                      'btn-active-bg': filterVaribleSet.attackFilter1500,
+                    }"
+                    @click="changeFilterStatus('attackFilter1500')"
+                  >
+                    1500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter2000,
+                      'btn-active-bg': filterVaribleSet.attackFilter2000,
+                    }"
+                    @click="changeFilterStatus('attackFilter2000')"
+                  >
+                    2000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter2500,
+                      'btn-active-bg': filterVaribleSet.attackFilter2500,
+                    }"
+                    @click="changeFilterStatus('attackFilter2500')"
+                  >
+                    2500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter3000,
+                      'btn-active-bg': filterVaribleSet.attackFilter3000,
+                    }"
+                    @click="changeFilterStatus('attackFilter3000')"
+                  >
+                    3000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter3500,
+                      'btn-active-bg': filterVaribleSet.attackFilter3500,
+                    }"
+                    @click="changeFilterStatus('attackFilter3500')"
+                  >
+                    3500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter4000,
+                      'btn-active-bg': filterVaribleSet.attackFilter4000,
+                    }"
+                    @click="changeFilterStatus('attackFilter4000')"
+                  >
+                    4000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter4500,
+                      'btn-active-bg': filterVaribleSet.attackFilter4500,
+                    }"
+                    @click="changeFilterStatus('attackFilter4500')"
+                  >
+                    4500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter5000,
+                      'btn-active-bg': filterVaribleSet.attackFilter5000,
+                    }"
+                    @click="changeFilterStatus('attackFilter5000')"
+                  >
+                    5000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter5500,
+                      'btn-active-bg': filterVaribleSet.attackFilter5500,
+                    }"
+                    @click="changeFilterStatus('attackFilter5500')"
+                  >
+                    5500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter6000,
+                      'btn-active-bg': filterVaribleSet.attackFilter6000,
+                    }"
+                    @click="changeFilterStatus('attackFilter6000')"
+                  >
+                    6000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter6500,
+                      'btn-active-bg': filterVaribleSet.attackFilter6500,
+                    }"
+                    @click="changeFilterStatus('attackFilter6500')"
+                  >
+                    6500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter7000,
+                      'btn-active-bg': filterVaribleSet.attackFilter7000,
+                    }"
+                    @click="changeFilterStatus('attackFilter7000')"
+                  >
+                    7000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter7500,
+                      'btn-active-bg': filterVaribleSet.attackFilter7500,
+                    }"
+                    @click="changeFilterStatus('attackFilter7500')"
+                  >
+                    7500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter8000,
+                      'btn-active-bg': filterVaribleSet.attackFilter8000,
+                    }"
+                    @click="changeFilterStatus('attackFilter8000')"
+                  >
+                    8000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter8500,
+                      'btn-active-bg': filterVaribleSet.attackFilter8500,
+                    }"
+                    @click="changeFilterStatus('attackFilter8500')"
+                  >
+                    8500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter9000,
+                      'btn-active-bg': filterVaribleSet.attackFilter9000,
+                    }"
+                    @click="changeFilterStatus('attackFilter9000')"
+                  >
+                    9000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter9500,
+                      'btn-active-bg': filterVaribleSet.attackFilter9500,
+                    }"
+                    @click="changeFilterStatus('attackFilter9500')"
+                  >
+                    9500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter10000,
+                      'btn-active-bg': filterVaribleSet.attackFilter10000,
+                    }"
+                    @click="changeFilterStatus('attackFilter10000')"
+                  >
+                    10000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter10500,
+                      'btn-active-bg': filterVaribleSet.attackFilter10500,
+                    }"
+                    @click="changeFilterStatus('attackFilter10500')"
+                  >
+                    10500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter11000,
+                      'btn-active-bg': filterVaribleSet.attackFilter11000,
+                    }"
+                    @click="changeFilterStatus('attackFilter11000')"
+                  >
+                    11000
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '稀有度'">
+                <div class="menu-inner-btn">
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterRR,
+                      'btn-active-bg': filterVaribleSet.rareFilterRR,
+                    }"
+                    @click="changeFilterStatus('rareFilterRR')"
+                  >
+                    RR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSSP,
+                      'btn-active-bg': filterVaribleSet.rareFilterSSP,
+                    }"
+                    @click="changeFilterStatus('rareFilterSSP')"
+                  >
+                    SSP
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterLRR,
+                      'btn-active-bg': filterVaribleSet.rareFilterLRR,
+                    }"
+                    @click="changeFilterStatus('rareFilterLRR')"
+                  >
+                    LRR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilteR,
+                      'btn-active-bg': filterVaribleSet.rareFilterR,
+                    }"
+                    @click="changeFilterStatus('rareFilterR')"
+                  >
+                    R
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSR,
+                      'btn-active-bg': filterVaribleSet.rareFilterSR,
+                    }"
+                    @click="changeFilterStatus('rareFilterSR')"
+                  >
+                    SR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterOFR,
+                      'btn-active-bg': filterVaribleSet.rareFilterOFR,
+                    }"
+                    @click="changeFilterStatus('rareFilterOFR')"
+                  >
+                    OFR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterU,
+                      'btn-active-bg': filterVaribleSet.rareFilterU,
+                    }"
+                    @click="changeFilterStatus('rareFilterU')"
+                  >
+                    U
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterC,
+                      'btn-active-bg': filterVaribleSet.rareFilterC,
+                    }"
+                    @click="changeFilterStatus('rareFilterC')"
+                  >
+                    C
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterCR,
+                      'btn-active-bg': filterVaribleSet.rareFilterCR,
+                    }"
+                    @click="changeFilterStatus('rareFilterCR')"
+                  >
+                    CR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterRRR,
+                      'btn-active-bg': filterVaribleSet.rareFilterRRR,
+                    }"
+                    @click="changeFilterStatus('rareFilterRRR')"
+                  >
+                    RRR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterCC,
+                      'btn-active-bg': filterVaribleSet.rareFilterCC,
+                    }"
+                    @click="changeFilterStatus('rareFilterCC')"
+                  >
+                    CC
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterPR,
+                      'btn-active-bg': filterVaribleSet.rareFilterPR,
+                    }"
+                    @click="changeFilterStatus('rareFilterPR')"
+                  >
+                    PR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterTD,
+                      'btn-active-bg': filterVaribleSet.rareFilterTD,
+                    }"
+                    @click="changeFilterStatus('rareFilterTD')"
+                  >
+                    TD
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSP,
+                      'btn-active-bg': filterVaribleSet.rareFilterSP,
+                    }"
+                    @click="changeFilterStatus('rareFilterSP')"
+                  >
+                    SP
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterN,
+                      'btn-active-bg': filterVaribleSet.rareFilterN,
+                    }"
+                    @click="changeFilterStatus('rareFilterN')"
+                  >
+                    N
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterLRP,
+                      'btn-active-bg': filterVaribleSet.rareFilterLRP,
+                    }"
+                    @click="changeFilterStatus('rareFilterLRP')"
+                  >
+                    LRP
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSIR,
+                      'btn-active-bg': filterVaribleSet.rareFilterSIR,
+                    }"
+                    @click="changeFilterStatus('rareFilterSIR')"
+                  >
+                    SIR
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="sidebar-filter-footer">
+          <button
+            :class="{
+              'apply-btn': !applyBtnStatus,
+              'apply-btn-active': applyBtnStatus,
+            }"
+            @click="handleApplyStatus"
+          >
+            <span>Apply</span>
+          </button>
+        </footer>
+      </section>
+
+      <section v-show="currentSidebar === 'open-deck'" class="sidebar-deck">
+        <header class="sidebar-header">
+          <div>
+            <p>牌組製作</p>
+            <p>
+              已選擇 {{ selectedCards.length }} 張卡片，總價 ¥{{ countDeck }}
+            </p>
+          </div>
+          <div>
+            <button class="icon del-btn" @click="clearDeckAndBacktoFirstStep">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+            <button @click="closeSidebar" class="icon xmark-btn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="sidebar-deck-choice" v-if="sidebarSelectedStatus === true">
+          <button id="type-btn-active" v-if="sortStatus === 'TYPE'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            類型
+          </button>
+          <button @click="handleSwitchBtnClick('TYPE')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            類型
+          </button>
+          <button id="color-btn-active" v-if="sortStatus === 'COLOR'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            顏色
+          </button>
+          <button @click="handleSwitchBtnClick('COLOR')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            顏色
+          </button>
+          <button id="level-btn-active" v-if="sortStatus === 'LEVEL'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            等級
+          </button>
+          <button @click="handleSwitchBtnClick('LEVEL')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            等級
+          </button>
+          <button id="rare-btn-active" v-if="sortStatus === 'RARE'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            稀有度
+          </button>
+          <button @click="handleSwitchBtnClick('RARE')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            稀有度
+          </button>
+          <button id="product-btn-active" v-if="sortStatus === 'PRODUCT'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            商品
+          </button>
+          <button @click="handleSwitchBtnClick('PRODUCT')" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              width="24"
+              height="24"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+              ></path>
+            </svg>
+            商品
+          </button>
+        </div>
+        <div class="sidebar-deck-control" v-if="sidebarSelectedStatus === true">
+          <button class="cash" @click="showCardPrice = !showCardPrice">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
+              width="24"
+              height="24"
               aria-hidden="true"
               data-slot="icon"
-              class="flex-none size-5 md:size-6"
+              class="size-6"
             >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
+                d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
               ></path>
             </svg>
-            <p>新增文章</p>
+          </button>
+          <span class="flex-none font-mono divder text-zinc-500/50"> | </span>
+
+          <button
+            id="plus-active"
+            @click="changeTypeToAdd"
+            v-if="editType === 'ADD_CARD'"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24"
+              height="24"
+              aria-hidden="true"
+              data-slot="icon"
+              class=""
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              ></path>
+            </svg>
+          </button>
+          <button
+            class="plus"
+            @click="changeTypeToAdd"
+            v-else="editType === 'CHECK_INFO'"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24"
+              height="24"
+              aria-hidden="true"
+              data-slot="icon"
+              class=""
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              ></path>
+            </svg>
+          </button>
+
+          <button
+            id="minus-active"
+            @click="changeTypeToDelete"
+            v-if="editType === 'DELETE_CARD'"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24"
+              height="24"
+              aria-hidden="true"
+              data-slot="icon"
+              class=""
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 12h14"
+              ></path>
+            </svg>
+          </button>
+          <button class="minus" @click="changeTypeToDelete" v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24"
+              height="24"
+              aria-hidden="true"
+              data-slot="icon"
+              class=""
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 12h14"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div class="card-content" v-if="sidebarSelectedStatus === true">
+          <div
+            class="card-section"
+            v-for="(title, sortedTitleIndex) in sortedTitle"
+            :key="sortedTitleIndex"
+          >
+            <h3>{{ title }} - {{ sortedDeck[sortedTitleIndex].length }}</h3>
+            <div class="card-choiced">
+              <div class="row">
+                <div
+                  class="col-choice"
+                  v-for="(card, index) in sortedDeck[sortedTitleIndex]"
+                  :key="index"
+                  @click="
+                    checkTypeAndRunFunction(card, index, sortedTitleIndex)
+                  "
+                >
+                  <div class="card-price" v-if="showCardPrice">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="size-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                      ></path>
+                    </svg>
+                    <span>{{ card.price.number }}</span>
+                    <span>{{ card.rare }}</span>
+                  </div>
+                  <div class="card-image">
+                    <img :src="card.cover" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <input
-            v-model="title"
-            class="enter-title"
-            type="text"
-            placeholder="請輸入標題"
-          />
-          <div class="card-select-area">
-            <button class="card-select-btn" @click="toggleMenu">
+        </div>
+        <div class="deck-save" v-if="settingDeckStatus === true">
+          <div class="deck-save-title-section">
+            <div class="deck-save-title-section-top">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -357,38 +1660,369 @@ onMounted(() => {
                 stroke="currentColor"
                 aria-hidden="true"
                 data-slot="icon"
-                class="flex-none size-5 md:size-6"
+                class="stroke-2 size-5"
               >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                  d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
                 ></path>
               </svg>
-              <p>{{ seriesName }}</p>
-            </button>
-            <ul
-              class="menu-area"
-              v-show="menuExpanded"
-              :style="{ height: menuHeight + 'px' }"
-            >
-              <li class="menu-search">
-                <input
-                  v-model="searchQuery"
-                  @keyup="searchSeries"
-                  class="keyword"
-                  type="text"
-                  placeholder="Keyword"
-                />
-                <button @click="clearSearch">✖</button>
-              </li>
+              <h2>標題：</h2>
+            </div>
+            <input
+              type="text"
+              placeholder="輸入牌組名稱"
+              name="deckName"
+              id="deckName"
+              v-model="deckName"
+            />
+            <p>設定預設牌組名稱，前往<a href="#">偏好設定</a></p>
+          </div>
+          <div class="deck-save-content-section">
+            <div class="deck-save-content-section-top">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="stroke-2 size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
+                ></path>
+              </svg>
+              <h2>內容：</h2>
+            </div>
+            <textarea
+              name=""
+              id=""
+              cols="30"
+              rows="4"
+              placeholder="用一段話介紹一下你的牌組"
+              v-model="deckDescription"
+            ></textarea>
+          </div>
+          <div
+            class="deck-save-covercard-section"
+            v-if="selectedCards.length > 0"
+          >
+            <div class="deck-save-covercard-section-top">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="stroke-2 size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
+                ></path>
+              </svg>
+              <h2>封面卡：</h2>
+            </div>
+            <div class="deck-save-covercard-section-content">
+              <div
+                :class="{
+                  'deck-save-covercard-section-content-card': true,
+                  'cover-card-selected': card.id === chooseCoverCard,
+                }"
+                v-for="card in selectedCards"
+                :key="card.id"
+                @click="chooseCoverCard = card.id"
+              >
+                <img :src="card.cover" />
+                <div class="deck-save-covercard-section-content-card-info">
+                  <h3>{{ card.title }}</h3>
+                  <p>{{ card.id }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-              <li
-                class="menu"
-                v-for="deck in filteredDecks"
-                :key="deck.id"
-                v-if="decks && decks.length"
-                @click="selectDeck(deck)"
+        <footer class="sidebar-footer">
+          <button
+            id="sidebar-footer-active"
+            v-if="selectedCards.length > 0 && settingDeckStatus === false"
+            @click="nextStep"
+          >
+            <span>
+              下一步
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                ></path>
+              </svg>
+            </span>
+          </button>
+          <div
+            class="sidebar-footer-box"
+            v-else-if="settingDeckStatus === true"
+          >
+            <button id="sidebar-footer-active" @click="finalStep">
+              <span>
+                完成
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="size-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                  ></path>
+                </svg>
+              </span>
+            </button>
+          </div>
+          <button v-else>
+            <span>
+              下一步
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                ></path>
+              </svg>
+            </span>
+          </button>
+        </footer>
+      </section>
+    </nav>
+
+    <div class="main" :style="{ marginLeft: sidebarMarginLeft + 'px' }">
+      <div class="main-info">
+        <header class="main-info-header">
+          <a :href="'/series'">
+            <button
+              class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 19.5 8.25 12l7.5-7.5"
+                ></path>
+              </svg>
+            </button>
+          </a>
+          <div class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
+            <h2 class="truncate text-2xl font-bold">{{ seriesInfo.name }}</h2>
+          </div>
+          <notice/>
+          <div class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50">            
+            <NavLoginBtn/>
+          </div>
+        </header>
+        <button @click="toggleSidebar('open-filter')" class="toggle-filter">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="#155E75"
+            aria-hidden="true"
+            data-slot="icon"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+        </button>
+        <button @click="toggleSidebar('open-deck')" class="toggle-deck">
+          <div class="toggle-deck-content">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="#C3D7D5"
+              aria-hidden="true"
+              data-slot="icon"
+            >
+              <path
+                d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"
+              ></path>
+              <path
+                d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"
+              ></path>
+            </svg>
+            <p>{{ selectedCards.length }}</p>
+          </div>
+        </button>
+        <section class="info-container">
+          <img :src="seriesInfo.cover" />
+          <div flex-col class="inner-info-container">
+            <span
+              ><i class="fa-regular fa-clone"></i>
+              <span v-for="(code, index) in seriesInfo.code" :key="index"
+                >{{ code
+                }}{{ index == seriesInfo.code.length - 1 ? '' : ', ' }}</span
+              ></span
+            >
+            <h1>{{ seriesInfo.name }}</h1>
+            <div>
+              <div v-if="seriesInfo.sellAt">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentcolor"
+                  width="20"
+                  height="20"
+                  class="icon-scale size-5 md:size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
+                  ></path>
+                  </svg>
+                  <span>
+                    最新發布{{ seriesInfo.sellAt[seriesInfo.sellAt.length - 1] }}
+                  </span>
+              </div>
+              <div v-else>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentcolor"
+                  width="20"
+                  height="20"
+                  class="icon-scale size-5 md:size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
+                  ></path></svg>
+                  <span>最新發布</span>
+              </div>
+              <div v-if="seriesCardListLength > 0">
+                <i class="fa-regular fa-clone"></i
+                ><span>總數{{ seriesCardListLength }}張</span>
+              </div>
+              <div v-else>
+                <i class="fa-regular fa-clone"></i><span>總數 0 張</span>
+              </div>
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="icon-scale size-5 md:size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+                  ></path></svg>
+                  <span>篩選出{{ seriesCardList.length }}張</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="info-container-filter">
+          <div class="card-control">
+            <p>
+              請在<svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                width="16"
+                height="16"
+                aria-hidden="true"
+                data-slot="icon"
+                class="icon-scale size-5 md:size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+                ></path></svg>
+                新增常用篩選
+            </p>
+            <div>
+              <button
+                @click="toggleFilter('open-filter')"
+                class="toggle-inner-filter"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="size-6"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </button>
+              <button
+                @click="view = 'card-sheet'"
+                :class="{ active: view === 'card-sheet' }"
+                class="icon-control change-sheet"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -398,1243 +2032,362 @@ onMounted(() => {
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="flex-none size-5 md:size-6"
+                  class="size-6"
                 >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                    d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
                   ></path>
                 </svg>
-                <p class="text-xs truncate">{{ deck.deck_name }}</p>
-              </li>
-            </ul>
+              </button>
+              <button
+                @click="view = 'card-info'"
+                :class="{ active: view === 'card-info' }"
+                class="icon-control change-info"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0 1 20.25 6v12A2.25 2.25 0 0 1 18 20.25H6A2.25 2.25 0 0 1 3.75 18V6A2.25 2.25 0 0 1 6 3.75h1.5m9 0h-9"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div v-if="view === 'card-sheet'" class="card-sheet">
+            <div class="row">
+              <div
+                class="col-Sheet"
+                v-for="(card, index) in seriesCardList"
+                :key="card.id"
+                @click.stop="getCardInfoAndShow(card)"
+              >
+                <div class="card-image">
+                  <img :src="card.cover" />
+                  <div>
+                    <p>{{ card.id }}</p>
+                    <h3>{{ card.title }}</h3>
+                  </div>
+                  <button
+                    @click.stop="addCard(card)"
+                    class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      width="24"
+                      height="24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="text-white stroke-2 size-7"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            v-if="seriesCardList.length > 0 && view === 'card-info'"
+            class="card-info"
+          >
+            <div class="row">
+              <div
+                class="col-Info"
+                v-for="(card, index) in seriesCardList"
+                :key="index"
+                @click.stop="addCard(card)"
+              >
+                <div class="card-info-image">
+                  <img :src="card.cover" />
+                  <div
+                    class="card-inner-info"
+                    @click.stop="getCardInfoAndShow(card)"
+                  >
+                    <div class="card-inner-info-header">
+                      <p>{{ card.id }}</p>
+                      <p>{{ card.rare }}</p>
+                    </div>
+                    <h3>{{ card.title }}</h3>
+                    <div class="details">
+                      <div>
+                        <span :class="`bg-${card.color}`">類型</span
+                        >{{ card.typeTranslate }}
+                      </div>
+                      <div>
+                        <span :class="`bg-${card.color}`">魂傷</span
+                        >{{ card.soul }}
+                      </div>
+                      <div>
+                        <span :class="`bg-${card.color}`">等級</span
+                        >{{ card.level }}
+                      </div>
+                      <div>
+                        <span :class="`bg-${card.color}`">攻擊</span
+                        >{{ card.attack }}
+                      </div>
+                      <div>
+                        <span :class="`bg-${card.color}`">費用</span
+                        >{{ card.cost }}
+                      </div>
+                    </div>
+                    <div class="price-download">
+                      <p>${{ card.price.number }}</p>
+                      <button @click.stop="addCard(card)">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                          data-slot="icon"
+                          class="text-white stroke-2 size-7"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="card-info-empty">
+            <div class="card-info-empty-content">
+              <div class="card-info-empty-content-box">
+                <img
+                  src="https://bottleneko.app/images/status/empty.png"
+                  alt=""
+                />
+                <h2>沒東西</h2>
+                <p>
+                  你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <section v-show="currentMain === 'open-filter'" class="sidebar-filter">
+        <header class="sidebar-filter-header">
+          <div>
+            <p>卡片篩選</p>
+            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ (filterVaribleSet.keyWord.trim()) }}"</p>
+          </div>
+          <div>
+            <button class="icon del-btn">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+            <button class="icon open-btn">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <button @click="closeSidebar" class="icon xmark-btn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </header>
 
-            <div class="cannot-change">
-              <p>非必填，但新增文章後將無法更改牌組內容</p>
+        <div class="sidebar-filter-content">
+          <div
+            class="whole-menu"
+            v-for="(filter, index) in filters"
+            :key="index"
+          >
+            <div class="menu" @click="MenuFilter(index)">
+              <i :class="[filter.icon]"></i>
+              <p>{{ filter.name }}</p>
+              <button class="icon del" v-if="filter.delButton" @click.stop="resetFilter(filter.filterTag)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+              <button class="icon check" v-if="filter.checkButton">
+                <i class="fa-regular fa-circle-check"></i>
+              </button>
+              <button class="open">
+                <i
+                  class="fa fa-chevron-down"
+                  :style="{ transform: filter.checked ? 'rotate(180deg)' : '' }"
+                ></i>
+              </button>
+            </div>
+            <div class="menu-inner" v-show="filter.checked">
+              <div v-if="filter.name === '常用'">
+                <span>"+" 按鈕可以儲存當下篩選內容，長按儲存篩選可以進行刪除。</span>
+                <div class="myfilter-button-group" >
+                  <button class="plus-btn-used" @click="saveMyFilters" ><i class="fa-solid fa-plus"></i></button>
+                  <button class="myfilter-button-item" v-for="(myfilter, index) in myFiltersGroup" :key="index" @click="handleUseMyFiltersBtn(myfilter)" @mousedown="countMouseUp" @mouseup="deleteMyFilters(myfilter)" >{{ myfilter.name }}</button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '關鍵字'">
+                <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
+                  <br>當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
+                </span>
+                <div class="input-keyword" :class="{ 'input-keyword-haveValue': filterVaribleSet.keyWord.trim() != '' }">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
+                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="filterVaribleSet.keyWord" @input="handleKeyWord">
+                  <div class="input-keyword-btn" >
+                    <button @click="changeReplaceKeyWord" ><span>{{ replaceWord }}</span></button>
+                    <!-- <button><span>OR</span></button> -->
+                    <button class="plus-btn" @click="saveKeyWord"><i class="fa-solid fa-plus"></i></button>
+                  </div>
+                </div>
+                <p class="keyword-below">"+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
+                </p>
+                <span v-if="keyWordGroup.length === 0" >無資料</span>
+                <div class="keyword-button-group" >
+                  <button class="keyword-button-item" v-for="(keyWord, index) in keyWordGroup" :key="index" @click="handleUseKeyWordBtn(keyWord)" @mousedown="countMouseUp" @mouseup="deleteKeyWord(keyWord)" >{{ keyWord }}</button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '排序'">
+                <div class="menu-inner-slider-btn">
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelDownSort || !filterVaribleSet.levelUpSort, 'btn-active-bg': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" @click="changeSortStatus('level')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" >
+                      {{ levelOrder > 0 ? levelOrder : '' }}
+                    </div>
+                    等級
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.levelUpSort ,'arrow-down': filterVaribleSet.levelUpSort}" ></i>
+                  </button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorDownSort || !filterVaribleSet.colorUpSort, 'btn-active-bg': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" @click="changeSortStatus('color')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" >
+                      {{ colorOrder > 0 ? colorOrder : '' }}
+                    </div>
+                    顏色
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.colorUpSort ,'arrow-down': filterVaribleSet.colorUpSort}" ></i>
+                  </button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.priceDownSort || !filterVaribleSet.priceUpSort, 'btn-active-bg': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" @click="changeSortStatus('price')" >
+                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" >
+                      {{ priceOrder > 0 ? priceOrder : '' }}
+                    </div>
+                    價格
+                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.priceUpSort ,'arrow-down': filterVaribleSet.priceUpSort}" ></i>
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '類型'">
+                <div class="menu-inner-btn">
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeCharacter, 'btn-active-bg': filterVaribleSet.typeCharacter }" @click="changeFilterStatus('typeCharacter')" >角色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeEvent, 'btn-active-bg': filterVaribleSet.typeEvent }" @click="changeFilterStatus('typeEvent')" >事件</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.typeScene, 'btn-active-bg': filterVaribleSet.typeScene }" @click="changeFilterStatus('typeScene')" >名場</button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '等級'">
+                <div class="menu-inner-btn">
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter0, 'btn-active-bg': filterVaribleSet.levelFilter0 }" @click="changeFilterStatus('levelFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter1, 'btn-active-bg': filterVaribleSet.levelFilter1 }" @click="changeFilterStatus('levelFilter1')" >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter2, 'btn-active-bg': filterVaribleSet.levelFilter2 }" @click="changeFilterStatus('levelFilter2')" >2</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter3, 'btn-active-bg': filterVaribleSet.levelFilter3 }" @click="changeFilterStatus('levelFilter3')" >3</button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '顏色'">
+                <div class="menu-inner-btn">
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterYellow, 'btn-active-bg': filterVaribleSet.colorFilterYellow }"@click="changeFilterStatus('colorFilterYellow')" >黃色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterRed, 'btn-active-bg': filterVaribleSet.colorFilterRed }"@click="changeFilterStatus('colorFilterRed')" >紅色</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterBlue, 'btn-active-bg': filterVaribleSet.colorFilterBlue }"@click="changeFilterStatus('colorFilterBlue')" >藍色</button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '費用'">
+                <div class="menu-inner-btn">
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter0, 'btn-active-bg': filterVaribleSet.costFilter0 }"@click="changeFilterStatus('costFilter0')"  >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter1, 'btn-active-bg': filterVaribleSet.costFilter1 }"@click="changeFilterStatus('costFilter1')"  >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter2, 'btn-active-bg': filterVaribleSet.costFilter2 }"@click="changeFilterStatus('costFilter2')"  >2</button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '魂傷'">
+                <div class="menu-inner-btn">
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter0, 'btn-active-bg': filterVaribleSet.soulFilter0 }"@click="changeFilterStatus('soulFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter1, 'btn-active-bg': filterVaribleSet.soulFilter1 }"@click="changeFilterStatus('soulFilter1')" >1</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter2, 'btn-active-bg': filterVaribleSet.soulFilter2 }"@click="changeFilterStatus('soulFilter2')" >2</button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '攻擊力'">
+                <div class="menu-inner-btn">
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter0, 'btn-active-bg': filterVaribleSet.attackFilter0 }"@click="changeFilterStatus('attackFilter0')" >0</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter500, 'btn-active-bg': filterVaribleSet.attackFilter500 }"@click="changeFilterStatus('attackFilter500')" >500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1000, 'btn-active-bg': filterVaribleSet.attackFilter1000 }"@click="changeFilterStatus('attackFilter1000')" >1000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1500, 'btn-active-bg': filterVaribleSet.attackFilter1500 }"@click="changeFilterStatus('attackFilter1500')" >1500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2000, 'btn-active-bg': filterVaribleSet.attackFilter2000 }"@click="changeFilterStatus('attackFilter2000')" >2000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2500, 'btn-active-bg': filterVaribleSet.attackFilter2500 }"@click="changeFilterStatus('attackFilter2500')" >2500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3000, 'btn-active-bg': filterVaribleSet.attackFilter3000 }"@click="changeFilterStatus('attackFilter3000')" >3000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3500, 'btn-active-bg': filterVaribleSet.attackFilter3500 }"@click="changeFilterStatus('attackFilter3500')" >3500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4000, 'btn-active-bg': filterVaribleSet.attackFilter4000 }"@click="changeFilterStatus('attackFilter4000')" >4000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4500, 'btn-active-bg': filterVaribleSet.attackFilter4500 }"@click="changeFilterStatus('attackFilter4500')" >4500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5000, 'btn-active-bg': filterVaribleSet.attackFilter5000 }"@click="changeFilterStatus('attackFilter5000')" >5000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5500, 'btn-active-bg': filterVaribleSet.attackFilter5500 }"@click="changeFilterStatus('attackFilter5500')" >5500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6000, 'btn-active-bg': filterVaribleSet.attackFilter6000 }"@click="changeFilterStatus('attackFilter6000')" >6000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6500, 'btn-active-bg': filterVaribleSet.attackFilter6500 }"@click="changeFilterStatus('attackFilter6500')" >6500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7000, 'btn-active-bg': filterVaribleSet.attackFilter7000 }"@click="changeFilterStatus('attackFilter7000')" >7000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7500, 'btn-active-bg': filterVaribleSet.attackFilter7500 }"@click="changeFilterStatus('attackFilter7500')" >7500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8000, 'btn-active-bg': filterVaribleSet.attackFilter8000 }"@click="changeFilterStatus('attackFilter8000')" >8000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8500, 'btn-active-bg': filterVaribleSet.attackFilter8500 }"@click="changeFilterStatus('attackFilter8500')" >8500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9000, 'btn-active-bg': filterVaribleSet.attackFilter9000 }"@click="changeFilterStatus('attackFilter9000')" >9000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9500, 'btn-active-bg': filterVaribleSet.attackFilter9500 }"@click="changeFilterStatus('attackFilter9500')" >9500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10000, 'btn-active-bg': filterVaribleSet.attackFilter10000 }"@click="changeFilterStatus('attackFilter10000')" >10000</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10500, 'btn-active-bg': filterVaribleSet.attackFilter10500 }"@click="changeFilterStatus('attackFilter10500')" >10500</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter11000, 'btn-active-bg': filterVaribleSet.attackFilter11000 }"@click="changeFilterStatus('attackFilter11000')" >11000</button>
+                </div>
+              </div>
+              <div v-else-if="filter.name === '稀有度'">
+                <div class="menu-inner-btn">
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRR, 'btn-active-bg': filterVaribleSet.rareFilterRR }"@click="changeFilterStatus('rareFilterRR')" >RR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSSP, 'btn-active-bg': filterVaribleSet.rareFilterSSP }"@click="changeFilterStatus('rareFilterSSP')" >SSP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRR, 'btn-active-bg': filterVaribleSet.rareFilterLRR }"@click="changeFilterStatus('rareFilterLRR')" >LRR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilteR, 'btn-active-bg': filterVaribleSet.rareFilterR}"@click="changeFilterStatus('rareFilterR')" >R</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSR, 'btn-active-bg': filterVaribleSet.rareFilterSR }"@click="changeFilterStatus('rareFilterSR')" >SR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterOFR, 'btn-active-bg': filterVaribleSet.rareFilterOFR }"@click="changeFilterStatus('rareFilterOFR')" >OFR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterU, 'btn-active-bg': filterVaribleSet.rareFilterU }"@click="changeFilterStatus('rareFilterU')" >U</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterC, 'btn-active-bg': filterVaribleSet.rareFilterC }"@click="changeFilterStatus('rareFilterC')" >C</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCR, 'btn-active-bg': filterVaribleSet.rareFilterCR }"@click="changeFilterStatus('rareFilterCR')" >CR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRRR, 'btn-active-bg': filterVaribleSet.rareFilterRRR }"@click="changeFilterStatus('rareFilterRRR')" >RRR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCC, 'btn-active-bg': filterVaribleSet.rareFilterCC }"@click="changeFilterStatus('rareFilterCC')" >CC</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterPR, 'btn-active-bg': filterVaribleSet.rareFilterPR }"@click="changeFilterStatus('rareFilterPR')" >PR</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterTD, 'btn-active-bg': filterVaribleSet.rareFilterTD }"@click="changeFilterStatus('rareFilterTD')" >TD</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSP, 'btn-active-bg': filterVaribleSet.rareFilterSP }"@click="changeFilterStatus('rareFilterSP')" >SP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterN, 'btn-active-bg': filterVaribleSet.rareFilterN }"@click="changeFilterStatus('rareFilterN')" >N</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRP, 'btn-active-bg': filterVaribleSet.rareFilterLRP }"@click="changeFilterStatus('rareFilterLRP')" >LRP</button>
+                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSIR, 'btn-active-bg': filterVaribleSet.rareFilterSIR }"@click="changeFilterStatus('rareFilterSIR')" >SIR</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-    <section class="text-area">
-      <div class="edit-area">
-        <div class="message-tag">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            class="text-white/50 size-8"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
-            ></path>
-          </svg>
-          <input type="text" placeholder="#Tag1#Tag2" />
-        </div>
 
-        <editor
-          v-model="content"
-          :api-key="Tiny_API_KEY"
-          :init="{
-            height: 415,
-            menubar: false,
-            plugins: 'lists link image',
-            toolbar:
-              'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
-            content_style: 'body { background-color: #222F3E ;color: #FFF; }',
-          }"
-        />
-      </div>
-      <div class="message-area">
-        <div class="user-message">
-          <div class="message-user-img">
-            <img src="/src/img/麻衣.png" alt="" />
-          </div>
-          <div class="message">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none size-7 default-transition text-zinc-300"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
-              ></path>
-            </svg>
-            <input class="enter-message" type="text" placeholder="留言..." />
-            <button>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                ></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <span class="message-count">0則留言</span>
-      </div>
-    </section>
-    <footer>123</footer>
-
-    <div class="deck-container">
-      <div class="deck-img">
-        <img src="/src/img/麻衣.png" alt="" />
-      </div>
-      <div class="deck-content">
-        <div class="line"></div>
-        <div class="total-cards">
-          <h2>刪除 DG/S02-027R</h2>
-          <span>牌組製作，共84張卡</span>
-        </div>
-        <div class="deckbtn-area">
-          <button class="deck-btn">
-            <i class="fa-regular fa-circle-up"></i>
-          </button>
-          <div class="pay-btn">
-            <svg
-              width="24px"
-              height="24px"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-              ></path>
-            </svg>
-            <span>00000 ¥</span>
-          </div>
-        </div>
-      </div>
+        <footer class="sidebar-filter-footer">
+          <button :class="{ 'apply-btn' : !applyBtnStatus, 'apply-btn-active' : applyBtnStatus}" @click="handleApplyStatus"><span>Apply</span></button>
+        </footer>
+      </section>
+      
     </div>
-  </main>
+  </div>
 </template>
-
+<style src="@/assets/base.css" scoped></style>
+<style src="@/assets/css/card-series/main-content.css" scoped></style>
+<style src="@/assets/css/card-series/sidebar-filter.css" scoped></style>
+<style src="@/assets/css/card-series/sidebar-deck.css" scoped></style>
 <style scoped>
-div,
-span,
-applet,
-object,
-iframe,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-blockquote,
-pre,
-a,
-abbr,
-acronym,
-address,
-big,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strike,
-strong,
-sub,
-sup,
-tt,
-var,
-b,
-u,
-i,
-center,
-dl,
-dt,
-dd,
-ol,
-ul,
-li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td,
-article,
-aside,
-canvas,
-details,
-embed,
-figure,
-figcaption,
-footer,
-header,
-hgroup,
-menu,
-nav,
-output,
-ruby,
-section,
-summary,
-time,
-mark,
-audio,
-video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-}
-
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-menu,
-nav,
-section {
-  display: block;
-}
-body {
-  line-height: 1;
-}
-ol,
-ul {
-  list-style: none;
-}
-blockquote,
-q {
-  quotes: none;
-}
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-  content: '';
-  content: none;
-}
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-
-a {
-  text-decoration: none;
-  color: #ffffff;
-}
-
-.black-container {
-  background-color: #121212;
-  font-family:
-    Roboto,
-    Noto Sans TC,
-    sans-serif;
-  overscroll-behavior-x: none;
-  width: 100%;
-}
-
-.black-container::-webkit-scrollbar {
-  display: none;
-}
-
-.sidebar-container {
-  position: fixed;
-  top: 0;
-}
-
-.translate-btn {
-  display: flex;
-  align-items: center;
-  width: 238px;
-  height: 40px;
-  gap: 8px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(45deg, #a855f7, #ec4899);
-  color: white;
-  margin-top: 20px;
-  cursor: pointer;
-  position: relative;
-}
-
-.translate-btn::after {
-  content: '';
-  position: absolute;
-  border-top: 1px solid #3f3f46;
-  top: 50px;
-  left: 0;
-  right: 0;
-  width: 100%;
-}
-
-.sidebar p {
-  color: #a1a1aa;
-  font-size: 16px;
-  margin-top: 30px;
-}
-
-.pagebtn-area {
-  position: relative;
-  width: 20%;
-  height: 64px;
-  background-color: #32c9ff;
-  min-width: 195px;
-  display: flex;
-  align-items: center;
-  margin-left: 24px;
-  gap: 8px;
-}
-
-.page-btn {
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: rgb(70, 67, 67);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.page-btn svg {
-  width: 24px;
-  height: 24px;
-  stroke: white;
-}
-
-.pagebtn-area h2 {
-  font-size: 24px;
-  font-weight: 900;
-  color: white;
-}
-
-.next-btn {
-  opacity: 0.3;
-}
-
-.btn-area {
-  position: absolute;
-  right: 30px;
-  display: flex;
-  gap: 8px;
-}
-
-.notice {
-  width: 30px;
-  height: 25px;
-  background-color: #2d7894;
-  color: white;
-  border-radius: 15px;
-  font-size: 15px;
-  font-weight: 900;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 0 8px 0 8px;
-  position: absolute;
-  right: 105px;
-  top: 35px;
-  opacity: 0;
-  visibility: hidden;
-  transition: ease 0.3s;
-}
-
-.submit-btn {
-  width: 92px;
-  height: 36px;
-  background-color: white;
-  border-radius: 20px;
-  border: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 3px;
-  cursor: pointer;
-}
-
-.submit-btn:hover {
-  background-color: #f59e0b;
-  color: white;
-  stroke: white;
-}
-
-.submit-btn:hover span {
-  color: white;
-}
-
-.submit-btn:hover svg {
-  stroke: white;
-}
-
-.submit-btn svg {
-  width: 20px;
-  height: 20px;
-  stroke: #292828;
-}
-
-.submit-btn span {
-  color: #292828;
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.bell {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background-color: rgba(0, 0, 0, 0);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.bell:hover {
-  background-color: #2d7894;
-}
-
-.bell:hover .notice {
-  opacity: 1;
-  visibility: visible;
-}
-
-.bell svg {
-  width: 24px;
-  height: 24px;
-  stroke: white;
-}
-
-.user-btn {
-  border: none;
-  background-color: #19647f;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 20px;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.user-btn:hover {
-  background-color: #2d7894;
-}
-
-.btn-img img {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-}
-
-.user-btn span {
-  color: white;
-}
-
-.user-btn svg {
-  width: 16px;
-  height: 16px;
-  stroke: white;
-}
-
-main {
-  margin-left: 270px;
-  width: calc(100% - 278px);
-  background-color: #32c9ff;
-  scroll-behavior: smooth;
-}
-
-.header-bg {
-  background-color: #000000;
-  width: calc(100% - 278px);
-  height: 72px;
-  position: fixed;
-  top: 0;
-  z-index: 4;
-}
-
-header {
-  background-color: #32c9ff;
-  border-radius: 20px 20px 0 0;
-  width: 100%;
-  position: absolute;
-  top: 8px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-}
-
-.title-area {
-  width: 100%;
-  height: 378px;
-  margin-top: 72px;
-  display: flex;
-}
-
-.title-area-container {
-  width: 100%;
-  margin-top: 88px;
-  margin-left: 24px;
-  display: flex;
-}
-
-.upload-btn {
-  margin-top: 0;
-  width: 240px;
-  min-width: 240px;
-  height: 240px;
-  background-color: #333333;
-  border-radius: 10px;
-  cursor: pointer;
-  border: none;
-  position: relative;
-  overflow: hidden;
-}
-.preview-image {
-  width: 240px;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.upload-btn svg {
-  width: 85px;
-  height: 85px;
-  stroke: white;
-  visibility: hidden;
-  opacity: 0;
-  transition: ease 0.2s;
-}
-
-.upload-btn:hover svg {
-  visibility: visible;
-  opacity: 1;
-}
-
-.file-input {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.add-section {
-  width: 100%;
-  margin-left: 32px;
-  margin-top: 53px;
-}
-
-.add-article {
-  display: flex;
-  margin-bottom: 8px;
-}
-
-.add-article svg {
-  width: 24px;
-  height: 24px;
-  color: white;
-}
-
-.add-article p {
-  margin-left: 4px;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  color: white;
-}
-
-.enter-title {
-  box-sizing: border-box;
-  color: white;
-  padding: 6px;
-  border: none;
-  display: flex;
-  width: 90%;
-  font-size: 80px;
-  height: 105px;
-  background-color: #32c9ff;
-  border-bottom: 1px solid #99e4ff;
-}
-
-.enter-title:focus {
-  outline: none;
-}
-
-.enter-title::placeholder {
-  font-size: 80px;
-  font-weight: 900;
-}
-
-.menu {
-  display: flex;
-  align-items: center;
-  padding: 5px 10px;
-  color: white;
-  cursor: pointer;
-  gap: 5px;
-}
-
-.menu-area {
-  display: grid;
-  position: absolute;
-  background-color: #20567a;
-  border-radius: 7px;
-  width: 270px;
-  margin-top: 45px;
-  margin-left: 5px;
-  overflow: hidden;
-  transition: height 1s ease;
-  z-index: 3;
-}
-
-.menu-search {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  color: white;
-  position: relative;
-  width: 250px;
-}
-
-.keyword {
-  box-sizing: border-box;
-  color: white;
-  padding: 4px 8px;
-  border: 1px solid gray;
-  border-radius: 10px;
-  display: flex;
-  background-color: transparent;
-  outline: none;
-  width: 250px;
-}
-
-.menu-search button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
-  color: white;
-  position: absolute;
-  right: 12px;
-}
-
-.card-select-area {
-  width: 100%;
-  display: flex;
-  gap: 24px;
-}
-
-.card-select-btn {
-  margin-top: 8px;
-  width: 108px;
-  height: 32px;
-  border-radius: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: none;
-  background-color: #2fb7e7;
-  cursor: pointer;
-}
-
-.card-select-btn p {
-  font-size: 16px;
-  font-weight: 900;
-  color: white;
-}
-
-.card-select-btn:hover {
-  background-color: #2d7894;
-}
-
-.card-select-btn svg,
-.menu svg {
-  width: 24px;
-  height: 24px;
-  stroke: white;
-}
-
-.cannot-change {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.cannot-change p {
-  font-size: 16px;
-  color: white;
-  font-weight: 900;
-}
-
-.text-area {
-  box-sizing: border-box;
-  height: 520px;
-  display: flex;
-  background: linear-gradient(to bottom, #20637a, #131617);
-}
-
-.edit-area {
-  width: 55%;
-  height: 456px;
-  padding: 8px;
-  box-sizing: border-box;
-  background-color: #1c3d4b;
-  margin: 32px 0 0 24px;
-  border-radius: 10px;
-}
-
-.enter-text {
-  margin-top: 8px;
-  border-radius: 10px;
-  height: 392px;
-  width: calc(100% - 8px);
-  background-color: #222f3e;
-  border: 2px solid black;
-}
-
-.message-tag {
-  width: 50%;
-  background-color: #1c3d4b;
-  display: flex;
-  gap: 8px;
-}
-
-.message-tag svg {
-  width: 32px;
-  height: 32px;
-  stroke: rgb(116, 112, 112);
-}
-
-.message-tag input {
-  box-sizing: border-box;
-  width: 100%;
-  background-color: transparent;
-  border: none;
-  color: rgb(116, 112, 112);
-  font-size: 16px;
-  border-bottom: 2px solid rgb(116, 112, 112);
-}
-
-.message-tag input:focus {
-  outline: none;
-}
-
-.message-area {
-  width: 45%;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  margin-top: 36px;
-  margin-left: 16px;
-}
-
-.user-message {
-  width: 100%;
-  display: flex;
-  gap: 8px;
-  margin: auto;
-}
-
-.message {
-  box-sizing: border-box;
-  width: 85%;
-  height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  background-color: #1c3d4b;
-  border-radius: 10px;
-  padding: 8px;
-}
-
-.message:hover {
-  background-color: black;
-}
-
-.message-user-img img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.message svg {
-  width: 28px;
-  height: 28px;
-  stroke: white;
-}
-
-.message-count {
-  color: white;
-  position: absolute;
-  top: 56px;
-  right: 40px;
-  font-weight: bold;
-}
-
-.enter-message {
-  width: 100%;
-  box-sizing: border-box;
-  background-color: transparent;
-  border: none;
-  font-size: 16px;
-  transform: translate(-5px, 1px);
-  color: white;
-}
-
-.enter-message:focus {
-  outline: none;
-}
-
-.enter-messgae::placeholder {
-  color: #4f4f50;
-}
-
-.message button {
-  width: 32px;
-  height: 32px;
-  background-color: #3f3f46;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.message button svg {
-  width: 24px;
-  height: 24px;
-}
-
-footer {
-  background-color: #222f3e;
-  width: 100%;
-  height: 401px;
-  color: white;
-}
-
-.footer-nav {
-  width: 100%;
-  height: 66px;
-  display: flex;
-  background-color: #0d0b0c;
-  position: fixed;
-  bottom: 0;
-  display: none;
-}
-
-.nav-link {
-  width: 16.66%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.nav-link img {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-}
-
-.link-svg {
-  width: 28px;
-  height: 28px;
-  stroke: #b1afaf;
-}
-
-.link-word {
-  font-size: 9px;
-  margin-top: 8px;
-  color: #b1afaf;
-}
-
-.nav-link:hover svg {
-  stroke: white;
-}
-
-.nav-link:hover span {
-  color: white;
-}
-
-.social-icon svg {
-  stroke: white;
-}
-
-.social-icon span {
-  color: white;
-}
-
-.deck-container {
-  width: 99%;
-  padding-right: 8px;
-  height: 56px;
-  position: fixed;
-  bottom: 66px;
-  display: flex;
-  display: none;
-}
-
-.deck-img {
-  overflow: hidden;
-  border-radius: 10px;
-  transform: translateX(8px);
-  z-index: 1;
-}
-
-.deck-img img {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-}
-
-.deck-content {
-  width: 92%;
-  height: 56px;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  padding-left: 8px;
-  border-radius: 0 10px 10px 0;
-  align-items: center;
-  position: relative;
-}
-
-.line {
-  position: absolute;
-  bottom: 52px;
-  width: 96%;
-  border-top: 4px solid;
-  border-image: linear-gradient(
-      to right,
-      rgb(234, 179, 8) 0%,
-      rgb(234, 179, 8) 89.0476%,
-      rgb(34, 197, 94) 94.0476%,
-      rgb(34, 197, 94) 95%
-    )
-    5 / 1 / 0 stretch;
-}
-
-.total-cards {
-  width: 80%;
-  padding-top: 8px;
-  padding-left: 8px;
-}
-
-.total-cards h2 {
-  font-size: 15px;
-  font-weight: 00;
-  color: #fff;
-  margin-bottom: 2px;
-}
-
-.total-cards span {
-  font-size: 13px;
-  color: #dad7d7;
-  font-weight: 700;
-}
-
-.deckbtn-area {
-  display: flex;
-  align-items: center;
-  width: 20%;
-  position: relative;
-  padding-left: 8px;
-}
-
-.deck-btn {
-  all: unset;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  color: #f0f0f0;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  right: 120px;
-  cursor: pointer;
-}
-
-.deck-btn:hover {
-  background-color: #42ebeb;
-}
-
-.deck-btn i::before {
-  font-size: 24px;
-}
-
-.pay-btn {
-  padding-left: 5px;
-  position: absolute;
-  right: 8px;
-  width: 86px;
-  min-width: 94px;
-  height: 32px;
-  background-color: #daa61e;
-  display: flex;
-  align-items: center;
-  color: #dad7d7;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.pay-btn:hover {
-  background-color: #e27637;
-}
-
-.pay-btn span {
-  font-size: 14px;
-  margin-left: 5px;
-}
-
-@media screen and (max-width: 1200px) {
-  body {
-    min-width: 100%;
-  }
-
-  .sidebar-container {
-    top: auto;
-  }
-
-  main {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .header-bg {
-    background-color: #000000;
-    width: 100%;
-    height: 64px;
-  }
-
-  header {
-    border-radius: 0;
-    width: 100%;
-    position: static;
-  }
-
-  .next-btn {
+  .hidden {
     display: none;
   }
-
-  .bell,
-  .user-btn {
-    display: none;
-  }
-
-  .title-area {
-    width: 100%;
-    margin-top: 0;
-    margin-left: 0;
-    height: 560px;
-  }
-
-  .title-area-container {
-    height: 560px;
-    display: flex;
-    flex-direction: column;
-    margin-left: 0;
-    margin-top: 80px;
-  }
-
-  .upload-btn {
-    width: 288px;
-    height: 288px;
-    margin: 0 auto;
-  }
-  .preview-image {
-    width: 288px;
-  }
-
-  .add-section {
-    width: 100%;
-    margin-left: 16px;
-    margin-top: 25px;
-  }
-
-  .enter-title {
-    padding: 0;
-    width: 90%;
-    font-size: 35px;
-    height: 40px;
-  }
-
-  .enter-title::placeholder {
-    font-size: 35px;
-    font-weight: 900;
-  }
-
-  .card-select-area {
-    gap: 5px;
-    flex-direction: column;
-  }
-
-  .card-select-btn {
-    justify-content: start;
-    width: 90%;
-  }
-
-  .menu-area {
-    width: 89%;
-  }
-  .menu-search {
-    width: 100%;
-  }
-  .menu-search button {
-    right: 40px;
-  }
-  .keyword {
-    width: 97%;
-  }
-
-  .cannot-change p {
-    font-size: 20px;
-  }
-
-  .text-area {
-    box-sizing: border-box;
-    width: 100%;
-    height: 650px;
-    flex-direction: column;
-  }
-
-  .edit-area {
-    width: 95%;
-    box-sizing: border-box;
-    background-color: #1c3d4b;
-    margin: 16px auto;
-  }
-
-  .message-user-img img {
-    width: 50px;
-    height: 50px;
-  }
-
-  .enter-message {
-    width: 100%;
-  }
-
-  .message-area {
-    width: 95%;
-    height: 40px;
-    margin-top: 36px;
-    margin-left: 16px;
-  }
-
-  .message {
-    width: 90%;
-    height: 50px;
-    gap: 8px;
-    background-color: #2a2a2b;
-  }
-
-  .message-count {
-    position: absolute;
-    top: 70px;
-    right: 20px;
-  }
-
-  .footer-nav {
-    display: flex;
-  }
-
-  .edit-area {
-    width: 95%;
-    box-sizing: border-box;
-    background-color: #1c3d4b;
-    margin: 16px auto;
-  }
-
-  .message-user-img img {
-    width: 50px;
-    height: 50px;
-  }
-
-  .enter-message {
-    width: 100%;
-  }
-
-  .message-area {
-    width: 95%;
-    height: 40px;
-    margin-top: 36px;
-    margin-left: 16px;
-  }
-
-  .message {
-    width: 90%;
-    height: 50px;
-    gap: 8px;
-    background-color: #2a2a2b;
-  }
-
-  .message-count {
-    position: absolute;
-    top: 70px;
-    right: 20px;
-  }
-
-  .footer-nav {
-    display: flex;
-  }
-
-  .deck-container {
-    display: flex;
-  }
-}
 </style>

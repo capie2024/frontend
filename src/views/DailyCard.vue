@@ -233,7 +233,6 @@ onMounted(async () => {
               >
                 <span class="hide">Close</span
                 ><svg
-                  data-v-896c8a0b=""
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -353,7 +352,7 @@ onMounted(async () => {
                       >日期</span
                     >
                   </button>
-                  <h3 data-v-896c8a0b="" class="font-bold text-red-500">
+                  <h3 class="font-bold text-red-500">
                     ＊僅顯示最近30天的資料內容
                   </h3>
                 </nav>

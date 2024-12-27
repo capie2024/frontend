@@ -2,8 +2,11 @@
   <div class="work-shop-page-container">
     <SidebarGrid />
     <div class="work-shop-main-content-container">
-      <div v-if="isVisible">
-        <RemitCard v-if="isVisible" />
+      <div v-if="firstVisible">
+        <RemitCard v-if="firstVisible" />
+      </div>
+      <div v-if="secondVisible">
+        <FindCard v-if="secondVisible" />
       </div>
       <header class="work-shop-header">
         <div class="header-container Top-bar">
@@ -82,7 +85,7 @@
           </div>
           <div class="w-full login">
             <div class="notice">
-              <notice />
+              <Notice />
               <p class="notice-txt">通知</p>
             </div>
             <button
@@ -148,7 +151,12 @@
         <div class="work-shop-title">
           <h2>實用工具</h2>
           <section class="show-container">
-            <a href="#" class="button a-button" type="button" id="#looking">
+            <button
+              class="button a-button"
+              type="button"
+              id="#looking"
+              @click="toggleFindCard"
+            >
               <div
                 class="shadow out-div"
                 style="
@@ -179,7 +187,7 @@
                   </p>
                 </div>
               </div>
-            </a>
+            </button>
 
             <button
               @click="toggleRemitCard"
@@ -303,15 +311,19 @@ import SidebarGrid from '../components/SidebarGrid.vue'
 import { onMounted, ref, computed } from 'vue'
 import axios from 'axios'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
-import notice from '../components/notification/notice.vue'
+import Notice from '../components/notification/notice.vue'
 import RemitCard from '../components/Mycard/remit-card.vue'
+import FindCard from '../components/Mycard/find-card.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-const isVisible = ref(false)
-
+const firstVisible = ref(false)
+const secondVisible = ref(false)
 const toggleRemitCard = () => {
-  isVisible.value = !isVisible.value
+  firstVisible.value = !firstVisible.value
+}
+const toggleFindCard = () => {
+  secondVisible.value = !secondVisible.value
 }
 // 日期晚>早排序
 const dateSort = (a, b) => {

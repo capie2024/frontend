@@ -19,7 +19,6 @@
             @click="confirmClose"
           >
             <svg
-              data-v-502f6c5f=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -39,9 +38,9 @@
         </div>
 
         <div class="modal-body">
-          <h3 data-v-41768621="" class="topic my-4">
+          <h3 class="topic my-4">
             選擇牌組
-            <span data-v-41768621="" class="subtitle">選擇你的牌組來源</span>
+            <span class="subtitle">選擇你的牌組來源</span>
           </h3>
         </div>
 
@@ -52,7 +51,6 @@
             class="button-remit item z-20 focus-button"
           >
             <svg
-              data-v-41768621=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -68,10 +66,10 @@
                 d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
               ></path>
             </svg>
-            <span data-v-41768621="" class="text-sm font-mono">牌組編號</span>
+            <span class="text-sm font-mono">牌組編號</span>
           </button>
 
-          <div data-v-41768621="" class="input-item-2">
+          <div class="input-item-2">
             <input
               class="input-text"
               id="input-text"
@@ -86,7 +84,6 @@
               @click="checkDeckId"
             >
               <svg
-                data-v-41768621=""
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -146,13 +143,11 @@
           </div>
         </div>
         <div class="modal-body">
-          <h3 data-v-41768621="" class="topic my-4">
+          <h3 class="topic my-4">
             匯出設定
-            <span data-v-41768621="" class="subtitle"
-              >選擇你的匯出格式內容</span
-            >
+            <span class="subtitle">選擇你的匯出格式內容</span>
           </h3>
-          <h3 data-v-41768621="" class="topic my-4">選擇匯出格式</h3>
+          <h3 class="topic my-4">選擇匯出格式</h3>
         </div>
 
         <div class="input-button">
@@ -162,7 +157,6 @@
             @click="toggleActive(1)"
           >
             <svg
-              data-v-41768621=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -182,7 +176,7 @@
           </button>
         </div>
 
-        <div data-v-c3ac02c2="" class="seeting">
+        <div class="seeting">
           <button
             class="item justify-center default-transition gray setting-text"
             id="setting-text"
@@ -191,7 +185,6 @@
             :class="{ black: allButtonsActive, gray: !allButtonsActive }"
           >
             <svg
-              data-v-c3ac02c2=""
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"

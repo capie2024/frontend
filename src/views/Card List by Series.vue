@@ -50,71 +50,109 @@
               </button>
             </div>
           </div>
-                            <div class="icons">
-                                <notice/>
-                                <NavLoginBtn/>
-                            </div>
-                        </div>
-                        <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
-                        <section class="show-card">
-                            <a v-for="card in viewedSeries" :key="card.id" href="#" class="transition-colors url" @click.prevent="handleSeries(card.id)" >
-
-                                    <div>
-                                        <img :src ="card.cover || '/src/img/cover.png'" alt="">
-                                    </div>
-                                    <div class="card-text">
-                                        <div class="flex">
-                                            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none icon-size color-a1">
-                                                <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                                                </path>
-                                                <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                                                </path>
-                                            </svg>
-                                            <p class="color-a1">{{ card.code.join(', ') }}</p>
-                                        </div>
-                                        <p class="font-size20 color-white padding-bottom" >{{ card.name }}</p>
-                                        <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
-                                    </div>
-                            </a>
-                        </section>
-                        <h2 class="font-size30 color-white">系列<br>
-                            <span class="font-size75rem color-a1">一共有  {{ searchResultCount }}  結果</span>
-                        </h2>
-                        <section class="grid-card">
-                           
-                            <a v-for="card in cardSeries" :key="card.id" href="#" class="transition-colors url" @click.prevent="handleSeries(card.id)" >
-                                    <div>
-                                        <img :src ="card.cover || 'https://bottleneko.app/images/cover.png'" alt="">
-                                    </div>
-                                    <div class="card-text">
-                                        <div class="flex">
-                                            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none icon-size color-a1">
-                                                <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                                                </path>
-                                                <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                                                </path>
-                                            </svg>
-                                            <p class="color-a1">{{ card.code.join(', ') }}</p>
-                                        </div>
-                                        <p class="font-size20 color-white padding-bottom" >{{ card.name }}</p>
-                                        <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
-                                    </div>
-                            </a>   
-                        </section>
-                    </div>
-                    <MainFooter/>
-                </div>
+          <div class="icons">
+            <notice />
+            <NavLoginBtn />
+          </div>
+        </div>
+        <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
+        <section class="show-card">
+          <a
+            v-for="card in viewedSeries"
+            :key="card.id"
+            href="#"
+            class="transition-colors url"
+            @click.prevent="handleSeries(card.id)"
+          >
+            <div>
+              <img :src="card.cover || '/src/img/cover.png'" alt="" />
+            </div>
+            <div class="card-text">
+              <div class="flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="flex-none icon-size color-a1"
+                >
+                  <path
+                    d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"
+                  ></path>
+                  <path
+                    d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"
+                  ></path>
+                </svg>
+                <p class="color-a1">{{ card.code.join(', ') }}</p>
               </div>
+              <p class="font-size20 color-white padding-bottom">
+                {{ card.name }}
+              </p>
+              <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
+            </div>
+          </a>
+        </section>
+        <h2 class="font-size30 color-white">
+          系列<br />
+          <span class="font-size75rem color-a1"
+            >一共有 {{ searchResultCount }} 結果</span
+          >
+        </h2>
+        <section class="grid-card">
+          <a
+            v-for="card in cardSeries"
+            :key="card.id"
+            href="#"
+            class="transition-colors url"
+            @click.prevent="handleSeries(card.id)"
+          >
+            <div>
+              <img
+                :src="card.cover || 'https://bottleneko.app/images/cover.png'"
+                alt=""
+              />
+            </div>
+            <div class="card-text">
+              <div class="flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="flex-none icon-size color-a1"
+                >
+                  <path
+                    d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"
+                  ></path>
+                  <path
+                    d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"
+                  ></path>
+                </svg>
+                <p class="color-a1">{{ card.code.join(', ') }}</p>
+              </div>
+              <p class="font-size20 color-white padding-bottom">
+                {{ card.name }}
+              </p>
+              <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
+            </div>
+          </a>
+        </section>
+      </div>
+      <MainFooter />
+    </div>
+  </div>
 </template>
 
 <script setup>
-import SidebarGrid from '../components/SidebarGrid.vue';
-import NavLoginBtn from '../components/NavLoginBtn.vue';
-import notice from '../components/notification/notice.vue';
-import MainFooter from '../components/MainFooter.vue';
-import { useCardSeriesStore } from "@/stores/card-series";
-import { ref, computed, onMounted } from 'vue';
-import axios from "axios";
+import SidebarGrid from '../components/SidebarGrid.vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import notice from '../components/notification/notice.vue'
+import MainFooter from '../components/MainFooter.vue'
+import { useCardSeriesStore } from '@/stores/card-series'
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 import { useRouter } from 'vue-router'
 const API_URL = import.meta.env.VITE_API_URL
 

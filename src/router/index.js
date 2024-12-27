@@ -86,7 +86,7 @@ const router = createRouter({
       path: '/signup',
       name: 'signup',
       component: Signup,
-    }
+    },
     {
       path: '/card-series/:series_id',
       component: CardSeries,

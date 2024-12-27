@@ -5,16 +5,16 @@ import { useCardInfoStore } from '@/stores/card-info'
 import { useDeckMakeStore } from '@/stores/deck-make'
 import { useSidebarStore } from '@/stores/sidebar'
 
-
 const cardInfoStore = useCardInfoStore()
-const { cardInfo, translatedCardInfo, cardInfoDisplay, leftDisabled, rightDisabled } =
-storeToRefs(cardInfoStore)
+const { cardInfo, translatedCardInfo, cardInfoDisplay, leftDisabled, rightDisabled, translatedCardQAList } = storeToRefs(cardInfoStore)
 const changeCardInfoCard = cardInfoStore.changeCardInfoCard
+const getCardQA = cardInfoStore.getCardQA
 
 const deckMakeStore = useDeckMakeStore()
 const { selectedCards } = storeToRefs(deckMakeStore)
 
 const sidebarStore = useSidebarStore()
+const { isActive } = storeToRefs(sidebarStore)
 const handleSwitchTranslate = () => {
   sidebarStore.switchLang()
 }
@@ -105,14 +105,15 @@ const bgColor = computed(() => {
     return `bg-purple-700/50`
   }
 })
-
 // const handle
 onBeforeMount(() => {})
 
-onMounted(() => {
+onMounted(async() => {
   import('../assets/js/cardEffect.js')
   cardCount.value = countCards(cardInfo.value)
+  await getCardQA()
 })
+
 </script>
 <template>
   <section
@@ -259,6 +260,29 @@ onMounted(() => {
             </div>
             <div class="flex items-center counter gap-x-2">
               <button
+              v-if="isActive === true"
+                class="flex-none text-white shadow btn btn-sm bg-gradient-to-r from-purple-500 to-pink-500 shadow-purple-500/50"
+                @click="handleSwitchTranslate"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802"
+                  ></path>
+                </svg>
+              </button>
+              <button
+                v-else-if="isActive === false"
                 class="flex-none text-white shadow btn btn-sm bg-zinc-700 hover:bg-gradient-to-r from-purple-500 to-pink-500 shadow-purple-500/50"
                 @click="handleSwitchTranslate"
               >
@@ -720,23 +744,19 @@ onMounted(() => {
             </svg>
             <span class="text-lg font-bold leading-none">QA</span>
           </h4>
-          <div class="flex flex-col gap-4">
+          <div v-if="translatedCardQAList.length > 0" class="flex flex-col gap-4" v-for="qa in translatedCardQAList" >
             <div class="flex items-end gap-2">
               <div
                 class="bg-gradient-to-tr from-emerald-500 to-green-300 p-2 rounded-2xl max-w-[80%]"
               >
                 <p class="text-sm leading-relaxed whitespace-pre-line">
-                  Q<mark class="mark-1"
-                    >『あなたは相手のキャラすべてを、思い出にしてよい。そうしたら、あなたはそれらのキャラを舞台の別々の枠に置く。』</mark
-                  >について。 前列に<mark class="mark-3"
-                    >「#絵クロマンサー 潤羽るしあ」</mark
-                  >があり、その正面のキャラがいる状態でこの効果を解決することはできますか？
+                  {{ qa.q }}
                 </p>
               </div>
               <div class="flex flex-col">
-                <p class="font-bold text-zinc-300">Q.678</p>
+                <p class="font-bold text-zinc-300">Q.{{ qa.id }}</p>
                 <p class="font-mono text-xs whitespace-nowrap text-zinc-500">
-                  2023-03-23
+                  {{ qa.date }}
                 </p>
               </div>
             </div>
@@ -745,32 +765,24 @@ onMounted(() => {
                 class="bg-gradient-to-bl from-white to-neutral-400 p-2 rounded-2xl max-w-[80%]"
               >
                 <p class="text-sm leading-relaxed whitespace-pre-line">
-                  Aいいえ、効果を解決することはできません。
-                  <mark class="mark-3"
-                    >「あなたは相手のキャラすべてを、思い出にしてよい。」</mark
-                  >とは、<mark class="mark-3"
-                    >「あなたは相手のキャラすべてを、思い出にする」</mark
-                  >か<mark class="mark-3">「なにもしない」</mark
-                  >のどちらかを行うことを指します。
-                  <mark class="mark-3">「#絵クロマンサー 潤羽るしあ」</mark
-                  >の効果によって正面のキャラを思い出にできない場合、<mark
-                    class="mark-3"
-                    >「あなたは相手のキャラすべてを、思い出にする」</mark
-                  >を行えないため、<mark class="mark-3">「なにもしない」</mark
-                  >を行うことになります。
-                  <mark class="mark-3">「なにもしない」</mark
-                  >を選択したため、<mark class="mark-3">「そうしたら～」</mark
-                  >以降の効果を解決することはできません。
+                  {{ qa.a }}
                 </p>
               </div>
               <div class="flex flex-col text-right">
-                <p class="font-bold text-zinc-300">A.678</p>
+                <p class="font-bold text-zinc-300">A.{{ qa.id }}</p>
                 <p class="font-mono text-xs whitespace-nowrap text-zinc-500">
-                  2023-03-23
+                  {{ qa.date }}
                 </p>
               </div>
             </div>
           </div>
+          <div v-else-if="translatedCardQAList.length <= 0" class="h-[10rem] grid place-content-center rounded-2xl text-white bg-black/20" >
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-8"><path stroke-linecap="round" stroke-linejoin="round" d="M10.05 4.575a1.575 1.575 0 1 0-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 0 1 3.15 0v1.5m-3.15 0 .075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 0 1 3.15 0V15M6.9 7.575a1.575 1.575 0 1 0-3.15 0v8.175a6.75 6.75 0 0 0 6.75 6.75h2.018a5.25 5.25 0 0 0 3.712-1.538l1.732-1.732a5.25 5.25 0 0 0 1.538-3.712l.003-2.024a.668.668 0 0 1 .198-.471 1.575 1.575 0 1 0-2.228-2.228 3.818 3.818 0 0 0-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0 1 16.35 15m.002 0h-.002"></path></svg>
+              <span>沒東西</span>
+            </div>
+          </div>
+          <div class=""></div>
           <hr class="my-2 -mx-4 border-zinc-700" />
           <div id="chat" class="flex flex-col gap-4">
             <h4 class="flex items-center gap-1 text-cyan-500">

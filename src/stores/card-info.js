@@ -1,7 +1,8 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
 import { useDeckMakeStore } from './deck-make'
 import { useI18n } from 'vue-i18n'
+import axios from 'axios'
 
 export const useCardInfoStore = defineStore('card-info', () => {
   const deckMakeStore = useDeckMakeStore()
@@ -10,6 +11,7 @@ export const useCardInfoStore = defineStore('card-info', () => {
   const cardInfoDisplay = ref(false)
   const cardInfo = ref(null)
   const cardIndex = ref(null)
+  const cardQAList = ref([])
 
   const leftDisabled = ref(null)
   const rightDisabled = ref(null)
@@ -69,28 +71,27 @@ export const useCardInfoStore = defineStore('card-info', () => {
     }
   }
 
+  const getCardQA = async() => {
+    cardQAList.value = []
+    const API_URL = import.meta.env.VITE_API_URL
+    const res = await axios.get(`${API_URL}/qa`)
+    const qalist = []
+    res.data.forEach( qa => {
+      if(qa.relations.includes(cardInfo.value.id)) {
+        qalist.unshift(qa)
+      }
+    });
+    cardQAList.value = qalist
+  }
+
   const translatedCardInfo = computed(() => {
     if(cardInfo.value === null) return
     const translateTitle = cardInfo.value.i18n?.[locale.value]?.title
-    console.log(translateTitle);
-    console.log(cardInfo.value.title);
-    
     const translateFeature = cardInfo.value.i18n?.[locale.value]?.feature
-    console.log(translateFeature);
-    console.log(cardInfo.value.feature);
-    
     const translateProductName = cardInfo.value.i18n?.[locale.value]?.productName
-    console.log(translateProductName);
-    console.log(cardInfo.value.productName);
-    
     const translateSay = cardInfo.value.i18n?.[locale.value]?.say
-    console.log(translateSay);
-    console.log(cardInfo.value.say);
-    
     const translateEffect = cardInfo.value.i18n?.[locale.value]?.effect
-    console.log(translateEffect);
-    console.log(cardInfo.value.effect);    
-    
+
     return {
       ...cardInfo.value,
       title: translateTitle || cardInfo.value.title,
@@ -102,6 +103,21 @@ export const useCardInfoStore = defineStore('card-info', () => {
     }
   })
 
+  const translatedCardQAList = computed(() => {
+    if(cardQAList.value === null) return
+    
+    return cardQAList.value.map(qa => {
+      const translateQ = qa.i18n?.[locale.value]?.q
+      const translateA = qa.i18n?.[locale.value]?.a
+      return {
+        ...qa,
+        q: translateQ || qa.q,
+        a: translateA || qa.a,
+        author: qa.i18n?.[locale.value]?.author
+      }
+    })
+  })
+
   return {
     cardInfoDisplay,
     cardInfo,
@@ -111,5 +127,8 @@ export const useCardInfoStore = defineStore('card-info', () => {
     changeCardInfoCard,
     leftDisabled,
     rightDisabled,
+    getCardQA,
+    cardQAList,
+    translatedCardQAList
   }
 })

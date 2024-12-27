@@ -2077,7 +2077,7 @@ onBeforeUnmount(() => {
                 class="col-Sheet"
                 v-for="(card, index) in translatedSeriesCardList"
                 :key="card.id"
-                @click.stop="getCardInfoAndShow(card)"
+                @click.stop="getCardInfoAndShow(seriesCardList[index])"
               >
                 <div class="card-image">
                   <img :src="card.cover" />
@@ -2086,7 +2086,7 @@ onBeforeUnmount(() => {
                     <h3>{{ card.title }}</h3>
                   </div>
                   <button
-                    @click.stop="addCard(card)"
+                    @click.stop="addCard(seriesCardList[index])"
                     class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"
                   >
                     <svg
@@ -2121,13 +2121,13 @@ onBeforeUnmount(() => {
                 class="col-Info"
                 v-for="(card, index) in translatedSeriesCardList"
                 :key="index"
-                @click.stop="addCard(card)"
+                @click.stop="addCard(seriesCardList[index])"
               >
                 <div class="card-info-image">
                   <img :src="card.cover" />
                   <div
                     class="card-inner-info"
-                    @click.stop="getCardInfoAndShow(card)"
+                    @click.stop="getCardInfoAndShow(seriesCardList[index])"
                   >
                     <div class="card-inner-info-header">
                       <p>{{ card.id }}</p>
@@ -2158,7 +2158,7 @@ onBeforeUnmount(() => {
                     </div>
                     <div class="price-download">
                       <p>${{ card.price.number }}</p>
-                      <button @click.stop="addCard(card)">
+                      <button @click.stop="addCard(seriesCardList[index])">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"

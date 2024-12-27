@@ -132,7 +132,7 @@ http://localhost:5173/
 
 ### 團隊成員
 
-- 旻睿 :https://github.com/minjuilu
+- 旻叡 :https://github.com/minjuilu
 - 佳樺 :https://github.com/wuuhua
 - 宗倫 :https://github.com/allen84324
 - 代賢 :https://github.com/Wandaihsien

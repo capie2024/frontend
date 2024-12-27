@@ -27,7 +27,7 @@
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="w-6 h-6"
+              class="h-6 w-6"
             >
               <path
                 stroke-linecap="round"
@@ -39,7 +39,7 @@
         </div>
 
         <div class="modal-body">
-          <h3 data-v-41768621="" class="my-4 topic">
+          <h3 data-v-41768621="" class="topic my-4">
             選擇牌組
             <span data-v-41768621="" class="subtitle">選擇你的牌組來源</span>
           </h3>
@@ -49,7 +49,7 @@
           <button
             :class="{ active: buttons[0] }"
             @click="toggleActive(0)"
-            class="z-20 button-remit item focus-button"
+            class="button-remit item z-20 focus-button"
           >
             <svg
               data-v-41768621=""
@@ -68,7 +68,7 @@
                 d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
               ></path>
             </svg>
-            <span data-v-41768621="" class="font-mono text-sm">牌組編號</span>
+            <span data-v-41768621="" class="text-sm font-mono">牌組編號</span>
           </button>
 
           <div data-v-41768621="" class="input-item-2">
@@ -122,7 +122,7 @@
                 ></path>
               </svg>
             </div>
-            <span class="font-mono text-green-500 truncate">找到牌組</span>
+            <span class="font-mono truncate text-green-500">找到牌組</span>
           </div>
 
           <!-- 當 deckId 沒有對應的牌組時顯示紅色提示 -->
@@ -146,13 +146,13 @@
           </div>
         </div>
         <div class="modal-body">
-          <h3 data-v-41768621="" class="my-4 topic">
+          <h3 data-v-41768621="" class="topic my-4">
             匯出設定
             <span data-v-41768621="" class="subtitle"
               >選擇你的匯出格式內容</span
             >
           </h3>
-          <h3 data-v-41768621="" class="my-4 topic">選擇匯出格式</h3>
+          <h3 data-v-41768621="" class="topic my-4">選擇匯出格式</h3>
         </div>
 
         <div class="input-button">
@@ -178,13 +178,13 @@
                 d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
               ></path>
             </svg>
-            <span class="font-mono text-sm">PDF</span>
+            <span class="text-sm font-mono">PDF</span>
           </button>
         </div>
 
         <div data-v-c3ac02c2="" class="seeting">
           <button
-            class="justify-center item default-transition gray setting-text"
+            class="item justify-center default-transition gray setting-text"
             id="setting-text"
             @click="exportToPDF"
             :disabled="!allButtonsActive"
@@ -207,7 +207,7 @@
                 d="m4.5 12.75 6 6 9-13.5"
               ></path>
             </svg>
-            <span class="font-mono text-sm input-text" id="input-text">
+            <span class="text-sm font-mono input-text" id="input-text">
               設定完成
             </span>
           </button>
@@ -482,45 +482,16 @@ export default {
   cursor: not-allowed;
 }
 
-  .black {
-      background-color: #121212;
-      color: black;
-      cursor: pointer;
-  }
-  .modal-content {
-      background-color: rgb(18,18,18);
-      border-radius:10px ;
-      width: 551px;
-      
-  }
-  
-  .modal-title {
-      color: white;
-      font-size: 16px;
-      width: 100%;
-      
-  }
-  
-  .input-text {
-      align-items: center;
-      border-radius: .75rem;
-      display: flex;
-      gap: .5rem;
-      padding-left: 5px;
-      width: 100%;
-      height: 40px;
-      background-color:transparent ;
-      color: #e5e7eb;
-      border-style: none;
-  }
-  #input-text:focus-visible {
-      border-color: transparent !important ;
-      outline: none;
-  }
-  
-  #input-button-2  {
-      border: 1px solid transparent ;
-  }
+.black {
+  background-color: #121212;
+  color: black;
+  cursor: pointer;
+}
+.modal-content {
+  background-color: rgb(18, 18, 18);
+  border-radius: 10px;
+  width: 551px;
+}
 
 .modal-title {
   color: white;
@@ -693,25 +664,98 @@ export default {
   color: white;
 }
 
-.button-remit-div {
-    width: 100%;
-}
-.modal-content{
-width: 80vw;
-height: 60vh;
+.input-item-2 {
+  align-items: center;
+  border-radius: 0.75rem;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 8px;
+  display: flex;
+  border: 1px solid #a1a1aa;
+  padding: 10px 0;
 }
 
-@media screen and (max-width: 375px){
-  .modal-content{
+.show-text-green {
+  display: flex;
+  color: #20b055;
+  align-items: center;
+}
+
+.show-text-green svg {
+  width: 28px;
+  background-color: #402f2f;
+  border-radius: 99px;
+  padding: 4px;
+  margin: 5px;
+}
+
+.show-text-red {
+  display: flex;
+  color: #ef4444;
+  align-items: center;
+}
+
+.show-text-red svg {
+  width: 28px;
+  background-color: #402f2f;
+  border-radius: 99px;
+  padding: 4px;
+  margin: 5px;
+}
+
+.seeting {
+  display: flex;
+  justify-content: center;
+}
+
+.setting-text {
+  display: flex;
+  justify-content: center;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  margin-top: 10px;
+  align-items: center;
+  gap: 0.5rem;
+}
+#setting-text {
+  padding: 0.3rem;
+}
+.setting:hover {
+  background-color: #27272a;
+}
+
+.item {
+  padding: 0 0.5rem 0 0;
+  border: 1px solid #a1a1aa;
+}
+
+@media (max-width: 767px) {
+  .input-button {
+    /* display: grid; */
+    /* align-items: flex-start; */
+    gap: 0.5rem;
+    box-sizing: content-box;
+    /* padding: 1rem; */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .modal-dialog {
+    height: 100%;
+    width: 100%;
+  }
+
+  .button-remit-div {
+    width: 100%;
+  }
+  .modal-content {
+    width: 80vw;
+    height: 60vh;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .modal-content {
     width: 100vw;
     height: 75vh;
   }
-}
-.modal-dialog {
-  height: 100%;
-  width: 100%;
-}
-.button-remit-div {
-  width: 100%;
 }
 </style>

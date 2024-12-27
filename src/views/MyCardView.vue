@@ -174,7 +174,6 @@
                       aria-hidden="true"
                       data-slot="icon"
                       class="flex-none size-6 md:size-8"
-                      data-v-f025b9fc=""
                     >
                       <path
                         stroke-linecap="round"
@@ -221,7 +220,7 @@
                            7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
                       ></path>
                     </svg>
-                    <span data-v-f025b9fc="">匯出牌組</span>
+                    <span>匯出牌組</span>
                   </p>
                 </div>
               </div>
@@ -236,7 +235,7 @@
         <section class="show-card grid-card">
           <a
             v-for="cardDeck in cardDecks"
-            href="#"
+            :href="`deck/${cardDeck.deck_id}`"
             class="hover:bg-[rgb(39,39,42)] url gap15 transition-colors"
           >
             <div class="img-btn">
@@ -249,11 +248,9 @@
                 alt=""
               />
               <button
-                data-v-6e6279af=""
                 class="bottom-0 right-0 p-1 m-1 text-white rounded-full bg-zinc-800"
               >
                 <svg
-                  data-v-6e6279af=""
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -275,7 +272,6 @@
             <div class="card-text">
               <div class="flex">
                 <svg
-                  data-v-09f2b439=""
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"

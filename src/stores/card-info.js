@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
-import router from '../router/index'
 import { useDeckMakeStore } from './deck-make'
+import { useI18n } from 'vue-i18n'
 
 export const useCardInfoStore = defineStore('card-info', () => {
   const deckMakeStore = useDeckMakeStore()
@@ -13,6 +13,9 @@ export const useCardInfoStore = defineStore('card-info', () => {
 
   const leftDisabled = ref(null)
   const rightDisabled = ref(null)
+
+  
+  const { locale } = useI18n()
 
   const getCardInfoAndShow = (card) => {
     cardInfo.value = card
@@ -66,9 +69,43 @@ export const useCardInfoStore = defineStore('card-info', () => {
     }
   }
 
+  const translatedCardInfo = computed(() => {
+    if(cardInfo.value === null) return
+    const translateTitle = cardInfo.value.i18n?.[locale.value]?.title
+    console.log(translateTitle);
+    console.log(cardInfo.value.title);
+    
+    const translateFeature = cardInfo.value.i18n?.[locale.value]?.feature
+    console.log(translateFeature);
+    console.log(cardInfo.value.feature);
+    
+    const translateProductName = cardInfo.value.i18n?.[locale.value]?.productName
+    console.log(translateProductName);
+    console.log(cardInfo.value.productName);
+    
+    const translateSay = cardInfo.value.i18n?.[locale.value]?.say
+    console.log(translateSay);
+    console.log(cardInfo.value.say);
+    
+    const translateEffect = cardInfo.value.i18n?.[locale.value]?.effect
+    console.log(translateEffect);
+    console.log(cardInfo.value.effect);    
+    
+    return {
+      ...cardInfo.value,
+      title: translateTitle || cardInfo.value.title,
+      feature: translateFeature || cardInfo.value.feature,
+      productName: translateProductName || cardInfo.value.productName,
+      say: translateSay || cardInfo.value.say,
+      effect: translateEffect || cardInfo.value.effect, 
+      author: cardInfo.value.i18n?.[locale.value]?.author,
+    }
+  })
+
   return {
     cardInfoDisplay,
     cardInfo,
+    translatedCardInfo,
     getCardInfoAndShow,
     getCardInfoIndex,
     changeCardInfoCard,

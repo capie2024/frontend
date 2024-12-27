@@ -1,24 +1,30 @@
 <script setup>
-import { ref, onMounted, computed, watch, onBeforeMount, onUpdated } from 'vue'
+import { ref, onMounted, computed, watch, onBeforeMount } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCardInfoStore } from '@/stores/card-info'
 import { useDeckMakeStore } from '@/stores/deck-make'
+import { useSidebarStore } from '@/stores/sidebar'
+
 
 const cardInfoStore = useCardInfoStore()
-const { cardInfo, cardInfoDisplay, leftDisabled, rightDisabled } =
-  storeToRefs(cardInfoStore)
-const getCardInfoIndex = cardInfoStore.getCardInfoIndex
+const { cardInfo, translatedCardInfo, cardInfoDisplay, leftDisabled, rightDisabled } =
+storeToRefs(cardInfoStore)
 const changeCardInfoCard = cardInfoStore.changeCardInfoCard
 
 const deckMakeStore = useDeckMakeStore()
 const { selectedCards } = storeToRefs(deckMakeStore)
+
+const sidebarStore = useSidebarStore()
+const handleSwitchTranslate = () => {
+  sidebarStore.switchLang()
+}
 
 const addCard = deckMakeStore.addCard
 const removeCard = deckMakeStore.removeCard
 const countCards = deckMakeStore.countCards
 
 const cardInfoDesc = computed(() => {
-  return cardInfo.value.effect
+  return translatedCardInfo.value.effect
     .replace(/<img[^>]*>/g, '')
     .replace(/【(.*?)】/g, '<mark class="mark-4">【$1】</mark>')
 })
@@ -146,7 +152,7 @@ onMounted(() => {
           ></div>
           <img
             class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image"
-            :src="cardInfo.cover"
+            :src="translatedCardInfo.cover"
             alt=""
             size="sm:100vw md:50vw lg:600px"
           />
@@ -203,7 +209,7 @@ onMounted(() => {
             <div class="flex items-center counter gap-x-1">
               <button
                 class="text-white btn btn-sm bg-zinc-700 hover:bg-green-400"
-                @click="addCard(cardInfo)"
+                @click="addCard(translatedCardInfo)"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -231,7 +237,7 @@ onMounted(() => {
               </div>
               <button
                 class="text-white btn btn-sm bg-zinc-700 hover:bg-red-400"
-                @click="removeCard(cardInfo)"
+                @click="removeCard(translatedCardInfo)"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -254,6 +260,7 @@ onMounted(() => {
             <div class="flex items-center counter gap-x-2">
               <button
                 class="flex-none text-white shadow btn btn-sm bg-zinc-700 hover:bg-gradient-to-r from-purple-500 to-pink-500 shadow-purple-500/50"
+                @click="handleSwitchTranslate"
               >
                 <svg
                   class="w-6 h-6 text-white"
@@ -313,7 +320,7 @@ onMounted(() => {
                 ]"
               >
                 <svg
-                  v-if="cardInfo.typeTranslate === '角色'"
+                  v-if="translatedCardInfo.typeTranslate === '角色'"
                   class="size-8"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -330,7 +337,7 @@ onMounted(() => {
                   ></path>
                 </svg>
                 <svg
-                  v-else-if="cardInfo.typeTranslate === '名場'"
+                  v-else-if="translatedCardInfo.typeTranslate === '名場'"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -347,7 +354,7 @@ onMounted(() => {
                   ></path>
                 </svg>
                 <svg
-                  v-else-if="cardInfo.typeTranslate === '事件'"
+                  v-else-if="translatedCardInfo.typeTranslate === '事件'"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -366,15 +373,15 @@ onMounted(() => {
               </div>
               <!-- <p class="w-full text-xs text-center text-white truncate">角色</p> -->
               <p class="w-full text-xs text-center text-white truncate">
-                {{ cardInfo.typeTranslate }}
+                {{ translatedCardInfo.typeTranslate }}
               </p>
             </div>
             <div>
-              <p class="font-mono text-xs text-zinc-300">{{ cardInfo.id }}</p>
+              <p class="font-mono text-xs text-zinc-300">{{ translatedCardInfo.id }}</p>
               <h3 class="text-2xl font-bold text-white">
-                {{ cardInfo.title }}
+                {{ translatedCardInfo.title }}
               </h3>
-              <p class="text-zinc-300">{{ cardInfo.productName }}</p>
+              <p class="text-zinc-300">{{ translatedCardInfo.productName }}</p>
               <!-- <p class="font-mono text-xs text-zinc-300">HOL/W104-123SSP</p>
                             <h3 class="text-2xl font-bold text-white">STELLAR into the GALAXY 星街すいせい</h3>
                             <p class="text-zinc-300">#ホロライブプロダクション Vol.2</p> -->
@@ -418,7 +425,7 @@ onMounted(() => {
               >
               <span
                 class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]"
-                >{{ cardInfo.level }}</span
+                >{{ translatedCardInfo.level }}</span
               >
             </div>
             <div class="flex items-center">
@@ -436,7 +443,7 @@ onMounted(() => {
               >
               <span
                 class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]"
-                >{{ cardInfo.cost }}</span
+                >{{ translatedCardInfo.cost }}</span
               >
             </div>
             <div class="flex items-center">
@@ -454,7 +461,7 @@ onMounted(() => {
               >
               <span
                 class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]"
-                >{{ cardInfo.soul }}</span
+                >{{ translatedCardInfo.soul }}</span
               >
             </div>
             <div class="flex items-center">
@@ -472,7 +479,7 @@ onMounted(() => {
               >
               <span
                 class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]"
-                >{{ cardInfo.attack }}</span
+                >{{ translatedCardInfo.attack }}</span
               >
             </div>
             <div class="flex items-center">
@@ -490,7 +497,7 @@ onMounted(() => {
               >
               <span
                 class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]"
-                >{{ cardInfo.rare }}</span
+                >{{ translatedCardInfo.rare }}</span
               >
             </div>
           </div>
@@ -686,7 +693,7 @@ onMounted(() => {
               </svg>
               <!-- <h3 class="font-mono text-6xl font-bold">448000</h3> -->
               <h3 class="font-mono text-6xl font-bold">
-                {{ cardInfo.price.number }}
+                {{ translatedCardInfo.price.number }}
               </h3>
             </div>
             <p class="mt-4 text-sm text-zinc-500 dark:text-zinc-300">

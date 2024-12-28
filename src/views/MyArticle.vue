@@ -1,14 +1,16 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
-import SidebarGrid from '@/components/SidebarGrid.vue'
-import MainFooter from '@/components/MainFooter.vue'
+import Swal from 'sweetalert2';
+import SidebarGrid from '@/components/SidebarGrid.vue';
+import MainFooter from '@/components/MainFooter.vue';
 import NavLoginBtn from '../components/NavLoginBtn.vue';
 import notice from '../components/notification/notice.vue';
 
-const articles = ref([])
-const postCount = computed(() => articles.value.length)
+const articles = ref([]);
+const postCount = computed(() => articles.value.length);
 const API_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const getUserArticles = async () => {
   const token = localStorage.getItem('token')
@@ -20,7 +22,17 @@ const getUserArticles = async () => {
     })
     articles.value = response.data
   } catch (error) {
-    console.error('獲取文章資料失敗', error)
+    if (error.response && error.response.status === 403) {
+      
+      Swal.fire({
+        title: '請先登入',
+        text: '登入後才能查看文章',
+        icon: 'warning',
+        confirmButtonText: '確定',
+      }).then(() => {
+        window.location.href = `${BASE_URL}/login`
+      })
+    }
   }
 }
 const formatDate = (date) => {
@@ -38,47 +50,29 @@ onMounted(() => {
   <body class="overflow-hidden bg-black root-container">
     <header class="z-10 h-16 md:mt-2 md:mr-2 header-bg md:rounded-t-2xl">
       <nav class="header-container">
-        <button
-          class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            class="w-6 h-6"
+        <a :href="'/user'">
+          <button
+            class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15.75 19.5 8.25 12l7.5-7.5"
-            ></path>
-          </svg>
-        </button>
-        <button
-          class="flex-none hidden p-1 text-white rounded-full md:block bg-black/50 default-transition hover:bg-zinc-800/50 disabled:opacity-30"
-          disabled
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m8.25 4.5 7.5 7.5-7.5 7.5"
-            ></path>
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              ></path>
+            </svg>
+          </button>
+        </a>
+      
         <div class="w-full min-w-0 text-lg font-bold text-white md:text-2xl">
           <h2 class="text-2xl font-bold truncate">我的文章</h2>
         </div>
@@ -99,16 +93,21 @@ onMounted(() => {
             <span class="subtitle"> 一共有{{ postCount }}結果 </span>
           </h2>
           <section class="card-area">
-            <a href="#" class="card-link" v-for="article in articles">
+            <a 
+              v-for="article in articles"
+              :key="article.post_code"
+              :href="'/social/' + article.post_code"
+              class="card-link" 
+            >
               <div class="card-img">
                 <img
-              :src="
-                article && article.post_picture
-                  ? article.post_picture
-                  : 'https://bottleneko.app/images/cover.png'
-              "
-              :alt="article && article.title ? article.title : 'Default Title'"
-            />
+                  :src="
+                    article && article.post_picture
+                      ? article.post_picture
+                      : 'https://bottleneko.app/images/cover.png'
+                  "
+                  :alt="article && article.title ? article.title : 'Default Title'"
+                />
               </div>
               <div class="card-user">
                 <div class="card-user-flex">
@@ -209,7 +208,6 @@ header {
   display: flex;
   flex-direction: column;
   grid-area: main-view;
-  padding-top: 10px;
   border-radius: 1rem;
   overflow: hidden;
 }

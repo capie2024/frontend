@@ -422,40 +422,49 @@ const sidebarMarginLeft = computed(() => {
   return 0
 })
 
-function toggleSidebar(sidebar) {
-  currentSidebar.value = currentSidebar.value === sidebar ? '' : sidebar
-}
+const toggleSidebar = (sidebar) => {
+  currentSidebar.value = currentSidebar.value === sidebar ? '' : sidebar;
+};
 
-function toggleFilter(value) {
+const toggleFilter = (value) => {
   if (!isLargeScreen.value) {
-    currentSidebar.value = ''
+    currentSidebar.value = '';
   }
-  currentMain.value = currentMain.value === value ? null : value
-}
+  currentMain.value = currentMain.value === value ? null : value;
+};
 
-function MenuFilter(index) {
-  filters.value[index].checked = !filters.value[index].checked
-}
+const MenuFilter = (index) => {
+  filters.value[index].checked = !filters.value[index].checked;
+};
 
-function closeSidebar() {
-  currentSidebar.value = ''
-  currentMain.value = ''
+const closeSidebar = () => {
+  currentSidebar.value = '';
+  currentMain.value = '';
 
-  settingDeckStatus.value = false
-  sidebarSelectedStatus.value = true
-  deckName.value = ''
-  deckDescription.value = ''
-  chooseCoverCard.value = ''
-}
+  settingDeckStatus.value = false;
+  sidebarSelectedStatus.value = true;
+  deckName.value = '';
+  deckDescription.value = '';
+  chooseCoverCard.value = '';
+};
 
-function updateScreenSize() {
-  isLargeScreen.value = window.innerWidth > 1200
+const updateScreenSize = () => {
+  isLargeScreen.value = window.innerWidth > 1200;
   if (!isLargeScreen.value) {
-    closeSidebar()
+    closeSidebar();
   } else {
-    currentMain.value = ''
+    currentMain.value = '';
   }
-}
+};
+
+const goBack = () => {
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    router.push('/series'); 
+  }
+};
+
 onBeforeMount(async () => {
   const route = useRoute()
   const seriesId = route.params.series_id
@@ -1831,28 +1840,28 @@ onBeforeUnmount(() => {
     <div class="main" :style="{ marginLeft: sidebarMarginLeft + 'px' }">
       <div class="main-info">
         <header class="main-info-header">
-          <a :href="'/series'">
-            <button
-              class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
+          
+          <button @click="goBack"
+            class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="w-6 h-6"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-                data-slot="icon"
-                class="w-6 h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15.75 19.5 8.25 12l7.5-7.5"
-                ></path>
-              </svg>
-            </button>
-          </a>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              ></path>
+            </svg>
+          </button>
+          
           <div class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
             <h2 class="truncate text-2xl font-bold">{{ seriesInfo.name }}</h2>
           </div>

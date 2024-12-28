@@ -300,28 +300,8 @@ onBeforeUnmount(() => {
             ></path>
           </svg>
         </button>
-        <button
-          class="flex-none p-1 text-white rounded-full arrow-right bg-black/50 default-transition hover:bg-zinc-800/50 disabled:opacity-30"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m8.25 4.5 7.5 7.5-7.5 7.5"
-            ></path>
-          </svg>
-        </button>
-        <div class="justify-start w-full min-w-0 font-bold text-white">
-          <h2 class="text-2xl font-bold truncate header-title">帳號管理</h2>
+        <div class="w-full min-w-0 font-bold text-white justify-start">
+          <h2 class="header-title truncate text-2xl font-bold">帳號管理</h2>
         </div>
         <div class="icons">
           <button class="logout" @click="logout">
@@ -880,8 +860,8 @@ onBeforeUnmount(() => {
               </section>
             </div>
           </div>
-          <MainFooter />
         </div>
+        <MainFooter />
       </main>
     </div>
   </div>

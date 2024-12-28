@@ -5,31 +5,30 @@ import WorkShopView from '@/views/WorkShopView.vue'
 import HeroMemberView from '@/views/HeroMemberView.vue'
 import OfficialProductList from '@/views/OfficialProductList.vue'
 import CardListbySeries from '@/views/Card List by Series.vue'
-// import MainPage from "@/views/MainPage.vue";
 import AccountPage from '@/views/AccountPage.vue'
 import DailyCard from '../views/DailyCard.vue'
 import Faq from '../views/Faq.vue'
 import FaqInfo from '../views/FaqInfo.vue'
 import Login from '../views/Login.vue'
 import Signup from '../views/Signup.vue'
-// import LoginHomePageView from "@/views/LoginHomepage.vue";
-import CardSeries from '@/views/CardSeries.vue'
-import Carddeck from '../components/card-deck/Carddeck.vue'
-import AddArticle from '../views/AddArticle.vue'
-import Social from '../views/Social.vue'
-import MyCardView from '../views/MyCardView.vue'
-import Findcard from '../components/Mycard/find-card.vue'
-import Remitcard from '../components/Mycard/remit-card.vue'
-import RemitCardNf from '../components/Mycard/remit-cardnf.vue'
-import AuthSuccess from '../views/AuthSuccess.vue'
-import MyArticle from '../views/MyArticle.vue'
-import Warning from '../components/Mycard/warning.vue'
-import Delete from '../components/Mycard/delete.vue'
-import deckPage from '../components/card-deck/deck-page.vue'
-import AddPostDeck from '../components/card-deck/AddPostDeck.vue'
-import Notice from '../components/notification/notice.vue'
-import Notification from '../components/notification/notification.vue'
-import Team from '../views/Team.vue'
+import CardSeries from "@/views/CardSeries.vue";
+import Carddeck from "../components/card-deck/Carddeck.vue";
+import AddArticle from "../views/AddArticle.vue";
+import Social from "../views/Social.vue";
+import MyCardView from "../views/MyCardView.vue";
+import Findcard from "../components/Mycard/find-card.vue";
+import Remitcard from "../components/Mycard/remit-card.vue";
+import RemitCardNf from "../components/Mycard/remit-cardnf.vue";
+import AuthSuccess from "../views/AuthSuccess.vue";
+import MyArticle from "../views/MyArticle.vue";
+import Warning from "../components/Mycard/warning.vue";
+import Delete from "../components/Mycard/delete.vue";
+import deckPage from "../components/card-deck/deck-page.vue";
+import AddPostDeck from "../components/card-deck/AddPostDeck.vue";
+import Notification from "../components/notification/notification.vue";
+import Team from "../views/Team.vue";
+import Contact from '../views/Contact.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -38,12 +37,6 @@ const router = createRouter({
       name: 'home',
       component: Home,
     },
-    // {
-    //   // path: card/:id
-    //   path: "/card-info",
-    //   name: "card-info",
-    //   component: CardInfo,
-    // },
     {
       path: '/workshop',
       name: 'workshop',
@@ -75,16 +68,10 @@ const router = createRouter({
       component: Faq,
     },
     {
-      // path: '/faq/:id',
       path: '/faq-info',
       name: 'faq-info',
       component: FaqInfo,
     },
-    // {
-    //   path: "/main-page",
-    //   name: "main-page",
-    //   component: MainPage,
-    // },
     {
       path: '/user',
       name: 'user',
@@ -99,12 +86,7 @@ const router = createRouter({
       path: '/signup',
       name: 'signup',
       component: Signup,
-    },
-    // {
-    //   path: "/login-homepage",
-    //   name: "login-homepage",
-    //   component: LoginHomePageView,
-    // },
+    }
     {
       path: '/card-series/:series_id',
       component: CardSeries,
@@ -179,19 +161,19 @@ const router = createRouter({
       component: AddPostDeck,
     },
     {
-      path: '/notice',
-      name: 'notice',
-      component: Notice,
+      path:"/notification",
+      name:"notification",
+      component: Notification
     },
     {
-      path: '/notification',
-      name: 'notification',
-      component: Notification,
+      path:"/team",
+      name:"Team",
+      component: Team
     },
     {
-      path: '/team',
-      name: 'Team',
-      component: Team,
+      path: '/contact',
+      name: 'contact',
+      component: Contact,
     },
   ],
 })

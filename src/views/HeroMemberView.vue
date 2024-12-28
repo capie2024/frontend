@@ -818,7 +818,7 @@ onMounted(async () => {
             </p>
           </div>
         </section>
-        <section class="hero-member-main-stores-about-section">
+        <!-- <section class="hero-member-main-stores-about-section">
           <div class="hero-member-main-stores-about-section-controlbar">
             <h2 class="hero-member-main-stores-about-section-controlbar-title">
               店家功能
@@ -908,7 +908,7 @@ onMounted(async () => {
               </button>
             </div>
           </div>
-        </section>
+        </section> -->
       </main>
       <footer class="hero-member-footer">
         <MainFooter />

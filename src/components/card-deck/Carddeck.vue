@@ -19,7 +19,8 @@ function getUserIdFromToken(token) {
     try {
         const payload = token.split(".")[1];
         const decodedPayload = JSON.parse(atob(payload));
-        return decodedPayload.userId || null; // 檢查是否有 userId
+        console.log(decodedPayload);
+        return decodedPayload.userId || null;
     } catch (error) {
         console.error("無法解析 token:", error);
         return null;
@@ -184,7 +185,7 @@ export default {
         },
         async fetchDeck() {
             try {
-                const postCode = this.$route.params.post_code;  // 获取当前路由的 post_code
+                const postCode = this.$route.params.post_code;  
                 const response = await axios.get(`${API_URL}/api/deck/${postCode}`);
 
                 const deckList = response.data[0].deck_list;
@@ -205,14 +206,14 @@ export default {
                     return;
                 }
 
-                const response = await axios.get('$API_URL/api/currentUser', {
-
+                const response = await axios.get(`{$API_URL}/api/currentUser`, {
                     headers: {
                         Authorization: `Bearer ${userToken}`,
                     },
                 });
 
-                this.currentUser = response.data;            
+                this.currentUser = response.data;
+                console.log(this.currentUser)            
             } catch (error) {
                 console.error('Failed to fetch current user:', error);
             }

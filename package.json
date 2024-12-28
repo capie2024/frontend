@@ -23,6 +23,7 @@
     "swiper": "^11.1.15",
     "tinymce": "^7.6.0",
     "vue": "^3.5.12",
+    "vue-i18n": "^10.0.5",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {

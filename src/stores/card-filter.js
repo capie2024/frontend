@@ -408,7 +408,6 @@ export const useCardFilterStore = defineStore('card-filter', () => {
     // seriesCardList是目前的系列所有的卡片，newSeriesCardList是篩選後的卡片
     newSeriesCardList.value = seriesCardList.value
 
-    // 測試下面寫的篩選相關function能不能正常使用
     if (keyWord != '') {
       keyWordFilter(keyWord)
     }
@@ -518,8 +517,6 @@ export const useCardFilterStore = defineStore('card-filter', () => {
     // 數組內分組的依據
     const filterArray = ref([])
 
-    // upDownSortArr.value = newSeriesCardList.value;
-
     // 第一階段 根據等級、顏色、價格排序
     if (
       filterVaribleSet.upDownSortArray[0] == 'levelUpSort' ||
@@ -549,7 +546,7 @@ export const useCardFilterStore = defineStore('card-filter', () => {
         clusteredArray.value.push(filteredArray)
       }
 
-      // 將數組解構成卡片合併成一個數組
+      // 將數組展開後合併成一個數組
       const unClusteredArray = ref([])
       clusteredArray.value.forEach((arr) => {
         unClusteredArray.value.push(...arr)
@@ -583,7 +580,7 @@ export const useCardFilterStore = defineStore('card-filter', () => {
         clusteredArray.value.push(filteredArray)
       }
 
-      // 將數組解構成卡片合併成一個數組
+      // 將數組展開合併成一個數組
       const unClusteredArray = ref([])
       clusteredArray.value.forEach((arr) => {
         unClusteredArray.value.push(...arr)
@@ -617,7 +614,7 @@ export const useCardFilterStore = defineStore('card-filter', () => {
         clusteredArray.value.push(filteredArray)
       }
 
-      // 將數組解構成卡片合併成一個數組
+      // 將數組展開合併成一個數組
       const unClusteredArray = ref([])
       clusteredArray.value.forEach((arr) => {
         unClusteredArray.value.push(...arr)
@@ -640,9 +637,9 @@ export const useCardFilterStore = defineStore('card-filter', () => {
       newClusteredArray.value.forEach((arr) => {
         unClusteredArray.value.push(...arr)
       })
-      // 包含未解構數組的數組
+      // 包含未展開數組的數組
       clusteredArray.value = newClusteredArray.value
-      // 將解構成卡片的數組賦值回原數組
+      // 將展開卡片的數組賦值回原數組
       newSeriesCardList.value = unClusteredArray.value
     } else if (
       filterVaribleSet.upDownSortArray[1] == 'colorUpSort' ||
@@ -658,9 +655,9 @@ export const useCardFilterStore = defineStore('card-filter', () => {
       newClusteredArray.value.forEach((arr) => {
         unClusteredArray.value.push(...arr)
       })
-      // 包含未解構數組的數組
+      // 包含未展開數組的數組
       clusteredArray.value = newClusteredArray.value
-      // 將解構成卡片的數組賦值回原數組
+      // 將展開卡片的數組賦值回原數組
       newSeriesCardList.value = unClusteredArray.value
     } else if (
       filterVaribleSet.upDownSortArray[1] == 'priceUpSort' ||
@@ -676,9 +673,9 @@ export const useCardFilterStore = defineStore('card-filter', () => {
       newClusteredArray.value.forEach((arr) => {
         unClusteredArray.value.push(...arr)
       })
-      // 包含未解構數組的數組
+      // 包含未展開數組的數組
       clusteredArray.value = newClusteredArray.value
-      // 將解構成卡片的數組賦值回原數組
+      // 將展開卡片的數組賦值回原數組
       newSeriesCardList.value = unClusteredArray.value
     }
 
@@ -853,7 +850,7 @@ export const useCardFilterStore = defineStore('card-filter', () => {
     newSeriesCardList.value = levelSortArr.value
   }
 
-  // 等級升降排序V2(通用修改試驗版) *目前只套用在整合分組第二階段*
+  // 等級升降排序V2 *目前使用在整合分組第二階段*
   const levelSortV2 = (arr) => {
     const levelSortArr = ref([])
     const levelArr = arr.map((card) => {
@@ -881,7 +878,7 @@ export const useCardFilterStore = defineStore('card-filter', () => {
     return levelSortArr.value
   }
 
-  // 等級升降排序V3 *目前只套用在整合分組第二階段*
+  // 等級升降排序V3 *目前使用在整合分組第三階段*
   const levelSortV3 = (arr) => {
     const levelSortArr = ref([])
     const levelArr = arr.map((card) => {
@@ -966,7 +963,7 @@ export const useCardFilterStore = defineStore('card-filter', () => {
     newSeriesCardList.value = colorSortArr.value
   }
 
-  // 顏色升降排序V2(通用修改試驗版) *目前只套用在整合分組第二階段*
+  // 顏色升降排序V2 *目前使用在整合分組第二階段*
   const colorSortV2 = (arr) => {
     const colorSortArr = ref([])
     if (filterVaribleSet.colorDownSort === true) {
@@ -1025,7 +1022,7 @@ export const useCardFilterStore = defineStore('card-filter', () => {
     return colorSortArr.value
   }
 
-  // 顏色升降排序V3 *目前只套用在整合分組第三階段*
+  // 顏色升降排序V3 *目前使用在整合分組第三階段*
   const colorSortV3 = (arr) => {
     const colorSortArr = ref([])
     const newArr = ref([])
@@ -1119,7 +1116,7 @@ export const useCardFilterStore = defineStore('card-filter', () => {
     newSeriesCardList.value = priceSortArr.value
   }
 
-  // 價格升降排序V2(通用修改試驗版) *目前只套用在整合分組第二階段*
+  // 價格升降排序V2 *目前使用在整合分組第二階段*
   const priceSortV2 = (arr) => {
     const priceSortArr = ref([])
     const priceArr = arr.map((card) => {
@@ -1146,7 +1143,7 @@ export const useCardFilterStore = defineStore('card-filter', () => {
     return priceSortArr.value
   }
 
-  // 價格升降排序V3 *目前只套用在整合分組第三階段*
+  // 價格升降排序V3 *目前使用在整合分組第三階段*
   const priceSortV3 = (arr) => {
     const priceSortArr = ref([])
     const priceArr = arr.map((card) => {

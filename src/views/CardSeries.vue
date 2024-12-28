@@ -40,7 +40,7 @@ const deleteMyFilters = cardFilterStore.deleteMyFilters
 
 // 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore()
-const { seriesCardList, seriesInfo, seriesCardListLength } =
+const { seriesCardList, seriesInfo, seriesCardListLength, translatedSeriesCardList, translatedSeriesInfo } =
   storeToRefs(cardSeriesStore)
 const getLastViewSeries = cardSeriesStore.getLastViewSeries
 const saveLastViewSeries = cardSeriesStore.saveLastViewSeries
@@ -1863,7 +1863,7 @@ onBeforeUnmount(() => {
           </button>
           
           <div class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
-            <h2 class="truncate text-2xl font-bold">{{ seriesInfo.name }}</h2>
+            <h2 class="truncate text-2xl font-bold">{{ translatedSeriesInfo.name }}</h2>
           </div>
           <Notice/>
           <div class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50">            
@@ -1905,18 +1905,18 @@ onBeforeUnmount(() => {
           </div>
         </button>
         <section class="info-container">
-          <img :src="seriesInfo.cover" />
+          <img :src="translatedSeriesInfo.cover" />
           <div flex-col class="inner-info-container">
             <span
               ><i class="fa-regular fa-clone"></i>
-              <span v-for="(code, index) in seriesInfo.code" :key="index"
+              <span v-for="(code, index) in translatedSeriesInfo.code" :key="index"
                 >{{ code
-                }}{{ index == seriesInfo.code.length - 1 ? '' : ', ' }}</span
+                }}{{ index == translatedSeriesInfo.code.length - 1 ? '' : ', ' }}</span
               ></span
             >
-            <h1>{{ seriesInfo.name }}</h1>
+            <h1>{{ translatedSeriesInfo.name }}</h1>
             <div>
-              <div v-if="seriesInfo.sellAt">
+              <div v-if="translatedSeriesInfo.sellAt">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -1930,11 +1930,8 @@ onBeforeUnmount(() => {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
-                  ></path>
-                  </svg>
-                  <span>
-                    最新發布{{ seriesInfo.sellAt[seriesInfo.sellAt.length - 1] }}
-                  </span>
+                  ></path></svg>
+                  <span>最新發布{{ seriesInfo.sellAt[seriesInfo.sellAt.length - 1] }}</span>
               </div>
               <div v-else>
                 <svg
@@ -2078,9 +2075,9 @@ onBeforeUnmount(() => {
             <div class="row">
               <div
                 class="col-Sheet"
-                v-for="(card, index) in seriesCardList"
+                v-for="(card, index) in translatedSeriesCardList"
                 :key="card.id"
-                @click.stop="getCardInfoAndShow(card)"
+                @click.stop="getCardInfoAndShow(seriesCardList[index])"
               >
                 <div class="card-image">
                   <img :src="card.cover" />
@@ -2089,7 +2086,7 @@ onBeforeUnmount(() => {
                     <h3>{{ card.title }}</h3>
                   </div>
                   <button
-                    @click.stop="addCard(card)"
+                    @click.stop="addCard(seriesCardList[index])"
                     class="group-hover:bg-zinc-800 group-hover:shadow group-hover:shadow-zinc-800/50 flex-none rounded-full p-1 shadow-xl will-change-[background,shadow] transition-all"
                   >
                     <svg
@@ -2122,15 +2119,15 @@ onBeforeUnmount(() => {
             <div class="row">
               <div
                 class="col-Info"
-                v-for="(card, index) in seriesCardList"
+                v-for="(card, index) in translatedSeriesCardList"
                 :key="index"
-                @click.stop="addCard(card)"
+                @click.stop="addCard(seriesCardList[index])"
               >
                 <div class="card-info-image">
                   <img :src="card.cover" />
                   <div
                     class="card-inner-info"
-                    @click.stop="getCardInfoAndShow(card)"
+                    @click.stop="getCardInfoAndShow(seriesCardList[index])"
                   >
                     <div class="card-inner-info-header">
                       <p>{{ card.id }}</p>
@@ -2161,7 +2158,7 @@ onBeforeUnmount(() => {
                     </div>
                     <div class="price-download">
                       <p>${{ card.price.number }}</p>
-                      <button @click.stop="addCard(card)">
+                      <button @click.stop="addCard(seriesCardList[index])">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"

@@ -7,6 +7,10 @@ import { useCardSeriesStore } from '@/stores/card-series'
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n';
+
+const { locale } = useI18n();
+
 const API_URL = import.meta.env.VITE_API_URL
 
 const router = useRouter()
@@ -243,6 +247,26 @@ const clearSearch = () => {
   }
 }
 
+const translatedCardSeries = computed(() => {
+  return cardSeries.value.map((card) => {
+    const translateName = card.i18n?.[locale.value]?.name
+    return {
+      ...card,
+      name: translateName || card.name 
+    }
+  })
+})
+
+const translatedViewedSeries = computed(() => {
+  return viewedSeries.value.map((card) => {
+    const translateName = card.i18n?.[locale.value]?.name
+    return {
+      ...card,
+      name: translateName || card.name 
+    }
+  })
+})
+
 onMounted(async () => {
   await fetchCardseries()
 
@@ -316,7 +340,7 @@ onMounted(async () => {
                         </div>
                         <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
                         <section class="show-card">
-                            <a v-for="card in viewedSeries" :key="card.id" href="#" class="transition-colors url" @click.prevent="handleSeries(card.id)" >
+                            <a v-for="card in translatedViewedSeries" :key="card.id" href="#" class="transition-colors url" @click.prevent="handleSeries(card.id)" >
 
                                     <div>
                                         <img :src ="card.cover || '/src/img/cover.png'" alt="">
@@ -341,7 +365,7 @@ onMounted(async () => {
                         </h2>
                         <section class="grid-card">
                            
-                            <a v-for="card in cardSeries" :key="card.id" href="#" class="transition-colors url" @click.prevent="handleSeries(card.id)" >
+                            <a v-for="card in translatedCardSeries" :key="card.id" href="#" class="transition-colors url" @click.prevent="handleSeries(card.id)" >
                                     <div>
                                         <img :src ="card.cover || 'https://bottleneko.app/images/cover.png'" alt="">
                                     </div>

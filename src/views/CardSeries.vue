@@ -1,7 +1,7 @@
 <script setup>
 import SidebarGrid from '../components/SidebarGrid.vue'
 import NavLoginBtn from '../components/NavLoginBtn.vue';
-import notice from '../components/notification/notice.vue';
+import Notice from '../components/notification/notice.vue';
 import {
   ref,
   computed,
@@ -1865,7 +1865,7 @@ onBeforeUnmount(() => {
           <div class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
             <h2 class="truncate text-2xl font-bold">{{ seriesInfo.name }}</h2>
           </div>
-          <notice/>
+          <Notice/>
           <div class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50">            
             <NavLoginBtn/>
           </div>
@@ -2396,7 +2396,10 @@ onBeforeUnmount(() => {
 <style src="@/assets/css/card-series/sidebar-filter.css" scoped></style>
 <style src="@/assets/css/card-series/sidebar-deck.css" scoped></style>
 <style scoped>
+
   .hidden {
     display: none;
   }
+
 </style>
+

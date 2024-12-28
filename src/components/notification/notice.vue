@@ -1,89 +1,72 @@
-<script>
-import dayjs from 'dayjs'
-import axios from 'axios'
+<script setup>
+import { ref, onMounted } from 'vue';
+import dayjs from 'dayjs';
+import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL
-const API_URL = import.meta.env.VITE_API_URL
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
-export default {
-  data() {
-    return {
-      unreadCount: '',
-      notices: [],
+const unreadCount = ref("");
+const notices = ref([]);
+
+const formattedTime = (createdAt) => {
+    if (!createdAt) return "未知時間";
+    return dayjs(createdAt).format("YYYY-MM-DD");
+};
+
+const fetchNotices = async () => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${API_URL}/api/notices`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+        notices.value = (data.notices || []).sort((a, b) => {
+            return new Date(b.created_at) - new Date(a.created_at);
+        });
+        unreadCount.value = data.unreadCount || 0;
+    } catch (error) {
+        console.error('Error fetching notices:', error);
     }
-  },
-  mounted() {
-    this.fetchNotices()
-  },
-  computed: {
-    formattedTime() {
-      return (createdAt) => {
-        if (!createdAt) return '未知時間'
-        return dayjs(createdAt).format('YYYY-MM-DD')
-      }
-    },
-  },
-  methods: {
-    async markAsRead(noticeId, postCode) {
-      try {
-        // 先找到通知
-        const notice = this.notices.find((n) => n.id === noticeId)
+};
 
-        // 如果通知已經是已讀狀態，直接返回，不再執行減少未讀計數
+const markAsRead = async (noticeId, postCode) => {
+    try {
+        const notice = notices.value.find(n => n.id === noticeId);
+
         if (notice && notice.is_read) {
-          this.goToPost(postCode)
-          return
+            goToPost(postCode);
+            return;
         }
 
-        // 向後端發送請求，標記為已讀
-
-        const response = await axios.post(
-          '${API_URL}/api/mark-as-read',
-          { noticeId },
-          {
+        const response = await axios.post(`${API_URL}/api/mark-as-read`, { noticeId }, {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          }
-        )
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
 
         if (response.data.is_read) {
-          // 成功標記為已讀，更新通知狀態
-          if (notice) {
-            notice.is_read = true
-          }
-          // 減少未讀計數
-          this.unreadCount -= 1
+            if (notice) {
+                notice.is_read = true;
+            }
+            unreadCount.value -= 1;
 
-          this.goToPost(postCode)
+            goToPost(postCode);
         }
-      } catch (error) {
-        console.error('Error marking as read:', error)
-      }
-    },
-    goToPost(postCode) {
-      window.location.href = `${BASE_URL}/social/${postCode}`
-    },
-    async fetchNotices() {
-      const token = localStorage.getItem('token')
-      try {
-        const response = await fetch(`${API_URL}/api/notices`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        const data = await response.json()
-        this.notices = (data.notices || []).sort((a, b) => {
-          return new Date(b.created_at) - new Date(a.created_at)
-        })
-        // 初始加載時，設定正確的未讀通知數量
-        this.unreadCount = data.unreadCount || 0
-      } catch (error) {
-        console.error('Error fetching notices:', error)
-      }
-    },
-  },
-}
+    } catch (error) {
+        console.error('Error marking as read:', error);
+    }
+};
+
+const goToPost = (postCode) => {
+    window.location.href = `${BASE_URL}/social/${postCode}`;
+};
+
+onMounted(() => {
+    fetchNotices();
+});
 </script>
 
 <template>

@@ -1,16 +1,32 @@
 <template>
-  <div class="work-shop-page-container">
+  <div class="container">
     <SidebarGrid />
-    <div class="work-shop-main-content-container">
+    <div class="main-container">
       <div v-if="firstVisible">
         <RemitCard v-if="firstVisible" />
       </div>
       <div v-if="secondVisible">
         <FindCard v-if="secondVisible" />
       </div>
-      <header class="work-shop-header">
-        <div class="header-container Top-bar">
-          <div class="input-svg-container">
+      <header class="header-container">
+        <div class="search-container">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            class="icon search-icon"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            ></path>
+          </svg>
+          <input type="text" class="header-input" placeholder="找我的牌組？" />
+          <button class="clear-btn">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -18,84 +34,53 @@
               stroke-width="1.5"
               stroke="currentColor"
               aria-hidden="true"
-              class="icon search-icon"
+              class="icon clear-icon"
             >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                d="M6 18L18 6M6 6l12 12"
               ></path>
             </svg>
-            <input
-              type="text"
-              class="header-input"
-              placeholder="找我的牌組？"
-            />
-            <button class="clear-btn">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-                class="icon clear-icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
-          </div>
-          <div class="sort-button">
-            <button
-              class="active1"
-              :class="{ selected: nameIsSelected }"
-              :style="{
-                background: nameIsSelected
-                  ? 'linear-gradient(to right, #5eead4, #93c5fd)'
-                  : 'white',
-              }"
-              @click="toggleNameSort"
-            >
-              <i
-                class="fa-solid fa-arrow-up"
-                :class="{ rotate180: nameIsSorted }"
-              ></i>
-              名稱
-            </button>
-            <button
-              class="active2"
-              :class="{ selected: dateIsSelected }"
-              :style="{
-                background: dateIsSelected
-                  ? 'linear-gradient(to right, #5eead4, #93c5fd)'
-                  : 'white',
-              }"
-              @click="toggleDateSort"
-            >
-              <i
-                class="fa-solid fa-arrow-up"
-                :class="{ rotate180: dateIsSorted }"
-              ></i>
-              日期
-            </button>
-          </div>
-          <div class="w-full login">
-            <div class="notice">
-              <Notice />
-              <p class="notice-txt">通知</p>
-            </div>
-            <button
-              class="login-btn"
-              data-bs-toggle="modal"
-              data-bs-target="#login"
-            >
-              <NavLoginBtn />
-            </button>
-          </div>
+          </button>
+        </div>
+        <div class="sort-button">
+          <button
+            class="active1"
+            :class="{ selected: nameIsSelected }"
+            :style="{
+              background: nameIsSelected
+                ? 'linear-gradient(to right, #5eead4, #93c5fd)'
+                : 'white',
+            }"
+            @click="toggleNameSort"
+          >
+            <i
+              class="fa-solid fa-arrow-up"
+              :class="{ rotate180: nameIsSorted }"
+            ></i>
+            名稱
+          </button>
+          <button
+            class="active2"
+            :class="{ selected: dateIsSelected }"
+            :style="{
+              background: dateIsSelected
+                ? 'linear-gradient(to right, #5eead4, #93c5fd)'
+                : 'white',
+            }"
+            @click="toggleDateSort"
+          >
+            <i
+              class="fa-solid fa-arrow-up"
+              :class="{ rotate180: dateIsSorted }"
+            ></i>
+            日期
+          </button>
+        </div>
+        <div class="notice-area">
+          <Notice />
+          <NavLoginBtn />
         </div>
       </header>
       <main class="work-shop-main">
@@ -104,7 +89,7 @@
             class="display-card"
             style="transform: translate3d(0px, 0px, 0px)"
           >
-            <div class="card-area" style="margin-right: 10px">
+            <div class="card-area">
               <button
                 v-for="(name, index) in matchedNames"
                 :key="index"
@@ -630,7 +615,7 @@ onMounted(() => {
   height: 0;
 }
 
-.work-shop-page-container {
+.container {
   background-color: black;
   max-width: 100%;
   display: flex;
@@ -638,20 +623,14 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.work-shop-main-content-container {
-  width: 100%;
+.main-container {
+  width: calc(100% - 8px);
+  height: calc(100vh - 16px);
   margin-top: 8px;
-  /* margin-right: 8px; */
-  margin-bottom: 8px;
   color: white;
-  border-radius: 16px;
+  border-radius: 1rem;
   background-color: #121212;
   overflow: auto;
-}
-
-.work-shop-header {
-  max-width: 100%;
-  box-sizing: border-box;
 }
 
 .work-shop-main {
@@ -678,25 +657,35 @@ onMounted(() => {
 }
 
 .header-container {
-  width: 100%;
+  width: calc(100% - 270px);
   display: flex;
   padding: 16px;
   height: 64px;
-  box-sizing: border-box;
+  position: fixed;
+  top: 8px;
+  z-index: 5;
+  background-color: rgba(0, 0, 0, 0);
+  gap: 0.5rem;
 }
 
 .Top-bar {
   gap: 0.5rem;
 }
 
+.notice-area {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 .w-full {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  width: 90%;
 }
 
-.input-svg-container {
+.search-container {
   display: flex;
   align-items: center;
   padding: 5px 10px;
@@ -721,7 +710,6 @@ onMounted(() => {
   box-sizing: border-box;
   position: fixed;
   z-index: 100;
-  /* background-color: black; */
 }
 
 .page-control-left {
@@ -905,11 +893,6 @@ onMounted(() => {
   line-height: 20px;
 }
 
-.login {
-  display: flex-end;
-  padding-right: 1.5rem;
-}
-
 .login-btn {
   display: flex;
   align-items: center;
@@ -983,8 +966,8 @@ onMounted(() => {
 }
 
 .header-input {
+  width: 100%;
   display: flex;
-  /* border: none; */
   outline: none;
   font-size: 1rem;
   color: black;
@@ -1007,8 +990,8 @@ onMounted(() => {
   padding: 8px 15px;
   white-space: nowrap;
   font-size: 0.875rem;
-  background-size: 200% 100%; /* 設定背景大小以便反轉 */
-  background-position: 0% 0%; /* 初始位置 */
+  background-size: 200% 100%;
+  background-position: 0% 0%;
 }
 
 .sort-button button i {
@@ -1016,10 +999,12 @@ onMounted(() => {
 }
 
 .active1 {
+  width: 72px;
   background: white;
 }
 
 .active2 {
+  width: 72px;
   background: linear-gradient(to right, #5eead4, #93c5fd);
 }
 
@@ -1086,7 +1071,6 @@ onMounted(() => {
 .button {
   display: block;
   width: 160px;
-  /* height: 120px; */
   overflow: hidden;
   border-radius: 18px;
   aspect-ratio: 4/3;
@@ -1245,7 +1229,6 @@ onMounted(() => {
   --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
   color: rgb(255 255 255 / var(--tw-text-opacity));
   --tw-shadow-color: rgba(14, 165, 233, 0.5);
-  /* --tw-shadow: var(--tw-shadow-colored); */
   color: white;
   width: 200px;
   height: 64px;
@@ -1317,8 +1300,6 @@ onMounted(() => {
   gap: 1.5rem;
   margin: 20px 0;
   box-sizing: border-box;
-  /* justify-items: start; */
-  /* width: 85%; */
 }
 
 .card-div-text {
@@ -1359,7 +1340,6 @@ onMounted(() => {
   display: inline-block;
   background-color: #18181b;
   border-radius: 5%;
-  /* width: 160px; */
   box-sizing: border-box;
 }
 
@@ -1411,18 +1391,18 @@ onMounted(() => {
 
 .display-area button {
   width: 160px;
-  /* height: 58px; */
   padding: 0.5rem;
 }
 
 .display-card {
-  box-sizing: content-box;
   display: grid;
   height: 100%;
 }
 
 .card-area {
+  width: 100%;
   display: flex;
+  margin-top: 100px;
   flex-wrap: wrap;
   gap: 20px;
   position: relative;
@@ -1496,6 +1476,22 @@ onMounted(() => {
 }
 
 @media (width < 1200px) {
+  .main-container {
+    width: 100%;
+  }
+
+  .header-container {
+    width: 100%;
+  }
+
+  .search-container {
+    min-width: calc(100% - 160px);
+  }
+
+  .notice-area {
+    display: none;
+  }
+
   .show-card {
     padding: 0px;
     margin: 0;

@@ -1,7 +1,7 @@
 <script setup>
 import router from '@/router'
 import NavLoginBtn from '@/components/NavLoginBtn.vue'
-import Notice from '@/components/notification/notice.vue'
+import Notice from '@/components/notification/Notice.vue'
 
 const goBack = () => {
   router.go(-1)

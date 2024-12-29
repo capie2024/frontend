@@ -307,7 +307,7 @@ import SidebarGrid from '../components/SidebarGrid.vue'
 import { onMounted, ref, computed } from 'vue'
 import axios from 'axios'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
-import Notice from '../components/notification/notice.vue'
+import Notice from '../components/notification/Notice.vue'
 import RemitCard from '../components/Mycard/remit-card.vue'
 import FindCard from '../components/Mycard/find-card.vue'
 

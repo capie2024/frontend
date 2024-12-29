@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/HomeView.vue'
-import CardInfo from '../views/CardInfo.vue'
 import WorkShopView from '@/views/WorkShopView.vue'
 import HeroMemberView from '@/views/HeroMemberView.vue'
 import OfficialProductList from '@/views/OfficialProductList.vue'
@@ -14,7 +13,7 @@ import Login from '../views/Login.vue'
 import Signup from '../views/Signup.vue'
 // import LoginHomePageView from "@/views/LoginHomepage.vue";
 import CardSeries from "@/views/CardSeries.vue";
-import Carddeck from "../components/card-deck/Carddeck.vue";
+import Carddeck from "../components/card-deck/SocialPost.vue";
 import AddArticle from "../views/AddArticle.vue";
 import Social from "../views/Social.vue";
 import MyCardView from "../views/MyCardView.vue";
@@ -23,11 +22,9 @@ import Remitcard from "../components/Mycard/remit-card.vue";
 import RemitCardNf from "../components/Mycard/remit-cardnf.vue";
 import AuthSuccess from "../views/AuthSuccess.vue";
 import MyArticle from "../views/MyArticle.vue";
-import Warning from "../components/Mycard/warning.vue";
-import Delete from "../components/Mycard/delete.vue";
 import deckPage from "../components/card-deck/deck-page.vue";
 import AddPostDeck from "../components/card-deck/AddPostDeck.vue";
-import Notification from "../components/notification/notification.vue";
+import Notification from "../components/notification/Notification.vue";
 import Team from "../views/Team.vue";
 import Contact from '../views/Contact.vue'
 
@@ -89,7 +86,7 @@ const router = createRouter({
     {
       path: '/user',
       name: 'user',
-      component: AccountPage,
+      component: User,
     },
     {
       path: '/login',
@@ -158,16 +155,6 @@ const router = createRouter({
       path: '/social/my',
       name: 'my-article',
       component: MyArticle,
-    },
-    {
-      path: '/warning',
-      name: 'warning',
-      component: Warning,
-    },
-    {
-      path: '/delete',
-      name: 'delete',
-      component: Delete,
     },
     {
       path: '/deck/:deck_id',

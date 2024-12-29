@@ -1,7 +1,7 @@
 <script setup>
 import SidebarGrid from '../components/SidebarGrid.vue'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
-import notice from '../components/notification/notice.vue'
+import Notice from '../components/notification/Notice.vue'
 import MainFooter from '../components/MainFooter.vue'
 import { useCardSeriesStore } from '@/stores/card-series'
 import { ref, computed, onMounted } from 'vue'
@@ -164,8 +164,7 @@ const toggleNameSort = () => {
   }
 }
 
-//日期排序切換
-
+//日期排序切
 const toggleDateSort = () => {
   if (sortState.value === 0) {
     cardSeries.value = [...cardSeries.value].sort((a, b) => {
@@ -311,7 +310,7 @@ onMounted(async () => {
             </div>
           </div>
                             <div class="icons">
-                                <notice/>
+                                <Notice/>
                                 <NavLoginBtn/>
                             </div>
                         </div>

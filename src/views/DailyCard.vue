@@ -4,7 +4,7 @@ import axios from 'axios'
 import { Fancybox } from '@fancyapps/ui'
 import '@fancyapps/ui/dist/fancybox/fancybox.css'
 import SidebarGrid from '../components/SidebarGrid.vue'
-import Notice from '../components/notification/notice.vue'
+import Notice from '../components/notification/Notice.vue'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 import MainFooter from '../components/MainFooter.vue'
 

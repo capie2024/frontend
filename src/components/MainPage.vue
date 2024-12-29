@@ -3,7 +3,7 @@ import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import placeholderImage from '@/img/card-loading.png' // 預設圖片
 import NavLoginBtn from './NavLoginBtn.vue'
-import Notice from '../components/notification/notice.vue'
+import Notice from './notification/Notice.vue'
 import MainFooter from '../components/MainFooter.vue'
 
 const isScrolled = ref(false) // 是否滾動

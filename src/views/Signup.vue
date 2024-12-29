@@ -3,7 +3,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import GoogleLogin from '../components/GoogleLogin.vue'
-import Notice from '../components/notification/notice.vue'
+import Notice from '../components/notification/Notice.vue'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 
 const API_URL = import.meta.env.VITE_API_URL

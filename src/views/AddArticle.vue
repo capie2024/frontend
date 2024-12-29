@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import MainFooter from '@/components/MainFooter.vue'
-import notice from '../components/notification/notice.vue'
+import notice from '../components/notification/Notice.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import Editor from '@tinymce/tinymce-vue'
 

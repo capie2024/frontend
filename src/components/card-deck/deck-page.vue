@@ -7,7 +7,7 @@ import SidebarGrid from '../SidebarGrid.vue'
 import RemitCard from '../Mycard/remit-card.vue'
 import NavLoginBtn from '../NavLoginBtn.vue'
 import MainFooter from '../MainFooter.vue'
-import Notice from '../notification/notice.vue'
+import Notice from '../notification/Notice.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 

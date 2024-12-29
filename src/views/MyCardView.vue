@@ -1,14 +1,396 @@
+<script setup>
+import MainFooter from '@/components/MainFooter.vue'
+import SidebarGrid from '../components/SidebarGrid.vue'
+import { onMounted, ref, computed, onBeforeUnmount } from 'vue'
+import axios from 'axios'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import Notice from '../components/notification/notice.vue'
+import RemitCard from '../components/Mycard/remit-card.vue'
+import FindCard from '../components/Mycard/find-card.vue'
+
+const API_URL = import.meta.env.VITE_API_URL
+
+const firstVisible = ref(false)
+const secondVisible = ref(false)
+const toggleRemitCard = () => {
+  firstVisible.value = !firstVisible.value
+}
+const toggleFindCard = () => {
+  secondVisible.value = !secondVisible.value
+}
+// 日期晚>早排序
+const dateSort = (a, b) => {
+  const dateA = a.build_time ? new Date(a.build_time) : null
+  const dateB = b.build_time ? new Date(b.build_time) : null
+  if (!dateA && !dateB) return 0
+  if (!dateA) return 1
+  if (!dateB) return -1
+
+  return dateB - dateA
+}
+
+// 日期早>晚排序
+const dateSortReverse = (a, b) => {
+  const dateA = a.build_time ? new Date(a.build_time) : null
+  const dateB = b.build_time ? new Date(b.build_time) : null
+  if (!dateA && !dateB) return 0
+  if (!dateA) return -1
+  if (!dateB) return 1
+
+  return dateA - dateB
+}
+
+const token = ref(localStorage.getItem('token'))
+const isScrolled = ref(false) // 是否滾動
+const cardDecks = ref([])
+const originalDecks = ref([])
+const error = ref('')
+const sortState = ref(0)
+const dateIsSorted = ref(false)
+const dateIsSelected = ref(true)
+const nameIsSorted = ref(false)
+const nameIsSelected = ref(false)
+const seriesIsSelected = ref(false)
+const searchQuery = ref('')
+
+// 獲取我的牌組資料
+const fetchMyDecks = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/decks`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    })
+    originalDecks.value = response.data.decks
+    cardDecks.value = [...originalDecks.value].sort(dateSort)
+    sortState.value = 0
+    dateIsSorted.value = false
+    dateIsSelected.value = true
+    nameIsSorted.value = false
+    nameIsSelected.value = false
+  } catch (err) {
+    error.value = '獲取我的牌組資料失敗' + err.message
+  }
+}
+
+// 獲取系列卡表資料
+const originalSeries = ref([])
+const fetchCardSeries = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/series`)
+    originalSeries.value = response.data
+  } catch (err) {
+    error.value = '獲取系列卡表資料失敗' + err.message
+  }
+}
+
+// A-Z>50音排序
+const nameSort = (a, b) => {
+  const nameA = a.deck_name
+  const nameB = b.deck_name
+
+  const len = Math.min(nameA.length, nameB.length)
+  for (let i = 0; i < len; i++) {
+    const charA = nameA[i]
+    const charB = nameB[i]
+
+    if (/[A-Z]/.test(charA) && !/[A-Z]/.test(charB)) return -1
+    if (!/[A-Z]/.test(charA) && /[A-Z]/.test(charB)) return 1
+
+    if (/[a-z]/.test(charA) && !/[a-z]/.test(charB)) return -1
+    if (!/[a-z]/.test(charA) && /[a-z]/.test(charB)) return 1
+
+    const EnglishCompare = charA.localeCompare(charB)
+    if (EnglishCompare !== 0) return EnglishCompare
+
+    const japaneseOrder =
+      'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'
+    const aJapaneseIndex = japaneseOrder.indexOf(charA)
+    const bJapaneseIndex = japaneseOrder.indexOf(charB)
+    if (aJapaneseIndex !== -1 && bJapaneseIndex !== -1) {
+      const japaneseCompare = aJapaneseIndex - bJapaneseIndex
+      if (japaneseCompare !== 0) return japaneseCompare
+    }
+  }
+
+  return nameA.length - nameB.length
+}
+
+const nameSortReverse = (a, b) => {
+  const nameA = a.deck_name
+  const nameB = b.deck_name
+
+  const len = Math.min(nameA.length, nameB.length)
+  for (let i = 0; i < len; i++) {
+    const charA = nameA[i]
+    const charB = nameB[i]
+
+    if (/[A-Z]/.test(charA) && !/[A-Z]/.test(charB)) return 1
+    if (!/[A-Z]/.test(charA) && /[A-Z]/.test(charB)) return -1
+
+    if (/[a-z]/.test(charA) && !/[a-z]/.test(charB)) return 1
+    if (!/[a-z]/.test(charA) && /[a-z]/.test(charB)) return -1
+
+    const EnglishCompare = charA.localeCompare(charB)
+    if (EnglishCompare !== 0) return -EnglishCompare
+
+    const japaneseOrder =
+      'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'
+    const aJapaneseIndex = japaneseOrder.indexOf(charA)
+    const bJapaneseIndex = japaneseOrder.indexOf(charB)
+    if (aJapaneseIndex !== -1 && bJapaneseIndex !== -1) {
+      const japaneseCompare = bJapaneseIndex - aJapaneseIndex
+      if (japaneseCompare !== 0) return japaneseCompare
+    }
+  }
+
+  return nameB.length - nameA.length
+}
+
+// 獲取我的牌組的seriesCode
+const seriesCodes = ref([])
+const fetchSeriesCode = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/decks`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+
+    const decks = response.data.decks
+    seriesCodes.value = []
+
+    decks.forEach((decksItem) => {
+      decksItem.deck.forEach((card) => {
+        if (card.seriesCode && !seriesCodes.value.includes(card.seriesCode)) {
+          seriesCodes.value.push(card.seriesCode)
+        }
+      })
+    })
+  } catch (err) {
+    error.value = '獲取我的牌組資料失敗: ' + err.message
+  }
+}
+
+// 比對seriesCode及code並回傳系列名稱
+const matchedNames = ref([])
+const findSeriesNames = () => {
+  matchedNames.value = []
+  seriesCodes.value.forEach((code) => {
+    for (let i = 0; i < originalSeries.value.length; i++) {
+      originalSeries.value[i].code.forEach((item) => {
+        if (item == code) {
+          const nameToAdd =
+            originalSeries.value[i].i18n.zh.name || originalSeries.value[i].name
+          if (!matchedNames.value.includes(nameToAdd)) {
+            matchedNames.value.push(nameToAdd)
+          }
+        }
+      })
+    }
+  })
+}
+
+// 比對seriesCode及code是否相同並新增至matchedCode
+const matchedCodes = ref([])
+const findMatchedCode = () => {
+  matchedCodes.value = []
+
+  seriesCodes.value.forEach((code) => {
+    for (let i = 0; i < originalSeries.value.length; i++) {
+      originalSeries.value[i].code.forEach((item) => {
+        if (item == code) {
+          if (!matchedCodes.value.includes(originalSeries.value[i].code)) {
+            matchedCodes.value.push(originalSeries.value[i].code)
+          }
+        }
+      })
+    }
+  })
+}
+
+// 系列按鈕的數字計算
+const counts = computed(() => {
+  const result = matchedCodes.value.map(() => 0)
+
+  originalDecks.value.forEach((deckItem) => {
+    const uniqueSeriesCodes = Array.from(
+      new Set(
+        deckItem.deck.map((card) => String(card.seriesCode).toUpperCase())
+      )
+    )
+
+    matchedCodes.value.forEach((codeArray, index) => {
+      // 檢查這個牌組的 uniqueSeriesCodes 是否包含 codeArray 中的任一代碼
+      const hasMatch = codeArray.some((matchCode) =>
+        uniqueSeriesCodes.includes(String(matchCode).toUpperCase())
+      )
+
+      if (hasMatch) {
+        result[index]++
+      }
+    })
+  })
+  return result
+})
+
+// 系列按鈕的排序功能
+const sortedStates = ref({})
+
+const toggleSeriesSort = (codes, index) => {
+  if (sortedStates.value[index]) {
+    cardDecks.value = [...originalDecks.value]
+
+    if (dateIsSelected.value) {
+      cardDecks.value.sort(dateIsSorted.value ? dateSortReverse : dateSort)
+    } else if (nameIsSelected.value) {
+      cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse)
+    }
+
+    sortedStates.value[index] = false
+    seriesIsSelected.value = false
+    return
+  }
+
+  let sortedDecks = originalDecks.value.filter((decksItem) =>
+    decksItem.deck.some(
+      (card) => card.seriesCode && codes.includes(card.seriesCode)
+    )
+  )
+
+  if (dateIsSelected.value) {
+    sortedDecks.sort(dateIsSorted.value ? dateSortReverse : dateSort)
+  } else if (nameIsSelected.value) {
+    sortedDecks.sort(nameIsSorted.value ? nameSort : nameSortReverse)
+  }
+
+  cardDecks.value = sortedDecks
+
+  Object.keys(sortedStates.value).forEach((key) => {
+    sortedStates.value[key] = false
+  })
+  sortedStates.value[index] = true
+  seriesIsSelected.value = true
+}
+
+const toggleDateSort = () => {
+  const decksToSort = [...cardDecks.value]
+  dateIsSorted.value = !dateIsSorted.value
+  sortState.value = dateIsSorted.value ? 1 : 0
+
+  cardDecks.value = decksToSort.sort(
+    dateIsSorted.value ? dateSortReverse : dateSort
+  )
+
+  dateIsSelected.value = true
+  nameIsSorted.value = false
+  nameIsSelected.value = false
+}
+
+const toggleNameSort = () => {
+  const decksToSort = [...cardDecks.value]
+  nameIsSorted.value = !nameIsSorted.value
+
+  cardDecks.value = decksToSort.sort(
+    nameIsSorted.value ? nameSort : nameSortReverse
+  )
+
+  nameIsSelected.value = true
+  dateIsSorted.value = false
+  dateIsSelected.value = false
+}
+
+const initData = async () => {
+  await fetchCardSeries()
+  await fetchSeriesCode()
+  findSeriesNames()
+  findMatchedCode()
+}
+
+// 日期格式化函數
+const formaDate = (time) => {
+  const date = new Date(time)
+  return date.toLocaleDateString('en-CA')
+}
+
+// 根據滾動位置判斷顯示 header 標題和背景色
+let mainElement = ref(null)
+const handleScroll = () => {
+  const scrollTop = mainElement.value.scrollTop
+  isScrolled.value = scrollTop > 300
+  console.log(isScrolled.value)
+}
+
+
+const main = () => {
+  mainElement.value = document.querySelector('.background')
+  if (mainElement.value) {
+    mainElement.value.addEventListener('scroll', handleScroll)
+  }
+}
+
+const searchDecks = () => {
+  if (!searchQuery.value.trim()) {
+    cardDecks.value = originalDecks.value
+  } else {
+    const query = searchQuery.value.toLowerCase()
+    cardDecks.value = originalDecks.value.filter((cardDeck) => {
+      const deckName = cardDeck.deck_name?.toLowerCase() || ''
+      const deckId = cardDeck.deck_id?.toLowerCase() || ''
+      const deckSeriesCode = cardDeck.deck.some((card) => {
+        const seriesCode = card.seriesCode?.toLowerCase() || ''
+        return seriesCode.includes(query)
+      })
+
+      return (
+        deckName.includes(query) ||
+        deckId.includes(query) ||
+        deckSeriesCode
+      )
+    })
+  }
+
+  if (dateIsSelected.value) {
+    cardDecks.value.sort(dateIsSorted.value ? dateSortReverse : dateSort)
+  } else if (nameIsSelected.value) {
+    cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse)
+  }
+}
+const clearSearch = () => {
+  searchQuery.value = ''
+  cardDecks.value = originalDecks.value
+  if (dateIsSelected.value) {
+    cardDecks.value.sort(dateIsSorted.value ? dateSortReverse : dateSort)
+  } else if (nameIsSelected.value) {
+    cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse)
+  }
+}
+onMounted(() => {
+  fetchMyDecks()
+  fetchCardSeries()
+  fetchSeriesCode()
+  initData()
+  main()
+})
+
+onBeforeUnmount(() => {
+  if (mainElement.value) {
+    mainElement.value.removeEventListener('scroll', handleScroll)
+  }
+})
+</script>
+
 <template>
   <div class="container">
     <SidebarGrid />
-    <div class="main-container">
+    <div class="main-container background">
       <div v-if="firstVisible">
         <RemitCard v-if="firstVisible" />
       </div>
       <div v-if="secondVisible">
         <FindCard v-if="secondVisible" />
       </div>
-      <header class="header-container">
+      <header class="header-container" :class="{ scrolled: isScrolled }">
         <div class="search-container">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -25,8 +407,18 @@
               d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
             ></path>
           </svg>
-          <input type="text" class="header-input" placeholder="找我的牌組？" />
-          <button class="clear-btn">
+
+          <input
+            v-model="searchQuery"
+            @keyup="searchDecks"
+            class="header-input"
+            type="text"
+            placeholder="找我的牌組？"
+          />
+          <button 
+            @click="clearSearch"
+            class="clear-btn"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -286,327 +678,6 @@
   </div>
 </template>
 
-<script setup>
-import MainFooter from '@/components/MainFooter.vue'
-import SidebarGrid from '../components/SidebarGrid.vue'
-import { onMounted, ref, computed } from 'vue'
-import axios from 'axios'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
-import Notice from '../components/notification/notice.vue'
-import RemitCard from '../components/Mycard/remit-card.vue'
-import FindCard from '../components/Mycard/find-card.vue'
-
-const API_URL = import.meta.env.VITE_API_URL
-
-const firstVisible = ref(false)
-const secondVisible = ref(false)
-const toggleRemitCard = () => {
-  firstVisible.value = !firstVisible.value
-}
-const toggleFindCard = () => {
-  secondVisible.value = !secondVisible.value
-}
-// 日期晚>早排序
-const dateSort = (a, b) => {
-  const dateA = a.build_time ? new Date(a.build_time) : null
-  const dateB = b.build_time ? new Date(b.build_time) : null
-  if (!dateA && !dateB) return 0
-  if (!dateA) return 1
-  if (!dateB) return -1
-
-  return dateB - dateA
-}
-
-// 日期早>晚排序
-const dateSortReverse = (a, b) => {
-  const dateA = a.build_time ? new Date(a.build_time) : null
-  const dateB = b.build_time ? new Date(b.build_time) : null
-  if (!dateA && !dateB) return 0
-  if (!dateA) return -1
-  if (!dateB) return 1
-
-  return dateA - dateB
-}
-
-const cardDecks = ref([])
-const originalDecks = ref([])
-const error = ref('')
-const sortState = ref(0)
-const dateIsSorted = ref(false)
-const dateIsSelected = ref(true)
-const nameIsSorted = ref(false)
-const nameIsSelected = ref(false)
-const seriesIsSelected = ref(false)
-
-// 獲取我的牌組資料
-const fetchMyDecks = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/decks`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-    originalDecks.value = response.data.decks
-    cardDecks.value = [...originalDecks.value].sort(dateSort)
-    sortState.value = 0
-    dateIsSorted.value = false
-    dateIsSelected.value = true
-    nameIsSorted.value = false
-    nameIsSelected.value = false
-  } catch (err) {
-    error.value = '獲取我的牌組資料失敗' + err.message
-  }
-}
-
-// 獲取系列卡表資料
-const originalSeries = ref([])
-const fetchCardSeries = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/api/series`)
-    originalSeries.value = response.data
-    console.log(originalSeries.value)
-  } catch (err) {
-    error.value = '獲取系列卡表資料失敗' + err.message
-  }
-}
-
-// A-Z>50音排序
-const nameSort = (a, b) => {
-  const nameA = a.deck_name
-  const nameB = b.deck_name
-
-  const len = Math.min(nameA.length, nameB.length)
-  for (let i = 0; i < len; i++) {
-    const charA = nameA[i]
-    const charB = nameB[i]
-
-    if (/[A-Z]/.test(charA) && !/[A-Z]/.test(charB)) return -1
-    if (!/[A-Z]/.test(charA) && /[A-Z]/.test(charB)) return 1
-
-    if (/[a-z]/.test(charA) && !/[a-z]/.test(charB)) return -1
-    if (!/[a-z]/.test(charA) && /[a-z]/.test(charB)) return 1
-
-    const EnglishCompare = charA.localeCompare(charB)
-    if (EnglishCompare !== 0) return EnglishCompare
-
-    const japaneseOrder =
-      'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'
-    const aJapaneseIndex = japaneseOrder.indexOf(charA)
-    const bJapaneseIndex = japaneseOrder.indexOf(charB)
-    if (aJapaneseIndex !== -1 && bJapaneseIndex !== -1) {
-      const japaneseCompare = aJapaneseIndex - bJapaneseIndex
-      if (japaneseCompare !== 0) return japaneseCompare
-    }
-  }
-
-  return nameA.length - nameB.length
-}
-
-const nameSortReverse = (a, b) => {
-  const nameA = a.deck_name
-  const nameB = b.deck_name
-
-  const len = Math.min(nameA.length, nameB.length)
-  for (let i = 0; i < len; i++) {
-    const charA = nameA[i]
-    const charB = nameB[i]
-
-    if (/[A-Z]/.test(charA) && !/[A-Z]/.test(charB)) return 1
-    if (!/[A-Z]/.test(charA) && /[A-Z]/.test(charB)) return -1
-
-    if (/[a-z]/.test(charA) && !/[a-z]/.test(charB)) return 1
-    if (!/[a-z]/.test(charA) && /[a-z]/.test(charB)) return -1
-
-    const EnglishCompare = charA.localeCompare(charB)
-    if (EnglishCompare !== 0) return -EnglishCompare
-
-    const japaneseOrder =
-      'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'
-    const aJapaneseIndex = japaneseOrder.indexOf(charA)
-    const bJapaneseIndex = japaneseOrder.indexOf(charB)
-    if (aJapaneseIndex !== -1 && bJapaneseIndex !== -1) {
-      const japaneseCompare = bJapaneseIndex - aJapaneseIndex
-      if (japaneseCompare !== 0) return japaneseCompare
-    }
-  }
-
-  return nameB.length - nameA.length
-}
-
-// 獲取我的牌組的seriesCode
-const seriesCodes = ref([])
-const fetchSeriesCode = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/decks`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-
-    const decks = response.data.decks
-    seriesCodes.value = []
-
-    decks.forEach((decksItem) => {
-      decksItem.deck.forEach((card) => {
-        if (card.seriesCode && !seriesCodes.value.includes(card.seriesCode)) {
-          seriesCodes.value.push(card.seriesCode)
-        }
-      })
-    })
-  } catch (err) {
-    error.value = '獲取我的牌組資料失敗: ' + err.message
-  }
-}
-
-// 比對seriesCode及code並回傳系列名稱
-const matchedNames = ref([])
-const findSeriesNames = () => {
-  matchedNames.value = []
-  seriesCodes.value.forEach((code) => {
-    for (let i = 0; i < originalSeries.value.length; i++) {
-      originalSeries.value[i].code.forEach((item) => {
-        if (item == code) {
-          const nameToAdd =
-            originalSeries.value[i].i18n.zh.name || originalSeries.value[i].name
-          if (!matchedNames.value.includes(nameToAdd)) {
-            matchedNames.value.push(nameToAdd)
-          }
-        }
-      })
-    }
-  })
-}
-
-// 比對seriesCode及code是否相同並新增至matchedCode
-const matchedCodes = ref([])
-const findMatchedCode = () => {
-  matchedCodes.value = []
-
-  seriesCodes.value.forEach((code) => {
-    for (let i = 0; i < originalSeries.value.length; i++) {
-      originalSeries.value[i].code.forEach((item) => {
-        if (item == code) {
-          if (!matchedCodes.value.includes(originalSeries.value[i].code)) {
-            matchedCodes.value.push(originalSeries.value[i].code)
-          }
-        }
-      })
-    }
-  })
-}
-
-// 系列按鈕的數字計算
-const counts = computed(() => {
-  const result = matchedCodes.value.map(() => 0)
-
-  originalDecks.value.forEach((deckItem) => {
-    const uniqueSeriesCodes = Array.from(
-      new Set(
-        deckItem.deck.map((card) => String(card.seriesCode).toUpperCase())
-      )
-    )
-
-    matchedCodes.value.forEach((codeArray, index) => {
-      // 檢查這個牌組的 uniqueSeriesCodes 是否包含 codeArray 中的任一代碼
-      const hasMatch = codeArray.some((matchCode) =>
-        uniqueSeriesCodes.includes(String(matchCode).toUpperCase())
-      )
-
-      if (hasMatch) {
-        result[index]++
-      }
-    })
-  })
-  return result
-})
-
-// 系列按鈕的排序功能
-const sortedStates = ref({})
-
-const toggleSeriesSort = (codes, index) => {
-  if (sortedStates.value[index]) {
-    cardDecks.value = [...originalDecks.value]
-
-    if (dateIsSelected.value) {
-      cardDecks.value.sort(dateIsSorted.value ? dateSortReverse : dateSort)
-    } else if (nameIsSelected.value) {
-      cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse)
-    }
-
-    sortedStates.value[index] = false
-    seriesIsSelected.value = false
-    return
-  }
-
-  let sortedDecks = originalDecks.value.filter((decksItem) =>
-    decksItem.deck.some(
-      (card) => card.seriesCode && codes.includes(card.seriesCode)
-    )
-  )
-
-  if (dateIsSelected.value) {
-    sortedDecks.sort(dateIsSorted.value ? dateSortReverse : dateSort)
-  } else if (nameIsSelected.value) {
-    sortedDecks.sort(nameIsSorted.value ? nameSort : nameSortReverse)
-  }
-
-  cardDecks.value = sortedDecks
-
-  Object.keys(sortedStates.value).forEach((key) => {
-    sortedStates.value[key] = false
-  })
-  sortedStates.value[index] = true
-  seriesIsSelected.value = true
-}
-
-const toggleDateSort = () => {
-  const decksToSort = [...cardDecks.value]
-  dateIsSorted.value = !dateIsSorted.value
-  sortState.value = dateIsSorted.value ? 1 : 0
-
-  cardDecks.value = decksToSort.sort(
-    dateIsSorted.value ? dateSortReverse : dateSort
-  )
-
-  dateIsSelected.value = true
-  nameIsSorted.value = false
-  nameIsSelected.value = false
-}
-
-const toggleNameSort = () => {
-  const decksToSort = [...cardDecks.value]
-  nameIsSorted.value = !nameIsSorted.value
-
-  cardDecks.value = decksToSort.sort(
-    nameIsSorted.value ? nameSort : nameSortReverse
-  )
-
-  nameIsSelected.value = true
-  dateIsSorted.value = false
-  dateIsSelected.value = false
-}
-
-const initData = async () => {
-  await fetchCardSeries()
-  await fetchSeriesCode()
-  findSeriesNames()
-  findMatchedCode()
-}
-
-// 日期格式化函數
-const formaDate = (time) => {
-  const date = new Date(time)
-  return date.toLocaleDateString('en-CA')
-}
-
-onMounted(() => {
-  fetchMyDecks()
-  fetchCardSeries()
-  fetchSeriesCode()
-  initData()
-})
-</script>
-
 <style scoped>
 @import '../assets/base.css';
 
@@ -631,6 +702,10 @@ onMounted(() => {
   border-radius: 1rem;
   background-color: #121212;
   overflow: auto;
+}
+
+header.scrolled {
+  background-color: #000000;
 }
 
 .work-shop-main {
@@ -666,6 +741,7 @@ onMounted(() => {
   z-index: 5;
   background-color: rgba(0, 0, 0, 0);
   gap: 0.5rem;
+  transition: 0.05s ease;
 }
 
 .Top-bar {

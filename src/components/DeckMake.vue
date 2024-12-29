@@ -179,12 +179,12 @@ function updateScreenSize() {
     currentMain.value = ''
   }
 }
-onBeforeMount(async () => {
-  const route = useRoute()
-  const seriesId = route.params.series_id
-  saveLastViewSeries(seriesId)
-  await getLastViewSeries()
-})
+// onBeforeMount(async () => {
+//   const route = useRoute()
+//   const seriesId = route.params.series_id
+//   saveLastViewSeries(seriesId)
+//   await getLastViewSeries()
+// })
 // Lifecycle hooks
 onMounted(async () => {
   getLastDeckEdit()

@@ -69,9 +69,10 @@ const router = createRouter({
       component: Faq,
     },
     {
-      path: '/faq-info',
-      name: 'faq-info',
+      path: '/faq/:id',
+      name: 'FaqInfo',
       component: FaqInfo,
+      // props: true
     },
     {
       path: '/user',

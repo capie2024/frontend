@@ -3,6 +3,7 @@ import MainFooter from '@/components/MainFooter.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import { onMounted, ref, computed, onBeforeUnmount } from 'vue'
 import axios from 'axios'
+import Swal from 'sweetalert2'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 import Notice from '../components/notification/notice.vue'
 import RemitCard from '../components/Mycard/remit-card.vue'
@@ -153,7 +154,7 @@ const fetchSeriesCode = async () => {
   try {
     const response = await axios.get(`${API_URL}/decks`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${token.value}`,
       },
     })
 
@@ -364,6 +365,46 @@ const clearSearch = () => {
   } else if (nameIsSelected.value) {
     cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse)
   }
+}
+
+const deleteDeck = async (deck_id) => {
+
+  Swal.fire({
+    title: "確定要刪除牌組嗎？",
+    text: "刪除後將無法復原。",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "確認刪除",
+    cancelButtonText: "取消",
+  })
+  .then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.delete(`${API_URL}/decks/${deck_id}`, {
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        });
+
+        if (response.status === 200) {
+          Swal.fire({
+            icon: 'success',
+            title: '刪除成功',
+            showConfirmButton: false,
+            timer: 1000,
+          }).then(() => {
+            fetchMyDecks()
+          })  
+        }
+      } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: '刪除失敗',
+            text: "已引用於文章,無法刪除",
+          });
+        }
+      }
+  });
 }
 onMounted(() => {
   fetchMyDecks()
@@ -625,6 +666,7 @@ onBeforeUnmount(() => {
                 alt=""
               />
               <button
+                @click.prevent="deleteDeck(cardDeck.deck_id)"
                 class="bottom-0 right-0 p-1 m-1 text-white rounded-full bg-zinc-800"
               >
                 <svg

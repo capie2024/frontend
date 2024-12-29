@@ -4,6 +4,10 @@ import PageControl from '@/components/work-shop/PageControl.vue'
 import SidebarGrid from '@/components/SidebarGrid.vue'
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
+import FindCard from '../components/Mycard/find-card.vue'
+import RemitCard from '../components/Mycard/remit-card.vue'
+
+
 
 const workShopData = [
   {
@@ -28,16 +32,20 @@ const workShopData = [
     imgUrl: 'https://bottleneko.app/images/workshop/find.png',
     title: '尋找牌組',
     icon: 'fa-solid fa-cube',
-    path: '/findcard',
+    path: '',
+    function: toggleFindCard,
   },
   {
     imgUrl: 'https://bottleneko.app/images/workshop/report.png',
     title: '匯出牌組',
     icon: 'fa-solid fa-cube',
-    path: 'daily',
+    path: '',
+    function: toggleRemitCard,
   },
 ]
 
+const showFindCard = ref(false)
+const showRemitCard = ref(false)
 const name = ref('')
 const email = ref('')
 const picture = ref('')
@@ -62,6 +70,14 @@ const getAccount = async () => {
   } catch (error) {
     console.error('獲取用戶資料失敗：', error)
   }
+}
+
+function toggleFindCard(){
+  showFindCard.value = !showFindCard.value
+}
+
+function toggleRemitCard(){
+  showRemitCard.value = !showRemitCard.value
 }
 
 onMounted(async () => {
@@ -129,7 +145,7 @@ onMounted(async () => {
             class="work-shop-outer"
             v-for="i in workShopData"
           >
-            <div class="work-shop-item">
+            <div class="work-shop-item" @click="i.function" >
               <img :src="i.imgUrl" alt="" />
               <div class="work-shop-item-content">
                 <div class="work-shop-item-content-icon">
@@ -150,6 +166,8 @@ onMounted(async () => {
       </footer>
     </div>
   </div>
+  <FindCard v-if="showFindCard === true" />
+  <RemitCard v-if="showRemitCard === true" />
 </template>
 
 <style scoped>

@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { useCardInfoStore } from '@/stores/card-info'
 import { useDeckMakeStore } from '@/stores/deck-make'
 import { useSidebarStore } from '@/stores/sidebar'
+import initCardEffect from '@/assets/js/cardEffect.js'
 
 const cardInfoStore = useCardInfoStore()
 const { cardInfo, translatedCardInfo, cardInfoDisplay, leftDisabled, rightDisabled, translatedCardQAList } = storeToRefs(cardInfoStore)
@@ -109,7 +110,7 @@ const bgColor = computed(() => {
 onBeforeMount(() => {})
 
 onMounted(async() => {
-  import('../assets/js/cardEffect.js')
+  initCardEffect()
   cardCount.value = countCards(cardInfo.value)
   await getCardQA()
 })

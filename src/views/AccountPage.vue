@@ -8,7 +8,6 @@ import SideBar from '../components/SidebarGrid.vue'
 import Notice from '../components/notification/notice.vue'
 import Login from '../components/NavLoginBtn.vue'
 import MainFooter from '../components/MainFooter.vue'
-import MainFooter from '../components/MainFooter.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 const router = useRouter()

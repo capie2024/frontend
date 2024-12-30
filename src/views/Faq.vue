@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+// import { useFaqInfoStore } from '@/stores/faq-info'
 import axios from 'axios'
 import SidebarGrid from '@/components/SidebarGrid.vue'
 import Notice from '../components/notification/notice.vue'
@@ -15,6 +16,10 @@ const sortOrder = ref('desc')
 const searchQuery = ref('')
 const filteredData = ref([])
 const API_URL = import.meta.env.VITE_API_URL
+
+// 引入FaqInfoStore並使用
+// const faqInfoStore = useFaqInfoStore()
+// const getFaqInfoAndShow = faqInfoStore.getFaqInfoAndShow
 
 const getQAList = async () => {
   try {

@@ -1929,24 +1929,23 @@ onMounted(() => {
   border: none;
 }
 
-    .dot-menu{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        background-color: rgb(63, 63, 63);
-        border-radius: .375rem;
-        position: absolute;
-        margin-top: 24px;
-        right: 0;
-        top: 0;
-        --tw-ring-opacity: 0.05;
-        overflow-y: auto;
-        min-width: 100% ;
-        padding: .2rem;
-    }
-
+.dot-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: rgb(63, 63, 63);
+  border-radius: 0.375rem;
+  position: absolute;
+  margin-top: 24px;
+  right: 0;
+  top: 0;
+  --tw-ring-opacity: 0.05;
+  overflow-y: auto;
+  min-width: 100%;
+  padding: 0.2rem;
+}
 
 .flex {
   display: flex;
@@ -2395,15 +2394,15 @@ header {
   right: 150px;
 }
 
-    .user-btn {
-        border: none;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 20px;
-        gap:8px;
-        cursor: pointer;
-    }
+.user-btn {
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  gap: 8px;
+  cursor: pointer;
+}
 
 .description4 {
   right: 90px;

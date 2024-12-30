@@ -480,7 +480,6 @@ onMounted(() => {
       </div>
     </section>
     <MainFooter />
-
   </main>
 </template>
 

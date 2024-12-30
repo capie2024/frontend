@@ -318,8 +318,7 @@ const formaDate = (time) => {
 let mainElement = ref(null)
 const handleScroll = () => {
   const scrollTop = mainElement.value.scrollTop
-  isScrolled.value = scrollTop > 300
-  console.log(isScrolled.value)
+  isScrolled.value = scrollTop > 0
 }
 
 

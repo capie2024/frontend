@@ -412,7 +412,7 @@ onMounted(async () => {
   padding: 10px;
   box-sizing: border-box;
   margin: 8px 8px 8px 0;
-  border-radius: 10px;
+  border-radius: 1rem;
   height: calc(100vh - 16px);
   overflow-y: scroll;
   scrollbar-width: none;

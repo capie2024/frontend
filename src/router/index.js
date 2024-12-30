@@ -161,9 +161,9 @@ const router = createRouter({
       component: AddPostDeck,
     },
     {
-      path:"/notification",
-      name:"notification",
-      component: Notification
+      path: '/notification',
+      name: 'notification',
+      component: Notification,
     },
     {
       path:"/team",

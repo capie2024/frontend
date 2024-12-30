@@ -78,7 +78,7 @@ const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow
 // 定義一些狀態
 const sidebarSelectedStatus = ref(true)
 const chooseCoverCard = ref('')
-const deckName = ref('LL牌組')
+const deckName = ref('XX牌組')
 const deckDescription = ref('這是測試牌組')
 const settingDeckStatus = ref(false)
 const levelOrder = computed(() => {
@@ -470,6 +470,19 @@ const goBack = () => {
   }
 }
 
+const randomColor = ref('')
+const bgColors = [
+  'red',
+  'yellow',
+  'green',
+  'blue',
+  'purple'
+]
+const randomBgColor = () => {
+  randomColor.value = ''
+  randomColor.value = bgColors[Math.floor(Math.random() * bgColors.length)]
+}
+
 onBeforeMount(async () => {
   const route = useRoute()
   const seriesId = route.params.series_id
@@ -480,6 +493,7 @@ onBeforeMount(async () => {
 onMounted(async () => {
   getLastDeckEdit()
   switchSortMode()
+  randomBgColor()
   window.addEventListener('resize', updateScreenSize)
 })
 
@@ -1846,10 +1860,9 @@ onBeforeUnmount(() => {
     </nav>
 
     <div class="main" :style="{ marginLeft: sidebarMarginLeft + 'px' }">
-      <div class="main-info">
-        <header class="main-info-header">
-          <button
-            @click="goBack"
+      <div class="main-info" :class="{ 'main-info-red': randomColor == 'red', 'main-info-yellow': randomColor == 'yellow', 'main-info-green': randomColor == 'green', 'main-info-blue': randomColor == 'blue', 'main-info-purple': randomColor == 'purple' }" >
+        <header class="main-info-header" :class="{ 'main-info-header-red': randomColor == 'red', 'main-info-header-yellow': randomColor == 'yellow', 'main-info-header-green': randomColor == 'green', 'main-info-header-blue': randomColor == 'blue', 'main-info-header-purple': randomColor == 'purple' }" >
+          <button @click="goBack"
             class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
           >
             <svg
@@ -1917,9 +1930,10 @@ onBeforeUnmount(() => {
           </div>
         </button>
         <section class="info-container">
-          <img :src="translatedSeriesInfo.cover" />
+          <img v-if="translatedSeriesInfo.cover" :src="translatedSeriesInfo.cover" />
+          <img v-else src="@/img/cover.png" />
           <div flex-col class="inner-info-container">
-            <span
+            <span class="text-white"
               ><i class="fa-regular fa-clone"></i>
               <span
                 v-for="(code, index) in translatedSeriesInfo.code"
@@ -1930,9 +1944,9 @@ onBeforeUnmount(() => {
                 }}</span
               ></span
             >
-            <h1>{{ translatedSeriesInfo.name }}</h1>
-            <div>
-              <div v-if="translatedSeriesInfo.sellAt">
+            <h1 class="text-white" >{{ translatedSeriesInfo.name }}</h1>
+            <div class="text-white">
+              <div v-if="translatedSeriesInfo.sellAt" >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -2210,12 +2224,12 @@ onBeforeUnmount(() => {
             <div class="card-info-empty-content">
               <div class="card-info-empty-content-box">
                 <img
-                  src="https://bottleneko.app/images/status/empty.png"
+                  src="@/assets/img/logo-use/no-data.png"
                   alt=""
                 />
                 <h2>沒東西</h2>
                 <p>
-                  你只有一無所有的時候，才能全身心地投入機會。 - 拿破崙·波拿巴
+                  何もないことは、何でもあることだ。 - YC
                 </p>
               </div>
             </div>

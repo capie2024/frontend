@@ -13,6 +13,13 @@ const filteredArticles = ref([]);
 const socialHistory = ref(
   JSON.parse(localStorage.getItem('socialHistory')) || []
 );
+
+const originalSeries = ref([])
+const filteredDecks = ref([])
+const menuExpanded = ref(false)
+const seriesName = ref('篩選系列')
+const searchSeriesQuery = ref('')
+
 const isScrolled = ref(false);
 let intervalId = null;
 
@@ -108,10 +115,52 @@ const startFunction = () => {
 
 const searchResultCount = computed(() => filteredArticles.value.length);
 
+const fetchCardseries = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/series`)
+    originalSeries.value = response.data
+    filteredDecks.value = response.data
+    console.log(originalSeries.value)
+  } catch (err) {
+    error.value = '獲取系列卡表資料失敗' + err.message
+  }
+}
+
+const toggleMenu = () => {
+  menuExpanded.value = !menuExpanded.value
+ 
+}
+
+const selectDeck = (deck) => {
+  seriesName.value = deck.name
+  menuExpanded.value = !menuExpanded.value
+}
+
+const clearSearchSeries = () => {
+  seriesName.value = '篩選系列'
+  menuExpanded.value = !menuExpanded.value
+};
+
+const searchSeries = () => {
+  if (!searchSeriesQuery.value.trim()) {
+    filteredDecks.value = originalSeries.value
+  } else {
+    const query = searchSeriesQuery.value.toLowerCase()
+    filteredDecks.value = originalSeries.value.filter((deck) =>
+      deck.name?.toLowerCase().includes(query)
+    )
+  }
+}
+
+const clearMenuSearch = () => {
+  searchSeriesQuery.value = ''
+  filteredDecks.value = originalSeries.value
+}
 
 onMounted(() => {
   fetchArticles();
   startFunction();
+  fetchCardseries();
 });
 
 onBeforeUnmount(() => {
@@ -127,7 +176,7 @@ onBeforeUnmount(() => {
     <div class="main">
       <div
         class="header-container"
-        :class="{ 'header-change': this.isScrolled }"
+        :class="{ 'header-change': isScrolled }"
       >
         <div class="search-container">
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -156,11 +205,66 @@ onBeforeUnmount(() => {
             ></path>
           </svg>
         </div>
-        <button class="filter">
-          <i class="fa-regular fa-window-restore"></i>
-          篩選系列
-          <i class="fa-solid fa-x"></i>
+        <div style="position: relative;">
+        <button class="filter" @click="toggleMenu">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke-width="1.5" 
+            stroke="currentColor" 
+            aria-hidden="true" 
+            data-slot="icon" 
+            class="flex-none w-7 h-7"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+            ></path>
+          </svg>
+          {{ seriesName }}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
+            @click="clearSearchSeries"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18 18 6M6 6l12 12"
+            ></path>
+          </svg>
         </button>
+        <ul
+          class="menu-area"
+          v-show="menuExpanded"
+        >
+          <li class="menu-search">
+            <input
+              v-model="searchSeriesQuery"
+              @keyup="searchSeries"
+              class="keyword"
+              type="text"
+              placeholder="Keyword"
+            />
+            <button @click="clearMenuSearch">✖</button>
+          </li>
+          
+          <li
+            class="menu"
+            v-for="deck in filteredDecks"
+            :key="deck.id"
+            @click="selectDeck(deck)"
+          >
+            <svg data-v-33ac09eb="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path data-v-33ac09eb="" stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
+            <p class="text-xs truncate">{{ deck.name }}</p>
+          </li>
+        </ul>
+      </div>
         <button class="filter-hidden">
           <i class="fa-regular fa-window-restore"></i>
           CODE
@@ -258,6 +362,65 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.menu {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  color: white;
+  cursor: pointer;
+  gap: 5px;
+  height: 35px;
+  box-sizing: border-box;
+}
+
+.menu-area {
+  position: absolute;
+  top: 100%; 
+  display: grid;
+  position: absolute;
+  background-color: #20567a;
+  border-radius: 7px;
+  width: 270px;
+  overflow: hidden;
+  transition: height 1s ease;
+  z-index: 3;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  max-height: 220px;
+}
+.menu-search {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  color: white;
+  position: relative;
+  width: 250px;
+}
+
+.keyword {
+  /* position: fixed; */
+  box-sizing: border-box;
+  color: white;
+  padding: 4px 8px;
+  border: 1px solid gray;
+  border-radius: 10px;
+  display: flex;
+  background-color: transparent;
+  outline: none;
+  width: 250px;
+}
+
+.menu-search button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: white;
+  position: absolute;
+  right: 12px;
+}
+
 html,
 body {
   width: 100%;
@@ -361,6 +524,16 @@ a {
   transform: translateY(14px);
   font-weight: 700;
   cursor: pointer;
+  width: auto;
+  display: flex;
+  align-items: center;
+  gap:5px;
+}
+
+.filter svg {
+  width:20px;
+  height:20px;
+  display: inline;
 }
 
 .filter-hidden {
@@ -406,6 +579,9 @@ a {
   font-weight: 900;
   cursor: pointer;
   border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .add-article-hidden {
@@ -474,6 +650,13 @@ a {
 
 .user-link span {
   line-height: 1.25rem;
+}
+
+.size-5 {
+    height: 1.25rem;
+    min-height: 1.25rem;
+    min-width: 1.25rem;
+    width: 1.25rem;
 }
 
 .title {

@@ -1,160 +1,151 @@
-<script>
-import axios from 'axios'
-import Swal from 'sweetalert2'
-import SidebarGrid from '../components/SidebarGrid.vue'
-import GoogleLogin from '../components/GoogleLogin.vue'
-import Notice from '../components/notification/Notice.vue'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
+<script setup>
+import { ref, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import SidebarGrid from '../components/SidebarGrid.vue';
+import GoogleLogin from '../components/GoogleLogin.vue';
+import Notice from '@/components/notification/notice.vue';
+import NavLoginBtn from '../components/NavLoginBtn.vue';
 
-const API_URL = import.meta.env.VITE_API_URL
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
-export default {
-  data() {
-    return {
-      email: '',
-      password: '',
-      agreeService: false,
-      agreePolicy: false,
-      isValid: false,
-      isServiceButtonGreen: false,
-      isServiceIconShown: false,
-      isPolicyButtonGreen: false,
-      isPolicyIconShown: false,
+const email = ref('');
+const password = ref('');
+const agreeService = ref(false);
+const agreePolicy = ref(false);
+const isValid = ref(false);
+
+const state = reactive({
+  isServiceButtonGreen: false,
+  isServiceIconShown: false,
+  isPolicyButtonGreen: false,
+  isPolicyIconShown: false,
+});
+
+const router = useRouter();
+
+const validateForm = () => {
+  isValid.value =
+    email.value.trim() !== '' &&
+    password.value.trim() !== '' &&
+    state.isServiceButtonGreen &&
+    state.isPolicyButtonGreen;
+};
+
+watch([email, password, () => state.isServiceButtonGreen, () => state.isPolicyButtonGreen], validateForm);
+
+const goBack = () => {
+  router.go(-1);
+};
+
+const goAhead = () => {
+  router.go(1);
+};
+
+const toggleServiceButton = () => {
+  state.isServiceButtonGreen = !state.isServiceButtonGreen;
+  state.isServiceIconShown = state.isServiceButtonGreen; 
+};
+
+const togglePolicyButton = () => {
+  state.isPolicyButtonGreen = !state.isPolicyButtonGreen;
+  state.isPolicyIconShown = state.isPolicyButtonGreen;
+};
+
+const clearForm = () => {
+  email.value = '';
+  password.value = '';
+  agreeService.value = false;
+  agreePolicy.value = false;
+};
+
+const goLogin = () => {
+  window.location.href = `${BASE_URL}/login`;
+};
+
+const goMainPage = () => {
+  window.location.href = `${BASE_URL}/`;
+};
+
+const signup = async () => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const errors = {};
+
+  if (email.value.trim() === '' || password.value.trim() === '') {
+    errors.general = '請填寫完整資料';
+  } else {
+    if (!emailRegex.test(email.value.trim())) {
+      errors.email = '電子郵件格式錯誤';
     }
-  },
-  components: {
-    SidebarGrid,
-    GoogleLogin,
-    Notice,
-    NavLoginBtn,
-  },
-  watch: {
-    email: 'validateForm',
-    password: 'validateForm',
-    isServiceButtonGreen: 'validateForm',
-    isPolicyButtonGreen: 'validateForm',
-  },
-  methods: {
-    goBack() {
-      router.go(-1)
-    },
-    goAhead() {
-      router.go(+1)
-    },
-    toggleServiceButton() {
-      this.isServiceButtonGreen = !this.isServiceButtonGreen
-      this.isServiceIconShown = !this.isServiceIconShown
-    },
-    togglePolicyButton() {
-      this.isPolicyButtonGreen = !this.isPolicyButtonGreen
-      this.isPolicyIconShown = !this.isPolicyIconShown
-    },
-    validateForm() {
-      this.isValid =
-        this.email.trim() !== '' &&
-        this.password.trim() !== '' &&
-        this.isServiceButtonGreen &&
-        this.isPolicyButtonGreen
-    },
-    clearForm() {
-      this.email = ''
-      this.password = ''
-      this.agreeService = false
-      this.agreePolicy = false
-    },
-    goLogin() {
-      window.location.href = `${BASE_URL}/login`
-    },
-    goMainPage() {
-      window.location.href = `${BASE_URL}/`
-    },
-    async signup() {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-      const errors = {}
 
-      if (this.email.trim() === '' || this.password.trim() === '') {
-        errors.general = '請填寫完整資料'
-      } else {
-        if (!emailRegex.test(this.email.trim())) {
-          errors.email = '電子郵件格式錯誤'
-        }
+    if (password.value.trim().length < 6) {
+      errors.password = '密碼至少需要6個字元';
+    }
+  }
 
-        if (this.password.trim().length < 6) {
-          errors.password = '密碼至少需要6個字元'
+  if (Object.keys(errors).length > 0) {
+    clearForm();
+    Swal.fire({
+      icon: 'error',
+      title: '錯誤',
+      text: Object.values(errors).join('\n'),
+    });
+  } else {
+    try {
+      const response = await axios.post(
+        `${API_URL}/auth/register`,
+        {
+          username: 'User',
+          email: email.value,
+          password: password.value,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
+      );
+
+      if (response.status === 200) {
+        Swal.fire({
+          icon: 'success',
+          title: '註冊成功',
+        });
+        clearForm();
+        router.push('/login');
       }
+    } catch (error) {
+      if (error.response) {
+        const status = error.response.status;
+        const message = error.response.data.message;
 
-      if (Object.keys(errors).length > 0) {
-        this.clearForm()
         Swal.fire({
           icon: 'error',
-          title: '錯誤',
-          text: Object.values(errors).join('\n'),
-        })
+          title: '註冊失敗',
+          text:
+            status === 409
+              ? message || '此 email 已註冊過'
+              : message || '發生未知錯誤，請稍後再試',
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: 'error',
+          title: '註冊失敗',
+          text: '無法連接到伺服器，請檢查網路連線',
+        });
       } else {
-        try {
-          const response = await axios.post(
-            `${API_URL}/auth/register`,
-            {
-              username: 'User',
-              email: this.email,
-              password: this.password,
-            },
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            }
-          )
-
-          if (response.status === 200) {
-            Swal.fire({
-              icon: 'success',
-              title: '註冊成功',
-            })
-            this.clearForm()
-            this.$router.push('/login')
-          }
-        } catch (error) {
-          if (error.response) {
-            // 處理後端返回的錯誤
-            const status = error.response.status
-            const message = error.response.data.message
-
-            if (status === 409) {
-              Swal.fire({
-                icon: 'error',
-                title: '註冊失敗',
-                text: message || '此 email 已註冊過',
-              })
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: '註冊失敗',
-                text: message || '發生未知錯誤，請稍後再試',
-              })
-            }
-          } else if (error.request) {
-            // 沒有收到後端回應，通常是網路問題
-            Swal.fire({
-              icon: 'error',
-              title: '註冊失敗',
-              text: '無法連接到伺服器，請檢查網路連線',
-            })
-          } else {
-            // 其他錯誤
-            Swal.fire({
-              icon: 'error',
-              title: '註冊失敗',
-              text: `發生錯誤：${error.message}`,
-            })
-          }
-          this.clearForm()
-        }
+        Swal.fire({
+          icon: 'error',
+          title: '註冊失敗',
+          text: `發生錯誤：${error.message}`,
+        });
       }
-    },
-  },
-}
+      clearForm();
+    }
+  }
+};
 </script>
 
 <template>
@@ -286,16 +277,16 @@ export default {
                   <button
                     class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input default-transition"
                     :style="{
-                      backgroundColor: isServiceButtonGreen ? '#203b2a' : '',
+                      backgroundColor: state.isServiceButtonGreen ? '#203b2a' : '',
                     }"
                     @click="toggleServiceButton"
                   >
                     <div
-                      v-if="!isServiceIconShown"
+                      v-if="!state.isServiceIconShown"
                       class="flex-none m-1 rounded-full size-5 bg-zinc-300/10"
                       :class="{
-                        '!bg-green-500': isServiceButtonGreen,
-                        'bg-zinc-300/10': !isServiceButtonGreen,
+                        '!bg-green-500': state.isServiceButtonGreen,
+                        'bg-zinc-300/10': !state.isServiceButtonGreen,
                       }"
                     ></div>
                     <svg
@@ -343,16 +334,16 @@ export default {
                   <button
                     class="flex items-center w-full gap-2 p-2 rounded-2xl bg-input default-transition"
                     :style="{
-                      backgroundColor: isPolicyButtonGreen ? '#203b2a' : '',
+                      backgroundColor: state.isPolicyButtonGreen ? '#203b2a' : '',
                     }"
                     @click="togglePolicyButton"
                   >
                     <div
-                      v-if="!isPolicyIconShown"
+                      v-if="!state.isPolicyIconShown"
                       class="flex-none m-1 rounded-full size-5 bg-zinc-300/10"
                       :class="{
-                        'bg-green-500': isPolicyButtonGreen,
-                        'bg-zinc-300/10': !isPolicyButtonGreen,
+                        'bg-green-500': state.isPolicyButtonGreen,
+                        'bg-zinc-300/10': !state.isPolicyButtonGreen,
                       }"
                     ></div>
                     <svg
@@ -413,10 +404,6 @@ export default {
                 </div>
                 <hr class="w-full my-4 border border-zinc-700/50" />
                 <span class="text-zinc-300">請先同意服務條款與隱私權政策</span>
-                <!-- <button class="flex items-center w-full gap-2 p-2 bg-white border shadow rounded-2xl" disabled>
-                                    <img src="../img/google-icon.png" class="flex-none size-7">
-                                    <span class="block w-full text-center"> Sign in with Google</span>
-                                </button> -->
                 <GoogleLogin />
               </div>
             </section>

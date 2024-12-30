@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted} from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import dayjs from 'dayjs'
@@ -33,108 +33,108 @@ const deckMakeStore = useDeckMakeStore()
 const cardSeriesStore = useCardSeriesStore()
 
 function getUserIdFromToken(token) {
-    if (!token) {
-        return null
-    }
-    const parts = token.split('.')
-    const payload = JSON.parse(atob(parts[1]))
-    return payload.userId
+  if (!token) {
+    return null
+  }
+  const parts = token.split('.')
+  const payload = JSON.parse(atob(parts[1]))
+  return payload.userId
 }
 
 const formattedTime = computed(() => {
-    return (createdAt) => {
-        if (!createdAt) return '未知時間'
-        return dayjs(createdAt).format('YYYY-MM-DD HH:mm:ss')
-    }
+  return (createdAt) => {
+    if (!createdAt) return '未知時間'
+    return dayjs(createdAt).format('YYYY-MM-DD HH:mm:ss')
+  }
 })
 
 const groupedCards = computed(() => {
-    let sorted = []
-    if (sortBy.value === 'level') {
-        sorted = [...cards.value].sort((a, b) => a.level - b.level)
-    } else if (sortBy.value === 'color') {
-        const colorOrder = ['red', 'yellow', 'green', 'blue']
-        sorted = [...cards.value].sort(
-            (a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color)
-        )
-    } else if (sortBy.value === 'typeTranslate') {
-        const typeOrder = ['角色', '事件', '名場']
-        sorted = [...cards.value].sort(
-            (a, b) =>
-                typeOrder.indexOf(a.typeTranslate) -
-                typeOrder.indexOf(b.typeTranslate)
-        )
-    } else if (sortBy.value === 'rare') {
-        sorted = [...cards.value].sort((a, b) => {
-            if (a.rare.length !== b.rare.length) {
-                return a.rare.length - b.rare.length
-            }
-            return a.rare.localeCompare(b.rare, 'en')
-        })
-    } else if (sortBy.value === 'seriesCode') {
-        sorted = [...cards.value].sort((a, b) =>
-            a.seriesCode.localeCompare(b.seriesCode, 'en')
-        )
-    } else {
-        sorted = [...cards.value]
+  let sorted = []
+  if (sortBy.value === 'level') {
+    sorted = [...cards.value].sort((a, b) => a.level - b.level)
+  } else if (sortBy.value === 'color') {
+    const colorOrder = ['red', 'yellow', 'green', 'blue']
+    sorted = [...cards.value].sort(
+      (a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color)
+    )
+  } else if (sortBy.value === 'typeTranslate') {
+    const typeOrder = ['角色', '事件', '名場']
+    sorted = [...cards.value].sort(
+      (a, b) =>
+        typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate)
+    )
+  } else if (sortBy.value === 'rare') {
+    sorted = [...cards.value].sort((a, b) => {
+      if (a.rare.length !== b.rare.length) {
+        return a.rare.length - b.rare.length
+      }
+      return a.rare.localeCompare(b.rare, 'en')
+    })
+  } else if (sortBy.value === 'seriesCode') {
+    sorted = [...cards.value].sort((a, b) =>
+      a.seriesCode.localeCompare(b.seriesCode, 'en')
+    )
+  } else {
+    sorted = [...cards.value]
+  }
+
+  const grouped = sorted.reduce((acc, card) => {
+    const groupKey = card[sortBy.value]
+    if (!acc[groupKey]) {
+      acc[groupKey] = []
     }
+    acc[groupKey].push(card)
+    return acc
+  }, {})
 
-    const grouped = sorted.reduce((acc, card) => {
-        const groupKey = card[sortBy.value] 
-        if (!acc[groupKey]) {
-            acc[groupKey] = []
-        }
-        acc[groupKey].push(card)
-        return acc
-    }, {})
+  const colorMap = {
+    red: '紅色',
+    yellow: '黃色',
+    green: '綠色',
+    blue: '藍色',
+  }
 
-    const colorMap = {
-        red: '紅色',
-        yellow: '黃色',
-        green: '綠色',
-        blue: '藍色',
-    }
+  const levelLabel = (level) => `${level}等`
 
-    const levelLabel = (level) => `${level}等`
-
-    return Object.entries(grouped).map(([key, cards]) => ({
-        group: sortBy.value === 'color'
-            ? colorMap[key] || key 
-            : sortBy.value === 'level'
-            ? levelLabel(key)      
-            : key,                 
-        cards,
-    }))
+  return Object.entries(grouped).map(([key, cards]) => ({
+    group:
+      sortBy.value === 'color'
+        ? colorMap[key] || key
+        : sortBy.value === 'level'
+          ? levelLabel(key)
+          : key,
+    cards,
+  }))
 })
 
 const totalPrice = computed(() => {
-    if (!Array.isArray(cards.value)) {
-        return 0
-    }
-    return cards.value.reduce((sum, card) => {
-        return sum + (card.price?.number || 0)
-    }, 0)
+  if (!Array.isArray(cards.value)) {
+    return 0
+  }
+  return cards.value.reduce((sum, card) => {
+    return sum + (card.price?.number || 0)
+  }, 0)
 })
 
 const uniqueProductNames = computed(() => {
-    const productNames = cards.value.map(card => card.productName)
-    return [...new Set(productNames)]
+  const productNames = cards.value.map((card) => card.productName)
+  return [...new Set(productNames)]
 })
 
 const toggleRemitCard = () => {
-    isVisible.value = !isVisible.value
+  isVisible.value = !isVisible.value
 }
 
 const togglePriceTableView = () => {
-    togglePriceView.value = !togglePriceView.value
+  togglePriceView.value = !togglePriceView.value
 }
 
 const countSoulCards = (cards) => {
-    return cards.filter(card => card.trigger.includes('soul')).length
+  return cards.filter((card) => card.trigger.includes('soul')).length
 }
 
 const setSortBy = (property) => {
-    sortBy.value = property 
+  sortBy.value = property
 }
 
 const fetchDeck = async () => {
@@ -149,60 +149,64 @@ const fetchDeck = async () => {
   }
 }
 const fetchCurrentUser = async () => {
-    const userToken = localStorage.getItem('token')
-    if (!userToken) {
-      return null
-    }
+  const userToken = localStorage.getItem('token')
+  if (!userToken) {
+    return null
+  }
 
-    const response = await axios.get(`${API_URL}/api/currentUser`, {
-        headers: { 
-          Authorization: `Bearer ${userToken}` 
-        },
-    })
+  const response = await axios.get(`${API_URL}/api/currentUser`, {
+    headers: {
+      Authorization: `Bearer ${userToken}`,
+    },
+  })
 
-    currentUser.value = response.data
+  currentUser.value = response.data
 }
 
 const fetchArticles = async () => {
-    const postCode = route.params.post_code
-    console.log('postcode',postCode)
-    if (!postCode) {
-        console.error('Error: postCode is not available in route params')
-        return
-    }
-    try {
-        const response = await axios.get(`${API_URL}/api/article-id/${postCode}`)
-        article.value = response.data
-        console.log("article", article.value)
-        await fetchMessages()
-    } catch (error) {
-        console.error('Error fetching article_id:', error)
-    }
+  const postCode = route.params.post_code
+  console.log('postcode', postCode)
+  if (!postCode) {
+    console.error('Error: postCode is not available in route params')
+    return
+  }
+  try {
+    const response = await axios.get(`${API_URL}/api/article-id/${postCode}`)
+    article.value = response.data
+    console.log('article', article.value)
+    await fetchMessages()
+  } catch (error) {
+    console.error('Error fetching article_id:', error)
+  }
 }
 
 const fetchMessages = async () => {
-    if (!article.value) {
-        console.error('Error: articleId is not available for fetching messages') 
-        return
-    }
+  if (!article.value) {
+    console.error('Error: articleId is not available for fetching messages')
+    return
+  }
 
-    try {
-        const response = await axios.get(`${API_URL}/api/comments?articleId=${article.value.article_id}`)
-        messages.value = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        messages.value.forEach(message => {
-            message.liked = message.liked || false
-            message.hated = message.hated || false
-            message.likeCount = message.like_count || 0
-            message.pictureUrl = message.users?.picture || '/default-avatar.png'
-        })
-    } catch (error) {
-        console.error('Error fetching messages:', error)
-    }
+  try {
+    const response = await axios.get(
+      `${API_URL}/api/comments?articleId=${article.value.article_id}`
+    )
+    messages.value = response.data.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    )
+    messages.value.forEach((message) => {
+      message.liked = message.liked || false
+      message.hated = message.hated || false
+      message.likeCount = message.like_count || 0
+      message.pictureUrl = message.users?.picture || '/default-avatar.png'
+    })
+  } catch (error) {
+    console.error('Error fetching messages:', error)
+  }
 }
 
-const sendMessage = async () => {  
+const sendMessage = async () => {
   if (newMessage.value.trim() === '') {
-    return;
+    return
   }
 
   const messageData = {
@@ -210,11 +214,11 @@ const sendMessage = async () => {
     message: newMessage.value.trim(),
     like_count: 0,
     created_at: new Date().toISOString(),
-  };
+  }
 
-  const userToken = localStorage.getItem('token');
+  const userToken = localStorage.getItem('token')
   if (!userToken) {
-    console.error('User token is missing');
+    console.error('User token is missing')
     Swal.fire({
       title: '請先登入',
       text: '留言功能需要登入才能使用。',
@@ -222,57 +226,61 @@ const sendMessage = async () => {
       confirmButtonText: '確定',
     }).then((result) => {
       if (result.isConfirmed) {
-        window.location.href = `${BASE_URL}/login`;
+        window.location.href = `${BASE_URL}/login`
       }
-    });
-    return;
+    })
+    return
   }
 
   try {
-    const response = await axios.post(`${API_URL}/api/send-message`, { messageData }, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    });
-    messages.value.unshift(response.data);
-    newMessage.value = ''; // 清空輸入框
+    const response = await axios.post(
+      `${API_URL}/api/send-message`,
+      { messageData },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    )
+    messages.value.unshift(response.data)
+    newMessage.value = '' // 清空輸入框
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error('Error sending message:', error)
   }
-};
+}
 
 const toggleMessages = () => {
-  showAllMessages.value = !showAllMessages.value;
-};
+  showAllMessages.value = !showAllMessages.value
+}
 
 const toggleMenu = (messageId) => {
-  const message = messages.value.find((msg) => msg.id === messageId);
-  
+  const message = messages.value.find((msg) => msg.id === messageId)
+
   if (message) {
-    const token = localStorage.getItem('token');
-    const loggedInUserId = getUserIdFromToken(token);
+    const token = localStorage.getItem('token')
+    const loggedInUserId = getUserIdFromToken(token)
 
     if (message.user_id === loggedInUserId) {
-      message.showMenu = !message.showMenu;
+      message.showMenu = !message.showMenu
     } else {
-      console.log('無權限編輯此留言');
+      console.log('無權限編輯此留言')
     }
   } else {
-    console.log('Message not found');
+    console.log('Message not found')
   }
-};
+}
 
 const toggleEdit = (message) => {
-  message.isEditing = true;
-  message.showMenu = !message.showMenu;
-  message.editContent = message.message;
-};
+  message.isEditing = true
+  message.showMenu = !message.showMenu
+  message.editContent = message.message
+}
 
 const submitEdit = async (message) => {
-  const userToken = localStorage.getItem('token');
+  const userToken = localStorage.getItem('token')
   if (!userToken) {
-    console.error('User token is missing');
-    return;
+    console.error('User token is missing')
+    return
   }
 
   try {
@@ -280,26 +288,26 @@ const submitEdit = async (message) => {
       `${API_URL}/api/comments/${message.id}`,
       { message: message.editContent },
       { headers: { Authorization: `Bearer ${userToken}` } }
-    );
+    )
 
     if (response.status === 200) {
-      const updatedComment = response.data;
-      message.message = updatedComment.message;
-      message.created_at = updatedComment.created_at;
-      message.isEditing = false;
+      const updatedComment = response.data
+      message.message = updatedComment.message
+      message.created_at = updatedComment.created_at
+      message.isEditing = false
     } else {
-      console.error('更新失敗', response);
-      alert('更新失敗，請稍後再試！');
+      console.error('更新失敗', response)
+      alert('更新失敗，請稍後再試！')
     }
   } catch (error) {
-    console.error('更新失敗', error);
-    alert('無法連接到伺服器，請稍後再試！');
+    console.error('更新失敗', error)
+    alert('無法連接到伺服器，請稍後再試！')
   }
-};
+}
 
 const cancelEdit = (message) => {
-  message.isEditing = false;
-};
+  message.isEditing = false
+}
 
 const deleteMessage = async (messageId) => {
   Swal.fire({
@@ -313,89 +321,99 @@ const deleteMessage = async (messageId) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const userToken = localStorage.getItem('token');
+        const userToken = localStorage.getItem('token')
         if (!userToken) {
-          console.error('User token not found.');
-          return;
+          console.error('User token not found.')
+          return
         }
 
-        const response = await axios.delete(`${API_URL}/api/comments/${messageId}`, {
-          headers: { Authorization: `Bearer ${userToken}` },
-        });
+        const response = await axios.delete(
+          `${API_URL}/api/comments/${messageId}`,
+          {
+            headers: { Authorization: `Bearer ${userToken}` },
+          }
+        )
 
         if (response.status === 200) {
-          Swal.fire('刪除成功!', '你的留言已被刪除', 'success');
-          messages.value = messages.value.filter((msg) => msg.id !== messageId);
+          Swal.fire('刪除成功!', '你的留言已被刪除', 'success')
+          messages.value = messages.value.filter((msg) => msg.id !== messageId)
         }
       } catch (error) {
-        console.error('Delete request failed:', error.response?.data || error.message);
-        Swal.fire('刪除失敗', error.response?.data?.error || 'Failed to delete the comment.', 'error');
+        console.error(
+          'Delete request failed:',
+          error.response?.data || error.message
+        )
+        Swal.fire(
+          '刪除失敗',
+          error.response?.data?.error || 'Failed to delete the comment.',
+          'error'
+        )
       }
     }
-  });
-};
+  })
+}
 
 const toggleLike = async (message) => {
   try {
-    const userToken = localStorage.getItem('token');
+    const userToken = localStorage.getItem('token')
     if (!userToken) {
-      console.error('User token not found.');
-      return;
+      console.error('User token not found.')
+      return
     }
 
     const response = await axios.post(
       `${API_URL}/api/comments/${message.id}/toggleLike`,
       {},
       { headers: { Authorization: `Bearer ${userToken}` } }
-    );
+    )
 
-    const { isLiked, isHated, likeCount } = response.data;
-    message.liked = isLiked;
-    message.hated = isHated;
-    message.likeCount = likeCount;
+    const { isLiked, isHated, likeCount } = response.data
+    message.liked = isLiked
+    message.hated = isHated
+    message.likeCount = likeCount
   } catch (error) {
-    console.error('Error toggling like:', error.response || error.message);
+    console.error('Error toggling like:', error.response || error.message)
   }
-};
+}
 
 const toggleHate = async (message) => {
   try {
-    const userToken = localStorage.getItem('token');
+    const userToken = localStorage.getItem('token')
     if (!userToken) {
-      console.error('User token not found.');
-      return;
+      console.error('User token not found.')
+      return
     }
 
     const response = await axios.post(
       `${API_URL}/api/comments/${message.id}/toggleHate`,
       {},
       { headers: { Authorization: `Bearer ${userToken}` } }
-    );
+    )
 
-    const { isHated, isLiked, likeCount } = response.data;
-    message.hated = isHated;
-    message.liked = isLiked;
-    message.likeCount = likeCount;
+    const { isHated, isLiked, likeCount } = response.data
+    message.hated = isHated
+    message.liked = isLiked
+    message.likeCount = likeCount
   } catch (error) {
-    console.error('Error toggling hate:', error.response || error.message);
+    console.error('Error toggling hate:', error.response || error.message)
   }
-};
+}
 
 const formatDate = (date) => {
-  if (!date) return '';
-  return date.split('T')[0];
-};
+  if (!date) return ''
+  return date.split('T')[0]
+}
 
 const isMyArticle = (article) => {
-  console.log('article:', article); 
-  const token = localStorage.getItem('token');
-  const loggedInUserId = getUserIdFromToken(token);
+  console.log('article:', article)
+  const token = localStorage.getItem('token')
+  const loggedInUserId = getUserIdFromToken(token)
 
-  return article.user_id === loggedInUserId;
-};
+  return article.user_id === loggedInUserId
+}
 
 const deleteArticle = async () => {
-  const postCode = route.params.post_code;
+  const postCode = route.params.post_code
   Swal.fire({
     title: '確定要刪除文章嗎？',
     text: '刪除後將無法復原。',
@@ -406,15 +424,18 @@ const deleteArticle = async () => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const userToken = localStorage.getItem('token');
+        const userToken = localStorage.getItem('token')
 
-        const response = await axios.delete(`${API_URL}/api/articles/${postCode}`, {
-          headers: { Authorization: `Bearer ${userToken}` },
-        });
+        const response = await axios.delete(
+          `${API_URL}/api/articles/${postCode}`,
+          {
+            headers: { Authorization: `Bearer ${userToken}` },
+          }
+        )
 
         if (response.status === 200) {
-          Swal.fire('刪除成功', '文章已成功刪除', 'success');
-          router.push('/social');
+          Swal.fire('刪除成功', '文章已成功刪除', 'success')
+          router.push('/social')
         }
       } catch (error) {
         if (error.response && error.response.status === 403) {
@@ -424,46 +445,48 @@ const deleteArticle = async () => {
             icon: 'warning',
             confirmButtonText: '確定',
           }).then(() => {
-            window.location.href = `${BASE_URL}/login`;
-          });
+            window.location.href = `${BASE_URL}/login`
+          })
         } else {
           Swal.fire({
             icon: 'error',
             title: '刪除文章失敗',
             text: error.message,
-          });
+          })
         }
       }
     }
-  });
-};
+  })
+}
 
 const copyDeck = async () => {
-  deckMakeStore.selectedCards = cards.value;
-  deckMakeStore.saveLastDeckEdit();
+  deckMakeStore.selectedCards = cards.value
+  deckMakeStore.saveLastDeckEdit()
 
-  const cardCode = cards.value[0]?.seriesCode || ''; 
-  let seriesId = '';
+  const cardCode = cards.value[0]?.seriesCode || ''
+  let seriesId = ''
 
   try {
-    const response = await axios.get(`${API_URL}/api/series`);
-    const series = response.data.find((series) => series.code.includes(cardCode));
+    const response = await axios.get(`${API_URL}/api/series`)
+    const series = response.data.find((series) =>
+      series.code.includes(cardCode)
+    )
     if (series) {
-      seriesId = series.id;
+      seriesId = series.id
     }
   } catch (error) {
-    console.error('Error fetching series:', error);
-    return;
+    console.error('Error fetching series:', error)
+    return
   }
 
-  cardSeriesStore.saveLastViewSeries(seriesId);
-  router.push(`/card-series/${seriesId}`);
-};
+  cardSeriesStore.saveLastViewSeries(seriesId)
+  router.push(`/card-series/${seriesId}`)
+}
 
 onMounted(() => {
-    fetchArticles()
-    fetchCurrentUser()
-    fetchDeck()
+  fetchArticles()
+  fetchCurrentUser()
+  fetchDeck()
 })
 </script>
 
@@ -676,7 +699,10 @@ onMounted(() => {
               <div class="data-container">
                 <div class="user-link">
                   <div class="user-img">
-                    <img :src="article.user_picture || userPicture" alt="用戶頭像" />
+                    <img
+                      :src="article.user_picture || userPicture"
+                      alt="用戶頭像"
+                    />
                   </div>
                   <span class="date-container">
                     <a href="#">{{ article.users?.username }}</a>
@@ -700,7 +726,7 @@ onMounted(() => {
                       stroke-linejoin="round"
                       d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
                     ></path></svg
-                  >&nbsp; 總數{{cards.length}}張
+                  >&nbsp; 總數{{ cards.length }}張
                 </span>
                 <span class="data-item">
                   <svg
@@ -721,10 +747,7 @@ onMounted(() => {
                   >&nbsp; 總價
                   <span>{{ totalPrice }}円</span>
                 </span>
-                <span
-                  class="data-item"
-                  v-if="cards && cards.length > 0"
-                >
+                <span class="data-item" v-if="cards && cards.length > 0">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -1927,24 +1950,23 @@ onMounted(() => {
   border: none;
 }
 
-    .dot-menu{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        background-color: rgb(63, 63, 63);
-        border-radius: .375rem;
-        position: absolute;
-        margin-top: 24px;
-        right: 0;
-        top: 0;
-        --tw-ring-opacity: 0.05;
-        overflow-y: auto;
-        min-width: 100% ;
-        padding: .2rem;
-    }
-
+.dot-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: rgb(63, 63, 63);
+  border-radius: 0.375rem;
+  position: absolute;
+  margin-top: 24px;
+  right: 0;
+  top: 0;
+  --tw-ring-opacity: 0.05;
+  overflow-y: auto;
+  min-width: 100%;
+  padding: 0.2rem;
+}
 
 .flex {
   display: flex;
@@ -2393,15 +2415,15 @@ header {
   right: 150px;
 }
 
-    .user-btn {
-        border: none;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 20px;
-        gap:8px;
-        cursor: pointer;
-    }
+.user-btn {
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  gap: 8px;
+  cursor: pointer;
+}
 
 .description4 {
   right: 90px;
@@ -2422,7 +2444,7 @@ header {
 .social-btn4:hover,
 .social-btn5:hover {
   background-color: #121212;
-  opacity: 0.6;
+  opacity: 1;
 }
 
 .social-btn1:hover .description1,

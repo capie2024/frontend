@@ -1828,7 +1828,7 @@ header {
 .social-btn4:hover,
 .social-btn5:hover {
   background-color: #121212;
-  opacity: 0.6;
+  opacity: 1;
 }
 
 .social-btn1:hover .description1,

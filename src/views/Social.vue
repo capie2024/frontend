@@ -5,6 +5,7 @@ import SidebarGrid from '../components/SidebarGrid.vue';
 import NavLoginBtn from '../components/NavLoginBtn.vue';
 import Notice from '../components/notification/notice.vue';
 import MainFooter from '../components/MainFooter.vue';
+import userPicture from '@/img/avatar.png'
 const API_URL = import.meta.env.VITE_API_URL; 
 
 const articles = ref([]);
@@ -179,7 +180,7 @@ onBeforeUnmount(() => {
         :class="{ 'header-change': isScrolled }"
       >
         <div class="search-container">
-          <i class="fa-solid fa-magnifying-glass"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path></svg>
           <input
             v-model="searchQuery"
             @keyup.enter="handleEnter"
@@ -253,33 +254,62 @@ onBeforeUnmount(() => {
             />
             <button @click="clearMenuSearch">✖</button>
           </li>
-          
-          <li
-            class="menu"
-            v-for="deck in filteredDecks"
-            :key="deck.id"
-            @click="selectDeck(deck)"
-          >
-            <svg data-v-33ac09eb="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path data-v-33ac09eb="" stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
-            <p class="text-xs truncate">{{ deck.name }}</p>
-          </li>
+          <div class="menu-inner-area">
+            <li
+              class="menu"
+              v-for="deck in filteredDecks"
+              :key="deck.id"
+              @click="selectDeck(deck)"
+            >
+              <svg data-v-33ac09eb="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path data-v-33ac09eb="" stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
+              <p class="text-xs truncate">{{ deck.name }}</p>
+            </li>
+          </div>
         </ul>
       </div>
         <button class="filter-hidden">
-          <i class="fa-regular fa-window-restore"></i>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke-width="1.5" 
+            stroke="currentColor" 
+            aria-hidden="true" 
+            data-slot="icon" 
+            class="flex-none w-7 h-7"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+            ></path>
+          </svg>
           CODE
-          <i class="fa-solid fa-x"></i>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
+            @click="clearSearchSeries"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18 18 6M6 6l12 12"
+            ></path>
+          </svg>
         </button>
         <div class="sign-container">
           <a :href="'/add'">
             <button class="add-article">
-              <i class="fa-solid fa-pen-to-square"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg>
               新增文章
             </button>
           </a>
           <a :href="'/add'">
             <button class="add-article-hidden">
-              <i class="fa-solid fa-pen-to-square"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg>
             </button>
           </a>
           <div class="bell">
@@ -299,11 +329,11 @@ onBeforeUnmount(() => {
         >
           <a href="#">
             <div class="user-link">
-              <i class="fa-solid fa-magnifying-glass"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 select-none"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path></svg>
               <span>{{ item.searchQuery }}</span>
             </div>
             <div class="user-link">
-              <i class="fa-regular fa-window-restore"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 select-none"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
               <span>-</span>
             </div>
           </a>
@@ -334,16 +364,16 @@ onBeforeUnmount(() => {
           <div class="card-user">
             <div class="card-user-flex">
               <div class="card-user-img">
-                <img :src="article.users.picture" alt="用戶頭像" />
+                <img :src="article.users.picture || userPicture" alt="用戶頭像" />
               </div>
               <div class="card-user-p">
                 <p>{{ article.users.username }}</p>
                 <div class="date-container">
                   <p class="date">{{ formatDate(article.created_at) }}</p>
-                  <i class="fa-solid fa-globe"></i>
+                  <svg data-v-9f28dcad="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="size-4 flex-none"><path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"></path></svg>
                   <p class="card-code">{{ article.post_code }}</p>
                   <div class="chat">
-                    <i class="fa-regular fa-comment"></i>
+                    <svg data-v-9f28dcad="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="ml-auto size-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"></path></svg>
                     <p>1</p>
                   </div>
                 </div>
@@ -378,16 +408,20 @@ onBeforeUnmount(() => {
   top: 100%; 
   display: grid;
   position: absolute;
-  background-color: #20567a;
+  background-color: #202020;
   border-radius: 7px;
   width: 270px;
   overflow: hidden;
   transition: height 1s ease;
   z-index: 3;
+}
+
+.menu-inner-area {
+  max-height: 210px;
   overflow-y: scroll;
   scrollbar-width: none;
-  max-height: 220px;
 }
+
 .menu-search {
   position: fixed;
   display: flex;
@@ -399,7 +433,6 @@ onBeforeUnmount(() => {
 }
 
 .keyword {
-  /* position: fixed; */
   box-sizing: border-box;
   color: white;
   padding: 4px 8px;
@@ -419,6 +452,14 @@ onBeforeUnmount(() => {
   color: white;
   position: absolute;
   right: 12px;
+}
+
+li p,li svg{
+  color: rgba(255, 255, 255, 0.750);
+}
+
+li:hover p,li:hover svg{
+  color: rgb(255, 255, 255);
 }
 
 html,
@@ -488,7 +529,7 @@ a {
   position: relative;
 }
 
-.search-container svg {
+.search-container svg:nth-of-type(2) {
   cursor: pointer;
   width: 22px;
   height: 22px;
@@ -496,8 +537,7 @@ a {
   right: 10px;
 }
 
-.search-container i::before,
-.header-container i::before {
+.search-container svg::before {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -550,20 +590,18 @@ a {
   display: none;
 }
 
+.filter-hidden svg {
+  width:20px;
+  height:20px;
+  display: inline;
+}
+
 .sign-container {
   display: flex;
   align-items: center;
   position: absolute;
   top: 14px;
-  right: 322px;
-}
-
-.bell i::before,
-.user-sign i::before {
-  color: #d4d4d8;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
+  right: 300px;
 }
 
 .sign-container {
@@ -596,22 +634,6 @@ a {
   display: none;
 }
 
-.user-sign {
-  width: 92px;
-  background-color: #1c1c1e;
-  border-radius: 20px;
-  color: #d4d4d8;
-}
-
-.user-sign:hover {
-  background-color: #2b2b2c;
-}
-
-.user-sign span {
-  font-weight: 700;
-  font-size: 14px;
-}
-
 .flex-item-hidden {
   display: flex;
   padding-left: 20px;
@@ -642,7 +664,7 @@ a {
   gap: 5px;
 }
 
-.user-link i {
+.user-link svg {
   width: 20px;
   height: 20px;
   line-height: 1.25rem;
@@ -745,16 +767,17 @@ a {
   display: flex;
   gap: 4px;
   color: rgb(170, 168, 168);
+  align-items: center;
 }
 
 .date {
   width: 62px;
 }
 
-.date-container i {
+.date-container svg {
   display: flex;
-  font-size: 14px;
-  margin: 0 2px;
+  width:15px;
+  height:15px;
 }
 
 .chat {
@@ -782,39 +805,6 @@ a {
 
 .card-name h2 {
   font-weight: 900;
-}
-
-.deck-container {
-  width: 100%;
-  padding-right: 8px;
-  height: 56px;
-  position: fixed;
-  bottom: 65.5px;
-  display: none;
-}
-
-.deck-img {
-  overflow: hidden;
-  border-radius: 10px;
-  transform: translateX(8px);
-  z-index: 1;
-}
-
-.deck-img img {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-}
-
-.deck-content {
-  width: 92%;
-  height: 56px;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  padding-left: 8px;
-  border-radius: 0 10px 10px 0;
-  align-items: center;
-  position: relative;
 }
 
 .line {
@@ -851,38 +841,6 @@ a {
   font-weight: 700;
 }
 
-.deckbtn-area {
-  display: flex;
-  align-items: center;
-  width: 20%;
-  position: relative;
-  padding-left: 8px;
-}
-
-.deck-btn {
-  all: unset;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  color: #f0f0f0;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  right: 120px;
-  cursor: pointer;
-}
-
-.deck-btn:hover {
-  background-color: #42ebeb;
-}
-
-.deck-btn i::before {
-  font-size: 24px;
-}
-
 .pay-btn {
   padding-left: 5px;
   position: absolute;
@@ -914,6 +872,10 @@ a {
 }
 
 @media screen and (max-width: 1200px) {
+  .menu-area {
+    display: none;
+  }
+  
   .main {
     margin: 0px;
   }
@@ -930,7 +892,7 @@ a {
   }
 
   .search {
-    width: calc(100% - 191px);
+    width: 100%
   }
 
   #xx {
@@ -944,7 +906,9 @@ a {
   }
 
   .filter-hidden {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
   }
 
   .add-article {
@@ -952,7 +916,8 @@ a {
   }
 
   .add-article-hidden {
-    display: block;
+    display: flex;
+    align-items: center;
   }
 
   .bell,
@@ -962,10 +927,6 @@ a {
 
   .card-area {
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .deck-container {
-    display: flex;
   }
 
   .chat {

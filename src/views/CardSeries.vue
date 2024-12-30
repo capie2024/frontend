@@ -1,7 +1,7 @@
 <script setup>
 import SidebarGrid from '../components/SidebarGrid.vue'
-import NavLoginBtn from '../components/NavLoginBtn.vue';
-import Notice from '../components/notification/notice.vue';
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import Notice from '../components/notification/notice.vue'
 import {
   ref,
   computed,
@@ -40,8 +40,13 @@ const deleteMyFilters = cardFilterStore.deleteMyFilters
 
 // 引入CardSeriesStore並使用
 const cardSeriesStore = useCardSeriesStore()
-const { seriesCardList, seriesInfo, seriesCardListLength, translatedSeriesCardList, translatedSeriesInfo } =
-  storeToRefs(cardSeriesStore)
+const {
+  seriesCardList,
+  seriesInfo,
+  seriesCardListLength,
+  translatedSeriesCardList,
+  translatedSeriesInfo,
+} = storeToRefs(cardSeriesStore)
 const getLastViewSeries = cardSeriesStore.getLastViewSeries
 const saveLastViewSeries = cardSeriesStore.saveLastViewSeries
 
@@ -255,7 +260,7 @@ const handleApplyStatus = async () => {
       }
     }
   })
-  currentMain.value = '';
+  currentMain.value = ''
 }
 
 // 按下關鍵字按鈕
@@ -423,47 +428,47 @@ const sidebarMarginLeft = computed(() => {
 })
 
 const toggleSidebar = (sidebar) => {
-  currentSidebar.value = currentSidebar.value === sidebar ? '' : sidebar;
-};
+  currentSidebar.value = currentSidebar.value === sidebar ? '' : sidebar
+}
 
 const toggleFilter = (value) => {
   if (!isLargeScreen.value) {
-    currentSidebar.value = '';
+    currentSidebar.value = ''
   }
-  currentMain.value = currentMain.value === value ? null : value;
-};
+  currentMain.value = currentMain.value === value ? null : value
+}
 
 const MenuFilter = (index) => {
-  filters.value[index].checked = !filters.value[index].checked;
-};
+  filters.value[index].checked = !filters.value[index].checked
+}
 
 const closeSidebar = () => {
-  currentSidebar.value = '';
-  currentMain.value = '';
+  currentSidebar.value = ''
+  currentMain.value = ''
 
-  settingDeckStatus.value = false;
-  sidebarSelectedStatus.value = true;
-  deckName.value = '';
-  deckDescription.value = '';
-  chooseCoverCard.value = '';
-};
+  settingDeckStatus.value = false
+  sidebarSelectedStatus.value = true
+  deckName.value = ''
+  deckDescription.value = ''
+  chooseCoverCard.value = ''
+}
 
 const updateScreenSize = () => {
-  isLargeScreen.value = window.innerWidth > 1200;
+  isLargeScreen.value = window.innerWidth > 1200
   if (!isLargeScreen.value) {
-    closeSidebar();
+    closeSidebar()
   } else {
-    currentMain.value = '';
+    currentMain.value = ''
   }
-};
+}
 
 const goBack = () => {
   if (window.history.length > 1) {
-    window.history.back();
+    window.history.back()
   } else {
-    router.push('/series'); 
+    router.push('/series')
   }
-};
+}
 
 onBeforeMount(async () => {
   const route = useRoute()
@@ -485,8 +490,11 @@ onBeforeUnmount(() => {
 <template>
   <div class="overflow-hidden bg-black root-container">
     <nav class="sidebar-container">
-
-      <SidebarGrid :class="{ hidden: currentMain === 'open-filter' || currentMain === 'open-deck'}" />
+      <SidebarGrid
+        :class="{
+          hidden: currentMain === 'open-filter' || currentMain === 'open-deck',
+        }"
+      />
 
       <section v-show="currentSidebar === 'open-filter'" class="sidebar-filter">
         <header class="sidebar-filter-header">
@@ -1840,8 +1848,8 @@ onBeforeUnmount(() => {
     <div class="main" :style="{ marginLeft: sidebarMarginLeft + 'px' }">
       <div class="main-info">
         <header class="main-info-header">
-          
-          <button @click="goBack"
+          <button
+            @click="goBack"
             class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
           >
             <svg
@@ -1861,13 +1869,17 @@ onBeforeUnmount(() => {
               ></path>
             </svg>
           </button>
-          
+
           <div class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
-            <h2 class="truncate text-2xl font-bold">{{ translatedSeriesInfo.name }}</h2>
+            <h2 class="truncate text-2xl font-bold w-72">
+              {{ translatedSeriesInfo.name }}
+            </h2>
           </div>
-          <Notice/>
-          <div class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50">            
-            <NavLoginBtn/>
+          <Notice />
+          <div
+            class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50"
+          >
+            <NavLoginBtn />
           </div>
         </header>
         <button @click="toggleSidebar('open-filter')" class="toggle-filter">
@@ -1909,9 +1921,13 @@ onBeforeUnmount(() => {
           <div flex-col class="inner-info-container">
             <span
               ><i class="fa-regular fa-clone"></i>
-              <span v-for="(code, index) in translatedSeriesInfo.code" :key="index"
+              <span
+                v-for="(code, index) in translatedSeriesInfo.code"
+                :key="index"
                 >{{ code
-                }}{{ index == translatedSeriesInfo.code.length - 1 ? '' : ', ' }}</span
+                }}{{
+                  index == translatedSeriesInfo.code.length - 1 ? '' : ', '
+                }}</span
               ></span
             >
             <h1>{{ translatedSeriesInfo.name }}</h1>
@@ -1930,8 +1946,13 @@ onBeforeUnmount(() => {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
-                  ></path></svg>
-                  <span>最新發布{{ seriesInfo.sellAt[seriesInfo.sellAt.length - 1] }}</span>
+                  ></path>
+                </svg>
+                <span
+                  >最新發布{{
+                    seriesInfo.sellAt[seriesInfo.sellAt.length - 1]
+                  }}</span
+                >
               </div>
               <div v-else>
                 <svg
@@ -1947,8 +1968,9 @@ onBeforeUnmount(() => {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
-                  ></path></svg>
-                  <span>最新發布</span>
+                  ></path>
+                </svg>
+                <span>最新發布</span>
               </div>
               <div v-if="seriesCardListLength > 0">
                 <i class="fa-regular fa-clone"></i
@@ -1974,8 +1996,9 @@ onBeforeUnmount(() => {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-                  ></path></svg>
-                  <span>篩選出{{ seriesCardList.length }}張</span>
+                  ></path>
+                </svg>
+                <span>篩選出{{ seriesCardList.length }}張</span>
               </div>
             </div>
           </div>
@@ -2000,8 +2023,9 @@ onBeforeUnmount(() => {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-                ></path></svg>
-                新增常用篩選
+                ></path>
+              </svg>
+              新增常用篩選
             </p>
             <div>
               <button
@@ -2202,7 +2226,11 @@ onBeforeUnmount(() => {
         <header class="sidebar-filter-header">
           <div>
             <p>卡片篩選</p>
-            <p>{{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{ (filterVaribleSet.keyWord.trim()) }}"</p>
+            <p>
+              {{ filterCount }} 篩選、{{ sortCount }} 排序、關鍵字 : "{{
+                filterVaribleSet.keyWord.trim()
+              }}"
+            </p>
           </div>
           <div>
             <button class="icon del-btn">
@@ -2226,7 +2254,11 @@ onBeforeUnmount(() => {
             <div class="menu" @click="MenuFilter(index)">
               <i :class="[filter.icon]"></i>
               <p>{{ filter.name }}</p>
-              <button class="icon del" v-if="filter.delButton" @click.stop="resetFilter(filter.filterTag)">
+              <button
+                class="icon del"
+                v-if="filter.delButton"
+                @click.stop="resetFilter(filter.filterTag)"
+              >
                 <i class="fa-solid fa-trash"></i>
               </button>
               <button class="icon check" v-if="filter.checkButton">
@@ -2241,139 +2273,714 @@ onBeforeUnmount(() => {
             </div>
             <div class="menu-inner" v-show="filter.checked">
               <div v-if="filter.name === '常用'">
-                <span>"+" 按鈕可以儲存當下篩選內容，長按儲存篩選可以進行刪除。</span>
-                <div class="myfilter-button-group" >
-                  <button class="plus-btn-used" @click="saveMyFilters" ><i class="fa-solid fa-plus"></i></button>
-                  <button class="myfilter-button-item" v-for="(myfilter, index) in myFiltersGroup" :key="index" @click="handleUseMyFiltersBtn(myfilter)" @mousedown="countMouseUp" @mouseup="deleteMyFilters(myfilter)" >{{ myfilter.name }}</button>
+                <span
+                  >"+"
+                  按鈕可以儲存當下篩選內容，長按儲存篩選可以進行刪除。</span
+                >
+                <div class="myfilter-button-group">
+                  <button class="plus-btn-used" @click="saveMyFilters">
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                  <button
+                    class="myfilter-button-item"
+                    v-for="(myfilter, index) in myFiltersGroup"
+                    :key="index"
+                    @click="handleUseMyFiltersBtn(myfilter)"
+                    @mousedown="countMouseUp"
+                    @mouseup="deleteMyFilters(myfilter)"
+                  >
+                    {{ myfilter.name }}
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '關鍵字'">
-                <span>可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
-                  <br>當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
+                <span
+                  >可輸入 "空白" 來複合搜尋，"AND/OR" 可以進行切換。
+                  <br />當前搜尋內容： {{ filterVaribleSet.keyWord.trim() }}
                 </span>
-                <div class="input-keyword" :class="{ 'input-keyword-haveValue': filterVaribleSet.keyWord.trim() != '' }">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16"aria-hidden="true" data-slot="icon" class="flex-none size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path></svg>
-                  <input class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none" type="text" placeholder="關鍵字搜尋" v-model="filterVaribleSet.keyWord" @input="handleKeyWord">
-                  <div class="input-keyword-btn" >
-                    <button @click="changeReplaceKeyWord" ><span>{{ replaceWord }}</span></button>
+                <div
+                  class="input-keyword"
+                  :class="{
+                    'input-keyword-haveValue':
+                      filterVaribleSet.keyWord.trim() != '',
+                  }"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    data-slot="icon"
+                    class="flex-none size-4"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                    ></path>
+                  </svg>
+                  <input
+                    class="w-full p-0 bg-transparent border-transparent focus:ring-0 placeholder:text-zinc-500 focus:outline-none"
+                    type="text"
+                    placeholder="關鍵字搜尋"
+                    v-model="filterVaribleSet.keyWord"
+                    @input="handleKeyWord"
+                  />
+                  <div class="input-keyword-btn">
+                    <button @click="changeReplaceKeyWord">
+                      <span>{{ replaceWord }}</span>
+                    </button>
                     <!-- <button><span>OR</span></button> -->
-                    <button class="plus-btn" @click="saveKeyWord"><i class="fa-solid fa-plus"></i></button>
+                    <button class="plus-btn" @click="saveKeyWord">
+                      <i class="fa-solid fa-plus"></i>
+                    </button>
                   </div>
                 </div>
-                <p class="keyword-below">"+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
+                <p class="keyword-below">
+                  "+" 按鈕可以儲存關鍵字，長按儲存關鍵字可以進行刪除。
                 </p>
-                <span v-if="keyWordGroup.length === 0" >無資料</span>
-                <div class="keyword-button-group" >
-                  <button class="keyword-button-item" v-for="(keyWord, index) in keyWordGroup" :key="index" @click="handleUseKeyWordBtn(keyWord)" @mousedown="countMouseUp" @mouseup="deleteKeyWord(keyWord)" >{{ keyWord }}</button>
+                <span v-if="keyWordGroup.length === 0">無資料</span>
+                <div class="keyword-button-group">
+                  <button
+                    class="keyword-button-item"
+                    v-for="(keyWord, index) in keyWordGroup"
+                    :key="index"
+                    @click="handleUseKeyWordBtn(keyWord)"
+                    @mousedown="countMouseUp"
+                    @mouseup="deleteKeyWord(keyWord)"
+                  >
+                    {{ keyWord }}
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '排序'">
                 <div class="menu-inner-slider-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelDownSort || !filterVaribleSet.levelUpSort, 'btn-active-bg': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" @click="changeSortStatus('level')" >
-                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.levelDownSort || filterVaribleSet.levelUpSort }" >
+                  <button
+                    :class="{
+                      'btn-default-bg':
+                        !filterVaribleSet.levelDownSort ||
+                        !filterVaribleSet.levelUpSort,
+                      'btn-active-bg':
+                        filterVaribleSet.levelDownSort ||
+                        filterVaribleSet.levelUpSort,
+                    }"
+                    @click="changeSortStatus('level')"
+                  >
+                    <div
+                      class="slider-btn"
+                      :class="{
+                        'slider-btn-active':
+                          filterVaribleSet.levelDownSort ||
+                          filterVaribleSet.levelUpSort,
+                      }"
+                    >
                       {{ levelOrder > 0 ? levelOrder : '' }}
                     </div>
                     等級
-                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.levelUpSort ,'arrow-down': filterVaribleSet.levelUpSort}" ></i>
+                    <i
+                      class="fa-solid fa-arrow-up"
+                      :class="{
+                        'arrow-up': !filterVaribleSet.levelUpSort,
+                        'arrow-down': filterVaribleSet.levelUpSort,
+                      }"
+                    ></i>
                   </button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.colorDownSort || !filterVaribleSet.colorUpSort, 'btn-active-bg': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" @click="changeSortStatus('color')" >
-                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.colorDownSort || filterVaribleSet.colorUpSort }" >
+                  <button
+                    :class="{
+                      'btn-default-bg':
+                        !filterVaribleSet.colorDownSort ||
+                        !filterVaribleSet.colorUpSort,
+                      'btn-active-bg':
+                        filterVaribleSet.colorDownSort ||
+                        filterVaribleSet.colorUpSort,
+                    }"
+                    @click="changeSortStatus('color')"
+                  >
+                    <div
+                      class="slider-btn"
+                      :class="{
+                        'slider-btn-active':
+                          filterVaribleSet.colorDownSort ||
+                          filterVaribleSet.colorUpSort,
+                      }"
+                    >
                       {{ colorOrder > 0 ? colorOrder : '' }}
                     </div>
                     顏色
-                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.colorUpSort ,'arrow-down': filterVaribleSet.colorUpSort}" ></i>
+                    <i
+                      class="fa-solid fa-arrow-up"
+                      :class="{
+                        'arrow-up': !filterVaribleSet.colorUpSort,
+                        'arrow-down': filterVaribleSet.colorUpSort,
+                      }"
+                    ></i>
                   </button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.priceDownSort || !filterVaribleSet.priceUpSort, 'btn-active-bg': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" @click="changeSortStatus('price')" >
-                    <div class="slider-btn" :class="{'slider-btn-active': filterVaribleSet.priceDownSort || filterVaribleSet.priceUpSort }" >
+                  <button
+                    :class="{
+                      'btn-default-bg':
+                        !filterVaribleSet.priceDownSort ||
+                        !filterVaribleSet.priceUpSort,
+                      'btn-active-bg':
+                        filterVaribleSet.priceDownSort ||
+                        filterVaribleSet.priceUpSort,
+                    }"
+                    @click="changeSortStatus('price')"
+                  >
+                    <div
+                      class="slider-btn"
+                      :class="{
+                        'slider-btn-active':
+                          filterVaribleSet.priceDownSort ||
+                          filterVaribleSet.priceUpSort,
+                      }"
+                    >
                       {{ priceOrder > 0 ? priceOrder : '' }}
                     </div>
                     價格
-                    <i class="fa-solid fa-arrow-up" :class="{'arrow-up': !filterVaribleSet.priceUpSort ,'arrow-down': filterVaribleSet.priceUpSort}" ></i>
+                    <i
+                      class="fa-solid fa-arrow-up"
+                      :class="{
+                        'arrow-up': !filterVaribleSet.priceUpSort,
+                        'arrow-down': filterVaribleSet.priceUpSort,
+                      }"
+                    ></i>
                   </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '類型'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.typeCharacter, 'btn-active-bg': filterVaribleSet.typeCharacter }" @click="changeFilterStatus('typeCharacter')" >角色</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.typeEvent, 'btn-active-bg': filterVaribleSet.typeEvent }" @click="changeFilterStatus('typeEvent')" >事件</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.typeScene, 'btn-active-bg': filterVaribleSet.typeScene }" @click="changeFilterStatus('typeScene')" >名場</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.typeCharacter,
+                      'btn-active-bg': filterVaribleSet.typeCharacter,
+                    }"
+                    @click="changeFilterStatus('typeCharacter')"
+                  >
+                    角色
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.typeEvent,
+                      'btn-active-bg': filterVaribleSet.typeEvent,
+                    }"
+                    @click="changeFilterStatus('typeEvent')"
+                  >
+                    事件
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.typeScene,
+                      'btn-active-bg': filterVaribleSet.typeScene,
+                    }"
+                    @click="changeFilterStatus('typeScene')"
+                  >
+                    名場
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '等級'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter0, 'btn-active-bg': filterVaribleSet.levelFilter0 }" @click="changeFilterStatus('levelFilter0')" >0</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter1, 'btn-active-bg': filterVaribleSet.levelFilter1 }" @click="changeFilterStatus('levelFilter1')" >1</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter2, 'btn-active-bg': filterVaribleSet.levelFilter2 }" @click="changeFilterStatus('levelFilter2')" >2</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.levelFilter3, 'btn-active-bg': filterVaribleSet.levelFilter3 }" @click="changeFilterStatus('levelFilter3')" >3</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter0,
+                      'btn-active-bg': filterVaribleSet.levelFilter0,
+                    }"
+                    @click="changeFilterStatus('levelFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter1,
+                      'btn-active-bg': filterVaribleSet.levelFilter1,
+                    }"
+                    @click="changeFilterStatus('levelFilter1')"
+                  >
+                    1
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter2,
+                      'btn-active-bg': filterVaribleSet.levelFilter2,
+                    }"
+                    @click="changeFilterStatus('levelFilter2')"
+                  >
+                    2
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.levelFilter3,
+                      'btn-active-bg': filterVaribleSet.levelFilter3,
+                    }"
+                    @click="changeFilterStatus('levelFilter3')"
+                  >
+                    3
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '顏色'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterYellow, 'btn-active-bg': filterVaribleSet.colorFilterYellow }"@click="changeFilterStatus('colorFilterYellow')" >黃色</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterRed, 'btn-active-bg': filterVaribleSet.colorFilterRed }"@click="changeFilterStatus('colorFilterRed')" >紅色</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.colorFilterBlue, 'btn-active-bg': filterVaribleSet.colorFilterBlue }"@click="changeFilterStatus('colorFilterBlue')" >藍色</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.colorFilterYellow,
+                      'btn-active-bg': filterVaribleSet.colorFilterYellow,
+                    }"
+                    @click="changeFilterStatus('colorFilterYellow')"
+                  >
+                    黃色
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.colorFilterRed,
+                      'btn-active-bg': filterVaribleSet.colorFilterRed,
+                    }"
+                    @click="changeFilterStatus('colorFilterRed')"
+                  >
+                    紅色
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.colorFilterBlue,
+                      'btn-active-bg': filterVaribleSet.colorFilterBlue,
+                    }"
+                    @click="changeFilterStatus('colorFilterBlue')"
+                  >
+                    藍色
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '費用'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter0, 'btn-active-bg': filterVaribleSet.costFilter0 }"@click="changeFilterStatus('costFilter0')"  >0</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter1, 'btn-active-bg': filterVaribleSet.costFilter1 }"@click="changeFilterStatus('costFilter1')"  >1</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.costFilter2, 'btn-active-bg': filterVaribleSet.costFilter2 }"@click="changeFilterStatus('costFilter2')"  >2</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.costFilter0,
+                      'btn-active-bg': filterVaribleSet.costFilter0,
+                    }"
+                    @click="changeFilterStatus('costFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.costFilter1,
+                      'btn-active-bg': filterVaribleSet.costFilter1,
+                    }"
+                    @click="changeFilterStatus('costFilter1')"
+                  >
+                    1
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.costFilter2,
+                      'btn-active-bg': filterVaribleSet.costFilter2,
+                    }"
+                    @click="changeFilterStatus('costFilter2')"
+                  >
+                    2
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '魂傷'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter0, 'btn-active-bg': filterVaribleSet.soulFilter0 }"@click="changeFilterStatus('soulFilter0')" >0</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter1, 'btn-active-bg': filterVaribleSet.soulFilter1 }"@click="changeFilterStatus('soulFilter1')" >1</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.soulFilter2, 'btn-active-bg': filterVaribleSet.soulFilter2 }"@click="changeFilterStatus('soulFilter2')" >2</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.soulFilter0,
+                      'btn-active-bg': filterVaribleSet.soulFilter0,
+                    }"
+                    @click="changeFilterStatus('soulFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.soulFilter1,
+                      'btn-active-bg': filterVaribleSet.soulFilter1,
+                    }"
+                    @click="changeFilterStatus('soulFilter1')"
+                  >
+                    1
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.soulFilter2,
+                      'btn-active-bg': filterVaribleSet.soulFilter2,
+                    }"
+                    @click="changeFilterStatus('soulFilter2')"
+                  >
+                    2
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '攻擊力'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter0, 'btn-active-bg': filterVaribleSet.attackFilter0 }"@click="changeFilterStatus('attackFilter0')" >0</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter500, 'btn-active-bg': filterVaribleSet.attackFilter500 }"@click="changeFilterStatus('attackFilter500')" >500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1000, 'btn-active-bg': filterVaribleSet.attackFilter1000 }"@click="changeFilterStatus('attackFilter1000')" >1000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter1500, 'btn-active-bg': filterVaribleSet.attackFilter1500 }"@click="changeFilterStatus('attackFilter1500')" >1500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2000, 'btn-active-bg': filterVaribleSet.attackFilter2000 }"@click="changeFilterStatus('attackFilter2000')" >2000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter2500, 'btn-active-bg': filterVaribleSet.attackFilter2500 }"@click="changeFilterStatus('attackFilter2500')" >2500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3000, 'btn-active-bg': filterVaribleSet.attackFilter3000 }"@click="changeFilterStatus('attackFilter3000')" >3000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter3500, 'btn-active-bg': filterVaribleSet.attackFilter3500 }"@click="changeFilterStatus('attackFilter3500')" >3500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4000, 'btn-active-bg': filterVaribleSet.attackFilter4000 }"@click="changeFilterStatus('attackFilter4000')" >4000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter4500, 'btn-active-bg': filterVaribleSet.attackFilter4500 }"@click="changeFilterStatus('attackFilter4500')" >4500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5000, 'btn-active-bg': filterVaribleSet.attackFilter5000 }"@click="changeFilterStatus('attackFilter5000')" >5000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter5500, 'btn-active-bg': filterVaribleSet.attackFilter5500 }"@click="changeFilterStatus('attackFilter5500')" >5500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6000, 'btn-active-bg': filterVaribleSet.attackFilter6000 }"@click="changeFilterStatus('attackFilter6000')" >6000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter6500, 'btn-active-bg': filterVaribleSet.attackFilter6500 }"@click="changeFilterStatus('attackFilter6500')" >6500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7000, 'btn-active-bg': filterVaribleSet.attackFilter7000 }"@click="changeFilterStatus('attackFilter7000')" >7000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter7500, 'btn-active-bg': filterVaribleSet.attackFilter7500 }"@click="changeFilterStatus('attackFilter7500')" >7500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8000, 'btn-active-bg': filterVaribleSet.attackFilter8000 }"@click="changeFilterStatus('attackFilter8000')" >8000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter8500, 'btn-active-bg': filterVaribleSet.attackFilter8500 }"@click="changeFilterStatus('attackFilter8500')" >8500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9000, 'btn-active-bg': filterVaribleSet.attackFilter9000 }"@click="changeFilterStatus('attackFilter9000')" >9000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter9500, 'btn-active-bg': filterVaribleSet.attackFilter9500 }"@click="changeFilterStatus('attackFilter9500')" >9500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10000, 'btn-active-bg': filterVaribleSet.attackFilter10000 }"@click="changeFilterStatus('attackFilter10000')" >10000</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter10500, 'btn-active-bg': filterVaribleSet.attackFilter10500 }"@click="changeFilterStatus('attackFilter10500')" >10500</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.attackFilter11000, 'btn-active-bg': filterVaribleSet.attackFilter11000 }"@click="changeFilterStatus('attackFilter11000')" >11000</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter0,
+                      'btn-active-bg': filterVaribleSet.attackFilter0,
+                    }"
+                    @click="changeFilterStatus('attackFilter0')"
+                  >
+                    0
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter500,
+                      'btn-active-bg': filterVaribleSet.attackFilter500,
+                    }"
+                    @click="changeFilterStatus('attackFilter500')"
+                  >
+                    500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter1000,
+                      'btn-active-bg': filterVaribleSet.attackFilter1000,
+                    }"
+                    @click="changeFilterStatus('attackFilter1000')"
+                  >
+                    1000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter1500,
+                      'btn-active-bg': filterVaribleSet.attackFilter1500,
+                    }"
+                    @click="changeFilterStatus('attackFilter1500')"
+                  >
+                    1500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter2000,
+                      'btn-active-bg': filterVaribleSet.attackFilter2000,
+                    }"
+                    @click="changeFilterStatus('attackFilter2000')"
+                  >
+                    2000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter2500,
+                      'btn-active-bg': filterVaribleSet.attackFilter2500,
+                    }"
+                    @click="changeFilterStatus('attackFilter2500')"
+                  >
+                    2500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter3000,
+                      'btn-active-bg': filterVaribleSet.attackFilter3000,
+                    }"
+                    @click="changeFilterStatus('attackFilter3000')"
+                  >
+                    3000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter3500,
+                      'btn-active-bg': filterVaribleSet.attackFilter3500,
+                    }"
+                    @click="changeFilterStatus('attackFilter3500')"
+                  >
+                    3500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter4000,
+                      'btn-active-bg': filterVaribleSet.attackFilter4000,
+                    }"
+                    @click="changeFilterStatus('attackFilter4000')"
+                  >
+                    4000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter4500,
+                      'btn-active-bg': filterVaribleSet.attackFilter4500,
+                    }"
+                    @click="changeFilterStatus('attackFilter4500')"
+                  >
+                    4500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter5000,
+                      'btn-active-bg': filterVaribleSet.attackFilter5000,
+                    }"
+                    @click="changeFilterStatus('attackFilter5000')"
+                  >
+                    5000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter5500,
+                      'btn-active-bg': filterVaribleSet.attackFilter5500,
+                    }"
+                    @click="changeFilterStatus('attackFilter5500')"
+                  >
+                    5500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter6000,
+                      'btn-active-bg': filterVaribleSet.attackFilter6000,
+                    }"
+                    @click="changeFilterStatus('attackFilter6000')"
+                  >
+                    6000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter6500,
+                      'btn-active-bg': filterVaribleSet.attackFilter6500,
+                    }"
+                    @click="changeFilterStatus('attackFilter6500')"
+                  >
+                    6500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter7000,
+                      'btn-active-bg': filterVaribleSet.attackFilter7000,
+                    }"
+                    @click="changeFilterStatus('attackFilter7000')"
+                  >
+                    7000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter7500,
+                      'btn-active-bg': filterVaribleSet.attackFilter7500,
+                    }"
+                    @click="changeFilterStatus('attackFilter7500')"
+                  >
+                    7500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter8000,
+                      'btn-active-bg': filterVaribleSet.attackFilter8000,
+                    }"
+                    @click="changeFilterStatus('attackFilter8000')"
+                  >
+                    8000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter8500,
+                      'btn-active-bg': filterVaribleSet.attackFilter8500,
+                    }"
+                    @click="changeFilterStatus('attackFilter8500')"
+                  >
+                    8500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter9000,
+                      'btn-active-bg': filterVaribleSet.attackFilter9000,
+                    }"
+                    @click="changeFilterStatus('attackFilter9000')"
+                  >
+                    9000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter9500,
+                      'btn-active-bg': filterVaribleSet.attackFilter9500,
+                    }"
+                    @click="changeFilterStatus('attackFilter9500')"
+                  >
+                    9500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter10000,
+                      'btn-active-bg': filterVaribleSet.attackFilter10000,
+                    }"
+                    @click="changeFilterStatus('attackFilter10000')"
+                  >
+                    10000
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter10500,
+                      'btn-active-bg': filterVaribleSet.attackFilter10500,
+                    }"
+                    @click="changeFilterStatus('attackFilter10500')"
+                  >
+                    10500
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.attackFilter11000,
+                      'btn-active-bg': filterVaribleSet.attackFilter11000,
+                    }"
+                    @click="changeFilterStatus('attackFilter11000')"
+                  >
+                    11000
+                  </button>
                 </div>
               </div>
               <div v-else-if="filter.name === '稀有度'">
                 <div class="menu-inner-btn">
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRR, 'btn-active-bg': filterVaribleSet.rareFilterRR }"@click="changeFilterStatus('rareFilterRR')" >RR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSSP, 'btn-active-bg': filterVaribleSet.rareFilterSSP }"@click="changeFilterStatus('rareFilterSSP')" >SSP</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRR, 'btn-active-bg': filterVaribleSet.rareFilterLRR }"@click="changeFilterStatus('rareFilterLRR')" >LRR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilteR, 'btn-active-bg': filterVaribleSet.rareFilterR}"@click="changeFilterStatus('rareFilterR')" >R</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSR, 'btn-active-bg': filterVaribleSet.rareFilterSR }"@click="changeFilterStatus('rareFilterSR')" >SR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterOFR, 'btn-active-bg': filterVaribleSet.rareFilterOFR }"@click="changeFilterStatus('rareFilterOFR')" >OFR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterU, 'btn-active-bg': filterVaribleSet.rareFilterU }"@click="changeFilterStatus('rareFilterU')" >U</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterC, 'btn-active-bg': filterVaribleSet.rareFilterC }"@click="changeFilterStatus('rareFilterC')" >C</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCR, 'btn-active-bg': filterVaribleSet.rareFilterCR }"@click="changeFilterStatus('rareFilterCR')" >CR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterRRR, 'btn-active-bg': filterVaribleSet.rareFilterRRR }"@click="changeFilterStatus('rareFilterRRR')" >RRR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterCC, 'btn-active-bg': filterVaribleSet.rareFilterCC }"@click="changeFilterStatus('rareFilterCC')" >CC</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterPR, 'btn-active-bg': filterVaribleSet.rareFilterPR }"@click="changeFilterStatus('rareFilterPR')" >PR</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterTD, 'btn-active-bg': filterVaribleSet.rareFilterTD }"@click="changeFilterStatus('rareFilterTD')" >TD</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSP, 'btn-active-bg': filterVaribleSet.rareFilterSP }"@click="changeFilterStatus('rareFilterSP')" >SP</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterN, 'btn-active-bg': filterVaribleSet.rareFilterN }"@click="changeFilterStatus('rareFilterN')" >N</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterLRP, 'btn-active-bg': filterVaribleSet.rareFilterLRP }"@click="changeFilterStatus('rareFilterLRP')" >LRP</button>
-                  <button :class="{'btn-default-bg': !filterVaribleSet.rareFilterSIR, 'btn-active-bg': filterVaribleSet.rareFilterSIR }"@click="changeFilterStatus('rareFilterSIR')" >SIR</button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterRR,
+                      'btn-active-bg': filterVaribleSet.rareFilterRR,
+                    }"
+                    @click="changeFilterStatus('rareFilterRR')"
+                  >
+                    RR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSSP,
+                      'btn-active-bg': filterVaribleSet.rareFilterSSP,
+                    }"
+                    @click="changeFilterStatus('rareFilterSSP')"
+                  >
+                    SSP
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterLRR,
+                      'btn-active-bg': filterVaribleSet.rareFilterLRR,
+                    }"
+                    @click="changeFilterStatus('rareFilterLRR')"
+                  >
+                    LRR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilteR,
+                      'btn-active-bg': filterVaribleSet.rareFilterR,
+                    }"
+                    @click="changeFilterStatus('rareFilterR')"
+                  >
+                    R
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSR,
+                      'btn-active-bg': filterVaribleSet.rareFilterSR,
+                    }"
+                    @click="changeFilterStatus('rareFilterSR')"
+                  >
+                    SR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterOFR,
+                      'btn-active-bg': filterVaribleSet.rareFilterOFR,
+                    }"
+                    @click="changeFilterStatus('rareFilterOFR')"
+                  >
+                    OFR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterU,
+                      'btn-active-bg': filterVaribleSet.rareFilterU,
+                    }"
+                    @click="changeFilterStatus('rareFilterU')"
+                  >
+                    U
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterC,
+                      'btn-active-bg': filterVaribleSet.rareFilterC,
+                    }"
+                    @click="changeFilterStatus('rareFilterC')"
+                  >
+                    C
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterCR,
+                      'btn-active-bg': filterVaribleSet.rareFilterCR,
+                    }"
+                    @click="changeFilterStatus('rareFilterCR')"
+                  >
+                    CR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterRRR,
+                      'btn-active-bg': filterVaribleSet.rareFilterRRR,
+                    }"
+                    @click="changeFilterStatus('rareFilterRRR')"
+                  >
+                    RRR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterCC,
+                      'btn-active-bg': filterVaribleSet.rareFilterCC,
+                    }"
+                    @click="changeFilterStatus('rareFilterCC')"
+                  >
+                    CC
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterPR,
+                      'btn-active-bg': filterVaribleSet.rareFilterPR,
+                    }"
+                    @click="changeFilterStatus('rareFilterPR')"
+                  >
+                    PR
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterTD,
+                      'btn-active-bg': filterVaribleSet.rareFilterTD,
+                    }"
+                    @click="changeFilterStatus('rareFilterTD')"
+                  >
+                    TD
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSP,
+                      'btn-active-bg': filterVaribleSet.rareFilterSP,
+                    }"
+                    @click="changeFilterStatus('rareFilterSP')"
+                  >
+                    SP
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterN,
+                      'btn-active-bg': filterVaribleSet.rareFilterN,
+                    }"
+                    @click="changeFilterStatus('rareFilterN')"
+                  >
+                    N
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterLRP,
+                      'btn-active-bg': filterVaribleSet.rareFilterLRP,
+                    }"
+                    @click="changeFilterStatus('rareFilterLRP')"
+                  >
+                    LRP
+                  </button>
+                  <button
+                    :class="{
+                      'btn-default-bg': !filterVaribleSet.rareFilterSIR,
+                      'btn-active-bg': filterVaribleSet.rareFilterSIR,
+                    }"
+                    @click="changeFilterStatus('rareFilterSIR')"
+                  >
+                    SIR
+                  </button>
                 </div>
               </div>
             </div>
@@ -2381,10 +2988,17 @@ onBeforeUnmount(() => {
         </div>
 
         <footer class="sidebar-filter-footer">
-          <button :class="{ 'apply-btn' : !applyBtnStatus, 'apply-btn-active' : applyBtnStatus}" @click="handleApplyStatus"><span>Apply</span></button>
+          <button
+            :class="{
+              'apply-btn': !applyBtnStatus,
+              'apply-btn-active': applyBtnStatus,
+            }"
+            @click="handleApplyStatus"
+          >
+            <span>Apply</span>
+          </button>
         </footer>
       </section>
-      
     </div>
   </div>
 </template>
@@ -2393,9 +3007,7 @@ onBeforeUnmount(() => {
 <style src="@/assets/css/card-series/sidebar-filter.css" scoped></style>
 <style src="@/assets/css/card-series/sidebar-deck.css" scoped></style>
 <style scoped>
-
-  .hidden {
-    display: none;
-  }
-
+.hidden {
+  display: none;
+}
 </style>

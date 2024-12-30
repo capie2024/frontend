@@ -1,8 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
-import Swal from 'sweetalert2'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import MainFooter from '@/components/MainFooter.vue'
+import notice from '../components/notification/notice.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import Editor from '@tinymce/tinymce-vue'
 
@@ -150,8 +152,7 @@ onMounted(() => {
 <template>
   <SidebarGrid style="grid-area: sidebar" />
   <main>
-    <div class="header-bg">
-      <header>
+    <header>
         <div class="pagebtn-area">
           <button class="page-btn">
             <svg
@@ -227,28 +228,10 @@ onMounted(() => {
               ></path>
             </svg>
           </button>
-          <button class="bell">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="size-6 stroke-2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-              ></path>
-            </svg>
-            <div class="notice">通知</div>
-          </button>
+          <notice />
           <button class="user-btn">
             <div class="btn-img">
-              <img src="/src/img/麻衣.png" alt="" />
+              <img src="/src/img/avatar.png" alt="" />
             </div>
             <span>XXXX</span>
             <svg
@@ -269,8 +252,7 @@ onMounted(() => {
             </svg>
           </button>
         </div>
-      </header>
-    </div>
+    </header>
     <section class="title-area">
       <div class="title-area-container">
         <button class="upload-btn" @click="handleButtonClick">
@@ -455,7 +437,7 @@ onMounted(() => {
       <div class="message-area">
         <div class="user-message">
           <div class="message-user-img">
-            <img src="/src/img/麻衣.png" alt="" />
+            <img src="/src/img/avatar.png" alt="" />
           </div>
           <div class="message">
             <svg
@@ -497,46 +479,7 @@ onMounted(() => {
         <span class="message-count">0則留言</span>
       </div>
     </section>
-    <footer>123</footer>
-
-    <div class="deck-container">
-      <div class="deck-img">
-        <img src="/src/img/麻衣.png" alt="" />
-      </div>
-      <div class="deck-content">
-        <div class="line"></div>
-        <div class="total-cards">
-          <h2>刪除 DG/S02-027R</h2>
-          <span>牌組製作，共84張卡</span>
-        </div>
-        <div class="deckbtn-area">
-          <button class="deck-btn">
-            <i class="fa-regular fa-circle-up"></i>
-          </button>
-          <div class="pay-btn">
-            <svg
-              width="24px"
-              height="24px"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="size-6 flex-none"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-              ></path>
-            </svg>
-            <span>00000 ¥</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <MainFooter />
   </main>
 </template>
 
@@ -826,32 +769,6 @@ a {
   font-weight: 900;
 }
 
-.bell {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background-color: rgba(0, 0, 0, 0);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.bell:hover {
-  background-color: #2d7894;
-}
-
-.bell:hover .notice {
-  opacity: 1;
-  visibility: visible;
-}
-
-.bell svg {
-  width: 24px;
-  height: 24px;
-  stroke: white;
-}
 
 .user-btn {
   border: none;
@@ -885,29 +802,27 @@ a {
 }
 
 main {
-  margin-left: 270px;
+  overflow: hidden;
+  margin: 0.5rem;
+  margin-left:270px;
   width: calc(100% - 278px);
+  height:calc(100vh - 16px);
+  border-radius: 20px;
   background-color: #32c9ff;
   scroll-behavior: smooth;
-}
-
-.header-bg {
-  background-color: #000000;
-  width: calc(100% - 278px);
-  height: 72px;
-  position: fixed;
-  top: 0;
-  z-index: 4;
+  overflow-y: scroll;
+  scrollbar-width: none;  
 }
 
 header {
   background-color: #32c9ff;
   border-radius: 20px 20px 0 0;
-  width: 100%;
-  position: absolute;
-  top: 8px;
+  width: calc(100% - 278px);
   height: 64px;
   display: flex;
+  position: fixed;
+  top: 8px;
+  z-index: 4;
   align-items: center;
 }
 
@@ -1120,7 +1035,7 @@ header {
   box-sizing: border-box;
   height: 520px;
   display: flex;
-  background: linear-gradient(to bottom, #20637a, #131617);
+  background: linear-gradient(to bottom, rgb(32, 99, 122) 100px, rgb(19, 22, 23) 450px);
 }
 
 .edit-area {
@@ -1260,10 +1175,12 @@ header {
 }
 
 footer {
-  background-color: #222f3e;
+  background: linear-gradient(to bottom, rgb(19, 22, 23)  100px, rgb(32, 99, 122)300px);
   width: 100%;
-  height: 401px;
-  color: white;
+}
+
+.main-footer {
+  background: linear-gradient(to bottom, rgb(19, 22, 23) , #121212);
 }
 
 .footer-nav {
@@ -1318,129 +1235,7 @@ footer {
   color: white;
 }
 
-.deck-container {
-  width: 99%;
-  padding-right: 8px;
-  height: 56px;
-  position: fixed;
-  bottom: 66px;
-  display: flex;
-  display: none;
-}
 
-.deck-img {
-  overflow: hidden;
-  border-radius: 10px;
-  transform: translateX(8px);
-  z-index: 1;
-}
-
-.deck-img img {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-}
-
-.deck-content {
-  width: 92%;
-  height: 56px;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  padding-left: 8px;
-  border-radius: 0 10px 10px 0;
-  align-items: center;
-  position: relative;
-}
-
-.line {
-  position: absolute;
-  bottom: 52px;
-  width: 96%;
-  border-top: 4px solid;
-  border-image: linear-gradient(
-      to right,
-      rgb(234, 179, 8) 0%,
-      rgb(234, 179, 8) 89.0476%,
-      rgb(34, 197, 94) 94.0476%,
-      rgb(34, 197, 94) 95%
-    )
-    5 / 1 / 0 stretch;
-}
-
-.total-cards {
-  width: 80%;
-  padding-top: 8px;
-  padding-left: 8px;
-}
-
-.total-cards h2 {
-  font-size: 15px;
-  font-weight: 00;
-  color: #fff;
-  margin-bottom: 2px;
-}
-
-.total-cards span {
-  font-size: 13px;
-  color: #dad7d7;
-  font-weight: 700;
-}
-
-.deckbtn-area {
-  display: flex;
-  align-items: center;
-  width: 20%;
-  position: relative;
-  padding-left: 8px;
-}
-
-.deck-btn {
-  all: unset;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  color: #f0f0f0;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  right: 120px;
-  cursor: pointer;
-}
-
-.deck-btn:hover {
-  background-color: #42ebeb;
-}
-
-.deck-btn i::before {
-  font-size: 24px;
-}
-
-.pay-btn {
-  padding-left: 5px;
-  position: absolute;
-  right: 8px;
-  width: 86px;
-  min-width: 94px;
-  height: 32px;
-  background-color: #daa61e;
-  display: flex;
-  align-items: center;
-  color: #dad7d7;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.pay-btn:hover {
-  background-color: #e27637;
-}
-
-.pay-btn span {
-  font-size: 14px;
-  margin-left: 5px;
-}
 
 @media screen and (max-width: 1200px) {
   body {
@@ -1456,23 +1251,17 @@ footer {
     width: 100%;
   }
 
-  .header-bg {
-    background-color: #000000;
-    width: 100%;
-    height: 64px;
-  }
 
   header {
     border-radius: 0;
     width: 100%;
-    position: static;
+    top: 0;
   }
 
   .next-btn {
     display: none;
   }
 
-  .bell,
   .user-btn {
     display: none;
   }
@@ -1542,8 +1331,13 @@ footer {
     width: 97%;
   }
 
+  .cannot-change {
+    width: calc(100% - 16px);
+  }
+
   .cannot-change p {
     font-size: 20px;
+    width: calc(100% - 16px);
   }
 
   .text-area {
@@ -1633,8 +1427,5 @@ footer {
     display: flex;
   }
 
-  .deck-container {
-    display: flex;
-  }
 }
 </style>

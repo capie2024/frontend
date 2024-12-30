@@ -3,10 +3,12 @@ import { onMounted, ref, computed, watch } from 'vue'
 import axios from 'axios'
 import SidebarGrid from '@/components/SidebarGrid.vue'
 import router from '../router'
-import Notice from '../components/notification/notice.vue'
+import Notice from '../components/notification/Notice.vue'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 import MainFooter from '../components/MainFooter.vue'
+import { useI18n } from 'vue-i18n'
 
+const { locale } = useI18n()
 const qaList = ref([])
 const sortOrder = ref('desc')
 const searchQuery = ref('')
@@ -27,6 +29,18 @@ const getQAList = async () => {
     console.error(error)
   }
 }
+
+const translatedQAList = computed(() => {
+  return filteredData.value.map((qa) => {
+    const translateQ = qa.i18n?.[locale.value]?.q
+    const translateA = qa.i18n?.[locale.value]?.a
+    return {
+      ...qa,
+      q: translateQ || qa.q,
+      a: translateA || qa.a
+    }
+  })
+})
 
 /**
  * highlightText: 對傳入字串進行括號、引號等符號區塊加上 <mark> 的處理
@@ -316,7 +330,7 @@ onMounted(async () => {
         <section class="grid grid-cols-1 gap-4 p-6 md:grid-cols-4">
           <div
             class="flex flex-col cursor-pointer group"
-            v-for="qa in filteredData"
+            v-for="qa in translatedQAList"
             :key="qa.id"
           >
             <div

@@ -1,311 +1,9 @@
-<template>
-  <div class="work-shop-page-container">
-    <SidebarGrid />
-    <div class="work-shop-main-content-container">
-      <div v-if="firstVisible">
-        <RemitCard v-if="firstVisible" />
-      </div>
-      <div v-if="secondVisible">
-        <FindCard v-if="secondVisible" />
-      </div>
-      <header class="work-shop-header">
-        <div class="header-container Top-bar">
-          <div class="input-svg-container">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              class="icon search-icon"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-              ></path>
-            </svg>
-            <input
-              type="text"
-              class="header-input"
-              placeholder="找我的牌組？"
-            />
-            <button class="clear-btn">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-                class="icon clear-icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
-          </div>
-          <div class="sort-button">
-            <button
-              class="active1"
-              :class="{ selected: nameIsSelected }"
-              :style="{
-                background: nameIsSelected
-                  ? 'linear-gradient(to right, #5eead4, #93c5fd)'
-                  : 'white',
-              }"
-              @click="toggleNameSort"
-            >
-              <i
-                class="fa-solid fa-arrow-up"
-                :class="{ rotate180: nameIsSorted }"
-              ></i>
-              名稱
-            </button>
-            <button
-              class="active2"
-              :class="{ selected: dateIsSelected }"
-              :style="{
-                background: dateIsSelected
-                  ? 'linear-gradient(to right, #5eead4, #93c5fd)'
-                  : 'white',
-              }"
-              @click="toggleDateSort"
-            >
-              <i
-                class="fa-solid fa-arrow-up"
-                :class="{ rotate180: dateIsSorted }"
-              ></i>
-              日期
-            </button>
-          </div>
-          <div class="w-full login">
-            <div class="notice">
-              <Notice />
-              <p class="notice-txt">通知</p>
-            </div>
-            <button
-              class="login-btn"
-              data-bs-toggle="modal"
-              data-bs-target="#login"
-            >
-              <NavLoginBtn />
-            </button>
-          </div>
-        </div>
-      </header>
-      <main class="work-shop-main">
-        <div class="display-area">
-          <div
-            class="display-card"
-            style="transform: translate3d(0px, 0px, 0px)"
-          >
-            <div class="card-area" style="margin-right: 10px">
-              <button
-                v-for="(name, index) in matchedNames"
-                :key="index"
-                @click="toggleSeriesSort(matchedCodes[index], index)"
-                :class="{ selectedGray: sortedStates[index] }"
-                class="relative hover:bg-[rgb(39,39,42)] overflow-hidden rounded-lg border border-zinc-800 flex items-center gap-2 px-1 md:p-2 bac-1818 w-full-col"
-              >
-                <div class="w-full min-w-0 text-left grow-1 w-full-col">
-                  <span
-                    class="flex items-center gap-1 font-mono text-xs truncate text-zinc-400"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      data-slot="icon"
-                      class="flex-none size-4 svg"
-                    >
-                      <path
-                        class="path"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-                      ></path>
-                    </svg>
-                    {{ matchedCodes[index].join(',') }}
-                  </span>
-                  <p
-                    class="hidden truncate md:block text-zinc-200 div-text card-name"
-                  >
-                    {{ name }}
-                  </p>
-                </div>
-                <span class="absolute text-xl font-bold text-white right-2">{{
-                  counts[index]
-                }}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="work-shop-title">
-          <h2>實用工具</h2>
-          <section class="show-container">
-            <button
-              class="button a-button"
-              type="button"
-              id="#looking"
-              @click="toggleFindCard"
-            >
-              <div
-                class="shadow out-div"
-                style="
-                  background-image: url(https://bottleneko.app/images/workshop/find.png);
-                "
-              >
-                <div class="in-div">
-                  <p class="in-div in-div-text">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      data-slot="icon"
-                      class="flex-none size-6 md:size-8"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3
-                            7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
-                      ></path>
-                    </svg>
-                    <span>尋找牌組</span>
-                  </p>
-                </div>
-              </div>
-            </button>
-
-            <button
-              @click="toggleRemitCard"
-              class="button a-button"
-              type="button"
-              data-bs-toggle="modal"
-              data-bs-target="#remit"
-            >
-              <div
-                class="shadow out-div"
-                style="
-                  background-image: url(https://bottleneko.app/images/workshop/report.png);
-                "
-              >
-                <div class="in-div">
-                  <p class="in-div in-div-text">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      data-slot="icon"
-                      class="flex-none size-6 md:size-8"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3
-                           7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
-                      ></path>
-                    </svg>
-                    <span>匯出牌組</span>
-                  </p>
-                </div>
-              </div>
-            </button>
-          </section>
-        </div>
-        <div class="work-shop-title">
-          <h2>我的牌組</h2>
-          <p>一共有{{ cardDecks.length }}結果</p>
-        </div>
-
-        <section class="show-card grid-card">
-          <a
-            v-for="cardDeck in cardDecks"
-            :href="`deck/${cardDeck.deck_id}`"
-            class="hover:bg-[rgb(39,39,42)] url gap15 transition-colors"
-          >
-            <div class="img-btn">
-              <img
-                :src="
-                  cardDeck.deck_cover ||
-                  'https://bottleneko.app/images/cover.png'
-                "
-                class="object-cover object-top aspect-square"
-                alt=""
-              />
-              <button
-                class="bottom-0 right-0 p-1 m-1 text-white rounded-full bg-zinc-800"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="text-white stroke-2 size-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0
-                             1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-            <div class="card-text">
-              <div class="flex">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="flex-none icon-size color-a1"
-                >
-                  <path
-                    d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"
-                  ></path>
-                  <path
-                    d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"
-                  ></path>
-                </svg>
-                <p class="card-div-text">{{ cardDeck.deck_id }}</p>
-              </div>
-              <p class="card-name">{{ cardDeck.deck_name }}</p>
-              <p class="color-a1">{{ formaDate(cardDeck.build_time) }}</p>
-            </div>
-          </a>
-        </section>
-      </main>
-      <footer class="work-shop-footer">
-        <MainFooter />
-      </footer>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import MainFooter from '@/components/MainFooter.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, onBeforeUnmount } from 'vue'
 import axios from 'axios'
+import Swal from 'sweetalert2'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 import Notice from '../components/notification/notice.vue'
 import RemitCard from '../components/Mycard/remit-card.vue'
@@ -343,6 +41,8 @@ const dateSortReverse = (a, b) => {
   return dateA - dateB
 }
 
+const token = ref(localStorage.getItem('token'))
+const isScrolled = ref(false) // 是否滾動
 const cardDecks = ref([])
 const originalDecks = ref([])
 const error = ref('')
@@ -352,13 +52,14 @@ const dateIsSelected = ref(true)
 const nameIsSorted = ref(false)
 const nameIsSelected = ref(false)
 const seriesIsSelected = ref(false)
+const searchQuery = ref('')
 
 // 獲取我的牌組資料
 const fetchMyDecks = async () => {
   try {
     const response = await axios.get(`${API_URL}/decks`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${token.value}`,
       },
     })
     originalDecks.value = response.data.decks
@@ -379,7 +80,6 @@ const fetchCardSeries = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/series`)
     originalSeries.value = response.data
-    console.log(originalSeries.value)
   } catch (err) {
     error.value = '獲取系列卡表資料失敗' + err.message
   }
@@ -454,7 +154,7 @@ const fetchSeriesCode = async () => {
   try {
     const response = await axios.get(`${API_URL}/decks`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${token.value}`,
       },
     })
 
@@ -614,13 +314,410 @@ const formaDate = (time) => {
   return date.toLocaleDateString('en-CA')
 }
 
+// 根據滾動位置判斷顯示 header 標題和背景色
+let mainElement = ref(null)
+const handleScroll = () => {
+  const scrollTop = mainElement.value.scrollTop
+  isScrolled.value = scrollTop > 0
+}
+
+
+const main = () => {
+  mainElement.value = document.querySelector('.background')
+  if (mainElement.value) {
+    mainElement.value.addEventListener('scroll', handleScroll)
+  }
+}
+
+const searchDecks = () => {
+  if (!searchQuery.value.trim()) {
+    cardDecks.value = originalDecks.value
+  } else {
+    const query = searchQuery.value.toLowerCase()
+    cardDecks.value = originalDecks.value.filter((cardDeck) => {
+      const deckName = cardDeck.deck_name?.toLowerCase() || ''
+      const deckId = cardDeck.deck_id?.toLowerCase() || ''
+      const deckSeriesCode = cardDeck.deck.some((card) => {
+        const seriesCode = card.seriesCode?.toLowerCase() || ''
+        return seriesCode.includes(query)
+      })
+
+      return (
+        deckName.includes(query) ||
+        deckId.includes(query) ||
+        deckSeriesCode
+      )
+    })
+  }
+
+  if (dateIsSelected.value) {
+    cardDecks.value.sort(dateIsSorted.value ? dateSortReverse : dateSort)
+  } else if (nameIsSelected.value) {
+    cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse)
+  }
+}
+const clearSearch = () => {
+  searchQuery.value = ''
+  cardDecks.value = originalDecks.value
+  if (dateIsSelected.value) {
+    cardDecks.value.sort(dateIsSorted.value ? dateSortReverse : dateSort)
+  } else if (nameIsSelected.value) {
+    cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse)
+  }
+}
+
+const deleteDeck = async (deck_id) => {
+
+  Swal.fire({
+    title: "確定要刪除牌組嗎？",
+    text: "刪除後將無法復原。",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "確認刪除",
+    cancelButtonText: "取消",
+  })
+  .then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.delete(`${API_URL}/decks/${deck_id}`, {
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        });
+
+        if (response.status === 200) {
+          Swal.fire({
+            icon: 'success',
+            title: '刪除成功',
+            showConfirmButton: false,
+            timer: 1000,
+          }).then(() => {
+            fetchMyDecks()
+          })  
+        }
+      } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: '刪除失敗',
+            text: "已引用於文章,無法刪除",
+          });
+        }
+      }
+  });
+}
 onMounted(() => {
   fetchMyDecks()
   fetchCardSeries()
   fetchSeriesCode()
   initData()
+  main()
+})
+
+onBeforeUnmount(() => {
+  if (mainElement.value) {
+    mainElement.value.removeEventListener('scroll', handleScroll)
+  }
 })
 </script>
+
+<template>
+  <div class="container">
+    <SidebarGrid />
+    <div class="main-container background">
+      <div v-if="firstVisible">
+        <RemitCard v-if="firstVisible" />
+      </div>
+      <div v-if="secondVisible">
+        <FindCard v-if="secondVisible" />
+      </div>
+      <header class="header-container" :class="{ scrolled: isScrolled }">
+        <div class="search-container">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            class="icon search-icon"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            ></path>
+          </svg>
+
+          <input
+            v-model="searchQuery"
+            @keyup="searchDecks"
+            class="header-input"
+            type="text"
+            placeholder="找我的牌組？"
+          />
+          <button 
+            @click="clearSearch"
+            class="clear-btn"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              class="icon clear-icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div class="sort-button">
+          <button
+            class="active1"
+            :class="{ selected: nameIsSelected }"
+            :style="{
+              background: nameIsSelected
+                ? 'linear-gradient(to right, #5eead4, #93c5fd)'
+                : 'white',
+            }"
+            @click="toggleNameSort"
+          >
+            <i
+              class="fa-solid fa-arrow-up"
+              :class="{ rotate180: nameIsSorted }"
+            ></i>
+            名稱
+          </button>
+          <button
+            class="active2"
+            :class="{ selected: dateIsSelected }"
+            :style="{
+              background: dateIsSelected
+                ? 'linear-gradient(to right, #5eead4, #93c5fd)'
+                : 'white',
+            }"
+            @click="toggleDateSort"
+          >
+            <i
+              class="fa-solid fa-arrow-up"
+              :class="{ rotate180: dateIsSorted }"
+            ></i>
+            日期
+          </button>
+        </div>
+        <div class="notice-area">
+          <Notice />
+          <NavLoginBtn />
+        </div>
+      </header>
+      <main class="work-shop-main">
+        <div class="display-area">
+          <div
+            class="display-card"
+            style="transform: translate3d(0px, 0px, 0px)"
+          >
+            <div class="card-area">
+              <button
+                v-for="(name, index) in matchedNames"
+                :key="index"
+                @click="toggleSeriesSort(matchedCodes[index], index)"
+                :class="{ selectedGray: sortedStates[index] }"
+                class="relative hover:bg-[rgb(39,39,42)] overflow-hidden rounded-lg border border-zinc-800 flex items-center gap-2 px-1 md:p-2 bac-1818 w-full-col"
+              >
+                <div class="w-full min-w-0 text-left grow-1 w-full-col">
+                  <span
+                    class="flex items-center gap-1 font-mono text-xs truncate text-zinc-400"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="flex-none size-4 svg"
+                    >
+                      <path
+                        class="path"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+                      ></path>
+                    </svg>
+                    {{ matchedCodes[index].join(',') }}
+                  </span>
+                  <p
+                    class="hidden truncate md:block text-zinc-200 div-text card-name"
+                  >
+                    {{ name }}
+                  </p>
+                </div>
+                <span class="absolute text-xl font-bold text-white right-2">{{
+                  counts[index]
+                }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="work-shop-title">
+          <h2>實用工具</h2>
+          <section class="show-container">
+            <button
+              class="button a-button"
+              type="button"
+              id="#looking"
+              @click="toggleFindCard"
+            >
+              <div
+                class="shadow out-div"
+                style="
+                  background-image: url(https://bottleneko.app/images/workshop/find.png);
+                "
+              >
+                <div class="in-div">
+                  <p class="in-div in-div-text">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="flex-none size-6 md:size-8"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3
+                            7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
+                      ></path>
+                    </svg>
+                    <span>尋找牌組</span>
+                  </p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              @click="toggleRemitCard"
+              class="button a-button"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#remit"
+            >
+              <div
+                class="shadow out-div"
+                style="
+                  background-image: url(https://bottleneko.app/images/workshop/report.png);
+                "
+              >
+                <div class="in-div">
+                  <p class="in-div in-div-text">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="flex-none size-6 md:size-8"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3
+                           7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
+                      ></path>
+                    </svg>
+                    <span>匯出牌組</span>
+                  </p>
+                </div>
+              </div>
+            </button>
+          </section>
+        </div>
+        <div class="work-shop-title">
+          <h2>我的牌組</h2>
+          <p>一共有{{ cardDecks.length }}結果</p>
+        </div>
+
+        <section class="show-card grid-card">
+          <a
+            v-for="cardDeck in cardDecks"
+            :href="`deck/${cardDeck.deck_id}`"
+            class="hover:bg-[rgb(39,39,42)] url gap15 transition-colors"
+          >
+            <div class="img-btn">
+              <img
+                :src="
+                  cardDeck.deck_cover ||
+                  'https://bottleneko.app/images/cover.png'
+                "
+                class="object-cover object-top aspect-square"
+                alt=""
+              />
+              <button
+                @click.prevent="deleteDeck(cardDeck.deck_id)"
+                class="bottom-0 right-0 p-1 m-1 text-white rounded-full bg-zinc-800"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="text-white stroke-2 size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0
+                             1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+            <div class="card-text">
+              <div class="flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="flex-none icon-size color-a1"
+                >
+                  <path
+                    d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"
+                  ></path>
+                  <path
+                    d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"
+                  ></path>
+                </svg>
+                <p class="card-div-text">{{ cardDeck.deck_id }}</p>
+              </div>
+              <p class="card-name">{{ cardDeck.deck_name }}</p>
+              <p class="color-a1">{{ formaDate(cardDeck.build_time) }}</p>
+            </div>
+          </a>
+        </section>
+      </main>
+      <footer class="work-shop-footer">
+        <MainFooter />
+      </footer>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 @import '../assets/base.css';
@@ -630,7 +727,7 @@ onMounted(() => {
   height: 0;
 }
 
-.work-shop-page-container {
+.container {
   background-color: black;
   max-width: 100%;
   display: flex;
@@ -638,20 +735,18 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.work-shop-main-content-container {
-  width: 100%;
+.main-container {
+  width: calc(100% - 8px);
+  height: calc(100vh - 16px);
   margin-top: 8px;
-  /* margin-right: 8px; */
-  margin-bottom: 8px;
   color: white;
-  border-radius: 16px;
+  border-radius: 1rem;
   background-color: #121212;
   overflow: auto;
 }
 
-.work-shop-header {
-  max-width: 100%;
-  box-sizing: border-box;
+header.scrolled {
+  background-color: #000000;
 }
 
 .work-shop-main {
@@ -672,37 +767,50 @@ onMounted(() => {
 }
 
 .work-shop-title p {
+  margin-top: 5px;
   font-size: 14px;
   line-height: 20px;
   color: #e6e6e6;
 }
 
 .header-container {
-  width: 100%;
+  width: calc(100% - 270px);
   display: flex;
   padding: 16px;
   height: 64px;
-  box-sizing: border-box;
+  position: fixed;
+  top: 8px;
+  z-index: 5;
+  background-color: rgba(0, 0, 0, 0);
+  gap: 0.5rem;
+  transition: 0.05s ease;
 }
 
 .Top-bar {
   gap: 0.5rem;
 }
 
+.notice-area {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 .w-full {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  width: 90%;
 }
 
-.input-svg-container {
+.search-container {
   display: flex;
   align-items: center;
   padding: 5px 10px;
   border-radius: 9999px;
   background-color: white;
   max-width: 270px;
+  gap: 5px;
 }
 
 .page-control-container {
@@ -721,7 +829,6 @@ onMounted(() => {
   box-sizing: border-box;
   position: fixed;
   z-index: 100;
-  /* background-color: black; */
 }
 
 .page-control-left {
@@ -800,150 +907,6 @@ onMounted(() => {
   transition: background-color 0.2s ease-in-out;
 }
 
-.notice-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 10px;
-  cursor: pointer;
-  border-radius: 50%;
-  background-color: transparent;
-  transition:
-    background-color 0.3s ease,
-    opacity 0.3s ease;
-}
-
-.notice-icon:hover {
-  background-color: #2a2727;
-  opacity: 0.8;
-}
-
-.notice-txt {
-  position: absolute;
-  top: 50px;
-  background-color: black;
-  color: white;
-  width: 40px;
-  line-height: 25px;
-  border-radius: 10px;
-  padding: 3px;
-  text-align: center;
-  font-weight: bold;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.notice:hover .notice-txt {
-  opacity: 1;
-}
-
-.notice-grid-up h2 {
-  color: white;
-  font-weight: bolder;
-  font-size: 24px;
-}
-
-.notice-grid {
-  display: grid;
-  grid-template-columns: 352px;
-  grid-template-rows: 64px 416px;
-  position: absolute;
-  top: 120%;
-  left: 50%;
-  transform: translateX(-70%);
-  opacity: 0;
-  height: 0;
-  transition:
-    opacity 0.3s ease,
-    height 0.3s ease,
-    transform 0.3s ease;
-}
-
-#notice-jump:checked ~ .notice-grid {
-  opacity: 1;
-  height: 480px;
-}
-
-#notice-jump {
-  display: none;
-}
-
-.notice-grid-up {
-  grid-area: 1/1/2/2;
-  background-color: #27272a;
-  padding: 24px 16px 8px 16px;
-  border-radius: 10px 10px 0px 0px;
-}
-
-.notice-grid-down {
-  grid-area: 2/1/3/2;
-  background-color: #1f1f22;
-  border-radius: 0px 0px 10px 10px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.notice-grid-down img {
-  width: 240px;
-  height: 240px;
-  margin-bottom: 30px;
-}
-
-.notice-grid-down h2 {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #f4f4f5;
-}
-
-.notice-grid-down p {
-  color: rgb(161 161 170);
-  font-size: 16px;
-  text-align: center;
-  margin-top: 10px;
-  line-height: 20px;
-}
-
-.login {
-  display: flex-end;
-  padding-right: 1.5rem;
-}
-
-.login-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 96px;
-  height: 32px;
-  border: none;
-  border-radius: 20px;
-  background-color: #111010;
-  cursor: pointer;
-}
-
-.login-btn > svg:first-child {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  margin: 4px;
-  background-color: black;
-}
-
-.login-btn > svg:last-child {
-  width: 16px;
-  height: 16px;
-}
-
-.login-btn > p {
-  color: white;
-  font-size: 16px;
-}
-
-.login-btn:hover {
-  background-color: #2a2727;
-}
-
 .page-control-status-btn:hover {
   background-color: rgba(40, 40, 40, 0.6);
   cursor: pointer;
@@ -983,8 +946,8 @@ onMounted(() => {
 }
 
 .header-input {
+  width: 100%;
   display: flex;
-  /* border: none; */
   outline: none;
   font-size: 1rem;
   color: black;
@@ -1007,8 +970,8 @@ onMounted(() => {
   padding: 8px 15px;
   white-space: nowrap;
   font-size: 0.875rem;
-  background-size: 200% 100%; /* 設定背景大小以便反轉 */
-  background-position: 0% 0%; /* 初始位置 */
+  background-size: 200% 100%;
+  background-position: 0% 0%;
 }
 
 .sort-button button i {
@@ -1016,10 +979,12 @@ onMounted(() => {
 }
 
 .active1 {
+  width: 72px;
   background: white;
 }
 
 .active2 {
+  width: 72px;
   background: linear-gradient(to right, #5eead4, #93c5fd);
 }
 
@@ -1060,7 +1025,6 @@ onMounted(() => {
   outline: none;
   cursor: pointer;
   padding: 0;
-  margin-left: 10px;
 }
 
 .clear-icon {
@@ -1072,7 +1036,6 @@ onMounted(() => {
 .header-input {
   display: flex;
   align-items: center;
-  border-radius: 12px;
   flex-grow: 1;
   background-color: white;
   border: none;
@@ -1086,7 +1049,6 @@ onMounted(() => {
 .button {
   display: block;
   width: 160px;
-  /* height: 120px; */
   overflow: hidden;
   border-radius: 18px;
   aspect-ratio: 4/3;
@@ -1245,7 +1207,6 @@ onMounted(() => {
   --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
   color: rgb(255 255 255 / var(--tw-text-opacity));
   --tw-shadow-color: rgba(14, 165, 233, 0.5);
-  /* --tw-shadow: var(--tw-shadow-colored); */
   color: white;
   width: 200px;
   height: 64px;
@@ -1315,10 +1276,12 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1.5rem;
-  margin: 20px 0;
+  margin: 10px 0 20px;
   box-sizing: border-box;
-  /* justify-items: start; */
-  /* width: 85%; */
+}
+
+.card-text {
+  padding: 5px;
 }
 
 .card-div-text {
@@ -1355,11 +1318,10 @@ onMounted(() => {
 }
 
 .url {
-  padding: 20px;
+  padding: 10px;
   display: inline-block;
   background-color: #18181b;
   border-radius: 5%;
-  /* width: 160px; */
   box-sizing: border-box;
 }
 
@@ -1411,18 +1373,18 @@ onMounted(() => {
 
 .display-area button {
   width: 160px;
-  /* height: 58px; */
   padding: 0.5rem;
 }
 
 .display-card {
-  box-sizing: content-box;
   display: grid;
   height: 100%;
 }
 
 .card-area {
+  width: 100%;
   display: flex;
+  margin-top: 100px;
   flex-wrap: wrap;
   gap: 20px;
   position: relative;
@@ -1496,6 +1458,24 @@ onMounted(() => {
 }
 
 @media (width < 1200px) {
+  .main-container {
+    width: 100%;
+    margin-top: 0px;
+  }
+
+  .header-container {
+    width: 100%;
+    top: 0px;
+  }
+
+  .search-container {
+    min-width: calc(100% - 160px);
+  }
+
+  .notice-area {
+    display: none;
+  }
+
   .show-card {
     padding: 0px;
     margin: 0;
@@ -1510,7 +1490,6 @@ onMounted(() => {
   }
   .url {
     background-color: transparent;
-    padding: 0;
   }
   .url img {
     border-radius: 10%;

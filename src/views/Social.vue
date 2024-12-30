@@ -18,7 +18,9 @@ const socialHistory = ref(
 const originalSeries = ref([])
 const filteredDecks = ref([])
 const menuExpanded = ref(false)
+const codeMenuExpanded = ref(false)
 const seriesName = ref('篩選系列')
+const seriesFilter = ref('CODE')
 const searchSeriesQuery = ref('')
 
 const isScrolled = ref(false);
@@ -36,6 +38,32 @@ const fetchArticles = async () => {
     console.error('獲取文章列表失敗', error);
   }
 };
+
+
+const selectDeck = (deck) => {
+  seriesName.value = deck.name
+  menuExpanded.value = !menuExpanded.value
+  seriesFilter.value = deck.name
+  codeMenuExpanded.value = !codeMenuExpanded.value
+
+
+  let findDecks = articles.value.filter((decksItem) => {
+    const deckList = decksItem.deck_list;
+    return (
+      deckList &&
+      deckList.deck &&
+      Array.isArray(deckList.deck) &&
+      deckList.deck.some(
+        (card) => card.seriesCode && deck.code.includes(card.seriesCode)
+      )
+    );
+  })
+
+
+  console.log("Find decks:", findDecks);
+  filteredArticles.value = [...findDecks];
+
+}
 
 
 const formatDate = (date) => {
@@ -121,7 +149,6 @@ const fetchCardseries = async () => {
     const response = await axios.get(`${API_URL}/api/series`)
     originalSeries.value = response.data
     filteredDecks.value = response.data
-    console.log(originalSeries.value)
   } catch (err) {
     error.value = '獲取系列卡表資料失敗' + err.message
   }
@@ -129,18 +156,25 @@ const fetchCardseries = async () => {
 
 const toggleMenu = () => {
   menuExpanded.value = !menuExpanded.value
- 
 }
 
-const selectDeck = (deck) => {
-  seriesName.value = deck.name
-  menuExpanded.value = !menuExpanded.value
+const toggleCodeMenu = () => {
+  codeMenuExpanded.value = !codeMenuExpanded.value
 }
 
 const clearSearchSeries = () => {
   seriesName.value = '篩選系列'
+  seriesFilter.value = 'CODE'
   menuExpanded.value = !menuExpanded.value
+  filteredArticles.value = articles.value
 };
+
+const clearSeriesSearch = () => {
+  seriesFilter.value = 'CODE'
+  seriesName.value = '篩選系列'
+  codeMenuExpanded.value = !codeMenuExpanded.value
+  filteredArticles.value = articles.value
+}
 
 const searchSeries = () => {
   if (!searchSeriesQuery.value.trim()) {
@@ -267,7 +301,7 @@ onBeforeUnmount(() => {
           </div>
         </ul>
       </div>
-        <button class="filter-hidden">
+        <button class="filter-hidden" @click="toggleCodeMenu">
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
             fill="none" 
@@ -281,7 +315,7 @@ onBeforeUnmount(() => {
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
             ></path>
           </svg>
-          CODE
+          <p>{{ seriesFilter }}</p>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -291,7 +325,7 @@ onBeforeUnmount(() => {
             aria-hidden="true"
             data-slot="icon"
             class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
-            @click="clearSearchSeries"
+            @click="clearSeriesSearch"
           >
             <path
               stroke-linecap="round"
@@ -300,6 +334,32 @@ onBeforeUnmount(() => {
             ></path>
           </svg>
         </button>
+        <ul
+          class="code-area"
+          v-show="codeMenuExpanded"
+        >
+          <li class="menu-search">
+            <input
+              v-model="searchSeriesQuery"
+              @keyup="searchSeries"
+              class="keyword"
+              type="text"
+              placeholder="Keyword"
+            />
+            <button @click="clearMenuSearch">✖</button>
+          </li>
+          <div class="menu-inner-area">
+            <li
+              class="menu"
+              v-for="deck in filteredDecks"
+              :key="deck.id"
+              @click="selectDeck(deck)"
+            >
+              <svg data-v-33ac09eb="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path data-v-33ac09eb="" stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
+              <p class="text-xs truncate">{{ deck.name }}</p>
+            </li>
+          </div>
+        </ul>
         <div class="sign-container">
           <a :href="'/add'">
             <button class="add-article">
@@ -410,7 +470,7 @@ onBeforeUnmount(() => {
   position: absolute;
   background-color: #202020;
   border-radius: 7px;
-  width: 270px;
+  width: 275px;
   overflow: hidden;
   transition: height 1s ease;
   z-index: 3;
@@ -429,7 +489,7 @@ onBeforeUnmount(() => {
   padding: 10px;
   color: white;
   position: relative;
-  width: 250px;
+  width: 255px;
 }
 
 .keyword {
@@ -441,7 +501,7 @@ onBeforeUnmount(() => {
   display: flex;
   background-color: transparent;
   outline: none;
-  width: 250px;
+  width: 255px;
 }
 
 .menu-search button {
@@ -460,6 +520,10 @@ li p,li svg{
 
 li:hover p,li:hover svg{
   color: rgb(255, 255, 255);
+}
+
+.code-area {
+    display: none;
 }
 
 html,
@@ -596,6 +660,15 @@ a {
   display: inline;
 }
 
+.filter-hidden p {
+  line-height: 20px;
+  height:20px;
+  width:calc(100% - 40px);
+  display: inline;
+  overflow: hidden;
+}
+
+
 .sign-container {
   display: flex;
   align-items: center;
@@ -636,11 +709,13 @@ a {
 
 .flex-item-hidden {
   display: flex;
-  padding-left: 20px;
+  padding: 0 20px;
   height: 62px;
   border-radius: 20px;
   margin-top: 80px;
   gap: 16px;
+  overflow-x: scroll;
+  scrollbar-width: none;
 }
 
 .user-button {
@@ -649,7 +724,7 @@ a {
   border: 1px solid #414142;
   background-color: #18181b;
   color: #d4d4d8;
-  width: 80px;
+  min-width: 80px;
   border-radius: 10px;
   display: flex;
   cursor: pointer;
@@ -875,6 +950,20 @@ a {
   .menu-area {
     display: none;
   }
+
+  .code-area {
+  position: absolute;
+  top: 100%; 
+  display: grid;
+  position: absolute;
+  background-color: #202020;
+  border-radius: 7px;
+  width: 275px;
+  overflow: hidden;
+  transition: height 1s ease;
+  z-index: 3;
+  right: 59px;
+}
   
   .main {
     margin: 0px;

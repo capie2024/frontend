@@ -256,6 +256,7 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
+
 <style scoped>
 html,
 body {
@@ -815,3 +816,4 @@ a {
   }
 }
 </style>
+

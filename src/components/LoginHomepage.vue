@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import notice from './notification/Notice.vue'
+import notice from './notification/notice.vue'
 import NavLoginBtn from './NavLoginBtn.vue'
 import MainFooter from './MainFooter.vue'
 const BASE_URL = import.meta.env.VITE_BASE_URL

@@ -1,6 +1,7 @@
 import { ref, computed, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { useI18n } from 'vue-i18n'
 
 export const useCardSeriesStore = defineStore('card-series', () => {
   const API_URL = import.meta.env.VITE_API_URL
@@ -10,6 +11,7 @@ export const useCardSeriesStore = defineStore('card-series', () => {
   const seriesInfo = ref('')
   const seriesCardList = ref([])
   const seriesCardListLength = ref(0)
+  const { locale } = useI18n()
 
   // 獲取指定系列所有卡牌資訊;
   const getSeriesCards = async (seriesId) => {
@@ -56,14 +58,42 @@ export const useCardSeriesStore = defineStore('card-series', () => {
     }
   }
 
+  const translatedSeriesCardList = computed(() => {
+    return seriesCardList.value.map((card) => {
+      const translateTitle = card.i18n?.[locale.value]?.title
+      const translateFeature = card.i18n?.[locale.value]?.feature
+      const translateProductName = card.i18n?.[locale.value]?.productName
+      const translateSay = card.i18n?.[locale.value]?.say
+      const translateEffect = card.i18n?.[locale.value]?.effect
+      return {
+        ...card,
+        title:translateTitle || card.title,
+        feature: translateFeature || card.feature,
+        productName: translateProductName || card.productName,
+        say: translateSay || card.say,
+        effect: translateEffect || card.effect, 
+        author: card.i18n?.[locale.value]?.author,
+      }
+    })
+  })
+
+  const translatedSeriesInfo = computed(() => {
+    return {
+      ...seriesInfo.value,
+      name: seriesInfo.value.i18n?.[locale.value]?.name || seriesInfo.value.name
+    }
+  })
+
   return {
     serieslastReleaseTime,
     seriesCode,
     seriesCardList,
+    translatedSeriesCardList,
     getSeriesCards,
     saveLastViewSeries,
     getLastViewSeries,
     seriesInfo,
+    translatedSeriesInfo,
     seriesCardListLength,
   }
 })

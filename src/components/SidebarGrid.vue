@@ -1,13 +1,23 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { useSidebarStore } from '@/stores/sidebar';
+import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n';
+
+const sidebarStore = useSidebarStore();
+const { isActive } = storeToRefs(sidebarStore);
+const { locale } = useI18n();
 
 const route = useRoute()
 const router = useRouter()
-const isActive = ref(false)
-
 const changeStyle = () => {
   isActive.value = !isActive.value
+  if(isActive.value === false){
+        locale.value = 'jp';
+    }else if(isActive.value === true){
+        locale.value = 'zh';
+    }
 }
 
 const isLoggedIn = ref(false)

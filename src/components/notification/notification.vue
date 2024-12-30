@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import SideBar from '../SidebarGrid.vue';
-import Notice from './Notice.vue';
+import Notice from './notice.vue';
 import Footer from '../MainFooter.vue';
 import Login from '../NavLoginBtn.vue';
 

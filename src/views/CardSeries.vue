@@ -471,13 +471,7 @@ const goBack = () => {
 }
 
 const randomColor = ref('')
-const bgColors = [
-  'red',
-  'yellow',
-  'green',
-  'blue',
-  'purple'
-]
+const bgColors = ['red', 'yellow', 'green', 'blue', 'purple']
 const randomBgColor = () => {
   randomColor.value = ''
   randomColor.value = bgColors[Math.floor(Math.random() * bgColors.length)]
@@ -1860,9 +1854,28 @@ onBeforeUnmount(() => {
     </nav>
 
     <div class="main" :style="{ marginLeft: sidebarMarginLeft + 'px' }">
-      <div class="main-info" :class="{ 'main-info-red': randomColor == 'red', 'main-info-yellow': randomColor == 'yellow', 'main-info-green': randomColor == 'green', 'main-info-blue': randomColor == 'blue', 'main-info-purple': randomColor == 'purple' }" >
-        <header class="main-info-header" :class="{ 'main-info-header-red': randomColor == 'red', 'main-info-header-yellow': randomColor == 'yellow', 'main-info-header-green': randomColor == 'green', 'main-info-header-blue': randomColor == 'blue', 'main-info-header-purple': randomColor == 'purple' }" >
-          <button @click="goBack"
+      <div
+        class="main-info"
+        :class="{
+          'main-info-red': randomColor == 'red',
+          'main-info-yellow': randomColor == 'yellow',
+          'main-info-green': randomColor == 'green',
+          'main-info-blue': randomColor == 'blue',
+          'main-info-purple': randomColor == 'purple',
+        }"
+      >
+        <header
+          class="main-info-header"
+          :class="{
+            'main-info-header-red': randomColor == 'red',
+            'main-info-header-yellow': randomColor == 'yellow',
+            'main-info-header-green': randomColor == 'green',
+            'main-info-header-blue': randomColor == 'blue',
+            'main-info-header-purple': randomColor == 'purple',
+          }"
+        >
+          <button
+            @click="goBack"
             class="flex-none p-1 text-white rounded-full bg-black/50 default-transition hover:bg-zinc-800/50"
           >
             <svg
@@ -1883,14 +1896,14 @@ onBeforeUnmount(() => {
             </svg>
           </button>
 
-          <div class="w-full min-w-0 text-lg md:text-2xl font-bold text-white">
-            <h2 class="truncate text-2xl font-bold w-72">
+          <div class="w-full min-w-0 text-lg font-bold text-white md:text-2xl">
+            <h2 class="text-2xl font-bold truncate w-72">
               {{ translatedSeriesInfo.name }}
             </h2>
           </div>
           <Notice />
           <div
-            class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50"
+            class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50"
           >
             <NavLoginBtn />
           </div>
@@ -1930,7 +1943,10 @@ onBeforeUnmount(() => {
           </div>
         </button>
         <section class="info-container">
-          <img v-if="translatedSeriesInfo.cover" :src="translatedSeriesInfo.cover" />
+          <img
+            v-if="translatedSeriesInfo.cover"
+            :src="translatedSeriesInfo.cover"
+          />
           <img v-else src="@/img/cover.png" />
           <div flex-col class="inner-info-container">
             <span class="text-white"
@@ -1944,9 +1960,9 @@ onBeforeUnmount(() => {
                 }}</span
               ></span
             >
-            <h1 class="text-white" >{{ translatedSeriesInfo.name }}</h1>
+            <h1 class="text-white">{{ translatedSeriesInfo.name }}</h1>
             <div class="text-white">
-              <div v-if="translatedSeriesInfo.sellAt" >
+              <div v-if="translatedSeriesInfo.sellAt">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -2223,14 +2239,9 @@ onBeforeUnmount(() => {
           <div v-else class="card-info-empty">
             <div class="card-info-empty-content">
               <div class="card-info-empty-content-box">
-                <img
-                  src="@/assets/img/logo-use/no-data.png"
-                  alt=""
-                />
+                <img src="@/assets/img/logo-use/no-data.png" alt="" />
                 <h2>沒東西</h2>
-                <p>
-                  何もないことは、何でもあることだ。 - YC
-                </p>
+                <p>何もないことは、何でもあることだ。 - YC</p>
               </div>
             </div>
           </div>

@@ -1,19 +1,38 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useCardInfoStore } from '@/stores/card-info'
+import initCardEffect from '@/assets/js/cardEffect.js'
 import axios from 'axios'
 
 const route = useRoute()
+const router = useRouter()
 const faqData = ref([])
 const faqId = Number(route.params.id) // 確保與資料型態相同
 const faqItem = ref({})
 const relationCards = ref([])
 const API_URL = import.meta.env.VITE_API_URL
 
+// 引入CardInfoStore並使用
+const cardInfoStore = useCardInfoStore()
+const getCardInfoAndShow = cardInfoStore.getCardInfoAndShow
+
 const getCardData = async (id) => {
   try {
-    const { data } = await axios.get(`${API_URL}/cards/${id}`)
-    return { cover: data.cover, title: data.title }
+    const { data } = await axios.get(`${API_URL}/cards`, {
+      params: { id },
+    })
+
+    if (!data) {
+      throw new Error('No data received')
+    }
+
+    return {
+      id: data.id,
+      cover: data.cover,
+      title: data.title,
+      i18n: data.i18n,
+    }
   } catch (error) {
     console.error(`Error fetching card data for id ${id}:`, error)
     return null
@@ -25,14 +44,14 @@ const getFaqData = async () => {
     const { data } = await axios.get(`${API_URL}/qa`)
     faqData.value = data
     // 過濾出對應的 ID
-    for(let i = 0 ; i < faqData.value.length; i++) {
-      if(faqData.value[i].id == faqId) {
+    for (let i = 0; i < faqData.value.length; i++) {
+      if (faqData.value[i].id == faqId) {
         faqItem.value = faqData.value[i]
         break
       }
     }
 
-    if(faqItem.value.relations.length > 0) {
+    if (faqItem.value.relations.length > 0) {
       await getRelationCards()
     }
   } catch (error) {
@@ -41,12 +60,16 @@ const getFaqData = async () => {
 }
 
 const getRelationCards = async () => {
-  if (faqItem.value && Array.isArray(faqItem.value.relations) && faqItem.value.relations.length > 0) {
+  if (
+    faqItem.value &&
+    Array.isArray(faqItem.value.relations) &&
+    faqItem.value.relations.length > 0
+  ) {
     try {
-      const promises = faqItem.value.relations.map(id => getCardData(id))
+      const promises = faqItem.value.relations.map((id) => getCardData(id))
       const results = await Promise.all(promises)
       // 過濾掉獲取失敗的卡片
-      relationCards.value = results.filter(card => card !== null)
+      relationCards.value = results.filter((card) => card !== null)
       console.log('Relation Cards:', relationCards.value)
     } catch (error) {
       console.error('Error fetching relation cards:', error)
@@ -58,7 +81,7 @@ const getRelationCards = async () => {
 }
 
 // highlightText: 對傳入字串進行括號、引號等符號區塊加上 <mark> 的處理
- const highlightText = (str) => {
+const highlightText = (str) => {
   if (typeof str !== 'string') return str
 
   let highlighted = str
@@ -91,17 +114,22 @@ const getRelationCards = async () => {
   return highlighted
 }
 
-onMounted(async() => {
-  console.log("FaqInfo onMounted");
+const goBack = () => {
+  router.go(-1)
+}
+
+onMounted(async () => {
   getFaqData()
+  initCardEffect()
 })
 
 // 監聽路由參數的變化
-watch(() => route.params.id, () => {
-  getFaqData()
-  console.log("watch");
-})
-
+watch(
+  () => route.params.id,
+  () => {
+    getFaqData()
+  }
+)
 </script>
 
 <template>
@@ -119,7 +147,7 @@ watch(() => route.params.id, () => {
             <p class="text-lg font-bold">Q.{{ faqItem.id }}</p>
           </div>
         </h2>
-        <div class="flex justify-end flex-none gap-2">
+        <div @click="goBack" class="flex justify-end flex-none gap-2">
           <button
             class="flex-none p-1 text-white rounded-full bg-black/70 hover:bg-white hover:text-black"
           >
@@ -149,12 +177,15 @@ watch(() => route.params.id, () => {
               <div
                 class="bg-gradient-to-tr from-emerald-500 to-green-300 p-2 rounded-2xl max-w-[80%]"
               >
-                <p v-html="highlightText(faqItem.q)" class="text-sm leading-relaxed whitespace-pre-line">
-                </p>
+                <p
+                  v-html="highlightText(faqItem.q)"
+                  class="text-sm leading-relaxed whitespace-pre-line"
+                ></p>
               </div>
               <div class="flex flex-col">
                 <span class="font-bold text-zinc-300">Q.{{ faqItem.id }}</span>
-                <span class="font-mono text-xs whitespace-nowrap text-zinc-500"
+                <span
+                  class="font-mono text-xs whitespace-nowrap text-zinc-500"
                   >{{ faqItem.date }}</span
                 >
               </div>
@@ -163,12 +194,15 @@ watch(() => route.params.id, () => {
               <div
                 class="bg-gradient-to-bl from-white to-neutral-400 p-2 rounded-2xl max-w-[80%]"
               >
-                <p v-html="highlightText(faqItem.a)" class="text-sm leading-relaxed whitespace-pre-line">
-                </p>
+                <p
+                  v-html="highlightText(faqItem.a)"
+                  class="text-sm leading-relaxed whitespace-pre-line"
+                ></p>
               </div>
               <div class="flex flex-col text-right">
                 <span class="font-bold text-zinc-300">A.{{ faqItem.id }}</span>
-                <span class="font-mono text-xs whitespace-nowrap text-zinc-500"
+                <span
+                  class="font-mono text-xs whitespace-nowrap text-zinc-500"
                   >{{ faqItem.date }}</span
                 >
               </div>
@@ -176,23 +210,38 @@ watch(() => route.params.id, () => {
           </div>
           <h3 class="mt-12 text-white topic">
             關聯卡牌
-            <span class="subtitle">一共有 {{ faqItem && faqItem.relations ? faqItem.relations.length : 0 }} 張</span>
-            <!-- <span class="subtitle">一共有 69 張</span> -->
+            <span class="subtitle"
+              >一共有
+              {{ faqItem && faqItem.relations ? faqItem.relations.length : 0 }}
+              張</span
+            >
           </h3>
           <div class="grid grid-cols-2 gap-4 pb-8 lg:grid-cols-5">
-            <div v-if="faqItem.relations != ''" v-for="relation in faqItem.relations" class="flex flex-col items-center">
-              <span class="font-mono text-sm text-zinc-200 truncate">{{ relation }}</span>
-              <div class="relative cursor-pointer group">
+            <div
+              v-if="faqItem.relations != ''"
+              v-for="card in relationCards"
+              class="flex flex-col items-center"
+            >
+              <span class="font-mono text-sm truncate text-zinc-200">{{
+                card.id
+              }}</span>
+              <div
+                @click="getCardInfoAndShow(card.id)"
+                class="relative cursor-pointer card-wrapper group"
+              >
                 <div
-                  class="relative overflow-hidden rounded-card"
+                  class="relative overflow-hidden card rounded-card"
                   style="
                     transition: transform 0.5s ease-in-out;
                     transform: rotateY(0deg) rotateX(0deg);
                   "
                 >
+                  <div
+                    class="absolute top-0 left-0 w-full h-full glossy rounded-2xl z-2 mix-blend-lighten"
+                  ></div>
                   <img
-                    src="https://jasonxddd.me:7001/imgproxy/D3So-YmZIXqkBTK2rjsyYvX31inrOLzIFSDx3y0MLQU/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL01ERV9TRTQ1XzEyLnBuZw.png"
-                    alt=""
+                    :src="card.cover"
+                    alt="關聯卡牌"
                     class="flex-none w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image"
                   />
                 </div>
@@ -203,10 +252,10 @@ watch(() => route.params.id, () => {
                     class="grow-1 w-full min-w-0 group-hover:opacity-0 will-change-[opacity] transition-opacity select-none"
                   >
                     <p class="font-mono text-sm truncate text-zinc-300">
-                      {{ relation }}
+                      {{ card.id }}
                     </p>
                     <p class="font-bold text-white truncate">
-                      乘著風的少年 疾風
+                      {{ card.title }}
                     </p>
                   </div>
                   <button
@@ -241,6 +290,7 @@ watch(() => route.params.id, () => {
 
 <style scoped>
 @import '@/assets/base.css';
+@import '@/assets/css/card-effect.css';
 
 *,
 :after,

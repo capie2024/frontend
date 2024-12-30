@@ -5,7 +5,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import GoogleLogin from '../components/GoogleLogin.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
-import notice from '../components/notification/notice.vue'
+import notice from '../components/notification/Notice.vue'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 
 const router = useRouter()

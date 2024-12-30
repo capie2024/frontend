@@ -1,594 +1,470 @@
-<script>
+<script setup>
+import { ref, computed, onMounted} from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import dayjs from 'dayjs'
 import SidebarGrid from '@/components/SidebarGrid.vue'
-import notice from '../notification/notice.vue'
+import Notice from '../notification/Notice.vue'
 import NavLoginBtn from '../NavLoginBtn.vue'
 import MainFooter from '../MainFooter.vue'
 import RemitCard from '../Mycard/remit-card.vue'
+import userPicture from '@/img/avatar.png'
 import { useDeckMakeStore } from '@/stores/deck-make'
 import { useCardSeriesStore } from '@/stores/card-series'
+import { useRoute, useRouter } from 'vue-router'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const API_URL = import.meta.env.VITE_API_URL
 
+const router = useRouter()
+const route = useRoute()
+const newMessage = ref('')
+const messages = ref([])
+const showAllMessages = ref(false)
+const cards = ref([])
+const sortBy = ref('typeTranslate')
+const toggleTableView = ref(false)
+const togglePriceView = ref(false)
+const article = ref(null)
+const isVisible = ref(false)
+const currentUser = ref(null)
+const deckData = ref({ deck: [] })
+const deckMakeStore = useDeckMakeStore()
+const cardSeriesStore = useCardSeriesStore()
+
 function getUserIdFromToken(token) {
-  try {
-    const payload = token.split('.')[1]
-    const decodedPayload = JSON.parse(atob(payload))
-    return decodedPayload.userId || null // 檢查是否有 userId
-  } catch (error) {
-    console.error('無法解析 token:', error)
-    return null
-  }
+    if (!token) {
+        return null
+    }
+    const parts = token.split('.')
+    const payload = JSON.parse(atob(parts[1]))
+    return payload.userId
 }
 
-export default {
-  components: {
-    SidebarGrid,
-    notice,
-    NavLoginBtn,
-    MainFooter,
-    RemitCard,
-  },
-  data() {
-    return {
-      newMessage: '', // 儲存輸入的留言內容
-      messages: [], // 儲存所有留言
-      username: '', // 用戶名稱
-      showAllMessages: false,
-      showMenu: false,
-      isEditing: false,
-      likeCount: 0 || 0,
-      liked: false,
-      hated: false,
-      loggedInUserId: null,
-      token: localStorage.getItem('token'),
-      created_at: null,
-      cards: [],
-      sortedCards: [],
-      sortBy: 'typeTranslate',
-      groupedCards: [],
-      toggleTableView: false,
-      togglePriceView: false,
-      article: null,
-      isVisible: false,
-      deckData: {
-        deck: [],
-      },
-      deckMakeStore: useDeckMakeStore(),
-      cardSeriesStore: useCardSeriesStore(),
-    }
-  },
-  mounted() {
-    this.fetchArticleId()
-    this.fetchCurrentUser()
-    this.fetchDeck()
-    this.fetchDeckData()
-  },
-
-  async created() {
-    this.loggedInUserId = getUserIdFromToken(this.token)
-    const postCode = this.$route.params.post_code
-    try {
-      const response = await axios.get(`${API_URL}/api/articles/${postCode}`)
-      this.article = response.data
-    } catch (error) {
-      console.error('獲取文章資料失敗', error)
-    }
-  },
-  computed: {
-    isLoggedIn() {
-      return localStorage.getItem('token') !== null
-    },
-    formattedTime() {
-      return (createdAt) => {
+const formattedTime = computed(() => {
+    return (createdAt) => {
         if (!createdAt) return '未知時間'
         return dayjs(createdAt).format('YYYY-MM-DD HH:mm:ss')
-      }
-    },
-    groupedCards() {
-      let sorted = []
-      if (this.sortBy === 'level') {
-        sorted = [...this.cards].sort((a, b) => a.level - b.level)
-      } else if (this.sortBy === 'color') {
+    }
+})
+
+const groupedCards = computed(() => {
+    let sorted = []
+    if (sortBy.value === 'level') {
+        sorted = [...cards.value].sort((a, b) => a.level - b.level)
+    } else if (sortBy.value === 'color') {
         const colorOrder = ['red', 'yellow', 'green', 'blue']
-        sorted = [...this.cards].sort(
-          (a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color)
+        sorted = [...cards.value].sort(
+            (a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color)
         )
-      } else if (this.sortBy === 'typeTranslate') {
+    } else if (sortBy.value === 'typeTranslate') {
         const typeOrder = ['角色', '事件', '名場']
-        sorted = [...this.cards].sort(
-          (a, b) =>
-            typeOrder.indexOf(a.typeTranslate) -
-            typeOrder.indexOf(b.typeTranslate)
+        sorted = [...cards.value].sort(
+            (a, b) =>
+                typeOrder.indexOf(a.typeTranslate) -
+                typeOrder.indexOf(b.typeTranslate)
         )
-      } else if (this.sortBy === 'rare') {
-        sorted = [...this.cards].sort((a, b) => {
-          if (a.rare.length !== b.rare.length) {
-            return a.rare.length - b.rare.length
-          }
-          return a.rare.localeCompare(b.rare, 'en')
+    } else if (sortBy.value === 'rare') {
+        sorted = [...cards.value].sort((a, b) => {
+            if (a.rare.length !== b.rare.length) {
+                return a.rare.length - b.rare.length
+            }
+            return a.rare.localeCompare(b.rare, 'en')
         })
-      } else if (this.sortBy === 'seriesCode') {
-        sorted = [...this.cards].sort((a, b) =>
-          a.seriesCode.localeCompare(b.seriesCode, 'en')
+    } else if (sortBy.value === 'seriesCode') {
+        sorted = [...cards.value].sort((a, b) =>
+            a.seriesCode.localeCompare(b.seriesCode, 'en')
         )
-      } else {
-        sorted = [...this.cards]
-      }
-      // 分組邏輯
-      const grouped = sorted.reduce((acc, card) => {
-        const groupKey = card[this.sortBy] // 根據當前的 sortBy 屬性作為分組依據
+    } else {
+        sorted = [...cards.value]
+    }
+
+    const grouped = sorted.reduce((acc, card) => {
+        const groupKey = card[sortBy.value] 
         if (!acc[groupKey]) {
-          acc[groupKey] = []
+            acc[groupKey] = []
         }
         acc[groupKey].push(card)
         return acc
-      }, {})
+    }, {})
 
-      // 定義顏色對應表
-      const colorMap = {
+    const colorMap = {
         red: '紅色',
         yellow: '黃色',
         green: '綠色',
         blue: '藍色',
-      }
+    }
 
-      // 等級轉換為中文格式
-      const levelLabel = (level) => `${level}等`
+    const levelLabel = (level) => `${level}等`
 
-      // 根據 sortBy 動態轉換分組鍵值
-      return Object.entries(grouped).map(([key, cards]) => ({
-        group:
-          this.sortBy === 'color'
-            ? colorMap[key] || key // 顏色轉換
-            : this.sortBy === 'level'
-              ? levelLabel(key) // 等級轉換
-              : key, // 其他保持原值
+    return Object.entries(grouped).map(([key, cards]) => ({
+        group: sortBy.value === 'color'
+            ? colorMap[key] || key 
+            : sortBy.value === 'level'
+            ? levelLabel(key)      
+            : key,                 
         cards,
-      }))
-    },
-    totalPrice() {
-      if (!Array.isArray(this.deckData.deck)) {
+    }))
+})
+
+const totalPrice = computed(() => {
+    if (!Array.isArray(cards.value)) {
         return 0
-      }
-      return this.deckData.deck.reduce((sum, card) => {
+    }
+    return cards.value.reduce((sum, card) => {
         return sum + (card.price?.number || 0)
-      }, 0)
-    },
-    uniqueProductNames() {
-      const productNames = this.deckData.deck.map((card) => card.productName)
-      return [...new Set(productNames)]
-    },
-  },
-  methods: {
-    goBack() {
-      if (window.history.length > 1) {
-        window.history.back()
-      } else {
-        this.$router.push('/') // 如果沒有上一頁，導向首頁或其他預設頁面
-      }
-    },
-    hideModal() {
-      // 使用 Vue 的響應式來隱藏 RemitCard 和 overlay
-      this.isVisible = false
-    },
-    toggleRemitCard() {
-      this.isVisible = !this.isVisible
-    },
-    toggleVisibility() {
-      this.isVisible = !this.isVisible // 切換 isVisible 的值
-    },
-    togglePriceTableView() {
-      this.togglePriceView = !this.togglePriceView
-    },
-    toggleViewMode() {
-      this.toggleTableView = !this.toggleTableView
-    },
-    countSoulCards(cards) {
-      return cards.filter((card) => card.trigger.includes('soul')).length
-    },
-    setSortBy(property) {
-      this.sortBy = property // 設定排序條件
-    },
-    async fetchDeck() {
-      try {
-        const postCode = this.$route.params.post_code // 获取当前路由的 post_code
-        const response = await axios.get(`${API_URL}/api/deck/${postCode}`)
+    }, 0)
+})
 
-        const deckList = response.data[0].deck_list
-        this.cards = deckList.deck
-        this.deckId = deckList.deck_id
+const uniqueProductNames = computed(() => {
+    const productNames = cards.value.map(card => card.productName)
+    return [...new Set(productNames)]
+})
 
-        await this.fetchDeckData()
-      } catch (error) {
-        console.error('Failed to fetch specific deck:', error)
-      }
-    },
-    async fetchCurrentUser() {
-      try {
-        const userToken = localStorage.getItem('token')
+const toggleRemitCard = () => {
+    isVisible.value = !isVisible.value
+}
 
-        if (!userToken) {
-          console.error('User token not found.')
-          return
-        }
+const togglePriceTableView = () => {
+    togglePriceView.value = !togglePriceView.value
+}
 
-        const response = await axios.get('$API_URL/api/currentUser', {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        })
+const countSoulCards = (cards) => {
+    return cards.filter(card => card.trigger.includes('soul')).length
+}
 
-        this.currentUser = response.data
-      } catch (error) {
-        console.error('Failed to fetch current user:', error)
-      }
-    },
-    async fetchArticleId() {
-      const postCode = this.$route.params.post_code
-      if (!postCode) {
+const setSortBy = (property) => {
+    sortBy.value = property 
+}
+
+const fetchDeck = async () => {
+  try {
+    const postCode = route.params.post_code
+    const response = await axios.get(`${API_URL}/api/deck/${postCode}`)
+    const deckList = response.data[0].deck_list
+    cards.value = deckList.deck
+    deckData.value.deck = deckList.deck
+  } catch (error) {
+    console.error('Failed to fetch specific deck:', error)
+  }
+}
+const fetchCurrentUser = async () => {
+    const userToken = localStorage.getItem('token')
+    if (!userToken) {
+      return null
+    }
+
+    const response = await axios.get(`${API_URL}/api/currentUser`, {
+        headers: { 
+          Authorization: `Bearer ${userToken}` 
+        },
+    })
+
+    currentUser.value = response.data
+}
+
+const fetchArticles = async () => {
+    const postCode = route.params.post_code
+    console.log('postcode',postCode)
+    if (!postCode) {
         console.error('Error: postCode is not available in route params')
         return
-      }
-      try {
-        // 根據 post_code 查詢對應的 article_id
-        const response = await axios.get(
-          `${API_URL}/api/article-id/${postCode}`
-        )
-        this.articleId = response.data.article_id // 從後端獲取 article_id
-
-        // 確保在獲取 articleId 後再獲取其他資料
-        await this.fetchMessages()
-      } catch (error) {
+    }
+    try {
+        const response = await axios.get(`${API_URL}/api/article-id/${postCode}`)
+        article.value = response.data
+        console.log("article", article.value)
+        await fetchMessages()
+    } catch (error) {
         console.error('Error fetching article_id:', error)
-      }
-    },
-    async fetchMessages() {
-      if (!this.articleId) {
-        console.error('Error: articleId is not available for fetching messages')
+    }
+}
+
+const fetchMessages = async () => {
+    if (!article.value) {
+        console.error('Error: articleId is not available for fetching messages') 
         return
-      }
+    }
 
-      try {
-        const response = await axios.get(
-          `${API_URL}/api/comments?articleId=${this.articleId}`
-        )
-
-        // 按創建時間降序排序
-        this.messages = response.data.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        )
-
-        this.messages.forEach((message) => {
-          message.liked = message.liked || false
-          message.hated = message.hated || false
-          message.likeCount = message.like_count || 0
-          message.pictureUrl = message.users?.picture || '/default-avatar.png'
+    try {
+        const response = await axios.get(`${API_URL}/api/comments?articleId=${article.value.article_id}`)
+        messages.value = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        messages.value.forEach(message => {
+            message.liked = message.liked || false
+            message.hated = message.hated || false
+            message.likeCount = message.like_count || 0
+            message.pictureUrl = message.users?.picture || '/default-avatar.png'
         })
-      } catch (error) {
+    } catch (error) {
         console.error('Error fetching messages:', error)
-      }
-    },
-    async sendMessage() {
-      if (!this.articleId) {
-        return // 防止未設置 post_id 時發送留言
-      }
+    }
+}
 
-      if (this.newMessage.trim() !== '' && this.articleId) {
-        const userToken = localStorage.getItem('token')
+const sendMessage = async () => {  
+  if (newMessage.value.trim() === '') {
+    return;
+  }
 
+  const messageData = {
+    article_id: article.value.article_id,
+    message: newMessage.value.trim(),
+    like_count: 0,
+    created_at: new Date().toISOString(),
+  };
+
+  const userToken = localStorage.getItem('token');
+  if (!userToken) {
+    console.error('User token is missing');
+    Swal.fire({
+      title: '請先登入',
+      text: '留言功能需要登入才能使用。',
+      icon: 'warning',
+      confirmButtonText: '確定',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = `${BASE_URL}/login`;
+      }
+    });
+    return;
+  }
+
+  try {
+    const response = await axios.post(`${API_URL}/api/send-message`, { messageData }, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    messages.value.unshift(response.data);
+    newMessage.value = ''; // 清空輸入框
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
+};
+
+const toggleMessages = () => {
+  showAllMessages.value = !showAllMessages.value;
+};
+
+const toggleMenu = (messageId) => {
+  const message = messages.value.find((msg) => msg.id === messageId);
+  
+  if (message) {
+    const token = localStorage.getItem('token');
+    const loggedInUserId = getUserIdFromToken(token);
+
+    if (message.user_id === loggedInUserId) {
+      message.showMenu = !message.showMenu;
+    } else {
+      console.log('無權限編輯此留言');
+    }
+  } else {
+    console.log('Message not found');
+  }
+};
+
+const toggleEdit = (message) => {
+  message.isEditing = true;
+  message.showMenu = !message.showMenu;
+  message.editContent = message.message;
+};
+
+const submitEdit = async (message) => {
+  const userToken = localStorage.getItem('token');
+  if (!userToken) {
+    console.error('User token is missing');
+    return;
+  }
+
+  try {
+    const response = await axios.put(
+      `${API_URL}/api/comments/${message.id}`,
+      { message: message.editContent },
+      { headers: { Authorization: `Bearer ${userToken}` } }
+    );
+
+    if (response.status === 200) {
+      const updatedComment = response.data;
+      message.message = updatedComment.message;
+      message.created_at = updatedComment.created_at;
+      message.isEditing = false;
+    } else {
+      console.error('更新失敗', response);
+      alert('更新失敗，請稍後再試！');
+    }
+  } catch (error) {
+    console.error('更新失敗', error);
+    alert('無法連接到伺服器，請稍後再試！');
+  }
+};
+
+const cancelEdit = (message) => {
+  message.isEditing = false;
+};
+
+const deleteMessage = async (messageId) => {
+  Swal.fire({
+    title: '刪除留言',
+    text: '確定要刪除留言嗎？將會清除目前編輯的所有資訊。',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'OK',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const userToken = localStorage.getItem('token');
         if (!userToken) {
-          console.error('User token is missing')
+          console.error('User token not found.');
+          return;
+        }
+
+        const response = await axios.delete(`${API_URL}/api/comments/${messageId}`, {
+          headers: { Authorization: `Bearer ${userToken}` },
+        });
+
+        if (response.status === 200) {
+          Swal.fire('刪除成功!', '你的留言已被刪除', 'success');
+          messages.value = messages.value.filter((msg) => msg.id !== messageId);
+        }
+      } catch (error) {
+        console.error('Delete request failed:', error.response?.data || error.message);
+        Swal.fire('刪除失敗', error.response?.data?.error || 'Failed to delete the comment.', 'error');
+      }
+    }
+  });
+};
+
+const toggleLike = async (message) => {
+  try {
+    const userToken = localStorage.getItem('token');
+    if (!userToken) {
+      console.error('User token not found.');
+      return;
+    }
+
+    const response = await axios.post(
+      `${API_URL}/api/comments/${message.id}/toggleLike`,
+      {},
+      { headers: { Authorization: `Bearer ${userToken}` } }
+    );
+
+    const { isLiked, isHated, likeCount } = response.data;
+    message.liked = isLiked;
+    message.hated = isHated;
+    message.likeCount = likeCount;
+  } catch (error) {
+    console.error('Error toggling like:', error.response || error.message);
+  }
+};
+
+const toggleHate = async (message) => {
+  try {
+    const userToken = localStorage.getItem('token');
+    if (!userToken) {
+      console.error('User token not found.');
+      return;
+    }
+
+    const response = await axios.post(
+      `${API_URL}/api/comments/${message.id}/toggleHate`,
+      {},
+      { headers: { Authorization: `Bearer ${userToken}` } }
+    );
+
+    const { isHated, isLiked, likeCount } = response.data;
+    message.hated = isHated;
+    message.liked = isLiked;
+    message.likeCount = likeCount;
+  } catch (error) {
+    console.error('Error toggling hate:', error.response || error.message);
+  }
+};
+
+const formatDate = (date) => {
+  if (!date) return '';
+  return date.split('T')[0];
+};
+
+const isMyArticle = (article) => {
+  console.log('article:', article); 
+  const token = localStorage.getItem('token');
+  const loggedInUserId = getUserIdFromToken(token);
+
+  return article.user_id === loggedInUserId;
+};
+
+const deleteArticle = async () => {
+  const postCode = route.params.post_code;
+  Swal.fire({
+    title: '確定要刪除文章嗎？',
+    text: '刪除後將無法復原。',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '確認刪除',
+    cancelButtonText: '取消',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const userToken = localStorage.getItem('token');
+
+        const response = await axios.delete(`${API_URL}/api/articles/${postCode}`, {
+          headers: { Authorization: `Bearer ${userToken}` },
+        });
+
+        if (response.status === 200) {
+          Swal.fire('刪除成功', '文章已成功刪除', 'success');
+          router.push('/social');
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
           Swal.fire({
             title: '請先登入',
-            text: '留言功能需要登入才能使用。',
+            text: '登入後才能刪除文章',
             icon: 'warning',
             confirmButtonText: '確定',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = `${BASE_URL}/login`
-            }
-          })
-          return
-        }
-
-        const newMessage = {
-          article_id: this.articleId,
-          message: this.newMessage.trim(),
-          like_count: 0,
-          created_at: new Date().toISOString(),
-        }
-        try {
-          const response = await axios.post(
-            '$API_URL/api/send-message',
-            { newMessage },
-            {
-              headers: {
-                Authorization: `Bearer ${userToken}`,
-              },
-            }
-          )
-          this.messages.unshift(response.data)
-          this.newMessage = ''
-        } catch (error) {
-          console.error('Error sending message:', error)
-        }
-      } else {
-        console.log('Invalid message or post_id')
-      }
-    },
-    toggleMenu(messageId) {
-      const message = this.messages.find((message) => message.id === messageId)
-      if (message) {
-        if (message.user_id === this.loggedInUserId) {
-          message.showMenu = !message.showMenu
+          }).then(() => {
+            window.location.href = `${BASE_URL}/login`;
+          });
         } else {
-          console.log('無權限編輯此留言')
+          Swal.fire({
+            icon: 'error',
+            title: '刪除文章失敗',
+            text: error.message,
+          });
         }
-      } else {
-        console.log('Message not found')
       }
-    },
-    toggleEdit(message) {
-      message.isEditing = true
-      message.showMenu = !message.showMenu
-      message.editContent = message.message // 初始化編輯內容
-    },
-    // 送出編輯
-    async submitEdit(message) {
-      const userToken = localStorage.getItem('token')
+    }
+  });
+};
 
-      if (!userToken) {
-        console.error('User token is missing')
-        return
-      }
+const copyDeck = async () => {
+  deckMakeStore.selectedCards = cards.value;
+  deckMakeStore.saveLastDeckEdit();
 
-      try {
-        const response = await axios.put(
-          `${API_URL}/api/comments/${message.id}`,
-          {
-            message: message.editContent,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        )
-        if (response.status === 200) {
-          // 後端返回的更新資料
-          const updatedComment = response.data
-          // 更新前端顯示的留言
-          message.message = updatedComment.message
-          message.created_at = updatedComment.created_at
-          message.isEditing = false // 結束編輯模式
-        } else {
-          console.error('更新失敗', response)
-          alert('更新失敗，請稍後再試！')
-        }
-      } catch (error) {
-        console.error('更新失敗', error)
-        alert('無法連接到伺服器，請稍後再試！')
-      }
-    },
-    // 取消編輯
-    cancelEdit(message) {
-      message.isEditing = false // 結束編輯模式
-    },
-    async deleteMessage(messageId) {
-      Swal.fire({
-        title: '刪除留言',
-        text: '確定要刪除留言嗎？將會清除目前編輯的所有資訊。',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'OK',
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            const userToken = localStorage.getItem('token')
+  const cardCode = cards.value[0]?.seriesCode || ''; 
+  let seriesId = '';
 
-            if (!userToken) {
-              console.error('User token not found.')
-              return
-            }
+  try {
+    const response = await axios.get(`${API_URL}/api/series`);
+    const series = response.data.find((series) => series.code.includes(cardCode));
+    if (series) {
+      seriesId = series.id;
+    }
+  } catch (error) {
+    console.error('Error fetching series:', error);
+    return;
+  }
 
-            const response = await axios.delete(
-              `${API_URL}/api/comments/${messageId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${userToken}`,
-                },
-              }
-            )
-            if (response.status === 200) {
-              Swal.fire('刪除成功!', '你的留言已被刪除', 'success')
-              this.messages = this.messages.filter(
-                (message) => message.id !== messageId
-              )
-            }
-          } catch (error) {
-            console.error(
-              'Delete request failed:',
-              error.response?.data || error.message
-            )
-            Swal.fire(
-              '刪除失敗',
-              error.response?.data?.error || 'Failed to delete the comment.',
-              'error'
-            )
-          }
-        }
-      })
-    },
-    toggleMessages() {
-      this.showAllMessages = !this.showAllMessages
-    },
-    async toggleLike(message) {
-      try {
-        const userToken = localStorage.getItem('token')
-        if (!userToken) {
-          console.error('User token not found.')
-          return
-        }
+  cardSeriesStore.saveLastViewSeries(seriesId);
+  router.push(`/card-series/${seriesId}`);
+};
 
-        const response = await axios.post(
-          `${API_URL}/api/comments/${message.id}/toggleLike`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        )
-
-        const { isLiked, isHated, likeCount } = response.data
-
-        // 確保互斥狀態和 Like 數更新
-        message.liked = isLiked
-        message.hated = isHated
-        message.likeCount = likeCount // 確保畫面同步更新 Like 數
-      } catch (error) {
-        console.error('Error toggling like:', error.response || error.message)
-      }
-    },
-    async toggleHate(message) {
-      try {
-        const userToken = localStorage.getItem('token')
-        if (!userToken) {
-          console.error('User token not found.')
-          return
-        }
-
-        const response = await axios.post(
-          `${API_URL}/api/comments/${message.id}/toggleHate`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        )
-
-        const { isHated, isLiked, likeCount } = response.data
-
-        // 確保互斥狀態和 Like 數更新
-        message.hated = isHated
-        message.liked = isLiked
-        message.likeCount = likeCount // 確保畫面同步更新 Like 數
-      } catch (error) {
-        console.error('Error toggling hate:', error.response || error.message)
-      }
-    },
-    formatDate(date) {
-      if (!date) {
-        return ''
-      }
-      return date.split('T')[0]
-    },
-    async fetchDeckData() {
-      try {
-        const response = await axios.get(
-          `${API_URL}/api/deck-page/${this.deckId}`
-        )
-        this.deckData = response.data
-        if (
-          !this.deckData ||
-          !this.deckData.users ||
-          !this.deckData.users.username ||
-          !this.deckData.deck
-        ) {
-          console.error('回傳資料格式錯誤:', this.deckData)
-          Swal.fire('錯誤', '無法獲取有效的資料', 'error')
-          return
-        }
-
-        if (!Array.isArray(this.deckData.deck)) {
-          this.deckData.deck = []
-        }
-      } catch (error) {
-        console.error('無法獲取資料:', error)
-      }
-    },
-
-    isMyArticle(article) {
-      return article.user_id === this.loggedInUserId
-    },
-
-    async deleteArticle() {
-      const postCode = this.$route.params.post_code
-      Swal.fire({
-        title: '確定要刪除文章嗎？',
-        text: '刪除後將無法復原。',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '確認刪除',
-        cancelButtonText: '取消',
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            const userToken = localStorage.getItem('token')
-
-            const response = await axios.delete(
-              `${API_URL}/api/articles/${postCode}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${userToken}`,
-                },
-              }
-            )
-
-            if (response.status === 200) {
-              Swal.fire('刪除成功', '文章已成功刪除', 'success')
-              this.$router.push('/social')
-            }
-          } catch (error) {
-            if (error.response && error.response.status === 403) {
-              const BASE_URL = import.meta.env.VITE_BASE_URL
-              Swal.fire({
-                title: '請先登入',
-                text: '登入後才能刪除文章',
-                icon: 'warning',
-                confirmButtonText: '確定',
-              }).then(() => {
-                window.location.href = `${BASE_URL}/login`
-              })
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: '刪除文章失敗',
-                text: error.message,
-              })
-            }
-          }
-        }
-      })
-    },
-    async copyDeck() {
-      this.deckMakeStore.selectedCards = this.deckData.deck
-      this.deckMakeStore.saveLastDeckEdit()
-      const cardCode = this.deckData.deck[0].seriesCode
-
-      let seriesId = ''
-      try {
-        const response = await axios.get(`${API_URL}/api/series`)
-        seriesId = response.data.find((series) => {
-          if (series.code.includes(cardCode)) {
-            return series
-          }
-        }).id
-      } catch (error) {
-        return error
-      }
-      this.cardSeriesStore.saveLastViewSeries(seriesId)
-      this.$router.push(`/card-series/${seriesId}`)
-    },
-  },
-}
+onMounted(() => {
+    fetchArticles()
+    fetchCurrentUser()
+    fetchDeck()
+})
 </script>
 
 <template>
@@ -800,10 +676,10 @@ export default {
               <div class="data-container">
                 <div class="user-link">
                   <div class="user-img">
-                    <img :src="article.users.picture" alt="用戶頭像" />
+                    <img :src="article.user_picture || userPicture" alt="用戶頭像" />
                   </div>
                   <span class="date-container">
-                    <a href="#">{{ article.users.username }}</a>
+                    <a href="#">{{ article.users?.username }}</a>
                     發布於
                     <span>{{ formatDate(article.created_at) }}</span>
                   </span>
@@ -824,7 +700,7 @@ export default {
                       stroke-linejoin="round"
                       d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
                     ></path></svg
-                  >&nbsp; 總數{{ deckData.deck.length }}張
+                  >&nbsp; 總數{{cards.length}}張
                 </span>
                 <span class="data-item">
                   <svg
@@ -847,7 +723,7 @@ export default {
                 </span>
                 <span
                   class="data-item"
-                  v-if="deckData.deck && deckData.deck.length > 0"
+                  v-if="cards && cards.length > 0"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -906,7 +782,7 @@ export default {
               <!-- 留言輸入 -->
               <div class="user-message">
                 <div class="message-user-img">
-                  <img :src="currentUser?.picture" alt="" />
+                  <img :src="currentUser?.picture || userPicture" alt="" />
                 </div>
                 <div class="message">
                   <svg

@@ -11,12 +11,12 @@ const products = ref([])
 
 // 當組件掛載時請求資料
 onMounted(async () => {
-try {
-  const response = await axios.get('/api/product') // 更新 API URL
-  products.value = response.data // 設置資料
-} catch (err) {
-  console.error('獲取產品資料失敗:', err.message)
-}
+  try {
+    const response = await axios.get('/api/product') // 更新 API URL
+    products.value = response.data // 設置資料
+  } catch (err) {
+    console.error('獲取產品資料失敗:', err.message)
+  }
 })
 </script>
 

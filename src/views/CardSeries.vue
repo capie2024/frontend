@@ -2397,5 +2397,4 @@ onBeforeUnmount(() => {
   .hidden {
     display: none;
   }
-
 </style>

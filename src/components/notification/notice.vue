@@ -16,6 +16,11 @@ const formattedTime = (createdAt) => {
 
 const fetchNotices = async () => {
     const token = localStorage.getItem('token');
+
+    if (!token) {
+        return null;
+    }
+
     try {
         const response = await fetch(`${API_URL}/api/notices`, {
             headers: {

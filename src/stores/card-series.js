@@ -67,11 +67,11 @@ export const useCardSeriesStore = defineStore('card-series', () => {
       const translateEffect = card.i18n?.[locale.value]?.effect
       return {
         ...card,
-        title:translateTitle || card.title,
+        title: translateTitle || card.title,
         feature: translateFeature || card.feature,
         productName: translateProductName || card.productName,
         say: translateSay || card.say,
-        effect: translateEffect || card.effect, 
+        effect: translateEffect || card.effect,
         author: card.i18n?.[locale.value]?.author,
       }
     })
@@ -80,7 +80,8 @@ export const useCardSeriesStore = defineStore('card-series', () => {
   const translatedSeriesInfo = computed(() => {
     return {
       ...seriesInfo.value,
-      name: seriesInfo.value.i18n?.[locale.value]?.name || seriesInfo.value.name
+      name:
+        seriesInfo.value.i18n?.[locale.value]?.name || seriesInfo.value.name,
     }
   })
 

@@ -318,9 +318,8 @@ const formaDate = (time) => {
 let mainElement = ref(null)
 const handleScroll = () => {
   const scrollTop = mainElement.value.scrollTop
-  isScrolled.value = scrollTop > 0
+  isScrolled.value = scrollTop > 300
 }
-
 
 const main = () => {
   mainElement.value = document.querySelector('.background')

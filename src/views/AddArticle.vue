@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import Swal from 'sweetalert2'
 import MainFooter from '@/components/MainFooter.vue'
 import notice from '../components/notification/notice.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
@@ -153,105 +153,105 @@ onMounted(() => {
   <SidebarGrid style="grid-area: sidebar" />
   <main>
     <header>
-        <div class="pagebtn-area">
-          <button class="page-btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="h-6 w-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15.75 19.5 8.25 12l7.5-7.5"
-              ></path>
-            </svg>
-          </button>
-          <button class="page-btn next-btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="h-6 w-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              ></path>
-            </svg>
-          </button>
-          <h2>新增文章</h2>
-        </div>
-        <div class="btn-area">
-          <button class="submit-btn" @click="submitArticle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none size-5 stroke-2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"
-              ></path>
-            </svg>
-            <span>送出</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none size-5 stroke-2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-              ></path>
-            </svg>
-          </button>
-          <notice />
-          <button class="user-btn">
-            <div class="btn-img">
-              <img src="/src/img/avatar.png" alt="" />
-            </div>
-            <span>XXXX</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="h-4 w-4 flex-none"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m19.5 8.25-7.5 7.5-7.5-7.5"
-              ></path>
-            </svg>
-          </button>
-        </div>
+      <div class="pagebtn-area">
+        <button class="page-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 19.5 8.25 12l7.5-7.5"
+            ></path>
+          </svg>
+        </button>
+        <button class="page-btn next-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+            ></path>
+          </svg>
+        </button>
+        <h2>新增文章</h2>
+      </div>
+      <div class="btn-area">
+        <button class="submit-btn" @click="submitArticle">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="flex-none size-5 stroke-2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"
+            ></path>
+          </svg>
+          <span>送出</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="flex-none size-5 stroke-2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+            ></path>
+          </svg>
+        </button>
+        <notice />
+        <button class="user-btn">
+          <div class="btn-img">
+            <img src="/src/img/avatar.png" alt="" />
+          </div>
+          <span>XXXX</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="h-4 w-4 flex-none"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m19.5 8.25-7.5 7.5-7.5-7.5"
+            ></path>
+          </svg>
+        </button>
+      </div>
     </header>
     <section class="title-area">
       <div class="title-area-container">
@@ -769,7 +769,6 @@ a {
   font-weight: 900;
 }
 
-
 .user-btn {
   border: none;
   background-color: #19647f;
@@ -804,14 +803,14 @@ a {
 main {
   overflow: hidden;
   margin: 0.5rem;
-  margin-left:270px;
+  margin-left: 270px;
   width: calc(100% - 278px);
-  height:calc(100vh - 16px);
+  height: calc(100vh - 16px);
   border-radius: 20px;
   background-color: #32c9ff;
   scroll-behavior: smooth;
   overflow-y: scroll;
-  scrollbar-width: none;  
+  scrollbar-width: none;
 }
 
 header {
@@ -1035,7 +1034,11 @@ header {
   box-sizing: border-box;
   height: 520px;
   display: flex;
-  background: linear-gradient(to bottom, rgb(32, 99, 122) 100px, rgb(19, 22, 23) 450px);
+  background: linear-gradient(
+    to bottom,
+    rgb(32, 99, 122) 100px,
+    rgb(19, 22, 23) 450px
+  );
 }
 
 .edit-area {
@@ -1175,12 +1178,16 @@ header {
 }
 
 footer {
-  background: linear-gradient(to bottom, rgb(19, 22, 23)  100px, rgb(32, 99, 122)300px);
+  background: linear-gradient(
+    to bottom,
+    rgb(19, 22, 23) 100px,
+    rgb(32, 99, 122) 300px
+  );
   width: 100%;
 }
 
 .main-footer {
-  background: linear-gradient(to bottom, rgb(19, 22, 23) , #121212);
+  background: linear-gradient(to bottom, rgb(19, 22, 23), #121212);
 }
 
 .footer-nav {
@@ -1235,8 +1242,6 @@ footer {
   color: white;
 }
 
-
-
 @media screen and (max-width: 1200px) {
   body {
     min-width: 100%;
@@ -1250,7 +1255,6 @@ footer {
     margin-left: 0;
     width: 100%;
   }
-
 
   header {
     border-radius: 0;
@@ -1426,6 +1430,5 @@ footer {
   .footer-nav {
     display: flex;
   }
-
 }
 </style>

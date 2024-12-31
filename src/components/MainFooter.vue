@@ -5,32 +5,21 @@ const footerData = [
   {
     title: '簡介',
     linkText: ['關於我們', '與我聯絡', 'Weiβ Schwarz'],
-    url : [
-      '',
-      `${BASE_URL}/contact`, 
-      'https://ws-tcg.com/']
+    url: ['', `${BASE_URL}/contact`, 'https://ws-tcg.com/'],
   },
   {
     title: '資源',
-    linkText: [
-      '遊々亭價格',
-      '基本規則',
-      '禁卡表',
+    linkText: ['遊々亭價格', '基本規則', '禁卡表'],
+    url: [
+      'https://yuyu-tei.jp/',
+      'https://ws-tcg.com/rules/',
+      'https://ws-tcg.com/rules/deck_rule/',
     ],
-    url:[
-    'https://yuyu-tei.jp/', 
-    'https://ws-tcg.com/rules/', 
-    'https://ws-tcg.com/rules/deck_rule/'
-    ]
   },
   {
     title: '常用連結',
     linkText: ['卡片問答集', '我的專頁', '英雄榜'],
-    url:[
-      '',
-      `${BASE_URL}/login`,
-      `${BASE_URL}/hero-member`
-    ]
+    url: ['', `${BASE_URL}/login`, `${BASE_URL}/hero-member`],
   },
 ]
 </script>
@@ -45,11 +34,12 @@ const footerData = [
           </li>
           <li
             class="main-footer-flexbox-left-item-link"
-            v-for="(link, index) in item.linkText" 
-            :key="index"          
-            >
-            <a class="main-footer-flexbox-left-item-link-text"
-              :href="item.url[index]" 
+            v-for="(link, index) in item.linkText"
+            :key="index"
+          >
+            <a
+              class="main-footer-flexbox-left-item-link-text"
+              :href="item.url[index]"
             >
               {{ link }}
             </a>

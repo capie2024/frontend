@@ -16,7 +16,6 @@ export const useCardInfoStore = defineStore('card-info', () => {
   const leftDisabled = ref(null)
   const rightDisabled = ref(null)
 
-  
   const { locale } = useI18n()
 
   const getCardInfoAndShow = (card) => {
@@ -71,24 +70,25 @@ export const useCardInfoStore = defineStore('card-info', () => {
     }
   }
 
-  const getCardQA = async() => {
+  const getCardQA = async () => {
     cardQAList.value = []
     const API_URL = import.meta.env.VITE_API_URL
     const res = await axios.get(`${API_URL}/qa`)
     const qalist = []
-    res.data.forEach( qa => {
-      if(qa.relations.includes(cardInfo.value.id)) {
+    res.data.forEach((qa) => {
+      if (qa.relations.includes(cardInfo.value.id)) {
         qalist.unshift(qa)
       }
-    });
+    })
     cardQAList.value = qalist
   }
 
   const translatedCardInfo = computed(() => {
-    if(cardInfo.value === null) return
+    if (cardInfo.value === null) return
     const translateTitle = cardInfo.value.i18n?.[locale.value]?.title
     const translateFeature = cardInfo.value.i18n?.[locale.value]?.feature
-    const translateProductName = cardInfo.value.i18n?.[locale.value]?.productName
+    const translateProductName =
+      cardInfo.value.i18n?.[locale.value]?.productName
     const translateSay = cardInfo.value.i18n?.[locale.value]?.say
     const translateEffect = cardInfo.value.i18n?.[locale.value]?.effect
 
@@ -98,22 +98,22 @@ export const useCardInfoStore = defineStore('card-info', () => {
       feature: translateFeature || cardInfo.value.feature,
       productName: translateProductName || cardInfo.value.productName,
       say: translateSay || cardInfo.value.say,
-      effect: translateEffect || cardInfo.value.effect, 
+      effect: translateEffect || cardInfo.value.effect,
       author: cardInfo.value.i18n?.[locale.value]?.author,
     }
   })
 
   const translatedCardQAList = computed(() => {
-    if(cardQAList.value === null) return
-    
-    return cardQAList.value.map(qa => {
+    if (cardQAList.value === null) return
+
+    return cardQAList.value.map((qa) => {
       const translateQ = qa.i18n?.[locale.value]?.q
       const translateA = qa.i18n?.[locale.value]?.a
       return {
         ...qa,
         q: translateQ || qa.q,
         a: translateA || qa.a,
-        author: qa.i18n?.[locale.value]?.author
+        author: qa.i18n?.[locale.value]?.author,
       }
     })
   })
@@ -129,6 +129,6 @@ export const useCardInfoStore = defineStore('card-info', () => {
     rightDisabled,
     getCardQA,
     cardQAList,
-    translatedCardQAList
+    translatedCardQAList,
   }
 })

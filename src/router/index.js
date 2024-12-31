@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/HomeView.vue'
-import CardInfo from '../views/CardInfo.vue'
 import WorkShopView from '@/views/WorkShopView.vue'
 import HeroMemberView from '@/views/HeroMemberView.vue'
 import OfficialProductList from '@/views/OfficialProductList.vue'
@@ -69,9 +68,10 @@ const router = createRouter({
       component: Faq,
     },
     {
-      path: '/faq-info',
-      name: 'faq-info',
+      path: '/faq/:id',
+      name: 'FaqInfo',
       component: FaqInfo,
+      // props: true
     },
     {
       path: '/user',

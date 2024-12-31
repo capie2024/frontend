@@ -488,12 +488,11 @@ const copyDeck = async () => {
 // 上一頁
 const goBack = () => {
   if (window.history.length > 1) {
-    router.back();
+    router.back()
   } else {
-    router.push('/'); 
+    router.push('/')
   }
-};
-
+}
 
 // 根據滾動位置判斷顯示 header 標題和背景色
 const isScrolled = ref(false)
@@ -503,7 +502,6 @@ const handleScroll = () => {
   const scrollTop = mainElement.value.scrollTop
   isScrolled.value = scrollTop > 100
 }
-
 
 const main = () => {
   mainElement.value = document.querySelector('.background')
@@ -523,7 +521,6 @@ onBeforeUnmount(() => {
   if (mainElement.value) {
     mainElement.value.removeEventListener('scroll', handleScroll)
   }
-
 })
 </script>
 
@@ -849,107 +846,7 @@ onBeforeUnmount(() => {
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
-                  ></path></svg
-                >{{ postCode }}
-              </p>
-              <h1>{{ article?.title }}</h1>
-              <div class="data-container">
-                <div class="user-link">
-                  <div class="user-img">
-                    <img
-                      :src="article.user_picture || userPicture"
-                      alt="用戶頭像"
-                    />
-                  </div>
-                  <span class="date-container">
-                    <a href="#">{{ article?.users?.username }}</a>
-                    發布於
-                    <span>{{ formatDate(article?.created_at) }}</span>
-                  </span>
-                </div>
-                <span class="data-item">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    data-slot="icon"
-                    class="size-5 md:size-6 flex-none"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-                    ></path></svg
-                  >&nbsp; 總數{{ cards.length }}張
-                </span>
-                <span class="data-item">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    data-slot="icon"
-                    class="size-5 md:size-6 flex-none"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
-                    ></path></svg
-                  >&nbsp; 總價
-                  <span>{{ totalPrice }}円</span>
-                </span>
-                <span class="data-item" v-if="cards && cards.length > 0">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    data-slot="icon"
-                    class="size-5 md:size-6 flex-none"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
-                    ></path></svg
-                  >&nbsp; 系列包含
-                  <a
-                    v-for="(product, index) in uniqueProductNames"
-                    :key="index"
-                    href="#"
-                    >{{ product }}</a
-                  >
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section class="main-container">
-          <div class="main-container-bg"></div>
-          <div class="article-area">
-            <div class="text-container">
-              <div class="article-title">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="text-white/50 size-8"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97ZM6.75 8.25a.75.75 0 0 1 .75-.75h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H7.5Z"
-                    clip-rule="evenodd"
+                    d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
                   ></path>
                 </svg>
                 <input
@@ -2566,7 +2463,7 @@ a {
 .social-btn4:hover,
 .social-btn5:hover {
   background-color: #121212;
-  opacity: 1;
+  opacity: 0.6;
 }
 
 .social-btn1:hover .description1,

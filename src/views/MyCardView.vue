@@ -3,6 +3,7 @@ import MainFooter from '@/components/MainFooter.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import { onMounted, ref, computed, onBeforeUnmount } from 'vue'
 import axios from 'axios'
+import Swal from 'sweetalert2'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 import Notice from '../components/notification/notice.vue'
 import RemitCard from '../components/Mycard/remit-card.vue'
@@ -40,6 +41,7 @@ const dateSortReverse = (a, b) => {
   return dateA - dateB
 }
 
+const token = ref(localStorage.getItem('token'))
 const isScrolled = ref(false) // 是否滾動
 const cardDecks = ref([])
 const originalDecks = ref([])
@@ -50,13 +52,14 @@ const dateIsSelected = ref(true)
 const nameIsSorted = ref(false)
 const nameIsSelected = ref(false)
 const seriesIsSelected = ref(false)
+const searchQuery = ref('')
 
 // 獲取我的牌組資料
 const fetchMyDecks = async () => {
   try {
     const response = await axios.get(`${API_URL}/decks`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${token.value}`,
       },
     })
     originalDecks.value = response.data.decks
@@ -151,7 +154,7 @@ const fetchSeriesCode = async () => {
   try {
     const response = await axios.get(`${API_URL}/decks`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${token.value}`,
       },
     })
 
@@ -325,6 +328,82 @@ const main = () => {
   }
 }
 
+const searchDecks = () => {
+  if (!searchQuery.value.trim()) {
+    cardDecks.value = originalDecks.value
+  } else {
+    const query = searchQuery.value.toLowerCase()
+    cardDecks.value = originalDecks.value.filter((cardDeck) => {
+      const deckName = cardDeck.deck_name?.toLowerCase() || ''
+      const deckId = cardDeck.deck_id?.toLowerCase() || ''
+      const deckSeriesCode = cardDeck.deck.some((card) => {
+        const seriesCode = card.seriesCode?.toLowerCase() || ''
+        return seriesCode.includes(query)
+      })
+
+      return (
+        deckName.includes(query) ||
+        deckId.includes(query) ||
+        deckSeriesCode
+      )
+    })
+  }
+
+  if (dateIsSelected.value) {
+    cardDecks.value.sort(dateIsSorted.value ? dateSortReverse : dateSort)
+  } else if (nameIsSelected.value) {
+    cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse)
+  }
+}
+const clearSearch = () => {
+  searchQuery.value = ''
+  cardDecks.value = originalDecks.value
+  if (dateIsSelected.value) {
+    cardDecks.value.sort(dateIsSorted.value ? dateSortReverse : dateSort)
+  } else if (nameIsSelected.value) {
+    cardDecks.value.sort(nameIsSorted.value ? nameSort : nameSortReverse)
+  }
+}
+
+const deleteDeck = async (deck_id) => {
+
+  Swal.fire({
+    title: "確定要刪除牌組嗎？",
+    text: "刪除後將無法復原。",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "確認刪除",
+    cancelButtonText: "取消",
+  })
+  .then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.delete(`${API_URL}/decks/${deck_id}`, {
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        });
+
+        if (response.status === 200) {
+          Swal.fire({
+            icon: 'success',
+            title: '刪除成功',
+            showConfirmButton: false,
+            timer: 1000,
+          }).then(() => {
+            fetchMyDecks()
+          })  
+        }
+      } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: '刪除失敗',
+            text: "已引用於文章,無法刪除",
+          });
+        }
+      }
+  });
+}
 onMounted(() => {
   fetchMyDecks()
   fetchCardSeries()
@@ -367,8 +446,18 @@ onBeforeUnmount(() => {
               d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
             ></path>
           </svg>
-          <input type="text" class="header-input" placeholder="找我的牌組？" />
-          <button class="clear-btn">
+
+          <input
+            v-model="searchQuery"
+            @keyup="searchDecks"
+            class="header-input"
+            type="text"
+            placeholder="找我的牌組？"
+          />
+          <button 
+            @click="clearSearch"
+            class="clear-btn"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -575,6 +664,7 @@ onBeforeUnmount(() => {
                 alt=""
               />
               <button
+                @click.prevent="deleteDeck(cardDeck.deck_id)"
                 class="bottom-0 right-0 p-1 m-1 text-white rounded-full bg-zinc-800"
               >
                 <svg
@@ -676,6 +766,7 @@ header.scrolled {
 }
 
 .work-shop-title p {
+  margin-top: 5px;
   font-size: 14px;
   line-height: 20px;
   color: #e6e6e6;
@@ -718,6 +809,7 @@ header.scrolled {
   border-radius: 9999px;
   background-color: white;
   max-width: 270px;
+  gap: 5px;
 }
 
 .page-control-container {
@@ -812,145 +904,6 @@ header.scrolled {
   cursor: pointer;
   background-color: rgb(18, 18, 18, 0.5);
   transition: background-color 0.2s ease-in-out;
-}
-
-.notice-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 10px;
-  cursor: pointer;
-  border-radius: 50%;
-  background-color: transparent;
-  transition:
-    background-color 0.3s ease,
-    opacity 0.3s ease;
-}
-
-.notice-icon:hover {
-  background-color: #2a2727;
-  opacity: 0.8;
-}
-
-.notice-txt {
-  position: absolute;
-  top: 50px;
-  background-color: black;
-  color: white;
-  width: 40px;
-  line-height: 25px;
-  border-radius: 10px;
-  padding: 3px;
-  text-align: center;
-  font-weight: bold;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.notice:hover .notice-txt {
-  opacity: 1;
-}
-
-.notice-grid-up h2 {
-  color: white;
-  font-weight: bolder;
-  font-size: 24px;
-}
-
-.notice-grid {
-  display: grid;
-  grid-template-columns: 352px;
-  grid-template-rows: 64px 416px;
-  position: absolute;
-  top: 120%;
-  left: 50%;
-  transform: translateX(-70%);
-  opacity: 0;
-  height: 0;
-  transition:
-    opacity 0.3s ease,
-    height 0.3s ease,
-    transform 0.3s ease;
-}
-
-#notice-jump:checked ~ .notice-grid {
-  opacity: 1;
-  height: 480px;
-}
-
-#notice-jump {
-  display: none;
-}
-
-.notice-grid-up {
-  grid-area: 1/1/2/2;
-  background-color: #27272a;
-  padding: 24px 16px 8px 16px;
-  border-radius: 10px 10px 0px 0px;
-}
-
-.notice-grid-down {
-  grid-area: 2/1/3/2;
-  background-color: #1f1f22;
-  border-radius: 0px 0px 10px 10px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.notice-grid-down img {
-  width: 240px;
-  height: 240px;
-  margin-bottom: 30px;
-}
-
-.notice-grid-down h2 {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #f4f4f5;
-}
-
-.notice-grid-down p {
-  color: rgb(161 161 170);
-  font-size: 16px;
-  text-align: center;
-  margin-top: 10px;
-  line-height: 20px;
-}
-
-.login-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 96px;
-  height: 32px;
-  border: none;
-  border-radius: 20px;
-  background-color: #111010;
-  cursor: pointer;
-}
-
-.login-btn > svg:first-child {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  margin: 4px;
-  background-color: black;
-}
-
-.login-btn > svg:last-child {
-  width: 16px;
-  height: 16px;
-}
-
-.login-btn > p {
-  color: white;
-  font-size: 16px;
-}
-
-.login-btn:hover {
-  background-color: #2a2727;
 }
 
 .page-control-status-btn:hover {
@@ -1071,7 +1024,6 @@ header.scrolled {
   outline: none;
   cursor: pointer;
   padding: 0;
-  margin-left: 10px;
 }
 
 .clear-icon {
@@ -1083,7 +1035,6 @@ header.scrolled {
 .header-input {
   display: flex;
   align-items: center;
-  border-radius: 12px;
   flex-grow: 1;
   background-color: white;
   border: none;
@@ -1324,8 +1275,12 @@ header.scrolled {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1.5rem;
-  margin: 20px 0;
+  margin: 10px 0 20px;
   box-sizing: border-box;
+}
+
+.card-text {
+  padding: 5px;
 }
 
 .card-div-text {
@@ -1362,7 +1317,7 @@ header.scrolled {
 }
 
 .url {
-  padding: 20px;
+  padding: 10px;
   display: inline-block;
   background-color: #18181b;
   border-radius: 5%;
@@ -1504,10 +1459,12 @@ header.scrolled {
 @media (width < 1200px) {
   .main-container {
     width: 100%;
+    margin-top: 0px;
   }
 
   .header-container {
     width: 100%;
+    top: 0px;
   }
 
   .search-container {
@@ -1532,7 +1489,6 @@ header.scrolled {
   }
   .url {
     background-color: transparent;
-    padding: 0;
   }
   .url img {
     border-radius: 10%;

@@ -31,6 +31,7 @@ const currentUser = ref(null)
 const deckData = ref({ deck: [] })
 const deckMakeStore = useDeckMakeStore()
 const cardSeriesStore = useCardSeriesStore()
+const postCode = ref(route.params.post_code)
 
 function getUserIdFromToken(token) {
   if (!token) {
@@ -164,20 +165,18 @@ const fetchCurrentUser = async () => {
 }
 
 const fetchArticles = async () => {
-  const postCode = route.params.post_code
-  console.log('postcode', postCode)
-  if (!postCode) {
-    console.error('Error: postCode is not available in route params')
-    return
-  }
-  try {
-    const response = await axios.get(`${API_URL}/api/article-id/${postCode}`)
-    article.value = response.data
-    console.log('article', article.value)
-    await fetchMessages()
-  } catch (error) {
-    console.error('Error fetching article_id:', error)
-  }
+    const postCode = route.params.post_code
+    if (!postCode) {
+        console.error('Error: postCode is not available in route params')
+        return
+    }
+    try {
+        const response = await axios.get(`${API_URL}/api/article-id/${postCode}`)
+        article.value = response.data
+      await fetchMessages()
+    } catch (error) {
+        console.error('Error fetching article_id:', error)
+    }
 }
 
 const fetchMessages = async () => {
@@ -404,13 +403,17 @@ const formatDate = (date) => {
   return date.split('T')[0]
 }
 
-const isMyArticle = (article) => {
-  console.log('article:', article)
-  const token = localStorage.getItem('token')
-  const loggedInUserId = getUserIdFromToken(token)
 
-  return article.user_id === loggedInUserId
-}
+const isMyArticle = () => {
+  // if (!article.value || typeof article.value.user_id === 'undefined') {
+  //   console.warn('Invalid article:', article);
+  //   return false; 
+  // }
+  const token = localStorage.getItem('token');
+  const loggedInUserId = getUserIdFromToken(token);
+
+  return article.value.user_id === loggedInUserId;
+};
 
 const deleteArticle = async () => {
   const postCode = route.params.post_code
@@ -537,11 +540,11 @@ onMounted(() => {
                   ></path>
                 </svg>
               </button>
-              <h2>{{ article.title }}</h2>
+              <h2 v-if="article">{{ article.title }}</h2>
             </div>
             <div class="btn-area">
               <button
-                v-if="isMyArticle(article)"
+                v-if="isMyArticle"
                 @click="editArticle"
                 class="social-btn-item social-btn2"
               >
@@ -587,7 +590,7 @@ onMounted(() => {
                 <div class="description-item description2">複製牌組</div>
               </button>
               <button
-                v-if="isMyArticle(article)"
+                v-if="isMyArticle"
                 @click="deleteArticle"
                 class="social-btn-item social-btn3"
               >
@@ -693,9 +696,9 @@ onMounted(() => {
                     stroke-linejoin="round"
                     d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
                   ></path></svg
-                >{{ article.post_code }}
+                >{{ postCode }}
               </p>
-              <h1>{{ article.title }}</h1>
+              <h1>{{ article?.title }}</h1>
               <div class="data-container">
                 <div class="user-link">
                   <div class="user-img">
@@ -705,9 +708,9 @@ onMounted(() => {
                     />
                   </div>
                   <span class="date-container">
-                    <a href="#">{{ article.users?.username }}</a>
+                    <a href="#">{{ article?.users?.username }}</a>
                     發布於
-                    <span>{{ formatDate(article.created_at) }}</span>
+                    <span>{{ formatDate(article?.created_at) }}</span>
                   </span>
                 </div>
                 <span class="data-item">
@@ -797,7 +800,7 @@ onMounted(() => {
                 <span>文章內容</span>
               </div>
               <div class="article-content">
-                <p v-html="article.content"></p>
+                <p v-html="article?.content"></p>
               </div>
             </div>
             <!-- 留言區域 -->

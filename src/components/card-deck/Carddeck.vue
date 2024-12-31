@@ -4,7 +4,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import dayjs from 'dayjs'
 import SidebarGrid from '@/components/SidebarGrid.vue'
-import Notice from '../notification/Notice.vue'
+import Notice from '@/components/notification/notice.vue'
 import NavLoginBtn from '../NavLoginBtn.vue'
 import MainFooter from '../MainFooter.vue'
 import RemitCard from '../Mycard/remit-card.vue'
@@ -12,6 +12,7 @@ import userPicture from '@/img/avatar.png'
 import { useDeckMakeStore } from '@/stores/deck-make'
 import { useCardSeriesStore } from '@/stores/card-series'
 import { useRoute, useRouter } from 'vue-router'
+import { comment } from 'postcss'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const API_URL = import.meta.env.VITE_API_URL
@@ -181,23 +182,31 @@ const fetchArticles = async () => {
 
 const fetchMessages = async () => {
     if (!article.value) {
-        console.error('Error: articleId is not available for fetching messages') 
-        return
+        console.error('Error: articleId is not available for fetching messages');
+        return;
     }
 
     try {
-        const response = await axios.get(`${API_URL}/api/comments?articleId=${article.value.article_id}`)
-        messages.value = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        const userToken = localStorage.getItem('token');
+        const headers = userToken
+            ? { Authorization: `Bearer ${userToken}` }
+            : {}; // 未登入時不傳授權標頭
+
+        const response = await axios.get(`${API_URL}/api/comments?articleId=${article.value.article_id}`, {
+            headers,
+        });
+
+        messages.value = response.data;
         messages.value.forEach(message => {
-            message.liked = message.liked || false
-            message.hated = message.hated || false
-            message.likeCount = message.like_count || 0
-            message.pictureUrl = message.users?.picture || '/default-avatar.png'
-        })
+            message.liked = message.isLiked ?? false; // 未登入時設為 false
+            message.hated = message.isHated ?? false; // 未登入時設為 false
+            message.likeCount = message.like_count || 0; // 顯示正確的 like_count
+            message.pictureUrl = message.users?.picture || '/default-avatar.png';
+        });
     } catch (error) {
-        console.error('Error fetching messages:', error)
+        console.error('Error fetching messages:', error);
     }
-}
+};
 
 const sendMessage = async () => {  
   if (newMessage.value.trim() === '') {
@@ -233,8 +242,11 @@ const sendMessage = async () => {
         Authorization: `Bearer ${userToken}`,
       },
     });
+    const commentId = response.data.id;
     messages.value.unshift(response.data);
-    newMessage.value = ''; // 清空輸入框
+    newMessage.value = ''; 
+    
+    fetchCommentReactions(commentId);
   } catch (error) {
     console.error('Error sending message:', error);
   }
@@ -372,6 +384,7 @@ const toggleHate = async (message) => {
     );
 
     const { isHated, isLiked, likeCount } = response.data;
+    console.log(response.data);
     message.hated = isHated;
     message.liked = isLiked;
     message.likeCount = likeCount;
@@ -386,10 +399,6 @@ const formatDate = (date) => {
 };
 
 const isMyArticle = () => {
-  // if (!article.value || typeof article.value.user_id === 'undefined') {
-  //   console.warn('Invalid article:', article);
-  //   return false; 
-  // }
   const token = localStorage.getItem('token');
   const loggedInUserId = getUserIdFromToken(token);
 
@@ -844,7 +853,7 @@ onMounted(() => {
                   >
                     <section>
                       <div class="message-user-img">
-                        <img :src="message.users.picture" alt="" />
+                        <img :src="message.users.picture || userPicture" alt="" />
                       </div>
                     </section>
                     <div class="message-body">

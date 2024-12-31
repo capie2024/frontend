@@ -252,7 +252,8 @@ const handleBack = () => {
 
               如果您對此仍不熟悉，歡迎至Capie Discord
               頻道讓大家一起幫你解答：<span>
-                <a href="https://discord.com/invite/QMtPcXrdBq"
+                <a href="https://discord.com/channels/1303258823104135219/1321898702750748752"
+                target="_blank"
                   >Discord
                 </a></span
               >

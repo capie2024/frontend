@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import dayjs from 'dayjs';
 import axios from 'axios';
 
@@ -72,6 +72,7 @@ const goToPost = (postCode) => {
 onMounted(() => {
     fetchNotices();
 });
+
 </script>
 
 <template>
@@ -251,7 +252,6 @@ onMounted(() => {
     transform 0.3s ease;
   z-index: 999;
   width: 350px;
-  height: 500px;
   z-index: 9999;
 }
 

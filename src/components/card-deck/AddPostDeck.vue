@@ -76,6 +76,8 @@ const submitArticle = async () => {
       title: '成功',
       showConfirmButton: false,
       timer: 1000,
+      color: '#e1e1e1',
+      background: '#27272a',
     }).then(() => {
       router.push(`/social/${postCode}`)
     })
@@ -87,6 +89,8 @@ const submitArticle = async () => {
         text: '登入後才能發布文章',
         icon: 'warning',
         confirmButtonText: '確定',
+        color: '#e1e1e1',
+        background: '#27272a',
       }).then(() => {
         window.location.href = `${BASE_URL}/login`
       })
@@ -95,6 +99,8 @@ const submitArticle = async () => {
         icon: 'error',
         title: '新增文章失敗',
         text: error.message,
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     }
   }
@@ -154,7 +160,7 @@ onMounted(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="h-6 w-6"
+              class="w-6 h-6"
             >
               <path
                 stroke-linecap="round"
@@ -172,7 +178,7 @@ onMounted(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="h-6 w-6"
+              class="w-6 h-6"
             >
               <path
                 stroke-linecap="round"
@@ -193,7 +199,7 @@ onMounted(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="flex-none size-5 stroke-2"
+              class="flex-none stroke-2 size-5"
             >
               <path
                 stroke-linecap="round"
@@ -210,7 +216,7 @@ onMounted(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="flex-none size-5 stroke-2"
+              class="flex-none stroke-2 size-5"
             >
               <path
                 stroke-linecap="round"
@@ -228,7 +234,7 @@ onMounted(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="size-6 stroke-2"
+              class="stroke-2 size-6"
             >
               <path
                 stroke-linecap="round"
@@ -251,7 +257,7 @@ onMounted(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="h-4 w-4 flex-none"
+              class="flex-none w-4 h-4"
             >
               <path
                 stroke-linecap="round"
@@ -274,7 +280,7 @@ onMounted(() => {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            class="h-20 w-20"
+            class="w-20 h-20"
           >
             <path
               stroke-linecap="round"
@@ -294,7 +300,7 @@ onMounted(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="size-5 md:size-6 flex-none"
+              class="flex-none size-5 md:size-6"
             >
               <path
                 stroke-linecap="round"
@@ -315,7 +321,7 @@ onMounted(() => {
                 stroke="currentColor"
                 aria-hidden="true"
                 data-slot="icon"
-                class="size-5 md:size-6 flex-none"
+                class="flex-none size-5 md:size-6"
               >
                 <path
                   stroke-linecap="round"
@@ -356,7 +362,7 @@ onMounted(() => {
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-5 md:size-6 flex-none"
+                  class="flex-none size-5 md:size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -483,7 +489,7 @@ onMounted(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="size-6 flex-none"
+              class="flex-none size-6"
             >
               <path
                 stroke-linecap="round"

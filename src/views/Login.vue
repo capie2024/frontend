@@ -46,6 +46,8 @@ const submit = async () => {
         icon: 'error',
         title: '登入失敗',
         text: '未能接收到驗證 token，請稍後重試',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     }
   } catch (error) {
@@ -53,6 +55,8 @@ const submit = async () => {
       icon: 'error',
       title: '登入失敗',
       text: error.response.data.message || '請檢查信箱密碼是否正確',
+      color: '#e1e1e1',
+      background: '#27272a',
     })
   }
 }

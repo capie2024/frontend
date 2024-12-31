@@ -112,6 +112,8 @@ const clearDeckAndBacktoFirstStep = async () => {
     confirmButtonText: '確定',
     showCancelButton: true,
     cancelButtonText: '取消',
+    color: '#e1e1e1',
+    background: '#27272a',
   })
   if (res.isConfirmed) {
     clearSelectedCards()
@@ -150,6 +152,8 @@ const finalStep = async () => {
         icon: 'error',
         title: '錯誤',
         text: '請重新登入',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
       router.push('/login')
     }
@@ -165,6 +169,8 @@ const finalStep = async () => {
         icon: 'success',
         title: '成功',
         text: '成功創建牌組',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
       router.push(`/deck/${res.data.data.deck_id}`)
     } else if (res.status == 403) {
@@ -172,6 +178,8 @@ const finalStep = async () => {
         icon: 'error',
         title: '錯誤',
         text: '請重新登入',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
       router.push('/login')
     } else {
@@ -179,6 +187,8 @@ const finalStep = async () => {
         icon: 'error',
         title: '錯誤',
         text: '創建牌組失敗',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     }
   } else {
@@ -187,18 +197,24 @@ const finalStep = async () => {
         icon: 'error',
         title: '錯誤',
         text: '需填寫牌組名',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     } else if (deckDescription.value.trim() == '') {
       Swal.fire({
         icon: 'error',
         title: '錯誤',
         text: '需填寫牌組描述',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     } else if (chooseCoverCard.value.trim() == '') {
       Swal.fire({
         icon: 'error',
         title: '錯誤',
         text: '未選擇封面卡',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     }
   }

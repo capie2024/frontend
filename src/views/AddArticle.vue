@@ -62,6 +62,8 @@ const submitArticle = async () => {
         text: '登入後才能發布文章',
         icon: 'warning',
         confirmButtonText: '確定',
+        color: '#e1e1e1',
+        background: '#27272a',
       }).then(() => {
         window.location.href = `${BASE_URL}/login`
       })
@@ -70,6 +72,8 @@ const submitArticle = async () => {
         icon: 'error',
         title: '新增文章失敗',
         text: error.message,
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     }
   }
@@ -164,7 +168,7 @@ onMounted(() => {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            class="h-6 w-6"
+            class="w-6 h-6"
           >
             <path
               stroke-linecap="round"
@@ -182,7 +186,7 @@ onMounted(() => {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            class="h-6 w-6"
+            class="w-6 h-6"
           >
             <path
               stroke-linecap="round"
@@ -203,7 +207,7 @@ onMounted(() => {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            class="flex-none size-5 stroke-2"
+            class="flex-none stroke-2 size-5"
           >
             <path
               stroke-linecap="round"
@@ -220,7 +224,7 @@ onMounted(() => {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            class="flex-none size-5 stroke-2"
+            class="flex-none stroke-2 size-5"
           >
             <path
               stroke-linecap="round"
@@ -230,27 +234,28 @@ onMounted(() => {
           </svg>
         </button>
         <Notice />
-        <NavLoginBtn />      
+        <NavLoginBtn />
       </div>
     </header>
     <section class="title-area">
       <div class="title-area-container">
         <button class="upload-btn" @click="handleButtonClick">
-          <svg 
+          <svg
             v-if="!imageUrl"
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke-width="1.5" 
-            stroke="currentColor" 
-            aria-hidden="true" 
-            data-slot="icon" 
-            class="w-20 h-20">
-            <path 
-            stroke="currentColor" 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2M12 4v12m0-12 4 4m-4-4L8 8"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="w-20 h-20"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2M12 4v12m0-12 4 4m-4-4L8 8"
             ></path>
           </svg>
 
@@ -293,7 +298,7 @@ onMounted(() => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="size-5 md:size-6 flex-none"
+              class="flex-none size-5 md:size-6"
             >
               <path
                 stroke-linecap="round"
@@ -309,7 +314,7 @@ onMounted(() => {
             type="text"
             placeholder="請輸入標題"
           />
-          <div class="card-select-area" style="position: relative;">
+          <div class="card-select-area" style="position: relative">
             <button class="card-select-btn" @click="toggleMenu">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -319,7 +324,7 @@ onMounted(() => {
                 stroke="currentColor"
                 aria-hidden="true"
                 data-slot="icon"
-                class="size-5 md:size-6 flex-none"
+                class="flex-none size-5 md:size-6"
               >
                 <path
                   stroke-linecap="round"
@@ -360,7 +365,7 @@ onMounted(() => {
                   stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="size-5 md:size-6 flex-none"
+                  class="flex-none size-5 md:size-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -610,7 +615,6 @@ a {
   position: fixed;
   top: 0;
 }
-
 
 .sidebar p {
   color: #a1a1aa;

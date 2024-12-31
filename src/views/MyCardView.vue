@@ -371,6 +371,8 @@ const deleteDeck = async (deck_id) => {
     showCancelButton: true,
     confirmButtonText: '確認刪除',
     cancelButtonText: '取消',
+    color: '#e1e1e1',
+    background: '#27272a',
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
@@ -386,6 +388,8 @@ const deleteDeck = async (deck_id) => {
             title: '刪除成功',
             showConfirmButton: false,
             timer: 1000,
+            color: '#e1e1e1',
+            background: '#27272a',
           }).then(() => {
             fetchMyDecks()
           })
@@ -395,6 +399,8 @@ const deleteDeck = async (deck_id) => {
           icon: 'error',
           title: '刪除失敗',
           text: '已引用於文章,無法刪除',
+          color: '#e1e1e1',
+          background: '#27272a',
         })
       }
     }

@@ -38,7 +38,6 @@ const fetchArticles = async () => {
   }
 }
 
-
 const searchArticles = () => {
   if (!searchQuery.value.trim()) {
     filteredArticles.value = articles.value
@@ -53,29 +52,24 @@ const searchArticles = () => {
   }
 }
 
-
 const handleEnter = () => {
   searchArticles()
   addSearchHistory()
   searchQuery.value = ''
 }
 
-
 const clearSearch = () => {
   searchQuery.value = ''
   filteredArticles.value = articles.value
 }
 
-
 const toggleMenu = () => {
   menuExpanded.value = !menuExpanded.value
 }
 
-
 const toggleCodeMenu = () => {
   codeMenuExpanded.value = !codeMenuExpanded.value
 }
-
 
 const fetchCardseries = async () => {
   try {
@@ -86,7 +80,6 @@ const fetchCardseries = async () => {
     error.value = '獲取系列卡表資料失敗' + err.message
   }
 }
-
 
 const searchSeries = () => {
   if (!searchSeriesQuery.value.trim()) {
@@ -99,12 +92,10 @@ const searchSeries = () => {
   }
 }
 
-
 const clearMenuSearch = () => {
   searchSeriesQuery.value = ''
   filteredDecks.value = originalSeries.value
 }
-
 
 const selectDeck = (deck) => {
   seriesName.value = deck.name
@@ -112,11 +103,10 @@ const selectDeck = (deck) => {
   seriesFilter.value = deck.name
   codeMenuExpanded.value = !codeMenuExpanded.value
 
-
   let findDecks = articles.value.filter((decksItem) => {
     const deckList = decksItem.deck_list
     const query = searchQuery.value.toLowerCase()
-    
+
     const isInSeries =
       deckList &&
       deckList.deck &&
@@ -125,20 +115,18 @@ const selectDeck = (deck) => {
         (card) => card.seriesCode && deck.code.includes(card.seriesCode)
       )
 
-    const isInSearchQuery = 
-      searchQuery.value.trim() === '' || 
+    const isInSearchQuery =
+      searchQuery.value.trim() === '' ||
       decksItem.title.toLowerCase().includes(query) ||
       decksItem.content.toLowerCase().includes(query) ||
       decksItem.post_code.includes(query)
 
     return isInSeries && isInSearchQuery
-
   })
 
   filteredArticles.value = [...findDecks]
   addSearchHistory()
 }
-
 
 const clearSearchSeries = () => {
   seriesName.value = '篩選系列'
@@ -148,7 +136,6 @@ const clearSearchSeries = () => {
   searchQuery.value = ''
 }
 
-
 const clearSeriesSearch = () => {
   seriesFilter.value = 'CODE'
   seriesName.value = '篩選系列'
@@ -157,46 +144,32 @@ const clearSeriesSearch = () => {
   searchQuery.value = ''
 }
 
-
 const searchResultCount = computed(() => filteredArticles.value.length)
 
-
 const addSearchHistory = () => {
-  
   const searchValue = searchQuery.value.trim() || '-'
   const seriesValue =
-    seriesName.value && seriesName.value !== '篩選系列'
-      ? seriesName.value
-      : '-'
+    seriesName.value && seriesName.value !== '篩選系列' ? seriesName.value : '-'
 
-  
   if (searchValue !== '-' || seriesValue !== '-') {
-    
     const newHistory = {
       searchQuery: searchValue,
       seriesName: seriesValue,
     }
 
-   
     const existingIndex = socialHistory.value.findIndex(
       (item) =>
         item.searchQuery === newHistory.searchQuery &&
         item.seriesName === newHistory.seriesName
     )
 
-    
     if (existingIndex !== -1) {
       socialHistory.value.splice(existingIndex, 1)
     }
 
-    
     socialHistory.value = [newHistory, ...socialHistory.value]
 
-    
-    localStorage.setItem(
-      'socialHistory',
-      JSON.stringify(socialHistory.value)
-    )
+    localStorage.setItem('socialHistory', JSON.stringify(socialHistory.value))
   }
 }
 
@@ -220,7 +193,6 @@ const handleHistoryClick = (query, series) => {
     codeMenuExpanded.value = !codeMenuExpanded.value
   }
 
-  
   addSearchHistory()
   if (seriesName.value !== '-') {
     menuExpanded.value = !menuExpanded.value
@@ -238,7 +210,6 @@ const handleScroll = () => {
   isScrolled.value = mainElement && mainElement.scrollTop > 0
 }
 
-
 const startFunction = () => {
   if (intervalId) {
     clearInterval(intervalId)
@@ -248,6 +219,7 @@ const startFunction = () => {
   }, 100)
 }
 
+const searchResultCount = computed(() => filteredArticles.value.length)
 
 onMounted(() => {
   fetchArticles()
@@ -266,25 +238,22 @@ onBeforeUnmount(() => {
   <div class="container">
     <SidebarGrid />
     <div class="main">
-      <div
-        class="header-container"
-        :class="{ 'header-change': isScrolled }"
-      >
+      <div class="header-container" :class="{ 'header-change': isScrolled }">
         <div class="search-container">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke-width="1.5" 
-            stroke="currentColor" 
-            aria-hidden="true" 
-            data-slot="icon" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
             class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"
           >
-            <path 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
             ></path>
           </svg>
           <input
@@ -313,26 +282,27 @@ onBeforeUnmount(() => {
           </svg>
         </div>
         <div style="position: relative">
-          <button 
-          class="filter" 
-          :class="{
-            'active-series': seriesName !== '篩選系列', 
-            'default-series': seriesName === '篩選系列'}"
-          @click="toggleMenu"
+          <button
+            class="filter"
+            :class="{
+              'active-series': seriesName !== '篩選系列',
+              'default-series': seriesName === '篩選系列',
+            }"
+            @click="toggleMenu"
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke-width="1.5" 
-              stroke="currentColor" 
-              aria-hidden="true" 
-              data-slot="icon" 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
               class="flex-none w-7 h-7"
             >
-              <path 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
                 d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
               ></path>
             </svg>
@@ -355,10 +325,7 @@ onBeforeUnmount(() => {
               ></path>
             </svg>
           </button>
-          <ul
-            class="menu-area"
-            v-show="menuExpanded"
-          >
+          <ul class="menu-area" v-show="menuExpanded">
             <li class="menu-search">
               <input
                 v-model="searchSeriesQuery"
@@ -376,19 +343,19 @@ onBeforeUnmount(() => {
                 :key="deck.id"
                 @click="selectDeck(deck)"
               >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke-width="1.5" 
-                  stroke="currentColor" 
-                  aria-hidden="true" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
                   data-slot="icon"
                 >
-                  <path 
-                  stroke-linecap="round" 
-                  stroke-linejoin="round" 
-                  d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
                   ></path>
                 </svg>
                 <p class="text-xs truncate">{{ deck.name }}</p>
@@ -396,26 +363,27 @@ onBeforeUnmount(() => {
             </div>
           </ul>
         </div>
-        <button 
-          class="filter-hidden" 
+        <button
+          class="filter-hidden"
           :class="{
-            'active-series': seriesFilter !== 'CODE', 
-            'default-series': seriesFilter === 'CODE'}"
+            'active-series': seriesFilter !== 'CODE',
+            'default-series': seriesFilter === 'CODE',
+          }"
           @click="toggleCodeMenu"
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke-width="1.5" 
-            stroke="currentColor" 
-            aria-hidden="true" 
-            data-slot="icon" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
             class="flex-none w-7 h-7"
           >
-            <path 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
               d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
             ></path>
           </svg>
@@ -438,10 +406,7 @@ onBeforeUnmount(() => {
             ></path>
           </svg>
         </button>
-        <ul
-          class="code-area"
-          v-show="codeMenuExpanded"
-        >
+        <ul class="code-area" v-show="codeMenuExpanded">
           <li class="menu-search">
             <input
               v-model="searchSeriesQuery"
@@ -459,7 +424,21 @@ onBeforeUnmount(() => {
               :key="deck.id"
               @click="selectDeck(deck)"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 28 28" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 28 28"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+                ></path>
+              </svg>
               <p class="text-xs truncate">{{ deck.name }}</p>
             </li>
           </div>
@@ -467,13 +446,43 @@ onBeforeUnmount(() => {
         <div class="sign-container">
           <a :href="'/add'">
             <button class="add-article">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                ></path>
+              </svg>
               新增文章
             </button>
           </a>
           <a :href="'/add'">
             <button class="add-article-hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="size-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                ></path>
+              </svg>
             </button>
           </a>
           <div class="bell">
@@ -489,29 +498,52 @@ onBeforeUnmount(() => {
           v-for="(item, index) in socialHistory"
           :key="index"
           class="user-button"
-          @click="handleHistoryClick(item.searchQuery || '-', item.seriesName || '-')"
+          @click="
+            handleHistoryClick(item.searchQuery || '-', item.seriesName || '-')
+          "
         >
           <a href="#">
             <div class="user-link">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" viewBox="0 0 24 24" 
-                stroke-width="1.5" 
-                stroke="currentColor" 
-                aria-hidden="true" 
-                data-slot="icon" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
                 class="flex-none size-5 select-none"
-                ><path 
-                  stroke-linecap="round" 
-                  stroke-linejoin="round" 
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                   d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
                 ></path>
               </svg>
               <span>{{ item.searchQuery || '-' }}</span>
             </div>
             <div class="user-link">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 select-none"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
-              <span>{{ item.seriesName && item.seriesName !== 'seriesName' ? item.seriesName : '-' }}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="flex-none size-5 select-none"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+                ></path>
+              </svg>
+              <span>{{
+                item.seriesName && item.seriesName !== 'seriesName'
+                  ? item.seriesName
+                  : '-'
+              }}</span>
             </div>
           </a>
         </button>
@@ -541,16 +573,45 @@ onBeforeUnmount(() => {
           <div class="card-user">
             <div class="card-user-flex">
               <div class="card-user-img">
-                <img :src="article.users.picture || userPicture" alt="用戶頭像" />
+                <img
+                  :src="article.users.picture || userPicture"
+                  alt="用戶頭像"
+                />
               </div>
               <div class="card-user-p">
                 <p>{{ article.users.username }}</p>
                 <div class="date-container">
                   <p class="date">{{ formatDate(article.created_at) }}</p>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="size-4 flex-none"><path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"></path></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                    data-slot="icon"
+                    class="size-4 flex-none"
+                  >
+                    <path
+                      d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"
+                    ></path>
+                  </svg>
                   <p class="card-code">{{ article.post_code }}</p>
                   <div class="chat">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="ml-auto size-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"></path></svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                      data-slot="icon"
+                      class="ml-auto size-4 flex-none"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
+                      ></path>
+                    </svg>
                     <p></p>
                   </div>
                 </div>
@@ -581,13 +642,13 @@ onBeforeUnmount(() => {
 }
 
 .menu svg {
-  width:28px;
-  height:28px;
+  width: 28px;
+  height: 28px;
 }
 
 .menu-area {
   position: absolute;
-  top: 100%; 
+  top: 100%;
   display: grid;
   position: absolute;
   background-color: #202020;
@@ -636,11 +697,13 @@ onBeforeUnmount(() => {
   right: 12px;
 }
 
-li p,li svg{
-  color: rgba(255, 255, 255, 0.750);
+li p,
+li svg {
+  color: rgba(255, 255, 255, 0.75);
 }
 
-li:hover p,li:hover svg{
+li:hover p,
+li:hover svg {
   color: rgb(255, 255, 255);
 }
 
@@ -751,22 +814,22 @@ a {
   width: auto;
   display: flex;
   align-items: center;
-  gap:5px;
+  gap: 5px;
 }
 
 .active-series {
   background: linear-gradient(to right, #5eead4, #93c5fd);
-  border: none
+  border: none;
 }
 
 .default-series {
   background-color: #f0f0f0;
-  border: none
+  border: none;
 }
 
 .filter svg {
-  width:20px;
-  height:20px;
+  width: 20px;
+  height: 20px;
   display: inline;
 }
 
@@ -783,19 +846,18 @@ a {
 }
 
 .filter-hidden svg {
-  width:20px;
-  height:20px;
+  width: 20px;
+  height: 20px;
   display: inline;
 }
 
 .filter-hidden p {
   line-height: 20px;
-  height:20px;
-  width:calc(100% - 40px);
+  height: 20px;
+  width: calc(100% - 40px);
   display: inline;
   overflow: hidden;
 }
-
 
 .sign-container {
   display: flex;
@@ -983,8 +1045,8 @@ a {
 
 .date-container svg {
   display: flex;
-  width:15px;
-  height:15px;
+  width: 15px;
+  height: 15px;
 }
 
 .chat {
@@ -1027,7 +1089,7 @@ a {
 
   .code-area {
     position: absolute;
-    top: 100%; 
+    top: 100%;
     display: grid;
     position: absolute;
     background-color: #202020;
@@ -1038,7 +1100,7 @@ a {
     z-index: 3;
     right: 59px;
   }
-  
+
   .main {
     margin: 0px;
   }
@@ -1055,7 +1117,7 @@ a {
   }
 
   .search {
-    width: 100%
+    width: 100%;
   }
 
   #xx {
@@ -1123,4 +1185,3 @@ a {
   }
 }
 </style>
-

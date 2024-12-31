@@ -181,34 +181,36 @@ const fetchArticles = async () => {
 }
 
 const fetchMessages = async () => {
-    if (!article.value) {
-        console.error('Error: articleId is not available for fetching messages');
-        return;
-    }
+  if (!article.value) {
+    console.error('Error: articleId is not available for fetching messages')
+    return
+  }
 
-    try {
-        const userToken = localStorage.getItem('token');
-        const headers = userToken
-            ? { Authorization: `Bearer ${userToken}` }
-            : {};
+  try {
+    const userToken = localStorage.getItem('token')
+    const headers = userToken ? { Authorization: `Bearer ${userToken}` } : {}
 
-        const response = await axios.get(`${API_URL}/api/comments?articleId=${article.value.article_id}`, {
-            headers,
-        });
+    const response = await axios.get(
+      `${API_URL}/api/comments?articleId=${article.value.article_id}`,
+      {
+        headers,
+      }
+    )
 
-        messages.value = response.data.sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at))
-      
-        messages.value.forEach(message => {
-            message.liked = message.isLiked; 
-            message.hated = message.isHated; 
-            message.likeCount = message.like_count || 0; 
-            message.pictureUrl = message.users?.picture;
-        });
-    } catch (error) {
-        console.error('Error fetching messages:', error);
-    }
-};
+    messages.value = response.data.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    )
+
+    messages.value.forEach((message) => {
+      message.liked = message.isLiked
+      message.hated = message.isHated
+      message.likeCount = message.like_count || 0
+      message.pictureUrl = message.users?.picture
+    })
+  } catch (error) {
+    console.error('Error fetching messages:', error)
+  }
+}
 
 const sendMessage = async () => {
   if (newMessage.value.trim() === '') {
@@ -222,25 +224,29 @@ const sendMessage = async () => {
     created_at: new Date().toISOString(),
   }
 
-  const userToken = localStorage.getItem('token');
-    if (!userToken) {
-      Swal.fire({
-        title: '請先登入',
-        text: '留言功能需要登入才能使用。',
-        icon: 'warning',
-        confirmButtonText: '確定',
-      })
-    }
+  const userToken = localStorage.getItem('token')
+  if (!userToken) {
+    Swal.fire({
+      title: '請先登入',
+      text: '留言功能需要登入才能使用。',
+      icon: 'warning',
+      confirmButtonText: '確定',
+    })
+  }
 
   try {
-    const response = await axios.post(`${API_URL}/api/send-message`, { messageData }, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    });
+    const response = await axios.post(
+      `${API_URL}/api/send-message`,
+      { messageData },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    )
 
-    messages.value.unshift(response.data);
-    newMessage.value = ''; 
+    messages.value.unshift(response.data)
+    newMessage.value = ''
   } catch (error) {
     console.error('Error sending message:', error)
   }
@@ -381,7 +387,7 @@ const toggleHate = async (message) => {
   try {
     const userToken = localStorage.getItem('token')
     if (!userToken) {
-      console.error('User token is missing');
+      console.error('User token is missing')
       Swal.fire({
         title: '請先登入',
         text: '按讚功能需要登入才能使用。',
@@ -396,13 +402,13 @@ const toggleHate = async (message) => {
       { headers: { Authorization: `Bearer ${userToken}` } }
     )
 
-    const { isLiked, isHated, likeCount } = response.data;
-    message.hated = isHated;
-    message.liked = isLiked;
-    message.likeCount = likeCount;
-    
+    const { isLiked, isHated, likeCount } = response.data
+    message.hated = isHated
+    message.liked = isLiked
+    message.likeCount = likeCount
+
     if (likeCount === 0) {
-      message.liked = false;
+      message.liked = false
     }
   } catch (error) {
     console.error('Error toggling hate:', error.response || error.message)
@@ -1123,7 +1129,10 @@ onBeforeUnmount(() => {
                   >
                     <section>
                       <div class="message-user-img">
-                        <img :src="message.users.picture || userPicture" alt="" />
+                        <img
+                          :src="message.users.picture || userPicture"
+                          alt=""
+                        />
                       </div>
                     </section>
                     <div class="message-body">

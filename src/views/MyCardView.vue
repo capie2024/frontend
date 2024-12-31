@@ -342,9 +342,7 @@ const searchDecks = () => {
       })
 
       return (
-        deckName.includes(query) ||
-        deckId.includes(query) ||
-        deckSeriesCode
+        deckName.includes(query) || deckId.includes(query) || deckSeriesCode
       )
     })
   }
@@ -366,23 +364,21 @@ const clearSearch = () => {
 }
 
 const deleteDeck = async (deck_id) => {
-
   Swal.fire({
-    title: "確定要刪除牌組嗎？",
-    text: "刪除後將無法復原。",
-    icon: "warning",
+    title: '確定要刪除牌組嗎？',
+    text: '刪除後將無法復原。',
+    icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: "確認刪除",
-    cancelButtonText: "取消",
-  })
-  .then(async (result) => {
+    confirmButtonText: '確認刪除',
+    cancelButtonText: '取消',
+  }).then(async (result) => {
     if (result.isConfirmed) {
       try {
         const response = await axios.delete(`${API_URL}/decks/${deck_id}`, {
           headers: {
             Authorization: `Bearer ${token.value}`,
           },
-        });
+        })
 
         if (response.status === 200) {
           Swal.fire({
@@ -392,17 +388,17 @@ const deleteDeck = async (deck_id) => {
             timer: 1000,
           }).then(() => {
             fetchMyDecks()
-          })  
+          })
         }
       } catch (error) {
-          Swal.fire({
-            icon: 'error',
-            title: '刪除失敗',
-            text: "已引用於文章,無法刪除",
-          });
-        }
+        Swal.fire({
+          icon: 'error',
+          title: '刪除失敗',
+          text: '已引用於文章,無法刪除',
+        })
       }
-  });
+    }
+  })
 }
 onMounted(() => {
   fetchMyDecks()
@@ -454,10 +450,7 @@ onBeforeUnmount(() => {
             type="text"
             placeholder="找我的牌組？"
           />
-          <button 
-            @click="clearSearch"
-            class="clear-btn"
-          >
+          <button @click="clearSearch" class="clear-btn">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -778,7 +771,7 @@ header.scrolled {
   padding: 16px;
   height: 64px;
   position: fixed;
-  top: 8px;
+  top: 0;
   z-index: 5;
   background-color: rgba(0, 0, 0, 0);
   gap: 0.5rem;

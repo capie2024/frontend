@@ -4,7 +4,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import dayjs from 'dayjs'
 import SidebarGrid from '@/components/SidebarGrid.vue'
-import Notice from '../notification/Notice.vue'
+import Notice from '../notification/notice.vue'
 import NavLoginBtn from '../NavLoginBtn.vue'
 import MainFooter from '../MainFooter.vue'
 import RemitCard from '../Mycard/remit-card.vue'
@@ -569,7 +569,7 @@ onBeforeUnmount(() => {
               ></path>
             </svg>
           </button>
-          <h2 v-if="article">{{ article.title }}</h2>
+          <h2 class="header-title" v-if="article">{{ article.title }}</h2>
         </div>
         <div class="btn-area">
           <button
@@ -2335,6 +2335,19 @@ a {
   background-color: rgb(59, 130, 246, 1);
 }
 
+.header-title {
+  opacity: 0;
+  transform: translateY(-100%);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+header.scrolled .header-title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .pagebtn-area {
   position: relative;
   width: 50%;
@@ -2367,8 +2380,8 @@ a {
   font-size: 24px;
   font-weight: 900;
   color: white;
-  white-space: nowrap; /* 強制單行顯示 */
-  overflow: hidden; /* 隱藏超出部分 */
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
@@ -2463,7 +2476,6 @@ a {
 .social-btn4:hover,
 .social-btn5:hover {
   background-color: #121212;
-  opacity: 0.6;
 }
 
 .social-btn1:hover .description1,

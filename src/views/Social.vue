@@ -26,7 +26,6 @@ const searchSeriesQuery = ref('')
 const isScrolled = ref(false);
 let intervalId = null;
 
-
 const fetchArticles = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/articles`);
@@ -37,38 +36,6 @@ const fetchArticles = async () => {
   } catch (error) {
     console.error('獲取文章列表失敗', error);
   }
-};
-
-
-const selectDeck = (deck) => {
-  seriesName.value = deck.name
-  menuExpanded.value = !menuExpanded.value
-  seriesFilter.value = deck.name
-  codeMenuExpanded.value = !codeMenuExpanded.value
-
-
-  let findDecks = articles.value.filter((decksItem) => {
-    const deckList = decksItem.deck_list;
-    return (
-      deckList &&
-      deckList.deck &&
-      Array.isArray(deckList.deck) &&
-      deckList.deck.some(
-        (card) => card.seriesCode && deck.code.includes(card.seriesCode)
-      )
-    );
-  })
-
-
-  console.log("Find decks:", findDecks);
-  filteredArticles.value = [...findDecks];
-
-}
-
-
-const formatDate = (date) => {
-  if (!date) return '';
-  return date.split('T')[0];
 };
 
 
@@ -87,36 +54,10 @@ const searchArticles = () => {
 };
 
 
-const addSearchHistory = () => {
-  if (searchQuery.value.trim()) {
-    const newHistory = { searchQuery: searchQuery.value.trim() };
-    const existingIndex = socialHistory.value.findIndex(
-      (item) => item.searchQuery === newHistory.searchQuery
-    );
-
-    if (existingIndex !== -1) {
-      socialHistory.value.splice(existingIndex, 1);
-    }
-    socialHistory.value = [newHistory, ...socialHistory.value];
-    localStorage.setItem(
-      'socialHistory',
-      JSON.stringify(socialHistory.value)
-    );
-  }
-};
-
-
 const handleEnter = () => {
   searchArticles();
   addSearchHistory();
   searchQuery.value = '';
-};
-
-
-const handleHistoryClick = (query) => {
-  searchQuery.value = query;
-  searchArticles();
-  addSearchHistory();
 };
 
 
@@ -125,6 +66,172 @@ const clearSearch = () => {
   filteredArticles.value = articles.value;
 };
 
+
+const toggleMenu = () => {
+  menuExpanded.value = !menuExpanded.value
+}
+
+
+const toggleCodeMenu = () => {
+  codeMenuExpanded.value = !codeMenuExpanded.value
+}
+
+
+const fetchCardseries = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/series`)
+    originalSeries.value = response.data
+    filteredDecks.value = response.data
+  } catch (err) {
+    error.value = '獲取系列卡表資料失敗' + err.message
+  }
+}
+
+
+const searchSeries = () => {
+  if (!searchSeriesQuery.value.trim()) {
+    filteredDecks.value = originalSeries.value
+  } else {
+    const query = searchSeriesQuery.value.toLowerCase()
+    filteredDecks.value = originalSeries.value.filter((deck) =>
+      deck.name?.toLowerCase().includes(query)
+    )
+  }
+}
+
+
+const clearMenuSearch = () => {
+  searchSeriesQuery.value = ''
+  filteredDecks.value = originalSeries.value
+}
+
+
+const selectDeck = (deck) => {
+  seriesName.value = deck.name
+  menuExpanded.value = !menuExpanded.value
+  seriesFilter.value = deck.name
+  codeMenuExpanded.value = !codeMenuExpanded.value
+
+
+  let findDecks = articles.value.filter((decksItem) => {
+    const deckList = decksItem.deck_list;
+    const query = searchQuery.value.toLowerCase();
+    
+    const isInSeries =
+      deckList &&
+      deckList.deck &&
+      Array.isArray(deckList.deck) &&
+      deckList.deck.some(
+        (card) => card.seriesCode && deck.code.includes(card.seriesCode)
+      )
+
+    const isInSearchQuery = 
+      searchQuery.value.trim() === '' || 
+      decksItem.title.toLowerCase().includes(query) ||
+      decksItem.content.toLowerCase().includes(query) ||
+      decksItem.post_code.includes(query);
+
+    return isInSeries && isInSearchQuery;
+
+  })
+
+
+  console.log("Find decks:", findDecks);
+  filteredArticles.value = [...findDecks];
+  addSearchHistory();
+}
+
+
+const clearSearchSeries = () => {
+  seriesName.value = '篩選系列'
+  seriesFilter.value = 'CODE'
+  menuExpanded.value = !menuExpanded.value
+  filteredArticles.value = articles.value
+};
+
+
+const clearSeriesSearch = () => {
+  seriesFilter.value = 'CODE'
+  seriesName.value = '篩選系列'
+  codeMenuExpanded.value = !codeMenuExpanded.value
+  filteredArticles.value = articles.value
+}
+
+
+const searchResultCount = computed(() => filteredArticles.value.length);
+
+
+const addSearchHistory = () => {
+  
+  const searchValue = searchQuery.value.trim() || '-';
+  const seriesValue =
+    seriesName.value && seriesName.value !== '篩選系列'
+      ? seriesName.value
+      : '-';
+
+  
+  if (searchValue !== '-' || seriesValue !== '-') {
+    
+    const newHistory = {
+      searchQuery: searchValue,
+      seriesName: seriesValue,
+    };
+
+   
+    const existingIndex = socialHistory.value.findIndex(
+      (item) =>
+        item.searchQuery === newHistory.searchQuery &&
+        item.seriesName === newHistory.seriesName
+    );
+
+    
+    if (existingIndex !== -1) {
+      socialHistory.value.splice(existingIndex, 1);
+    }
+
+    
+    socialHistory.value = [newHistory, ...socialHistory.value];
+
+    
+    localStorage.setItem(
+      'socialHistory',
+      JSON.stringify(socialHistory.value)
+    );
+  }
+};
+
+const handleHistoryClick = (query, series) => {
+  searchQuery.value = query === '-' ? '' : query;
+
+  if (series === '-') {
+    seriesName.value = series === '-' ? '篩選系列' : series;
+    seriesFilter.value = series === '-' ? 'CODE' : series;
+  } else {
+    seriesName.value = series;
+    seriesFilter.value = series;
+  }
+
+  const selectedDeck = originalSeries.value.find((deck) => deck.name === series);
+  if (selectedDeck) {
+    selectDeck(selectedDeck); 
+  } else {
+    searchArticles();
+    menuExpanded.value = !menuExpanded.value
+    codeMenuExpanded.value = !codeMenuExpanded.value
+  }
+
+  
+  addSearchHistory();
+  if (seriesName.value !== '-') {
+    menuExpanded.value = !menuExpanded.value
+    codeMenuExpanded.value = !codeMenuExpanded.value
+  }
+};
+
+const formatDate = (date) => {
+  if (!date) return '';
+  return date.split('T')[0];
+};
 
 const handleScroll = () => {
   const mainElement = document.querySelector('.main');
@@ -141,56 +248,6 @@ const startFunction = () => {
   }, 100);
 };
 
-
-const searchResultCount = computed(() => filteredArticles.value.length);
-
-const fetchCardseries = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/api/series`)
-    originalSeries.value = response.data
-    filteredDecks.value = response.data
-  } catch (err) {
-    error.value = '獲取系列卡表資料失敗' + err.message
-  }
-}
-
-const toggleMenu = () => {
-  menuExpanded.value = !menuExpanded.value
-}
-
-const toggleCodeMenu = () => {
-  codeMenuExpanded.value = !codeMenuExpanded.value
-}
-
-const clearSearchSeries = () => {
-  seriesName.value = '篩選系列'
-  seriesFilter.value = 'CODE'
-  menuExpanded.value = !menuExpanded.value
-  filteredArticles.value = articles.value
-};
-
-const clearSeriesSearch = () => {
-  seriesFilter.value = 'CODE'
-  seriesName.value = '篩選系列'
-  codeMenuExpanded.value = !codeMenuExpanded.value
-  filteredArticles.value = articles.value
-}
-
-const searchSeries = () => {
-  if (!searchSeriesQuery.value.trim()) {
-    filteredDecks.value = originalSeries.value
-  } else {
-    const query = searchSeriesQuery.value.toLowerCase()
-    filteredDecks.value = originalSeries.value.filter((deck) =>
-      deck.name?.toLowerCase().includes(query)
-    )
-  }
-}
-
-const clearMenuSearch = () => {
-  searchSeriesQuery.value = ''
-  filteredDecks.value = originalSeries.value
-}
 
 onMounted(() => {
   fetchArticles();
@@ -295,7 +352,7 @@ onBeforeUnmount(() => {
               :key="deck.id"
               @click="selectDeck(deck)"
             >
-              <svg data-v-33ac09eb="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path data-v-33ac09eb="" stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
               <p class="text-xs truncate">{{ deck.name }}</p>
             </li>
           </div>
@@ -355,7 +412,7 @@ onBeforeUnmount(() => {
               :key="deck.id"
               @click="selectDeck(deck)"
             >
-              <svg data-v-33ac09eb="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none w-7 h-7"><path data-v-33ac09eb="" stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 28 28" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
               <p class="text-xs truncate">{{ deck.name }}</p>
             </li>
           </div>
@@ -385,16 +442,16 @@ onBeforeUnmount(() => {
           v-for="(item, index) in socialHistory"
           :key="index"
           class="user-button"
-          @click="handleHistoryClick(item.searchQuery)"
+          @click="handleHistoryClick(item.searchQuery || '-', item.seriesName || '-')"
         >
           <a href="#">
             <div class="user-link">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 select-none"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path></svg>
-              <span>{{ item.searchQuery }}</span>
+              <span>{{ item.searchQuery || '-' }}</span>
             </div>
             <div class="user-link">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 select-none"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
-              <span>-</span>
+              <span>{{ item.seriesName && item.seriesName !== 'seriesName' ? item.seriesName : '-' }}</span>
             </div>
           </a>
         </button>
@@ -461,6 +518,11 @@ onBeforeUnmount(() => {
   gap: 5px;
   height: 35px;
   box-sizing: border-box;
+}
+
+.menu svg {
+  width:28px;
+  height:28px;
 }
 
 .menu-area {
@@ -724,7 +786,8 @@ a {
   border: 1px solid #414142;
   background-color: #18181b;
   color: #d4d4d8;
-  min-width: 80px;
+  min-width: 100px;
+  overflow: hidden;
   border-radius: 10px;
   display: flex;
   cursor: pointer;
@@ -746,6 +809,8 @@ a {
 }
 
 .user-link span {
+  height: 20px;
+  overflow: hidden;
   line-height: 1.25rem;
 }
 

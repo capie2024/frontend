@@ -4,7 +4,7 @@ import NavLoginBtn from '../components/NavLoginBtn.vue'
 import notice from '../components/notification/notice.vue'
 import MainFooter from '../components/MainFooter.vue'
 import { useCardSeriesStore } from '@/stores/card-series'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -267,9 +267,24 @@ const translatedViewedSeries = computed(() => {
   })
 })
 
-onMounted(async () => {
-  await fetchCardseries()
+// 根據滾動位置判斷顯示 header 標題和背景色
+const isScrolled = ref(false)
+let mainElement = ref(null)
+const handleScroll = () => {
+  const scrollTop = mainElement.value.scrollTop
+  isScrolled.value = scrollTop > 300
+}
 
+const main = () => {
+  mainElement.value = document.querySelector('.background')
+  if (mainElement.value) {
+    mainElement.value.addEventListener('scroll', handleScroll)
+  }
+}
+
+onMounted(async () => {
+  main()
+  await fetchCardseries()
   const viewed = JSON.parse(localStorage.getItem('viewedSeries')) || []
 
   // 匹配卡片信息並渲染已查看的系列
@@ -279,14 +294,20 @@ onMounted(async () => {
     })
     .filter(Boolean)
 })
+
+onBeforeUnmount(() => {
+  if (mainElement.value) {
+    mainElement.value.removeEventListener('scroll', handleScroll)
+  }
+})
 </script>
 
 <template>
   <div class="All root-container">
     <SidebarGrid style="grid-area: sidebar" />
-    <div class="aa" style="grid-area: main">
+    <div class="aa background" style="grid-area: main">
       <div class="all-card">
-        <div class="top-container">
+        <header class="top-container" :class="{ scrolled: isScrolled }">
           <div class="Top-bar">
             <div class="search-bar">
               <span><i class="fa-solid fa-magnifying-glass"></i></span>
@@ -337,7 +358,7 @@ onMounted(async () => {
             <notice />
             <NavLoginBtn />
           </div>
-        </div>
+        </header>
         <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
         <section class="show-card">
           <a
@@ -445,9 +466,7 @@ onMounted(async () => {
 .aa {
   position: absolute;
   top: 0;
-  /* left: 270px; */
   background-color: #121212;
-  padding: 10px;
   box-sizing: border-box;
   margin: 8px 8px 8px 0;
   border-radius: 1rem;
@@ -460,15 +479,21 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #121212;
-  padding: 20px 30px;
-  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.05s ease;
+  padding: 0 20px;
   justify-content: space-between;
   position: fixed;
-  width: calc(99% - 336px);
-  top: 8px;
-  /* left: 270px; */
+  top: 0;
+  width: calc(100% - 278px);
+  box-sizing: border-box;
+  height: 64px;
 }
+
+header.scrolled {
+  background-color: #000000;
+}
+
 .Top-bar {
   display: flex;
   gap: 0.5rem;

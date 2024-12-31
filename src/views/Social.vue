@@ -1,134 +1,117 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import axios from 'axios';
-import SidebarGrid from '../components/SidebarGrid.vue';
-import NavLoginBtn from '../components/NavLoginBtn.vue';
-import Notice from '../components/notification/notice.vue';
-import MainFooter from '../components/MainFooter.vue';
-const API_URL = import.meta.env.VITE_API_URL; 
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import axios from 'axios'
+import SidebarGrid from '../components/SidebarGrid.vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import Notice from '../components/notification/notice.vue'
+import MainFooter from '../components/MainFooter.vue'
+const API_URL = import.meta.env.VITE_API_URL
 
-const articles = ref([]);
-const searchQuery = ref('');
-const filteredArticles = ref([]);
+const articles = ref([])
+const searchQuery = ref('')
+const filteredArticles = ref([])
 const socialHistory = ref(
   JSON.parse(localStorage.getItem('socialHistory')) || []
-);
-const isScrolled = ref(false);
-let intervalId = null;
-
+)
+const isScrolled = ref(false)
+let intervalId = null
 
 const fetchArticles = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/articles`);
+    const response = await axios.get(`${API_URL}/api/articles`)
     articles.value = response.data.sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
-    filteredArticles.value = articles.value;
+    )
+    filteredArticles.value = articles.value
   } catch (error) {
-    console.error('獲取文章列表失敗', error);
+    console.error('獲取文章列表失敗', error)
   }
-};
-
+}
 
 const formatDate = (date) => {
-  if (!date) return '';
-  return date.split('T')[0];
-};
-
+  if (!date) return ''
+  return date.split('T')[0]
+}
 
 const searchArticles = () => {
   if (!searchQuery.value.trim()) {
-    filteredArticles.value = articles.value;
+    filteredArticles.value = articles.value
   } else {
-    const query = searchQuery.value.toLowerCase();
+    const query = searchQuery.value.toLowerCase()
     filteredArticles.value = articles.value.filter(
       (article) =>
         article.title.toLowerCase().includes(query) ||
         article.content.toLowerCase().includes(query) ||
         article.post_code.includes(query)
-    );
+    )
   }
-};
-
+}
 
 const addSearchHistory = () => {
   if (searchQuery.value.trim()) {
-    const newHistory = { searchQuery: searchQuery.value.trim() };
+    const newHistory = { searchQuery: searchQuery.value.trim() }
     const existingIndex = socialHistory.value.findIndex(
       (item) => item.searchQuery === newHistory.searchQuery
-    );
+    )
 
     if (existingIndex !== -1) {
-      socialHistory.value.splice(existingIndex, 1);
+      socialHistory.value.splice(existingIndex, 1)
     }
-    socialHistory.value = [newHistory, ...socialHistory.value];
-    localStorage.setItem(
-      'socialHistory',
-      JSON.stringify(socialHistory.value)
-    );
+    socialHistory.value = [newHistory, ...socialHistory.value]
+    localStorage.setItem('socialHistory', JSON.stringify(socialHistory.value))
   }
-};
-
+}
 
 const handleEnter = () => {
-  searchArticles();
-  addSearchHistory();
-  searchQuery.value = '';
-};
-
+  searchArticles()
+  addSearchHistory()
+  searchQuery.value = ''
+}
 
 const handleHistoryClick = (query) => {
-  searchQuery.value = query;
-  searchArticles();
-  addSearchHistory();
-};
-
+  searchQuery.value = query
+  searchArticles()
+  addSearchHistory()
+}
 
 const clearSearch = () => {
-  searchQuery.value = '';
-  filteredArticles.value = articles.value;
-};
+  searchQuery.value = ''
+  filteredArticles.value = articles.value
+}
 
-
+// 根據滾動位置判斷顯示 header 標題和背景色
+let mainElement = ref(null)
 const handleScroll = () => {
-  const mainElement = document.querySelector('.main');
-  isScrolled.value = mainElement && mainElement.scrollTop > 0;
-};
+  const scrollTop = mainElement.value.scrollTop
+  isScrolled.value = scrollTop > 300
+}
 
-
-const startFunction = () => {
-  if (intervalId) {
-    clearInterval(intervalId);
+const main = () => {
+  mainElement.value = document.querySelector('.background')
+  if (mainElement.value) {
+    mainElement.value.addEventListener('scroll', handleScroll)
   }
-  intervalId = setInterval(() => {
-    handleScroll();
-  }, 100);
-};
+}
 
-
-const searchResultCount = computed(() => filteredArticles.value.length);
-
+const searchResultCount = computed(() => filteredArticles.value.length)
 
 onMounted(() => {
-  fetchArticles();
-  startFunction();
-});
+  fetchArticles()
+  main()
+})
 
 onBeforeUnmount(() => {
-  if (intervalId) {
-    clearInterval(intervalId);
+  if (mainElement.value) {
+    mainElement.value.removeEventListener('scroll', handleScroll)
   }
-});
+})
 </script>
 
 <template>
   <div class="container">
     <SidebarGrid />
-    <div class="main">
-      <div
-        class="header-container"
-        :class="{ 'header-change': this.isScrolled }"
-      >
+    <div class="main background">
+      <header class="header-container" :class="{ scrolled: isScrolled }">
         <div class="search-container">
           <i class="fa-solid fa-magnifying-glass"></i>
           <input
@@ -185,7 +168,7 @@ onBeforeUnmount(() => {
             <NavLoginBtn />
           </div>
         </div>
-      </div>
+      </header>
       <section class="flex-item-hidden">
         <button
           v-for="(item, index) in socialHistory"
@@ -305,9 +288,8 @@ a {
   z-index: 1;
 }
 
-.header-change {
-  background-color: rgba(0, 0, 0, 1);
-  transition: background-color 0.05s ease;
+header.scrolled {
+  background-color: #000000;
 }
 
 .search-container {
@@ -383,6 +365,7 @@ a {
   position: absolute;
   top: 14px;
   right: 322px;
+  gap: 8px;
 }
 
 .bell i::before,
@@ -393,9 +376,8 @@ a {
   cursor: pointer;
 }
 
-.sign-container {
-  display: flex;
-  gap: 8px;
+.sign-container a {
+  position: relative;
 }
 
 .add-article {
@@ -416,7 +398,7 @@ a {
   cursor: pointer;
   position: absolute;
   top: 0;
-  right: -285px;
+  right: -306px;
   display: none;
 }
 
@@ -816,4 +798,3 @@ a {
   }
 }
 </style>
-

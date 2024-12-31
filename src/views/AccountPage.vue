@@ -363,7 +363,7 @@ onBeforeUnmount(() => {
             <label class="cursor-pointer upload group" @click.stop="uploadPic">
               <Loading v-if="isUploading" />
               <div
-                class="rounded-full relative h-full w-full shadow-[0_4px_60px_rgba(0,0,0,.5)] overflow-hidden"
+                class="max-w-[240px] max-h-[240px] rounded-full relative h-full w-full shadow-[0_4px_60px_rgba(0,0,0,.5)] overflow-hidden"
                 style="background-color: rgb(50, 201, 255)"
               >
                 <img

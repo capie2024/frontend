@@ -251,7 +251,7 @@ export default {
                   </svg>
                   <input
                     type="email"
-                    class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500"
+                    class="w-full p-0 bg-transparent outline-none focus:ring-0 placeholder:text-zinc-500"
                     placeholder="信箱"
                     v-model="email"
                   />
@@ -277,7 +277,7 @@ export default {
                   </svg>
                   <input
                     type="password"
-                    class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500"
+                    class="w-full p-0 bg-transparent outline-none focus:ring-0 placeholder:text-zinc-500"
                     placeholder="密碼"
                     v-model="password"
                   />

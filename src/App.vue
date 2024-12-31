@@ -6,12 +6,13 @@ import { storeToRefs } from 'pinia'
 import { useCardInfoStore } from '@/stores/card-info'
 import DeckMake from './components/DeckMake.vue'
 
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
-const route = useRoute();
+const route = useRoute()
 
-const LoginPage = computed(() => route.name === 'login'); 
+const LoginPage = computed(() => route.name === 'login')
+const SignupPage = computed(() => route.name === 'signup')
 
 const cardInfoStore = useCardInfoStore()
 const { cardInfoDisplay } = storeToRefs(cardInfoStore)
@@ -20,5 +21,5 @@ const { cardInfoDisplay } = storeToRefs(cardInfoStore)
 <template>
   <router-view />
   <CardInfo v-if="cardInfoDisplay" />
-  <DeckMake v-if="!LoginPage"/>
+  <DeckMake v-if="!LoginPage && !SignupPage && !FaqInfoPage" />
 </template>

@@ -36,10 +36,10 @@ export default {
   },
   methods: {
     goBack() {
-      router.go(-1)
+      this.$router.go(-1)
     },
     goAhead() {
-      router.go(+1)
+      this.$router.go(+1)
     },
     toggleServiceButton() {
       this.isServiceButtonGreen = !this.isServiceButtonGreen
@@ -63,7 +63,7 @@ export default {
       this.agreePolicy = false
     },
     goLogin() {
-      window.location.href = `${BASE_URL}/login`
+      this.$router.push('/login')
     },
     goMainPage() {
       window.location.href = `${BASE_URL}/`

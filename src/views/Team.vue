@@ -1,12 +1,47 @@
 <script setup>
 import SidebarGrid from '../components/SidebarGrid.vue'
 import MainFooter from '../components/MainFooter.vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import Notice from '../components/notification/notice.vue'
+const goBack = () => {
+  if (window.history.length > 1) {
+    window.history.back()
+  } else {
+    router.push('/')
+  }
+}
 </script>
 
 <template>
   <div class="overall-situation">
     <SidebarGrid />
     <div class="team">
+      <nav class="navbar">
+        <button class="page-btn" @click="goBack">
+          <svg
+            data-v-337105ab=""
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="h-6 w-6 text-white"
+          >
+            <path
+              data-v-337105ab=""
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 19.5 8.25 12l7.5-7.5"
+            ></path>
+          </svg>
+        </button>
+        <div class="import-bar">
+          <Notice />
+          <NavLoginBtn />
+        </div>
+      </nav>
       <section class="question-section">
         <h2>團隊成員</h2>
         <div class="question-area">
@@ -335,6 +370,27 @@ import MainFooter from '../components/MainFooter.vue'
   border-radius: 10px;
   width: calc(100% - 278px);
 }
+.navbar {
+  display: flex;
+  align-items: center;
+  /* background-color: wheat; */
+  gap: 0.5rem;
+  padding: 0.5rem;
+  justify-content: space-between;
+}
+.import-bar {
+  display: flex;
+}
+.page-btn {
+  border: 0px;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  background-color: #000000;
+}
+.page-btn:hover {
+  background-color: #3d3d3dbe;
+}
+
 .question-section {
   margin: 0 auto;
   margin-top: 40px;

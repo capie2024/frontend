@@ -674,7 +674,7 @@ input[type='checkbox'] {
   flex-direction: column;
   position: relative;
   border-radius: 10px;
-  overflow: hidden;
+  /* overflow: hidden; */
   margin: 5px;
   background-color: #121212;
   cursor: pointer;

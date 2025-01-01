@@ -19,6 +19,7 @@ import { useCardInfoStore } from '@/stores/card-info'
 import Swal from 'sweetalert2'
 import { useCardFilterStore } from '@/stores/card-filter'
 import { useRoute } from 'vue-router'
+import Card from '@/components/Card.vue'
 
 // 引入CardFilterStore並使用
 const cardFilterStore = useCardFilterStore()
@@ -1666,9 +1667,11 @@ onBeforeUnmount(() => {
                     <span>{{ card.price.number }}</span>
                     <span>{{ card.rare }}</span>
                   </div>
-                  <div class="card-image">
-                    <img :src="card.cover" />
-                  </div>
+                  <Card>
+                    <div class="card-image">
+                        <img :src="card.cover" />
+                    </div>
+                  </Card>
                 </div>
               </div>
             </div>
@@ -2178,7 +2181,9 @@ onBeforeUnmount(() => {
                 @click.stop="addCard(seriesCardList[index])"
               >
                 <div class="card-info-image">
-                  <img :src="card.cover" />
+                  <Card>
+                    <img :src="card.cover" />
+                  </Card>
                   <div
                     class="card-inner-info"
                     @click.stop="getCardInfoAndShow(seriesCardList[index])"

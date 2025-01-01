@@ -1,19 +1,19 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import axios from 'axios';
-import SidebarGrid from '../components/SidebarGrid.vue';
-import NavLoginBtn from '../components/NavLoginBtn.vue';
-import Notice from '../components/notification/notice.vue';
-import MainFooter from '../components/MainFooter.vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import axios from 'axios'
+import SidebarGrid from '../components/SidebarGrid.vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import Notice from '../components/notification/notice.vue'
+import MainFooter from '../components/MainFooter.vue'
 import userPicture from '@/img/avatar.png'
-const API_URL = import.meta.env.VITE_API_URL; 
+const API_URL = import.meta.env.VITE_API_URL
 
-const articles = ref([]);
-const searchQuery = ref('');
-const filteredArticles = ref([]);
+const articles = ref([])
+const searchQuery = ref('')
+const filteredArticles = ref([])
 const socialHistory = ref(
   JSON.parse(localStorage.getItem('socialHistory')) || []
-);
+)
 
 const originalSeries = ref([])
 const filteredDecks = ref([])
@@ -23,48 +23,48 @@ const seriesName = ref('篩選系列')
 const seriesFilter = ref('CODE')
 const searchSeriesQuery = ref('')
 
-const isScrolled = ref(false);
-let intervalId = null;
+const isScrolled = ref(false)
+let intervalId = null
 
 const fetchArticles = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/articles`);
+    const response = await axios.get(`${API_URL}/api/articles`)
     articles.value = response.data.sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
-    filteredArticles.value = articles.value;
+    )
+    filteredArticles.value = articles.value
   } catch (error) {
-    console.error('獲取文章列表失敗', error);
+    console.error('獲取文章列表失敗', error)
   }
-};
+}
 
 
 const searchArticles = () => {
   if (!searchQuery.value.trim()) {
-    filteredArticles.value = articles.value;
+    filteredArticles.value = articles.value
   } else {
-    const query = searchQuery.value.toLowerCase();
+    const query = searchQuery.value.toLowerCase()
     filteredArticles.value = articles.value.filter(
       (article) =>
         article.title.toLowerCase().includes(query) ||
         article.content.toLowerCase().includes(query) ||
         article.post_code.includes(query)
-    );
+    )
   }
-};
+}
 
 
 const handleEnter = () => {
-  searchArticles();
-  addSearchHistory();
-  searchQuery.value = '';
-};
+  searchArticles()
+  addSearchHistory()
+  searchQuery.value = ''
+}
 
 
 const clearSearch = () => {
-  searchQuery.value = '';
-  filteredArticles.value = articles.value;
-};
+  searchQuery.value = ''
+  filteredArticles.value = articles.value
+}
 
 
 const toggleMenu = () => {
@@ -114,8 +114,8 @@ const selectDeck = (deck) => {
 
 
   let findDecks = articles.value.filter((decksItem) => {
-    const deckList = decksItem.deck_list;
-    const query = searchQuery.value.toLowerCase();
+    const deckList = decksItem.deck_list
+    const query = searchQuery.value.toLowerCase()
     
     const isInSeries =
       deckList &&
@@ -129,16 +129,14 @@ const selectDeck = (deck) => {
       searchQuery.value.trim() === '' || 
       decksItem.title.toLowerCase().includes(query) ||
       decksItem.content.toLowerCase().includes(query) ||
-      decksItem.post_code.includes(query);
+      decksItem.post_code.includes(query)
 
-    return isInSeries && isInSearchQuery;
+    return isInSeries && isInSearchQuery
 
   })
 
-
-  console.log("Find decks:", findDecks);
-  filteredArticles.value = [...findDecks];
-  addSearchHistory();
+  filteredArticles.value = [...findDecks]
+  addSearchHistory()
 }
 
 
@@ -147,7 +145,8 @@ const clearSearchSeries = () => {
   seriesFilter.value = 'CODE'
   menuExpanded.value = !menuExpanded.value
   filteredArticles.value = articles.value
-};
+  searchQuery.value = ''
+}
 
 
 const clearSeriesSearch = () => {
@@ -155,19 +154,20 @@ const clearSeriesSearch = () => {
   seriesName.value = '篩選系列'
   codeMenuExpanded.value = !codeMenuExpanded.value
   filteredArticles.value = articles.value
+  searchQuery.value = ''
 }
 
 
-const searchResultCount = computed(() => filteredArticles.value.length);
+const searchResultCount = computed(() => filteredArticles.value.length)
 
 
 const addSearchHistory = () => {
   
-  const searchValue = searchQuery.value.trim() || '-';
+  const searchValue = searchQuery.value.trim() || '-'
   const seriesValue =
     seriesName.value && seriesName.value !== '篩選系列'
       ? seriesName.value
-      : '-';
+      : '-'
 
   
   if (searchValue !== '-' || seriesValue !== '-') {
@@ -175,91 +175,91 @@ const addSearchHistory = () => {
     const newHistory = {
       searchQuery: searchValue,
       seriesName: seriesValue,
-    };
+    }
 
    
     const existingIndex = socialHistory.value.findIndex(
       (item) =>
         item.searchQuery === newHistory.searchQuery &&
         item.seriesName === newHistory.seriesName
-    );
+    )
 
     
     if (existingIndex !== -1) {
-      socialHistory.value.splice(existingIndex, 1);
+      socialHistory.value.splice(existingIndex, 1)
     }
 
     
-    socialHistory.value = [newHistory, ...socialHistory.value];
+    socialHistory.value = [newHistory, ...socialHistory.value]
 
     
     localStorage.setItem(
       'socialHistory',
       JSON.stringify(socialHistory.value)
-    );
+    )
   }
-};
+}
 
 const handleHistoryClick = (query, series) => {
-  searchQuery.value = query === '-' ? '' : query;
+  searchQuery.value = query === '-' ? '' : query
 
   if (series === '-') {
-    seriesName.value = series === '-' ? '篩選系列' : series;
-    seriesFilter.value = series === '-' ? 'CODE' : series;
+    seriesName.value = series === '-' ? '篩選系列' : series
+    seriesFilter.value = series === '-' ? 'CODE' : series
   } else {
-    seriesName.value = series;
-    seriesFilter.value = series;
+    seriesName.value = series
+    seriesFilter.value = series
   }
 
-  const selectedDeck = originalSeries.value.find((deck) => deck.name === series);
+  const selectedDeck = originalSeries.value.find((deck) => deck.name === series)
   if (selectedDeck) {
-    selectDeck(selectedDeck); 
+    selectDeck(selectedDeck)
   } else {
-    searchArticles();
+    searchArticles()
     menuExpanded.value = !menuExpanded.value
     codeMenuExpanded.value = !codeMenuExpanded.value
   }
 
   
-  addSearchHistory();
+  addSearchHistory()
   if (seriesName.value !== '-') {
     menuExpanded.value = !menuExpanded.value
     codeMenuExpanded.value = !codeMenuExpanded.value
   }
-};
+}
 
 const formatDate = (date) => {
-  if (!date) return '';
-  return date.split('T')[0];
-};
+  if (!date) return ''
+  return date.split('T')[0]
+}
 
 const handleScroll = () => {
-  const mainElement = document.querySelector('.main');
-  isScrolled.value = mainElement && mainElement.scrollTop > 0;
-};
+  const mainElement = document.querySelector('.main')
+  isScrolled.value = mainElement && mainElement.scrollTop > 0
+}
 
 
 const startFunction = () => {
   if (intervalId) {
-    clearInterval(intervalId);
+    clearInterval(intervalId)
   }
   intervalId = setInterval(() => {
-    handleScroll();
-  }, 100);
-};
+    handleScroll()
+  }, 100)
+}
 
 
 onMounted(() => {
-  fetchArticles();
-  startFunction();
-  fetchCardseries();
-});
+  fetchArticles()
+  startFunction()
+  fetchCardseries()
+})
 
 onBeforeUnmount(() => {
   if (intervalId) {
-    clearInterval(intervalId);
+    clearInterval(intervalId)
   }
-});
+})
 </script>
 
 <template>
@@ -271,7 +271,22 @@ onBeforeUnmount(() => {
         :class="{ 'header-change': isScrolled }"
       >
         <div class="search-container">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path></svg>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke-width="1.5" 
+            stroke="currentColor" 
+            aria-hidden="true" 
+            data-slot="icon" 
+            class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"
+          >
+            <path 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            ></path>
+          </svg>
           <input
             v-model="searchQuery"
             @keyup.enter="handleEnter"
@@ -297,68 +312,97 @@ onBeforeUnmount(() => {
             ></path>
           </svg>
         </div>
-        <div style="position: relative;">
-        <button class="filter" @click="toggleMenu">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke-width="1.5" 
-            stroke="currentColor" 
-            aria-hidden="true" 
-            data-slot="icon" 
-            class="flex-none w-7 h-7"
+        <div style="position: relative">
+          <button 
+          class="filter" 
+          :class="{
+            'active-series': seriesName !== '篩選系列', 
+            'default-series': seriesName === '篩選系列'}"
+          @click="toggleMenu"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-            ></path>
-          </svg>
-          {{ seriesName }}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
-            @click="clearSearchSeries"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            ></path>
-          </svg>
-        </button>
-        <ul
-          class="menu-area"
-          v-show="menuExpanded"
-        >
-          <li class="menu-search">
-            <input
-              v-model="searchSeriesQuery"
-              @keyup="searchSeries"
-              class="keyword"
-              type="text"
-              placeholder="Keyword"
-            />
-            <button @click="clearMenuSearch">✖</button>
-          </li>
-          <div class="menu-inner-area">
-            <li
-              class="menu"
-              v-for="deck in filteredDecks"
-              :key="deck.id"
-              @click="selectDeck(deck)"
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke-width="1.5" 
+              stroke="currentColor" 
+              aria-hidden="true" 
+              data-slot="icon" 
+              class="flex-none w-7 h-7"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
-              <p class="text-xs truncate">{{ deck.name }}</p>
+              <path 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+              ></path>
+            </svg>
+            {{ seriesName }}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
+              @click="clearSearchSeries"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+          <ul
+            class="menu-area"
+            v-show="menuExpanded"
+          >
+            <li class="menu-search">
+              <input
+                v-model="searchSeriesQuery"
+                @keyup="searchSeries"
+                class="keyword"
+                type="text"
+                placeholder="Keyword"
+              />
+              <button @click="clearMenuSearch">✖</button>
             </li>
-          </div>
-        </ul>
-      </div>
-        <button class="filter-hidden" @click="toggleCodeMenu">
+            <div class="menu-inner-area">
+              <li
+                class="menu"
+                v-for="deck in filteredDecks"
+                :key="deck.id"
+                @click="selectDeck(deck)"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke-width="1.5" 
+                  stroke="currentColor" 
+                  aria-hidden="true" 
+                  data-slot="icon"
+                >
+                  <path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+                  ></path>
+                </svg>
+                <p class="text-xs truncate">{{ deck.name }}</p>
+              </li>
+            </div>
+          </ul>
+        </div>
+        <button 
+          class="filter-hidden" 
+          :class="{
+            'active-series': seriesFilter !== 'CODE', 
+            'default-series': seriesFilter === 'CODE'}"
+          @click="toggleCodeMenu"
+        >
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
             fill="none" 
@@ -369,7 +413,10 @@ onBeforeUnmount(() => {
             data-slot="icon" 
             class="flex-none w-7 h-7"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+            <path 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
             ></path>
           </svg>
           <p>{{ seriesFilter }}</p>
@@ -446,7 +493,20 @@ onBeforeUnmount(() => {
         >
           <a href="#">
             <div class="user-link">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 select-none"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path></svg>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" viewBox="0 0 24 24" 
+                stroke-width="1.5" 
+                stroke="currentColor" 
+                aria-hidden="true" 
+                data-slot="icon" 
+                class="flex-none size-5 select-none"
+                ><path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                ></path>
+              </svg>
               <span>{{ item.searchQuery || '-' }}</span>
             </div>
             <div class="user-link">
@@ -487,11 +547,11 @@ onBeforeUnmount(() => {
                 <p>{{ article.users.username }}</p>
                 <div class="date-container">
                   <p class="date">{{ formatDate(article.created_at) }}</p>
-                  <svg data-v-9f28dcad="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="size-4 flex-none"><path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"></path></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="size-4 flex-none"><path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"></path></svg>
                   <p class="card-code">{{ article.post_code }}</p>
                   <div class="chat">
-                    <svg data-v-9f28dcad="" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="ml-auto size-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"></path></svg>
-                    <p>1</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="ml-auto size-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"></path></svg>
+                    <p></p>
                   </div>
                 </div>
               </div>
@@ -585,7 +645,7 @@ li:hover p,li:hover svg{
 }
 
 .code-area {
-    display: none;
+  display: none;
 }
 
 html,
@@ -682,8 +742,6 @@ a {
 }
 
 .filter {
-  background-color: #f0f0f0;
-  border: 1px solid #f0f0f0;
   width: 120px;
   border-radius: 20px;
   height: 36px;
@@ -696,6 +754,16 @@ a {
   gap:5px;
 }
 
+.active-series {
+  background: linear-gradient(to right, #5eead4, #93c5fd);
+  border: none
+}
+
+.default-series {
+  background-color: #f0f0f0;
+  border: none
+}
+
 .filter svg {
   width:20px;
   height:20px;
@@ -703,11 +771,9 @@ a {
 }
 
 .filter-hidden {
-  border: 1px solid #f0f0f0;
   width: 100px;
   height: 36px;
   border-radius: 20px;
-  background-color: #f0f0f0;
   position: absolute;
   top: 14px;
   right: 59px;
@@ -786,7 +852,8 @@ a {
   border: 1px solid #414142;
   background-color: #18181b;
   color: #d4d4d8;
-  min-width: 100px;
+  width: 80px;
+  min-width: 80px;
   overflow: hidden;
   border-radius: 10px;
   display: flex;
@@ -815,10 +882,10 @@ a {
 }
 
 .size-5 {
-    height: 1.25rem;
-    min-height: 1.25rem;
-    min-width: 1.25rem;
-    width: 1.25rem;
+  height: 1.25rem;
+  min-height: 1.25rem;
+  min-width: 1.25rem;
+  width: 1.25rem;
 }
 
 .title {
@@ -947,64 +1014,6 @@ a {
   font-weight: 900;
 }
 
-.line {
-  position: absolute;
-  bottom: 52px;
-  width: 96%;
-  border-top: 4px solid;
-  border-image: linear-gradient(
-      to right,
-      rgb(234, 179, 8) 0%,
-      rgb(234, 179, 8) 89.0476%,
-      rgb(34, 197, 94) 94.0476%,
-      rgb(34, 197, 94) 95%
-    )
-    5 / 1 / 0 stretch;
-}
-
-.total-cards {
-  width: 80%;
-  padding-top: 8px;
-  padding-left: 8px;
-}
-
-.total-cards h2 {
-  font-size: 15px;
-  font-weight: 00;
-  color: #fff;
-  margin-bottom: 2px;
-}
-
-.total-cards span {
-  font-size: 13px;
-  color: #dad7d7;
-  font-weight: 700;
-}
-
-.pay-btn {
-  padding-left: 5px;
-  position: absolute;
-  right: 8px;
-  width: 86px;
-  min-width: 94px;
-  height: 32px;
-  background-color: #daa61e;
-  display: flex;
-  align-items: center;
-  color: #dad7d7;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.pay-btn:hover {
-  background-color: #e27637;
-}
-
-.pay-btn span {
-  font-size: 14px;
-  margin-left: 5px;
-}
-
 @media screen and (min-width: 1470px) {
   .card-area {
     grid-template-columns: repeat(5, 1fr);
@@ -1017,18 +1026,18 @@ a {
   }
 
   .code-area {
-  position: absolute;
-  top: 100%; 
-  display: grid;
-  position: absolute;
-  background-color: #202020;
-  border-radius: 7px;
-  width: 275px;
-  overflow: hidden;
-  transition: height 1s ease;
-  z-index: 3;
-  right: 59px;
-}
+    position: absolute;
+    top: 100%; 
+    display: grid;
+    position: absolute;
+    background-color: #202020;
+    border-radius: 7px;
+    width: 275px;
+    overflow: hidden;
+    transition: height 1s ease;
+    z-index: 3;
+    right: 59px;
+  }
   
   .main {
     margin: 0px;

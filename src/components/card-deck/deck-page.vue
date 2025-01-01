@@ -1,4 +1,6 @@
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { useDeckMakeStore } from '@/stores/deck-make'
@@ -7,208 +9,182 @@ import SidebarGrid from '../SidebarGrid.vue'
 import RemitCard from '../Mycard/remit-card.vue'
 import NavLoginBtn from '../NavLoginBtn.vue'
 import MainFooter from '../MainFooter.vue'
-import Notice from '../notification/notice.vue'
+import Notice from '@/components/notification/notice.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-export default {
-  components: {
-    RemitCard,
-    SidebarGrid,
-    NavLoginBtn,
-    Notice,
-    MainFooter,
-  },
-  data() {
-    return {
-      // 控制組件顯示或隱藏
-      isVisible: false,
-      deckData: {
-        deck: [],
-      }, // 儲存從 API 獲得的牌組資料
-      sortBy: 'typeTranslate',
-      togglePriceView: false, // 用於切換價格表顯示
-      toggleTableView: false, // 用於切換顯示模式
-      deckMakeStore: useDeckMakeStore(),
-      cardSeriesStore: useCardSeriesStore(),
-    }
-  },
-  computed: {
-    totalPrice() {
-      if (!Array.isArray(this.deckData.deck)) {
-        return 0
-      }
-      return this.deckData.deck.reduce((sum, card) => {
-        return sum + (card.price?.number || 0) // 確保價格存在
-      }, 0)
-    },
-    uniqueProductNames() {
-      const productNames = this.deckData.deck.map((card) => card.productName)
-      return [...new Set(productNames)]
-    },
-    groupedCards() {
-      let sorted = []
-      if (this.sortBy === 'level') {
-        sorted = [...this.deckData.deck].sort((a, b) => a.level - b.level)
-      } else if (this.sortBy === 'color') {
-        const colorOrder = ['red', 'yellow', 'green', 'blue']
-        sorted = [...this.deckData.deck].sort(
-          (a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color)
-        )
-      } else if (this.sortBy === 'typeTranslate') {
-        const typeOrder = ['角色', '事件', '名場']
-        sorted = [...this.deckData.deck].sort(
-          (a, b) =>
-            typeOrder.indexOf(a.typeTranslate) -
-            typeOrder.indexOf(b.typeTranslate)
-        )
-      } else if (this.sortBy === 'rare') {
-        sorted = [...this.deckData.deck].sort((a, b) => {
-          if (a.rare.length !== b.rare.length) {
-            return a.rare.length - b.rare.length
-          }
-          return a.rare.localeCompare(b.rare, 'en')
-        })
-      } else if (this.sortBy === 'seriesCode') {
-        sorted = [...this.deckData.deck].sort((a, b) =>
-          a.seriesCode.localeCompare(b.seriesCode, 'en')
-        )
-      } else {
-        sorted = [...this.deckData.deck]
-      }
+const isVisible = ref(false)
+const deckData = ref({ deck: [] })
+const sortBy = ref('typeTranslate')
+const togglePriceView = ref(false)
+const toggleTableView = ref(false)
 
-      const grouped = sorted.reduce((acc, card) => {
-        let groupKey = card[this.sortBy]
+const deckMakeStore = useDeckMakeStore()
+const cardSeriesStore = useCardSeriesStore()
 
-        if (!acc[groupKey]) {
-          acc[groupKey] = []
-        }
+const router = useRouter()
+const route = useRoute()
 
-        acc[groupKey].push(card)
-        return acc
-      }, {})
+const totalPrice = computed(() => {
+  if (!Array.isArray(deckData.value.deck)) return 0
+  return deckData.value.deck.reduce(
+    (sum, card) => sum + (card.price?.number || 0),
+    0
+  )
+})
 
-      const colorMap = {
-        red: '紅色',
-        yellow: '黃色',
-        green: '綠色',
-        blue: '藍色',
-      }
+const uniqueProductNames = computed(() => {
+  const productNames = deckData.value.deck.map((card) => card.productName)
+  return [...new Set(productNames)]
+})
 
-      const levelLabel = (level) => `${level}等`
+const groupedCards = computed(() => {
+  let sorted = []
+  if (sortBy.value === 'level') {
+    sorted = [...deckData.value.deck].sort((a, b) => a.level - b.level)
+  } else if (sortBy.value === 'color') {
+    const colorOrder = ['red', 'yellow', 'green', 'blue']
+    sorted = [...deckData.value.deck].sort(
+      (a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color)
+    )
+  } else if (sortBy.value === 'typeTranslate') {
+    const typeOrder = ['角色', '事件', '名場']
+    sorted = [...deckData.value.deck].sort(
+      (a, b) =>
+        typeOrder.indexOf(a.typeTranslate) - typeOrder.indexOf(b.typeTranslate)
+    )
+  } else if (sortBy.value === 'rare') {
+    sorted = [...deckData.value.deck].sort((a, b) => {
+      if (a.rare.length !== b.rare.length) return a.rare.length - b.rare.length
+      return a.rare.localeCompare(b.rare, 'en')
+    })
+  } else if (sortBy.value === 'seriesCode') {
+    sorted = [...deckData.value.deck].sort((a, b) =>
+      a.seriesCode.localeCompare(b.seriesCode, 'en')
+    )
+  } else {
+    sorted = [...deckData.value.deck]
+  }
 
-      return Object.entries(grouped).map(([key, cards]) => ({
-        group:
-          this.sortBy === 'color'
-            ? colorMap[key] || key
-            : this.sortBy === 'level'
-              ? levelLabel(key)
-              : key,
-        cards,
-      }))
-    },
-  },
-  mounted() {
-    this.fetchDeckData()
-  },
-  methods: {
-    goBack() {
-      if (window.history.length > 1) {
-        window.history.back()
-      } else {
-        this.$router.push('/')
-      }
-    },
-    confirmClose() {
-      Swal.fire({
-        title: '確定要離開嗎？',
-        text: '您的資料尚未完成，確定要離開嗎？',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '離開',
-        cancelButtonText: '取消',
-        reverseButtons: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // 用戶確認離開，隱藏模態框
-          this.isVisible = false
-        }
-      })
-    },
-    hideModal() {
-      // 使用 Vue 的響應式來隱藏 RemitCard 和 overlay
-      this.isVisible = false
-    },
-    toggleVisibility() {
-      this.isVisible = !this.isVisible // 切換 isVisible 的值
-    },
-    goToArticlePage() {
-      // 使用 Vue 的路由進行跳轉
-      const deckId = this.$route.params.deck_id
-      this.$router.push(`/add/${deckId}`)
-    },
-    toggleRemitCard() {
-      this.isVisible = !this.isVisible
-    },
-    async fetchDeckData() {
-      const deckId = this.$route.params.deck_id
+  const grouped = sorted.reduce((acc, card) => {
+    let groupKey = card[sortBy.value]
+    if (!acc[groupKey]) acc[groupKey] = []
+    acc[groupKey].push(card)
+    return acc
+  }, {})
 
-      try {
-        const response = await axios.get(`${API_URL}/api/deck-page/${deckId}`)
-        this.deckData = response.data
+  const colorMap = { red: '紅色', yellow: '黃色', green: '綠色', blue: '藍色' }
+  const levelLabel = (level) => `${level}等`
 
-        if (
-          !this.deckData ||
-          !this.deckData.users ||
-          !this.deckData.users.username ||
-          !this.deckData.deck
-        ) {
-          console.error('回傳資料格式錯誤:', this.deckData)
-          Swal.fire('錯誤', '無法獲取有效的資料', 'error')
-          return
-        }
+  return Object.entries(grouped).map(([key, cards]) => ({
+    group:
+      sortBy.value === 'color'
+        ? colorMap[key] || key
+        : sortBy.value === 'level'
+          ? levelLabel(key)
+          : key,
+    cards,
+  }))
+})
 
-        if (!Array.isArray(this.deckData.deck)) {
-          this.deckData.deck = []
-        }
-      } catch (error) {
-        console.error('Error fetching deck data:', error)
-        Swal.fire('錯誤', '無法獲取資料', 'error')
-      }
-    },
-    togglePriceTableView() {
-      this.togglePriceView = !this.togglePriceView
-    },
-    toggleViewMode() {
-      this.toggleTableView = !this.toggleTableView
-    },
-    countSoulCards(cards) {
-      return cards.filter((card) => card.trigger.includes('soul')).length
-    },
-    setSortBy(property) {
-      this.sortBy = property // 設定排序條件
-    },
-    async copyDeck() {
-      this.deckMakeStore.selectedCards = this.deckData.deck
-      this.deckMakeStore.saveLastDeckEdit()
-      const cardCode = this.deckData.deck[0].seriesCode
-
-      let seriesId = ''
-      try {
-        const response = await axios.get(`${API_URL}/api/series`)
-        seriesId = response.data.find((series) => {
-          if (series.code.includes(cardCode)) {
-            return series
-          }
-        }).id
-      } catch (error) {
-        return error
-      }
-      this.cardSeriesStore.saveLastViewSeries(seriesId)
-      this.$router.push(`/card-series/${seriesId}`)
-    },
-  },
+const goBack = () => {
+  if (window.history.length > 1) {
+    window.history.back()
+  } else {
+    router.push('/')
+  }
 }
+
+const confirmClose = () => {
+  Swal.fire({
+    title: '確定要離開嗎？',
+    text: '您的資料尚未完成，確定要離開嗎？',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '離開',
+    cancelButtonText: '取消',
+    reverseButtons: true,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      isVisible.value = false
+    }
+  })
+}
+
+const hideModal = () => {
+  isVisible.value = false
+}
+
+const toggleVisibility = () => {
+  isVisible.value = !isVisible.value
+}
+
+const goToArticlePage = () => {
+  const deckId = route.params.deck_id
+  router.push(`/add/${deckId}`)
+}
+
+const toggleRemitCard = () => {
+  isVisible.value = !isVisible.value
+}
+
+const fetchDeckData = async () => {
+  const deckId = route.params.deck_id
+  try {
+    const response = await axios.get(`${API_URL}/api/deck-page/${deckId}`)
+    deckData.value = response.data
+
+    if (!deckData.value?.users?.username || !deckData.value.deck) {
+      console.error('回傳資料格式錯誤:', deckData.value)
+      Swal.fire('錯誤', '無法獲取有效的資料', 'error')
+      return
+    }
+
+    if (!Array.isArray(deckData.value.deck)) {
+      deckData.value.deck = []
+    }
+  } catch (error) {
+    console.error('Error fetching deck data:', error)
+    Swal.fire('錯誤', '無法獲取資料', 'error')
+  }
+}
+
+const togglePriceTableView = () => {
+  togglePriceView.value = !togglePriceView.value
+}
+
+const toggleViewMode = () => {
+  toggleTableView.value = !toggleTableView.value
+}
+
+const countSoulCards = (cards) => {
+  return cards.filter((card) => card.trigger.includes('soul')).length
+}
+
+const setSortBy = (property) => {
+  sortBy.value = property
+}
+
+const copyDeck = async () => {
+  deckMakeStore.selectedCards = deckData.value.deck
+  deckMakeStore.saveLastDeckEdit()
+  const cardCode = deckData.value.deck[0]?.seriesCode
+
+  try {
+    const response = await axios.get(`${API_URL}/api/series`)
+    const seriesId = response.data.find((series) =>
+      series.code.includes(cardCode)
+    )?.id
+    cardSeriesStore.saveLastViewSeries(seriesId)
+    router.push(`/card-series/${seriesId}`)
+  } catch (error) {
+    console.error('Error fetching series:', error)
+  }
+}
+
+onMounted(() => {
+  fetchDeckData()
+})
 </script>
 
 <template>
@@ -1798,23 +1774,23 @@ header {
 }
 
 .description2 {
-  right: 233px;
+  right: 270px;
 }
 
 .description3 {
-  right: 155px;
+  right: 189px;
 }
 
 .description4 {
-  right: 115px;
+  right: 147px;
 }
 
 .description5 {
-  right: 89px;
+  right: 125px;
 }
 
 .description7 {
-  right: 193px;
+  right: 227px;
 }
 
 .description6 {
@@ -1828,7 +1804,7 @@ header {
 .social-btn4:hover,
 .social-btn5:hover {
   background-color: #121212;
-  opacity: 0.6;
+  opacity: 1;
 }
 
 .social-btn1:hover .description1,

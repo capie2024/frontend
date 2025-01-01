@@ -274,11 +274,31 @@ input[type='checkbox'] {
 .main-info {
   margin: 8px;
   border-radius: 17px;
-  background-color: #008000;
+  /* background-color: #ef4444; */
   overflow: hidden;
   max-height: calc(100% - 16px);
   overflow-y: scroll;
   scrollbar-width: none;
+}
+
+.main-info-red {
+  background: linear-gradient(to bottom, #ef4444, transparent);
+}
+
+.main-info-yellow {
+  background: linear-gradient(to bottom, #eab308, transparent);
+}
+
+.main-info-green {
+  background: linear-gradient(to bottom, #22c55e, transparent);
+}
+
+.main-info-blue {
+  background: linear-gradient(to bottom, #3b82f6, transparent);
+}
+
+.main-info-purple {
+  background: linear-gradient(to bottom, #a855f7, transparent);
 }
 
 .main-info-header {
@@ -289,9 +309,28 @@ input[type='checkbox'] {
   width: 100%;
   position: sticky;
   top: 0;
-  background-color: #10b47e;
   height: 64px;
-  z-index: 1;
+  z-index: 50;
+}
+
+.main-info-header-red {
+  background-color: #ef4444;
+}
+
+.main-info-header-yellow {
+  background-color: #eab308;
+}
+
+.main-info-header-green {
+  background-color: #22c55e;
+}
+
+.main-info-header-blue {
+  background-color: #3b82f6;
+}
+
+.main-info-header-purple {
+  background-color: #a855f7;
 }
 
 .toggle-filter {
@@ -442,7 +481,8 @@ input[type='checkbox'] {
   position: sticky;
   top: 64px;
   z-index: 1;
-  background-color: rgba(128, 128, 128, 0.644);
+  /* font-weight: 700; */
+  backdrop-filter: blur(10px);
 }
 
 .card-control p {

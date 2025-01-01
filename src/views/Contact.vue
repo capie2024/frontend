@@ -1,9 +1,9 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import SideBar from '@/components/SidebarGrid.vue';
-import Notice from '@/components/notification/notice.vue';
-import Footer from '@/components/MainFooter.vue';
-import Login from '@/components/NavLoginBtn.vue';
+import SideBar from '@/components/SidebarGrid.vue'
+import Notice from '@/components/notification/notice.vue'
+import Footer from '@/components/MainFooter.vue'
+import Login from '@/components/NavLoginBtn.vue'
 
 const router = useRouter()
 const BASE_URL = import.meta.env.VITE_BASE_URL
@@ -48,371 +48,379 @@ const handleBack = () => {
         </div>
 
         <Notice class="notice-mobile-hidden" />
-        <Login class="login-mobile-hidden"/>
+        <Login class="login-mobile-hidden" />
       </nav>
     </header>
     <div class="background scrollbar">
       <main class="main-grid">
         <section class="main-container">
-            <section class="w-full md:w-[75%] mx-auto text-white">
-                <div class="mt-12 mb-8">
-                    <h2 class="text-center text-3xl font-black">與我聯絡</h2>
-                    <p class="mt-2 text-center">無論您有任何問題、意見與建議，歡迎透過以下方式與我聯絡！</p>
+          <section class="w-full md:w-[75%] mx-auto text-white">
+            <div class="mt-12 mb-8">
+              <h2 class="text-center text-3xl font-black">與我聯絡</h2>
+              <p class="mt-2 text-center">
+                無論您有任何問題、意見與建議，歡迎透過以下方式與我聯絡！
+              </p>
+            </div>
+            <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a
+                class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-[#0866ff50] to-zinc-700 hover:shadow-lg hover:shadow-zinc-700/50"
+                :href="`${BASE_URL}/team`"
+                target="_blank"
+              >
+                <div class="capie-img">
+                  <img src="../img/capie-user.png" />
                 </div>
-                <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <a class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-[#0866ff50] to-zinc-700 hover:shadow-lg hover:shadow-zinc-700/50" 
-                    :href="`${BASE_URL}/team`"                    
-                    target="_blank">
-                        <div class="capie-img">
-                            <img src="../img/capie-user.png">
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg">關於卡派團隊</h3>
-                            <p class="text-zinc-300">專注於提供輕鬆趣味卡牌遊戲的七人小組</p>
-                        </div>
-                    </a>
-                    <a 
-                    class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-[#0866ff50] to-zinc-700 hover:shadow-lg hover:shadow-zinc-700/50" 
-                    href="https://discord.com/channels/1303258823104135219/1321898702750748752" 
-                    target="_blank"
-                    >
-                        <div class="capie-img">
-                            <img src="../img/capie-user.png">
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg">卡派 Discord</h3>
-                            <p class="text-zinc-300">加入 Discord 與大家一起討論與分享消息</p>
-                        </div>
-                    </a>
+                <div>
+                  <h3 class="font-bold text-lg">關於卡派團隊</h3>
+                  <p class="text-zinc-300">
+                    專注於提供輕鬆趣味卡牌遊戲的七人小組
+                  </p>
                 </div>
-            </section>
-            <section class="question-section">
-        <h2>常見問答</h2>
-        <div class="question-area">
-          <div>
-            <input type="checkbox" id="question1" />
-            <label for="question1" class="question question1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
+              </a>
+              <a
+                class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-[#0866ff50] to-zinc-700 hover:shadow-lg hover:shadow-zinc-700/50"
+                href="https://discord.com/channels/1303258823104135219/1321898702750748752"
+                target="_blank"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                ></path>
-              </svg>
-              <h3>Capie是什麼？</h3>
-              <svg
-                class="dropdown-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
-            </label>
-            <p class="answer">
-              Capie是一個線上的卡牌組牌工具，提供各種便利的功能，讓您可以輕鬆的組牌、分享牌組、查詢卡片等等。
-              目前專為 Weiβ Schwarz 卡牌遊戲製作。
-            </p>
-          </div>
-          <div>
-            <input type="checkbox" id="question2" />
-            <label for="question2" class="question question2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                ></path>
-              </svg>
-              <h3>是否有手機版可以用？</h3>
-              <svg
-                class="dropdown-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
-            </label>
-            <p class="answer">
-              目前Capie以全網站式開發，但您能可以透過以下方式加入至主畫面：<br /><br />
-              1. 在裝置上開啟原生瀏覽器並進入Capie網站 <br />
-              2. Android 裝置點選 [安裝]。 iPhone
-              裝置輕觸網址列右上方的「分享」圖示 <br />
-              3. 找出並輕觸「加入主畫面」並按照畫面上的指示操作 <br />
-              4. 在手機桌面即可出現Capie應用程式 <br />
-              <br />
-              相關教學
-              <span
-                ><a
-                  href="https://support.google.com/chrome/answer/9658361?hl=zh-Hant&co=GENIE.Platform%3DiOS"
-                  >使用漸進式網頁應用程式</a
-                ></span
-              >
-            </p>
-          </div>
-          <div>
-            <input type="checkbox" id="question3" />
-            <label for="question3" class="question question3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                ></path>
-              </svg>
-              <h3>我的Capie打不開或是轉圈圈？</h3>
-              <svg
-                class="dropdown-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
-            </label>
-            <p class="answer">
-              請您先確認處於網路良好狀態，並嘗試著重新開啟網站/應用程式，<br />
-              如仍然失敗，請立即與Capie團隊聯絡，很有可能伺服器冒煙不乖了
-            </p>
-          </div>
-          <div>
-            <input type="checkbox" id="question4" />
-            <label for="question4" class="question question4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                ></path>
-              </svg>
-              <h3>我是新手，我要怎麼開始呢？</h3>
-              <svg
-                class="dropdown-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
-            </label>
-            <p class="answer">
-              由於Capie提供很多功能，您可以首先到 "系列卡表"
-              尋找喜愛的系列查看，<br />
-              卡片會有中文翻譯/機器翻譯，點選加入按鈕進行牌組製作。<br />
-              或是您可以到社群上找大家或是官方賽事的牌組來複製。<br /><br />
+                <div class="capie-img">
+                  <img src="../img/capie-user.png" />
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg">卡派 Discord</h3>
+                  <p class="text-zinc-300">
+                    加入 Discord 與大家一起討論與分享消息
+                  </p>
+                </div>
+              </a>
+            </div>
+          </section>
+          <section class="question-section">
+            <h2>常見問答</h2>
+            <div class="question-area">
+              <div>
+                <input type="checkbox" id="question1" />
+                <label for="question1" class="question question1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                    ></path>
+                  </svg>
+                  <h3>Capie是什麼？</h3>
+                  <svg
+                    class="dropdown-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    ></path>
+                  </svg>
+                </label>
+                <p class="answer">
+                  Capie是一個線上的卡牌組牌工具，提供各種便利的功能，讓您可以輕鬆的組牌、分享牌組、查詢卡片等等。
+                  目前專為 Weiβ Schwarz 卡牌遊戲製作。
+                </p>
+              </div>
+              <div>
+                <input type="checkbox" id="question2" />
+                <label for="question2" class="question question2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                    ></path>
+                  </svg>
+                  <h3>是否有手機版可以用？</h3>
+                  <svg
+                    class="dropdown-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    ></path>
+                  </svg>
+                </label>
+                <p class="answer">
+                  目前Capie以全網站式開發，但您能可以透過以下方式加入至主畫面：<br /><br />
+                  1. 在裝置上開啟原生瀏覽器並進入Capie網站 <br />
+                  2. Android 裝置點選 [安裝]。 iPhone
+                  裝置輕觸網址列右上方的「分享」圖示 <br />
+                  3. 找出並輕觸「加入主畫面」並按照畫面上的指示操作 <br />
+                  4. 在手機桌面即可出現Capie應用程式 <br />
+                  <br />
+                  相關教學
+                  <span
+                    ><a
+                      href="https://support.google.com/chrome/answer/9658361?hl=zh-Hant&co=GENIE.Platform%3DiOS"
+                      >使用漸進式網頁應用程式</a
+                    ></span
+                  >
+                </p>
+              </div>
+              <div>
+                <input type="checkbox" id="question3" />
+                <label for="question3" class="question question3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                    ></path>
+                  </svg>
+                  <h3>我的Capie打不開或是轉圈圈？</h3>
+                  <svg
+                    class="dropdown-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    ></path>
+                  </svg>
+                </label>
+                <p class="answer">
+                  請您先確認處於網路良好狀態，並嘗試著重新開啟網站/應用程式，<br />
+                  如仍然失敗，請立即與Capie團隊聯絡，很有可能伺服器冒煙不乖了
+                </p>
+              </div>
+              <div>
+                <input type="checkbox" id="question4" />
+                <label for="question4" class="question question4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                    ></path>
+                  </svg>
+                  <h3>我是新手，我要怎麼開始呢？</h3>
+                  <svg
+                    class="dropdown-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    ></path>
+                  </svg>
+                </label>
+                <p class="answer">
+                  由於Capie提供很多功能，您可以首先到 "系列卡表"
+                  尋找喜愛的系列查看，<br />
+                  卡片會有中文翻譯/機器翻譯，點選加入按鈕進行牌組製作。<br />
+                  或是您可以到社群上找大家或是官方賽事的牌組來複製。<br /><br />
 
-              如果您對此仍不熟悉，歡迎至Capie Discord
-              頻道讓大家一起幫你解答：<span>
-                <a href="https://discord.com/invite/QMtPcXrdBq"
-                  >Discord
-                </a></span
-              >
-            </p>
-          </div>
-          <div>
-            <input type="checkbox" id="question5" />
-            <label for="question5" class="question question5">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                ></path>
-              </svg>
-              <h3>我要怎麼加入英雄會員呢？</h3>
-              <svg
-                class="dropdown-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
-            </label>
-            <p class="answer">
-              英雄榜的會員，可以到工作坊找到 "加入英雄榜" 按鈕。<br />
-              完成贊助後到粉專與我們聯繫，會幫您處理後續動作。
-            </p>
-          </div>
-          <div>
-            <input type="checkbox" id="question6" />
-            <label for="question6" class="question question6">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                ></path>
-              </svg>
-              <h3>是否有其他資源？</h3>
-              <svg
-                class="dropdown-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
-            </label>
-            <p class="answer">
-              目前Capie搜集來自<span
-                ><a href="https://ws-tcg.com/"> WS官方</a></span
-              >以及<span><a href="https://yuyu-tei.jp/">遊遊亭</a></span
-              >的價格資訊，以及強大的Capie管理群資源。<br />
-              如果您有資源想與我們分享或商業合作，請與我聯繫！
-            </p>
-          </div>
-          <div>
-            <input type="checkbox" id="question7" />
-            <label for="question7" class="question question7">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                ></path>
-              </svg>
-              <h3>Capie與武士道</h3>
-              <svg
-                class="dropdown-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
-            </label>
-            <p class="answer">
-              Capie提供的 Weiβ Schwarz 卡牌資訊以及卡圖，皆為<span
-                ><a href="https://ws-tcg.com/">武士道官方資料</a></span
-              >，與Capie本身無任何關係。<br />
-              若卡片資訊有相關侵權問題，則會下架其內容，Capie僅為提供輔助工具進行服務。
-            </p>
-          </div>
-          <div>
-            <input type="checkbox" id="question8" />
-            <label for="question8" class="question question8">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                ></path>
-              </svg>
-              <h3>其他問題與我們態度</h3>
-              <svg
-                class="dropdown-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                ></path>
-              </svg>
-            </label>
-            <p class="answer">
-              保持正向、保持快樂、持續改善。 <br />
-              無論您有任何問題、許願、想法...等等，歡迎您與我們討論！
-            </p>
-          </div>
-        </div>
-    </section>
+                  如果您對此仍不熟悉，歡迎至Capie Discord
+                  頻道讓大家一起幫你解答：<span>
+                    <a href="https://discord.com/invite/QMtPcXrdBq"
+                      >Discord
+                    </a></span
+                  >
+                </p>
+              </div>
+              <div>
+                <input type="checkbox" id="question5" />
+                <label for="question5" class="question question5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                    ></path>
+                  </svg>
+                  <h3>我要怎麼加入英雄會員呢？</h3>
+                  <svg
+                    class="dropdown-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    ></path>
+                  </svg>
+                </label>
+                <p class="answer">
+                  英雄榜的會員，可以到工作坊找到 "加入英雄榜" 按鈕。<br />
+                  完成贊助後到粉專與我們聯繫，會幫您處理後續動作。
+                </p>
+              </div>
+              <div>
+                <input type="checkbox" id="question6" />
+                <label for="question6" class="question question6">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                    ></path>
+                  </svg>
+                  <h3>是否有其他資源？</h3>
+                  <svg
+                    class="dropdown-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    ></path>
+                  </svg>
+                </label>
+                <p class="answer">
+                  目前Capie搜集來自<span
+                    ><a href="https://ws-tcg.com/"> WS官方</a></span
+                  >以及<span><a href="https://yuyu-tei.jp/">遊遊亭</a></span
+                  >的價格資訊，以及強大的Capie管理群資源。<br />
+                  如果您有資源想與我們分享或商業合作，請與我聯繫！
+                </p>
+              </div>
+              <div>
+                <input type="checkbox" id="question7" />
+                <label for="question7" class="question question7">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                    ></path>
+                  </svg>
+                  <h3>Capie與武士道</h3>
+                  <svg
+                    class="dropdown-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    ></path>
+                  </svg>
+                </label>
+                <p class="answer">
+                  Capie提供的 Weiβ Schwarz 卡牌資訊以及卡圖，皆為<span
+                    ><a href="https://ws-tcg.com/">武士道官方資料</a></span
+                  >，與Capie本身無任何關係。<br />
+                  若卡片資訊有相關侵權問題，則會下架其內容，Capie僅為提供輔助工具進行服務。
+                </p>
+              </div>
+              <div>
+                <input type="checkbox" id="question8" />
+                <label for="question8" class="question question8">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                    ></path>
+                  </svg>
+                  <h3>其他問題與我們態度</h3>
+                  <svg
+                    class="dropdown-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    st
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    ></path>
+                  </svg>
+                </label>
+                <p class="answer">
+                  保持正向、保持快樂、持續改善。 <br />
+                  無論您有任何問題、許願、想法...等等，歡迎您與我們討論！
+                </p>
+              </div>
+            </div>
+          </section>
         </section>
         <Footer />
       </main>
@@ -424,14 +432,14 @@ const handleBack = () => {
 @import '@/assets/base.css';
 
 .capie-img {
-    width: 64px;
-    height: 64px;
-    display: flex;
-    align-items: center;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
 }
 
 .capie-img img {
-    border-radius: 999px;
+  border-radius: 999px;
 }
 
 .notice-mobile-hidden {
@@ -725,7 +733,6 @@ input[type='checkbox']:not(:checked) + label .dropdown-icon {
   color: rgb(59 130 246);
 }
 
-
 @media screen and (width < 1200px) {
   .login-mobile-hidden {
     display: none;
@@ -778,6 +785,5 @@ input[type='checkbox']:not(:checked) + label .dropdown-icon {
     margin-left: 0px !important;
     margin-right: 0px !important;
   }
-
 }
 </style>

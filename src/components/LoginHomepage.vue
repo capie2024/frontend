@@ -5,10 +5,11 @@ import notice from './notification/notice.vue'
 import NavLoginBtn from './NavLoginBtn.vue'
 import MainFooter from './MainFooter.vue'
 const BASE_URL = import.meta.env.VITE_BASE_URL
+const API_URL = import.meta.env.VITE_API_URL
 const API_DATA = async () => {
   try {
-    const response = await axios.get('/api/topics')
-    const apiData = response.data // API 返回的資料
+    const response = await axios.get(`${API_URL}/api/topics`)
+    const apiData = response.data.data // API 返回的資料
 
     // 分別處理 topics 和 videos 資料
     const topics = apiData.find((item) => item.title === 'topics')
@@ -49,7 +50,7 @@ const API_DATA = async () => {
     }
 
     // 新增 /api/series 的請求
-    const seriesResponse = await axios.get('/api/series')
+    const seriesResponse = await axios.get(`${API_URL}/api/series`)
     const seriesData = seriesResponse.data
     items.value.series = seriesData.map((series) => ({
       id: formatValue(series.id),

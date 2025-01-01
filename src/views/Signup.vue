@@ -3,7 +3,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import GoogleLogin from '../components/GoogleLogin.vue'
-import Notice from '../components/notification/Notice.vue'
+import Notice from '../components/notification/notice.vue'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -36,10 +36,10 @@ export default {
   },
   methods: {
     goBack() {
-      router.go(-1)
+      this.$router.go(-1)
     },
     goAhead() {
-      router.go(+1)
+      this.$router.go(+1)
     },
     toggleServiceButton() {
       this.isServiceButtonGreen = !this.isServiceButtonGreen
@@ -63,7 +63,7 @@ export default {
       this.agreePolicy = false
     },
     goLogin() {
-      window.location.href = `${BASE_URL}/login`
+      this.$router.push('/login')
     },
     goMainPage() {
       window.location.href = `${BASE_URL}/`
@@ -251,7 +251,7 @@ export default {
                   </svg>
                   <input
                     type="email"
-                    class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500"
+                    class="w-full p-0 bg-transparent outline-none focus:ring-0 placeholder:text-zinc-500"
                     placeholder="信箱"
                     v-model="email"
                   />
@@ -277,7 +277,7 @@ export default {
                   </svg>
                   <input
                     type="password"
-                    class="w-full p-0 bg-transparent border-none focus:ring-0 placeholder:text-zinc-500"
+                    class="w-full p-0 bg-transparent outline-none focus:ring-0 placeholder:text-zinc-500"
                     placeholder="密碼"
                     v-model="password"
                   />

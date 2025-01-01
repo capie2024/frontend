@@ -1,20 +1,20 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import SidebarGrid from '@/components/SidebarGrid.vue';
-import MainFooter from '@/components/MainFooter.vue';
-import NavLoginBtn from '../components/NavLoginBtn.vue';
-import notice from '../components/notification/notice.vue';
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import SidebarGrid from '@/components/SidebarGrid.vue'
+import MainFooter from '@/components/MainFooter.vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import notice from '../components/notification/notice.vue'
 
-const articles = ref([]);
-const postCount = computed(() => articles.value.length);
-const API_URL = import.meta.env.VITE_API_URL;
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const articles = ref([])
+const postCount = computed(() => articles.value.length)
+const API_URL = import.meta.env.VITE_API_URL
+const BASE_URL = import.meta.env.VITE_BASE_URL
 
 const getUserArticles = async () => {
   const token = localStorage.getItem('token')
-  if (!token) return;
+  if (!token) return
 
   try {
     const response = await axios.get(`${API_URL}/api/my`, {
@@ -23,7 +23,6 @@ const getUserArticles = async () => {
     articles.value = response.data
   } catch (error) {
     if (error.response && error.response.status === 403) {
-      
       Swal.fire({
         title: '請先登入',
         text: '登入後才能查看文章',
@@ -36,14 +35,13 @@ const getUserArticles = async () => {
   }
 }
 const formatDate = (date) => {
-  if (!date) return '';
-  return date.split('T')[0];
-};
+  if (!date) return ''
+  return date.split('T')[0]
+}
 
 onMounted(() => {
   getUserArticles()
 })
-
 </script>
 
 <template>
@@ -72,13 +70,15 @@ onMounted(() => {
             </svg>
           </button>
         </a>
-      
+
         <div class="w-full min-w-0 text-lg font-bold text-white md:text-2xl">
           <h2 class="text-2xl font-bold truncate">我的文章</h2>
         </div>
-        <notice/>
-        <div class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50">            
-          <NavLoginBtn/>
+        <notice />
+        <div
+          class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50"
+        >
+          <NavLoginBtn />
         </div>
       </nav>
     </header>
@@ -93,11 +93,11 @@ onMounted(() => {
             <span class="subtitle"> 一共有{{ postCount }}結果 </span>
           </h2>
           <section class="card-area">
-            <a 
+            <a
               v-for="article in articles"
               :key="article.post_code"
               :href="'/social/' + article.post_code"
-              class="card-link" 
+              class="card-link"
             >
               <div class="card-img">
                 <img
@@ -106,7 +106,9 @@ onMounted(() => {
                       ? article.post_picture
                       : 'https://bottleneko.app/images/cover.png'
                   "
-                  :alt="article && article.title ? article.title : 'Default Title'"
+                  :alt="
+                    article && article.title ? article.title : 'Default Title'
+                  "
                 />
               </div>
               <div class="card-user">
@@ -147,8 +149,8 @@ onMounted(() => {
 @import '@/assets/base.css';
 
 img {
-    max-width: none;
-    height: unset;
+  max-width: none;
+  height: unset;
 }
 
 .root-container {
@@ -176,7 +178,6 @@ img {
   width: 85px;
   height: 35px;
 }
-
 
 header {
   width: calc(100% - 270px);

@@ -150,96 +150,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <SidebarGrid />
+  <SidebarGrid style="grid-area: sidebar" />
   <main>
-    <div class="header-bg">
-      <header>
-        <div class="pagebtn-area">
-          <button 
-            class="page-btn"
-            @click="goBack"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="h-6 w-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15.75 19.5 8.25 12l7.5-7.5"
-              ></path>
-            </svg>
-          </button>
-          <button class="page-btn next-btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="h-6 w-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              ></path>
-            </svg>
-          </button>
-          <h2>新增文章</h2>
-        </div>
-        <div class="btn-area">
-          <button class="submit-btn" @click="submitArticle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none size-5 stroke-2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"
-              ></path>
-            </svg>
-            <span>送出</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none size-5 stroke-2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-              ></path>
-            </svg>
-          </button>
-          <Notice />
-          <NavLoginBtn />
-        </div>
-      </header>
-    </div>
-    <section class="title-area">
-      <div class="title-area-container">
-        <button class="upload-btn" @click="handleButtonClick" alt="">
+    <header>
+      <div class="pagebtn-area">
+        <button 
+          class="page-btn"
+          @click="goBack"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -248,14 +166,99 @@ onMounted(() => {
             stroke="currentColor"
             aria-hidden="true"
             data-slot="icon"
-            class="h-20 w-20"
+            class="h-6 w-6"
           >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+              d="M15.75 19.5 8.25 12l7.5-7.5"
             ></path>
           </svg>
+        </button>
+        <button class="page-btn next-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+            ></path>
+          </svg>
+        </button>
+        <h2>新增文章</h2>
+      </div>
+      <div class="btn-area">
+        <button class="submit-btn" @click="submitArticle">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="flex-none size-5 stroke-2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 0 0-8.862 12.872M12.75 3.031a9 9 0 0 1 6.69 14.036m0 0-.177-.529A2.25 2.25 0 0 0 17.128 15H16.5l-.324-.324a1.453 1.453 0 0 0-2.328.377l-.036.073a1.586 1.586 0 0 1-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 0 1-5.276 3.67m0 0a9 9 0 0 1-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25"
+            ></path>
+          </svg>
+          <span>送出</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="flex-none size-5 stroke-2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+            ></path>
+          </svg>
+        </button>
+        <Notice />
+        <div class="user-sign">
+          <NavLoginBtn />      
+        </div>
+      </div>
+    </header>
+    <section class="title-area">
+      <div class="title-area-container">
+        <button class="upload-btn" @click="handleButtonClick">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke-width="1.5" 
+            stroke="currentColor" 
+            aria-hidden="true" 
+            data-slot="icon" 
+            class="w-20 h-20"
+          >
+            <path 
+              stroke="currentColor" 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2M12 4v12m0-12 4 4m-4-4L8 8"
+            >
+            </path>
+          </svg>
+
           <img :src="deckData.deck_cover" alt="" />
         </button>
         <div class="add-section">
@@ -278,8 +281,13 @@ onMounted(() => {
             </svg>
             <p>新增文章</p>
           </div>
-          <input v-model="title" class="enter-title" type="text" />
-          <div class="card-select-area">
+          <input
+            v-model="title"
+            class="enter-title"
+            type="text"
+            placeholder="請輸入標題"
+          />
+          <div class="card-select-area" style="position: relative;">
             <button class="card-select-btn" @click="toggleMenu">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -341,6 +349,7 @@ onMounted(() => {
                 <p class="text-xs truncate">{{ deck.deck_name }}</p>
               </li>
             </ul>
+
             <div class="cannot-change">
               <p>非必填，但新增文章後將無法更改牌組內容</p>
             </div>
@@ -405,7 +414,7 @@ onMounted(() => {
                 d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
               ></path>
             </svg>
-            <input class="enter-message" type="text" placeholder="留言..." />
+            <input class="enter-message" type="text" placeholder="留言..." disabled/>
             <button>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -428,10 +437,7 @@ onMounted(() => {
         <span class="message-count">0則留言</span>
       </div>
     </section>
-    <footer>
-      <MainFooter />
-    </footer>
-
+    <MainFooter />
   </main>
 </template>
 
@@ -616,27 +622,6 @@ a {
   gap: 8px;
 }
 
-.notice {
-  width: 30px;
-  height: 25px;
-  background-color: #2d7894;
-  color: white;
-  border-radius: 15px;
-  font-size: 15px;
-  font-weight: 900;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 0 8px 0 8px;
-  position: absolute;
-  right: 105px;
-  top: 35px;
-  opacity: 0;
-  visibility: hidden;
-  transition: ease 0.3s;
-}
-
 .submit-btn {
   width: 92px;
   height: 36px;
@@ -676,90 +661,28 @@ a {
   font-weight: 900;
 }
 
-.bell {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background-color: rgba(0, 0, 0, 0);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.bell:hover {
-  background-color: #2d7894;
-}
-
-.bell:hover .notice {
-  opacity: 1;
-  visibility: visible;
-}
-
-.bell svg {
-  width: 24px;
-  height: 24px;
-  stroke: white;
-}
-
-.user-btn {
-  border: none;
-  background-color: #19647f;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 20px;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.user-btn:hover {
-  background-color: #2d7894;
-}
-
-.btn-img img {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-}
-
-.user-btn span {
-  color: white;
-}
-
-.user-btn svg {
-  width: 16px;
-  height: 16px;
-  stroke: white;
-}
-
 main {
+  overflow: hidden;
+  margin: 0.5rem;
   margin-left: 270px;
-  /* width: 100%; */
   width: calc(100% - 278px);
-  /* height: calc(100vh - 16px); */
+  height: calc(100vh - 16px);
+  border-radius: 20px;
   background-color: #32c9ff;
   scroll-behavior: smooth;
-}
-
-.header-bg {
-  background-color: #000000;
-  width: calc(100% - 278px);
-  height: 72px;
-  position: fixed;
-  top: 0;
-  z-index: 4;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
 
 header {
   background-color: #32c9ff;
   border-radius: 20px 20px 0 0;
-  width: 100%;
-  position: absolute;
-  top: 8px;
+  width: calc(100% - 278px);
   height: 64px;
   display: flex;
+  position: fixed;
+  top: 8px;
+  z-index: 4;
   align-items: center;
 }
 
@@ -784,10 +707,10 @@ header {
   height: 240px;
   background-color: #333333;
   border-radius: 10px;
-  overflow: hidden;
   cursor: pointer;
   border: none;
   position: relative;
+  overflow: hidden;
 }
 
 .upload-btn img {
@@ -800,7 +723,8 @@ header {
 .upload-btn svg {
   width: 85px;
   height: 85px;
-  stroke: white;
+  --tw-text-opacity: 1;
+  color: rgb(228 228 231 / var(--tw-text-opacity, 1));
   visibility: hidden;
   opacity: 0;
   transition: ease 0.2s;
@@ -928,7 +852,6 @@ header {
   border: none;
   background-color: #2fb7e7;
   cursor: pointer;
-  gap: 5px;
 }
 
 .card-select-btn p {
@@ -964,7 +887,11 @@ header {
   box-sizing: border-box;
   height: 520px;
   display: flex;
-  background: linear-gradient(to bottom, #20637a, #131617);
+  background: linear-gradient(
+    to bottom,
+    rgb(32, 99, 122) 100px,
+    rgb(19, 22, 23) 450px
+  );
 }
 
 .edit-area {
@@ -1103,11 +1030,8 @@ header {
   height: 24px;
 }
 
-footer {
-  background-color: #222f3e;
-  width: 100%;
-  height: 401px;
-  color: white;
+input:disabled {
+    cursor: not-allowed;
 }
 
 @media screen and (max-width: 1200px) {
@@ -1124,24 +1048,13 @@ footer {
     width: 100%;
   }
 
-  .header-bg {
-    background-color: #000000;
-    width: 100%;
-    height: 64px;
-  }
-
   header {
     border-radius: 0;
     width: 100%;
-    position: static;
+    top: 0;
   }
 
   .next-btn {
-    display: none;
-  }
-
-  .bell,
-  .user-btn {
     display: none;
   }
 
@@ -1172,6 +1085,7 @@ footer {
 
   .add-section {
     width: 100%;
+    margin-left: 16px;
     margin-top: 25px;
   }
 
@@ -1261,5 +1175,44 @@ footer {
   }
 
 
+  .edit-area {
+    width: 95%;
+    box-sizing: border-box;
+    background-color: #1c3d4b;
+    margin: 16px auto;
+  }
+
+  .message-user-img img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .enter-message {
+    width: 100%;
+  }
+
+  .message-area {
+    width: 95%;
+    height: 40px;
+    margin-top: 36px;
+    margin-left: 16px;
+  }
+
+  .message {
+    width: 90%;
+    height: 50px;
+    gap: 8px;
+    background-color: #2a2a2b;
+  }
+
+  .message-count {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+  }
+
+  .user-sign {
+    display: none;
+  }
 }
 </style>

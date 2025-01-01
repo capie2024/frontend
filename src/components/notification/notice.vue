@@ -28,6 +28,7 @@ const fetchNotices = async () => {
             }
         });
         const data = await response.json();
+        console.log('Unread count from API:', data);
         notices.value = (data.notices || []).sort((a, b) => {
             return new Date(b.created_at) - new Date(a.created_at);
         });
@@ -51,7 +52,7 @@ const markAsRead = async (noticeId, postCode) => {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
-
+        console.log(response.data)
         if (response.data.is_read) {
             if (notice) {
                 notice.is_read = true;
@@ -108,7 +109,7 @@ onMounted(() => {
 
       <div class="z-10 notice-grid">
         <div class="notice-grid-up">
-          <h2>通知({{ unreadCount }})</h2>
+          <h2>通知({{ unreadCount || 0 }})</h2>
         </div>
         <div class="notice-grid-down-1" v-if="notices.length > 0">
           <a

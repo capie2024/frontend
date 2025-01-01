@@ -149,6 +149,7 @@ const fetchDeck = async () => {
     console.error('Failed to fetch specific deck:', error)
   }
 }
+
 const fetchCurrentUser = async () => {
     const userToken = localStorage.getItem('token')
     if (!userToken) {
@@ -238,6 +239,9 @@ const sendMessage = async () => {
         Authorization: `Bearer ${userToken}`,
       },
     });
+
+    messages.value.unshift(response.data);
+    newMessage.value = ''; 
     
   } catch (error) {
     console.error('Error sending message:', error);
@@ -344,7 +348,7 @@ const toggleLike = async (message) => {
     if (!userToken) {
       Swal.fire({
         title: '請先登入',
-        text: '留言功能需要登入才能使用。',
+        text: '按讚功能需要登入才能使用。',
         icon: 'warning',
         confirmButtonText: '確定',
       })
@@ -372,7 +376,7 @@ const toggleHate = async (message) => {
       console.error('User token is missing');
       Swal.fire({
         title: '請先登入',
-        text: '留言功能需要登入才能使用。',
+        text: '按讚功能需要登入才能使用。',
         icon: 'warning',
         confirmButtonText: '確定',
       })

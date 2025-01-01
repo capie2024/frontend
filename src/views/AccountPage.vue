@@ -438,7 +438,7 @@ onBeforeUnmount(() => {
                   <input
                     id="editName"
                     v-model="name"
-                    class="text-white w-full p-0 text-4xl font-bold leading-relaxed break-all bg-transparent border-none focus:ring-0 placeholder:text-zinc-500 md:mb-2 md:text-4.5xl line-clamp-2 focus:border-none"
+                    class="text-white w-full p-0 text-4xl font-bold leading-relaxed break-all bg-transparent placeholder:text-zinc-500 md:mb-2 md:text-4.5xl line-clamp-2"
                     type="text"
                     placeholder="請輸入名稱"
                   />

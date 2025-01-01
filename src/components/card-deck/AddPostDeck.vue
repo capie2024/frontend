@@ -135,6 +135,14 @@ const clearSearch = () => {
   calculateMenuHeight()
 }
 
+const goBack = () => {
+  if (window.history.length > 1) {
+    window.history.back()
+  } else {
+    router.push('/')
+  }
+}
+
 onMounted(() => {
   fetchDeckData()
   getUserDecks()
@@ -147,7 +155,10 @@ onMounted(() => {
     <div class="header-bg">
       <header>
         <div class="pagebtn-area">
-          <button class="page-btn">
+          <button 
+            class="page-btn"
+            @click="goBack"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

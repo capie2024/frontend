@@ -1,11 +1,11 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import dayjs from 'dayjs'
-import axios from 'axios'
-import SideBar from '../SidebarGrid.vue'
-import Notice from './notice.vue'
-import Footer from '../MainFooter.vue'
-import Login from '../NavLoginBtn.vue'
+import { ref, onMounted } from 'vue';
+import dayjs from 'dayjs';
+import axios from 'axios';
+import SideBar from '../SidebarGrid.vue';
+import Notice from './notice.vue';
+import Footer from '../MainFooter.vue';
+import Login from '../NavLoginBtn.vue';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const API_URL = import.meta.env.VITE_API_URL
@@ -30,8 +30,9 @@ const fetchNotices = async () => {
     notices.value = (data.notices || []).sort((a, b) => {
       return new Date(b.created_at) - new Date(a.created_at)
     })
-    // 初始加載時，設定正確的未讀通知數量
+    
     unreadCount.value = data.unreadCount || 0
+    
   } catch (error) {
     console.error('Error fetching notices:', error)
   }
@@ -39,16 +40,14 @@ const fetchNotices = async () => {
 
 const markAsRead = async (noticeId, postCode) => {
   try {
-    // 先找到通知
-    const notice = notices.value.find((n) => n.id === noticeId)
+    
+    const notice = notices.value.find((n) => n.id === noticeId);
 
-    // 如果通知已經是已讀狀態，直接返回，不再執行減少未讀計數
     if (notice && notice.is_read) {
       goToPost(postCode)
       return
     }
 
-    // 向後端發送請求，標記為已讀
     const response = await axios.post(
       `${API_URL}/api/mark-as-read`,
       { noticeId },
@@ -60,12 +59,11 @@ const markAsRead = async (noticeId, postCode) => {
     )
 
     if (response.data.is_read) {
-      // 成功標記為已讀，更新通知狀態
       if (notice) {
         notice.is_read = true
       }
-      // 減少未讀計數
-      unreadCount.value -= 1
+
+      unreadCount.value -= 1;
 
       goToPost(postCode)
     }

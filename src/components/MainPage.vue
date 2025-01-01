@@ -3,7 +3,7 @@ import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import placeholderImage from '@/img/card-loading.png' // 預設圖片
 import NavLoginBtn from './NavLoginBtn.vue'
-import Notice from '../components/notification/notice.vue'
+import Notice from '@/components/notification/notice.vue'
 import MainFooter from '../components/MainFooter.vue'
 
 const isScrolled = ref(false) // 是否滾動
@@ -139,10 +139,6 @@ onBeforeUnmount(() => {
       <section class="author-section">
         <div>
           <div class="author-icon">
-            <!-- <img
-                    src="https://jasonxddd.me:9000/image/1701747118927_head.png"
-                    alt=""
-                    /> -->
             <h2>Capie 團隊</h2>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -521,7 +517,7 @@ onBeforeUnmount(() => {
 
               如果您對此仍不熟悉，歡迎至Capie Discord
               頻道讓大家一起幫你解答：<span>
-                <a href="https://discord.com/invite/QMtPcXrdBq"
+                <a href="https://discord.com/channels/1303258823104135219/1321898702750748752"
                   >Discord
                 </a></span
               >
@@ -897,25 +893,6 @@ onBeforeUnmount(() => {
               </svg>
               <span>服務條款</span>
             </a>
-            <a
-              href="https://jasonxddd.me:7701/status/bottleneko"
-              target="_blank"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                st
-                data-slot="icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
-                ></path>
-              </svg>
-              <span>系統狀況</span>
-            </a>
           </div>
           <div class="link-area2">
             <h3>外部連結</h3>
@@ -954,7 +931,7 @@ onBeforeUnmount(() => {
           </div>
           <div class="link-area3">
             <h3>內部連結</h3>
-            <a href="#">
+            <a href="/team">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -1014,20 +991,9 @@ header {
 }
 
 .header-container {
-  /* grid-area: navbar; */
   padding-left: 1.5rem;
   padding-right: 1.5rem;
   background-color: transparent;
-}
-
-.header-container.scrolled {
-  background-color: rgba(18, 18, 18, 1);
-}
-
-.default-transition {
-  transition-duration: 0.3s;
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .notice-icon {
@@ -1486,7 +1452,6 @@ header {
   border-radius: 20px;
   border: 8px solid transparent;
   height: 624px;
-  width: 100%;
   object-fit: cover;
 }
 .card2-right-img {
@@ -1501,7 +1466,6 @@ header {
   border-radius: 20px;
   border: 8px solid transparent;
   height: 624px;
-  width: 100%;
   object-fit: cover;
 }
 
@@ -1535,17 +1499,17 @@ header {
   border-radius: 20px;
   margin-left: 53.5px;
   margin-right: 53.5px;
-  position: relative;
   box-sizing: border-box;
+}
+
+.card3-img {
+  margin-top: 30px;
 }
 
 .card3-img img {
   border-radius: 20px 0px 0px 20px;
   max-width: 100%;
   height: auto;
-  position: absolute;
-  top: 2rem;
-  left: 25rem;
 }
 
 .card3 > div {
@@ -1994,6 +1958,10 @@ input[type='checkbox']:not(:checked) + label .dropdown-icon {
   overflow: auto;
 }
 
+.specialthank-img::-webkit-scrollbar {
+  display: none; 
+}
+
 .specialthank-img img {
   max-width: 128px;
   height: 128px;
@@ -2376,90 +2344,82 @@ link-area3 a svg {
   }
 
   .logo-banner h1 {
-    font-size: 30px !important;
+    font-size: 30px;
   }
 
   .card1 {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
+    margin-left: 0px ;
+    margin-right: 0px ;
   }
 
   .card2 {
     flex-direction: column;
     justify-content: center;
-    overflow: hidden !important;
-    margin-left: 0px !important;
-    margin-right: 0px !important;
+    overflow: hidden ;
+    margin-left: 0px ;
+    margin-right: 0px ;
   }
 
   .card2-left,
   .card2-right {
-    width: 100% !important;
-    margin-left: 0px !important;
-    margin-right: 0px !important;
+    width: 100%;
+    margin-left: 0px;
+    margin-right: 0px;
     overflow: hidden;
   }
 
-  .card2-left-img img {
-    width: 70% !important;
-  }
-
-  .card2-right-img img {
-    width: 70% !important;
-  }
-
   .card3 {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   .card4 {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
-    grid-template-columns: 1fr !important;
-    grid-auto-rows: minmax(480px, auto) !important;
+    margin-left: 0px;
+    margin-right: 0px;
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(480px, auto);
   }
 
   .card4-left {
-    grid-area: 1 / 1 / 2 / 2 !important;
+    grid-area: 1 / 1 / 2 / 2;
   }
 
   .card4-right {
-    grid-area: 2 / 1 / 3 / 2 !important;
+    grid-area: 2 / 1 / 3 / 2;
   }
 
   .card5 {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
-    margin-top: 550px !important;
-    grid-template-columns: 1fr !important;
-    grid-template-rows: minmax(384px, 480px) !important;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 550px;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(384px, 480px);
   }
 
   .card5-left {
-    grid-area: 1 / 1 / 2 / 2 !important;
+    grid-area: 1 / 1 / 2 / 2;
   }
 
   .card5-right {
-    grid-area: 2 / 1 / 3 / 2 !important;
+    grid-area: 2 / 1 / 3 / 2;
   }
 
   .author-icon svg {
-    margin-left: auto !important;
+    margin-left: auto;
   }
 
   .question-section {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   .specialthank-section {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   .specialthank-img {
-    justify-content: flex-start !important;
+    justify-content: flex-start;
     align-items: center;
   }
 
@@ -2470,31 +2430,31 @@ link-area3 a svg {
   }
 
   .link-section {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   .link-area {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: repeat(3, 1fr) !important;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, 1fr);
     gap: 2rem;
   }
 
   .link-area1 {
-    grid-area: 1/1/2/2 !important;
+    grid-area: 1/1/2/2;
   }
 
   .link-area2 {
-    grid-area: 2/1/3/2 !important;
+    grid-area: 2/1/3/2;
   }
 
   .link-area3 {
-    grid-area: 3/1/4/2 !important;
+    grid-area: 3/1/4/2;
   }
 
   .member-section {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   .work-shop-footer-flexbox {
@@ -2574,7 +2534,6 @@ link-area3 a svg {
     border-radius: 20px 0px 0px 20px;
     max-width: 100%;
     height: auto;
-    /* position: none; */
   }
 }
 

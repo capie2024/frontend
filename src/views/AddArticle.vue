@@ -4,7 +4,8 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import MainFooter from '@/components/MainFooter.vue'
-import notice from '../components/notification/notice.vue'
+import Notice from '../components/notification/notice.vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
 import SidebarGrid from '../components/SidebarGrid.vue'
 import Editor from '@tinymce/tinymce-vue'
 
@@ -228,49 +229,28 @@ onMounted(() => {
             ></path>
           </svg>
         </button>
-        <notice />
-        <button class="user-btn">
-          <div class="btn-img">
-            <img src="/src/img/avatar.png" alt="" />
-          </div>
-          <span>XXXX</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            class="h-4 w-4 flex-none"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m19.5 8.25-7.5 7.5-7.5-7.5"
-            ></path>
-          </svg>
-        </button>
+        <Notice />
+        <NavLoginBtn />      
       </div>
     </header>
     <section class="title-area">
       <div class="title-area-container">
         <button class="upload-btn" @click="handleButtonClick">
-          <svg
+          <svg 
             v-if="!imageUrl"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            class="h-20 w-20"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke-width="1.5" 
+            stroke="currentColor" 
+            aria-hidden="true" 
+            data-slot="icon" 
+            class="w-20 h-20">
+            <path 
+            stroke="currentColor" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2M12 4v12m0-12 4 4m-4-4L8 8"
             ></path>
           </svg>
 
@@ -329,7 +309,7 @@ onMounted(() => {
             type="text"
             placeholder="請輸入標題"
           />
-          <div class="card-select-area">
+          <div class="card-select-area" style="position: relative;">
             <button class="card-select-btn" @click="toggleMenu">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -631,30 +611,6 @@ a {
   top: 0;
 }
 
-.translate-btn {
-  display: flex;
-  align-items: center;
-  width: 238px;
-  height: 40px;
-  gap: 8px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(45deg, #a855f7, #ec4899);
-  color: white;
-  margin-top: 20px;
-  cursor: pointer;
-  position: relative;
-}
-
-.translate-btn::after {
-  content: '';
-  position: absolute;
-  border-top: 1px solid #3f3f46;
-  top: 50px;
-  left: 0;
-  right: 0;
-  width: 100%;
-}
 
 .sidebar p {
   color: #a1a1aa;
@@ -709,27 +665,6 @@ a {
   gap: 8px;
 }
 
-.notice {
-  width: 30px;
-  height: 25px;
-  background-color: #2d7894;
-  color: white;
-  border-radius: 15px;
-  font-size: 15px;
-  font-weight: 900;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 0 8px 0 8px;
-  position: absolute;
-  right: 105px;
-  top: 35px;
-  opacity: 0;
-  visibility: hidden;
-  transition: ease 0.3s;
-}
-
 .submit-btn {
   width: 92px;
   height: 36px;
@@ -767,37 +702,6 @@ a {
   color: #292828;
   font-size: 15px;
   font-weight: 900;
-}
-
-.user-btn {
-  border: none;
-  background-color: #19647f;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 20px;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.user-btn:hover {
-  background-color: #2d7894;
-}
-
-.btn-img img {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-}
-
-.user-btn span {
-  color: white;
-}
-
-.user-btn svg {
-  width: 16px;
-  height: 16px;
-  stroke: white;
 }
 
 main {
@@ -852,7 +756,8 @@ header {
   overflow: hidden;
 }
 .preview-image {
-  width: 240px;
+  width: 100%;
+  object-fit: cover;
   position: absolute;
   top: 0;
   left: 0;
@@ -861,7 +766,8 @@ header {
 .upload-btn svg {
   width: 85px;
   height: 85px;
-  stroke: white;
+  --tw-text-opacity: 1;
+  color: rgb(228 228 231 / var(--tw-text-opacity, 1));
   visibility: hidden;
   opacity: 0;
   transition: ease 0.2s;
@@ -1263,10 +1169,6 @@ footer {
   }
 
   .next-btn {
-    display: none;
-  }
-
-  .user-btn {
     display: none;
   }
 

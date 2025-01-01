@@ -12,7 +12,6 @@ import userPicture from '@/img/avatar.png'
 import { useDeckMakeStore } from '@/stores/deck-make'
 import { useCardSeriesStore } from '@/stores/card-series'
 import { useRoute, useRouter } from 'vue-router'
-import { comment } from 'postcss'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const API_URL = import.meta.env.VITE_API_URL
@@ -190,18 +189,21 @@ const fetchMessages = async () => {
         const userToken = localStorage.getItem('token');
         const headers = userToken
             ? { Authorization: `Bearer ${userToken}` }
-            : {}; // 未登入時不傳授權標頭
+            : {};
 
         const response = await axios.get(`${API_URL}/api/comments?articleId=${article.value.article_id}`, {
             headers,
         });
 
+        console.log("Headers being sent:", headers);
+
         messages.value = response.data;
+        console.log(messages.value)
         messages.value.forEach(message => {
-            message.liked = message.isLiked ?? false; // 未登入時設為 false
-            message.hated = message.isHated ?? false; // 未登入時設為 false
-            message.likeCount = message.like_count || 0; // 顯示正確的 like_count
-            message.pictureUrl = message.users?.picture || '/default-avatar.png';
+            message.liked = message.isLiked; 
+            message.hated = message.isHated; 
+            message.likeCount = message.like_count || 0; 
+            message.pictureUrl = message.users?.picture;
         });
     } catch (error) {
         console.error('Error fetching messages:', error);
@@ -221,20 +223,14 @@ const sendMessage = async () => {
   };
 
   const userToken = localStorage.getItem('token');
-  if (!userToken) {
-    console.error('User token is missing');
-    Swal.fire({
-      title: '請先登入',
-      text: '留言功能需要登入才能使用。',
-      icon: 'warning',
-      confirmButtonText: '確定',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = `${BASE_URL}/login`;
-      }
-    });
-    return;
-  }
+    if (!userToken) {
+      Swal.fire({
+        title: '請先登入',
+        text: '留言功能需要登入才能使用。',
+        icon: 'warning',
+        confirmButtonText: '確定',
+      })
+    }
 
   try {
     const response = await axios.post(`${API_URL}/api/send-message`, { messageData }, {
@@ -242,11 +238,7 @@ const sendMessage = async () => {
         Authorization: `Bearer ${userToken}`,
       },
     });
-    const commentId = response.data.id;
-    messages.value.unshift(response.data);
-    newMessage.value = ''; 
     
-    fetchCommentReactions(commentId);
   } catch (error) {
     console.error('Error sending message:', error);
   }
@@ -350,8 +342,12 @@ const toggleLike = async (message) => {
   try {
     const userToken = localStorage.getItem('token');
     if (!userToken) {
-      console.error('User token not found.');
-      return;
+      Swal.fire({
+        title: '請先登入',
+        text: '留言功能需要登入才能使用。',
+        icon: 'warning',
+        confirmButtonText: '確定',
+      })
     }
 
     const response = await axios.post(
@@ -373,8 +369,13 @@ const toggleHate = async (message) => {
   try {
     const userToken = localStorage.getItem('token');
     if (!userToken) {
-      console.error('User token not found.');
-      return;
+      console.error('User token is missing');
+      Swal.fire({
+        title: '請先登入',
+        text: '留言功能需要登入才能使用。',
+        icon: 'warning',
+        confirmButtonText: '確定',
+      })
     }
 
     const response = await axios.post(
@@ -383,11 +384,14 @@ const toggleHate = async (message) => {
       { headers: { Authorization: `Bearer ${userToken}` } }
     );
 
-    const { isHated, isLiked, likeCount } = response.data;
-    console.log(response.data);
+    const { isLiked, isHated, likeCount } = response.data;
     message.hated = isHated;
     message.liked = isLiked;
     message.likeCount = likeCount;
+    
+    if (likeCount === 0) {
+      message.liked = false;
+    }
   } catch (error) {
     console.error('Error toggling hate:', error.response || error.message);
   }
@@ -1087,7 +1091,7 @@ onMounted(() => {
                     >
                       <section>
                         <div class="message-user-img">
-                          <img :src="message.users.picture" alt="" />
+                          <img :src="message.users.picture || userPicture" alt="" />
                         </div>
                       </section>
                       <div class="message-body">

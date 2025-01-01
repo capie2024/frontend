@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted } from 'vue';
 import dayjs from 'dayjs';
 import axios from 'axios';
 
@@ -187,6 +187,18 @@ onMounted(() => {
 <style scoped>
 @import '@/assets/base.css';
 
+.notice-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 999;
+}
+
+.notice {
+  position: relative;
+  z-index: 999;
+}
+
 .notice-item.read {
   background-color: #1f1f22;
 }
@@ -197,23 +209,13 @@ onMounted(() => {
 
 .notice-grid-down-1 {
   border-radius: 0px 0px 10px 10px;
-  height: 100%;
+  height: 350px;
+  z-index: 999;
   overflow-y: scroll;
 }
 
 .notice-grid-down-1::-webkit-scrollbar {
-  display: none; /* 隱藏滾動條 */
-}
-
-.notice-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  /* margin-right: 136px; */
-  /* margin-top: 16px; */
-}
-
-.notice {
-  position: relative;
+  display: none; 
 }
 
 .notice-icon {
@@ -231,7 +233,6 @@ onMounted(() => {
 
 .notice-icon:hover {
   background-color: #2a2727;
-  /* opacity: 0.8; */
 }
 
 .notice-grid-up h2 {
@@ -252,7 +253,6 @@ onMounted(() => {
     transform 0.3s ease;
   z-index: 999;
   width: 350px;
-  z-index: 9999;
 }
 
 #notice-jump:checked ~ .notice-grid {
@@ -267,7 +267,6 @@ onMounted(() => {
   background-color: #27272a;
   padding: 24px 16px 8px 16px;
   border-radius: 10px 10px 0px 0px;
-  /* position: sticky; */
 }
 
 .notice-grid-down {
@@ -281,7 +280,6 @@ onMounted(() => {
 }
 
 .notice-grid-down img {
-  /* width: 240px; */
   height: 240px;
   margin-bottom: 30px;
 }

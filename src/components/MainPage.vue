@@ -990,7 +990,7 @@ onBeforeUnmount(() => {
         </div>
       </section>
       <section class="member-section">
-        <a href="">
+        <a href="/login">
           <p>疑？你還不是會員嗎？ 趕快來加入我們吧！</p>
         </a>
       </section>

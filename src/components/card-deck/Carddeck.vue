@@ -26,6 +26,7 @@ const sortBy = ref('typeTranslate')
 const toggleTableView = ref(false)
 const togglePriceView = ref(false)
 const article = ref(null)
+const post = ref(null)
 const isVisible = ref(false)
 const currentUser = ref(null)
 const deckData = ref({ deck: [] })
@@ -164,7 +165,7 @@ const fetchCurrentUser = async () => {
   currentUser.value = response.data
 }
 
-const fetchArticles = async () => {
+const fetchArticleId = async () => {
   const postCode = route.params.post_code
   if (!postCode) {
     console.error('Error: postCode is not available in route params')
@@ -176,6 +177,16 @@ const fetchArticles = async () => {
     await fetchMessages()
   } catch (error) {
     console.error('Error fetching article_id:', error)
+  }
+}
+
+const fetchArticle = async() => {
+  const postCode = route.params.post_code
+  try {
+    const response = await axios.get(`${API_URL}/api/articles/${postCode}`);
+    post.value = response.data; 
+  } catch (error) {
+    console.error('獲取文章資料失敗', error);
   }
 }
 
@@ -404,14 +415,14 @@ const formatDate = (date) => {
 }
 
 const isMyArticle = () => {
-  // if (!article.value || typeof article.value.user_id === 'undefined') {
-  //   console.warn('Invalid article:', article);
-  //   return false;
-  // }
+  if (!post.value || post.value.user_id === 'undefined') {
+    console.warn('Invalid article:', post);
+    return false;
+  }
   const token = localStorage.getItem('token')
   const loggedInUserId = getUserIdFromToken(token)
 
-  return article.value.user_id === loggedInUserId
+  return post.value.user_id === loggedInUserId
 }
 
 const deleteArticle = async () => {
@@ -500,7 +511,7 @@ let mainElement = ref(null)
 
 const handleScroll = () => {
   const scrollTop = mainElement.value.scrollTop
-  isScrolled.value = scrollTop > 100
+  isScrolled.value = scrollTop > 0
 }
 
 const main = () => {
@@ -511,7 +522,8 @@ const main = () => {
 }
 
 onMounted(() => {
-  fetchArticles()
+  fetchArticleId()
+  fetchArticle()
   fetchCurrentUser()
   fetchDeck()
   main()
@@ -569,11 +581,11 @@ onBeforeUnmount(() => {
               ></path>
             </svg>
           </button>
-          <h2 class="header-title" v-if="article">{{ article.title }}</h2>
+          <h2 class="header-title" v-if="post">{{ post.title }}</h2>
         </div>
         <div class="btn-area">
           <button
-            v-if="isMyArticle"
+            v-if="isMyArticle()"
             @click="editArticle"
             class="social-btn-item social-btn2"
           >
@@ -615,7 +627,7 @@ onBeforeUnmount(() => {
             <div class="description-item description2">複製牌組</div>
           </button>
           <button
-            v-if="isMyArticle"
+            v-if="isMyArticle()"
             @click="deleteArticle"
             class="social-btn-item social-btn3"
           >
@@ -660,10 +672,7 @@ onBeforeUnmount(() => {
             </svg>
             <div class="description-item description3">匯出牌組</div>
           </button>
-          <button class="social-btn-item social-btn4">
-            <div class="description-item description4">通知</div>
-            <notice />
-          </button>
+          <Notice />
           <div class="user-btn">
             <NavLoginBtn />
           </div>
@@ -694,11 +703,11 @@ onBeforeUnmount(() => {
           <div class="carddeck-img">
             <img
               :src="
-                article && article.post_picture
-                  ? article.post_picture
+                post && post.post_picture
+                  ? post.post_picture
                   : 'https://bottleneko.app/images/cover.png'
               "
-              :alt="article && article.title ? article.title : 'Default Title'"
+              :alt="post && post.title ? post.title : 'Default Title'"
             />
           </div>
           <div class="carddeck-data">
@@ -720,19 +729,19 @@ onBeforeUnmount(() => {
                 ></path></svg
               >{{ postCode }}
             </p>
-            <h1>{{ article?.title }}</h1>
+            <h1>{{ post?.title }}</h1>
             <div class="data-container">
               <div class="user-link">
                 <div class="user-img">
                   <img
-                    :src="article?.user_picture || userPicture"
+                    :src="post?.users?.picture || userPicture"
                     alt="用戶頭像"
                   />
                 </div>
                 <span class="date-container">
-                  <a href="#">{{ article?.users?.username }}</a>
+                  <a href="#">{{ post?.users?.username }}</a>
                   發布於
-                  <span>{{ formatDate(article?.created_at) }}</span>
+                  <span>{{ formatDate(post?.created_at) }}</span>
                 </span>
               </div>
               <span class="data-item">
@@ -822,7 +831,7 @@ onBeforeUnmount(() => {
               <span>文章內容</span>
             </div>
             <div class="article-content">
-              <p v-html="article?.content"></p>
+              <p v-html="post?.content"></p>
             </div>
           </div>
           <!-- 留言區域 -->
@@ -2447,6 +2456,10 @@ header.scrolled .header-title {
   width: 60px;
 }
 
+.description3 {
+  width: 60px;
+}
+
 .user-btn {
   border: none;
   display: flex;
@@ -2583,22 +2596,6 @@ main {
   width: 24px;
   height: 24px;
   stroke: white;
-}
-
-.carddeck-name {
-  width: 60%;
-  display: flex;
-}
-
-.carddeck-name h1 {
-  width: 70%;
-  min-height: 138px;
-  font-size: 70px;
-  font-weight: bold;
-  color: white;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .data-container {
@@ -3120,25 +3117,18 @@ span svg {
     display: none;
   }
 
-  .pagebtn-area h2 {
-    display: none;
-  }
   .user-btn {
     display: none;
   }
-  .btn-area {
-    right: 0px;
-  }
 
   .social-btn2,
-  .social-btn3,
-  .social-btn4 {
+  .social-btn3 {
     display: block;
   }
 
   .carddeck-information {
     width: 100%;
-    height: 615px;
+    height: calc(100% - 40px);
     padding: 0;
   }
 
@@ -3161,20 +3151,6 @@ span svg {
     width: 288px;
   }
 
-  .carddeck-name {
-    width: 100%;
-    height: 40px;
-    overflow: visible;
-  }
-
-  .carddeck-name h1 {
-    width: 100%;
-    font-size: 30px;
-    height: 20px;
-    white-space: unset;
-    overflow: visible;
-    text-overflow: unset;
-  }
 
   .carddeck-data {
     width: 100%;
@@ -3185,7 +3161,8 @@ span svg {
   }
 
   .data-container {
-    width: 100%;
+    width: calc(100% - 20px);
+    margin-bottom: 16px;
     flex-direction: column;
     flex-wrap: wrap;
     align-items: start;
@@ -3255,6 +3232,18 @@ span svg {
   .func-btn1 {
     display: none;
   }
+
+  .row {
+    margin-top: 30px;
+  }
+
+  .description2 {
+    right:20px;
+  }
+
+  .description3 {
+    right:-10px;
+  }
 }
 
 @media screen and (max-width: 800px) {
@@ -3283,12 +3272,10 @@ span svg {
   }
 }
 
-@media screen and (max-width: 410px) {
-  .carddeck-name h1 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+@media screen and (max-width: 450px) {
+.carddeck-information {
+  height:700px;
+}
 }
 @media screen and (max-width: 375px) {
   .tool-btn1 {

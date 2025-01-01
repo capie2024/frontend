@@ -63,29 +63,8 @@ const markAsRead = async (noticeId, postCode) => {
     } catch (error) {
         console.error('Error marking as read:', error);
     }
+};
 
-    const response = await axios.post(
-      `${API_URL}/api/mark-as-read`,
-      { noticeId },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      }
-    )
-
-    if (response.data.is_read) {
-      if (notice) {
-        notice.is_read = true
-      }
-      unreadCount.value -= 1
-
-      goToPost(postCode)
-    }
-  } catch (error) {
-    console.error('Error marking as read:', error)
-  }
-}
 
 const goToPost = (postCode) => {
   window.location.href = `${BASE_URL}/social/${postCode}`

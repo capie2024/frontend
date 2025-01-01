@@ -757,7 +757,7 @@ onBeforeUnmount(() => {
       </div>
       <div class="line"></div>
       <div class="total-cards">
-        <span>牌組製作，目前共{{ selectedCards.length }}張卡</span>
+        <span>牌組製作，共{{ selectedCards.length }}張卡</span>
       </div>
       <div class="deckbtn-area">
         <button class="deck-btn">
@@ -858,12 +858,11 @@ onBeforeUnmount(() => {
 
 .total-cards {
   width: 80%;
-  padding-top: 8px;
   padding-left: 15px;
 }
 
 .total-cards span {
-  font-size: 16px;
+  font-size: 14px;
   color: #dad7d7;
   font-weight: 700;
 }
@@ -887,7 +886,7 @@ onBeforeUnmount(() => {
   flex-direction: row;
   align-items: center;
   position: absolute;
-  right: 120px;
+  right: 110px;
   cursor: pointer;
   justify-content: center;
 }

@@ -272,7 +272,7 @@ const isScrolled = ref(false)
 let mainElement = ref(null)
 const handleScroll = () => {
   const scrollTop = mainElement.value.scrollTop
-  isScrolled.value = scrollTop > 300
+  isScrolled.value = scrollTop > 0
 }
 
 const main = () => {
@@ -727,7 +727,7 @@ a {
     height: 100vh;
   }
   .top-container {
-    width: calc(100% - 48px);
+    width: 100%;
     top: 0;
     left: 0;
   }
@@ -752,7 +752,7 @@ a {
     padding: 24px 0 8px 0;
   }
   .show-card {
-    padding: 0px;
+    padding: 0 10px;
     margin: 0;
   }
   .show-card > * {
@@ -760,7 +760,7 @@ a {
     flex: none;
   }
   .grid-card {
-    padding: 0;
+    padding: 0 10px;
     margin: 0;
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -804,7 +804,6 @@ a {
     padding: 24px 0 8px 0;
   }
   .show-card {
-    padding: 0px;
     margin: 0;
   }
   .show-card > * {
@@ -812,7 +811,6 @@ a {
     flex: none;
   }
   .grid-card {
-    padding: 0px;
     margin: 0;
   }
   .url {
@@ -854,7 +852,6 @@ a {
     padding: 24px 0 8px 0;
   }
   .show-card {
-    padding: 0px;
     margin: 0;
   }
   .show-card > * {
@@ -862,7 +859,6 @@ a {
     flex: none;
   }
   .grid-card {
-    padding: 0px;
     margin: 0;
   }
   .url {

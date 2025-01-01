@@ -7,35 +7,36 @@ import Notice from './notice.vue';
 import Footer from '../MainFooter.vue';
 import Login from '../NavLoginBtn.vue';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-const API_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL
+const API_URL = import.meta.env.VITE_API_URL
 
-const unreadCount = ref('');
-const notices = ref([]);
+const unreadCount = ref('')
+const notices = ref([])
 
 const formattedTime = (createdAt) => {
-  if (!createdAt) return '未知時間';
-  return dayjs(createdAt).format('YYYY-MM-DD');
-};
+  if (!createdAt) return '未知時間'
+  return dayjs(createdAt).format('YYYY-MM-DD')
+}
 
 const fetchNotices = async () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token')
   try {
     const response = await fetch(`${API_URL}/api/notices`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
-    const data = await response.json();
+    })
+    const data = await response.json()
     notices.value = (data.notices || []).sort((a, b) => {
-      return new Date(b.created_at) - new Date(a.created_at);
-    });
-
-    unreadCount.value = data.unreadCount || 0;
+      return new Date(b.created_at) - new Date(a.created_at)
+    })
+    
+    unreadCount.value = data.unreadCount || 0
+    
   } catch (error) {
-    console.error('Error fetching notices:', error);
+    console.error('Error fetching notices:', error)
   }
-};
+}
 
 const markAsRead = async (noticeId, postCode) => {
   try {
@@ -43,8 +44,8 @@ const markAsRead = async (noticeId, postCode) => {
     const notice = notices.value.find((n) => n.id === noticeId);
 
     if (notice && notice.is_read) {
-      goToPost(postCode);
-      return;
+      goToPost(postCode)
+      return
     }
 
     const response = await axios.post(
@@ -55,29 +56,29 @@ const markAsRead = async (noticeId, postCode) => {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       }
-    );
+    )
 
     if (response.data.is_read) {
       if (notice) {
-        notice.is_read = true;
+        notice.is_read = true
       }
 
       unreadCount.value -= 1;
 
-      goToPost(postCode);
+      goToPost(postCode)
     }
   } catch (error) {
-    console.error('Error marking as read:', error);
+    console.error('Error marking as read:', error)
   }
-};
+}
 
 const goToPost = (postCode) => {
-  window.location.href = `${BASE_URL}/social/${postCode}`;
-};
+  window.location.href = `${BASE_URL}/social/${postCode}`
+}
 
 onMounted(() => {
-  fetchNotices();
-});
+  fetchNotices()
+})
 </script>
 
 <template>
@@ -130,7 +131,7 @@ onMounted(() => {
         </div>
 
         <Notice class="notice-mobile-hidden" />
-        <Login class="login-mobile-hidden"/>
+        <Login class="login-mobile-hidden" />
       </nav>
     </header>
     <div class="background scrollbar">

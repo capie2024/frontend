@@ -1,18 +1,18 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import dayjs from 'dayjs';
-import axios from 'axios';
+import { ref, onMounted } from 'vue'
+import dayjs from 'dayjs'
+import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-const API_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL
+const API_URL = import.meta.env.VITE_API_URL
 
-const unreadCount = ref("");
-const notices = ref([]);
+const unreadCount = ref('')
+const notices = ref([])
 
 const formattedTime = (createdAt) => {
-    if (!createdAt) return "未知時間";
-    return dayjs(createdAt).format("YYYY-MM-DD");
-};
+  if (!createdAt) return '未知時間'
+  return dayjs(createdAt).format('YYYY-MM-DD')
+}
 
 const fetchNotices = async () => {
     const token = localStorage.getItem('token');
@@ -28,7 +28,6 @@ const fetchNotices = async () => {
             }
         });
         const data = await response.json();
-        console.log('Unread count from API:', data);
         notices.value = (data.notices || []).sort((a, b) => {
             return new Date(b.created_at) - new Date(a.created_at);
         });
@@ -52,7 +51,7 @@ const markAsRead = async (noticeId, postCode) => {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
-        console.log(response.data)
+       
         if (response.data.is_read) {
             if (notice) {
                 notice.is_read = true;
@@ -64,16 +63,37 @@ const markAsRead = async (noticeId, postCode) => {
     } catch (error) {
         console.error('Error marking as read:', error);
     }
-};
+
+    const response = await axios.post(
+      `${API_URL}/api/mark-as-read`,
+      { noticeId },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    )
+
+    if (response.data.is_read) {
+      if (notice) {
+        notice.is_read = true
+      }
+      unreadCount.value -= 1
+
+      goToPost(postCode)
+    }
+  } catch (error) {
+    console.error('Error marking as read:', error)
+  }
+}
 
 const goToPost = (postCode) => {
-    window.location.href = `${BASE_URL}/social/${postCode}`;
-};
+  window.location.href = `${BASE_URL}/social/${postCode}`
+}
 
 onMounted(() => {
     fetchNotices();
 });
-
 </script>
 
 <template>

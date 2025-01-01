@@ -1,13 +1,15 @@
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
+// import { useFaqInfoStore } from '@/stores/faq-info'
 import axios from 'axios'
 import SidebarGrid from '@/components/SidebarGrid.vue'
-import router from '../router'
 import Notice from '../components/notification/notice.vue'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 import MainFooter from '../components/MainFooter.vue'
 import { useI18n } from 'vue-i18n'
 
+const router = useRouter()
 const { locale } = useI18n()
 const qaList = ref([])
 const sortOrder = ref('desc')
@@ -15,16 +17,18 @@ const searchQuery = ref('')
 const filteredData = ref([])
 const API_URL = import.meta.env.VITE_API_URL
 
+// 引入FaqInfoStore並使用
+// const faqInfoStore = useFaqInfoStore()
+// const getFaqInfoAndShow = faqInfoStore.getFaqInfoAndShow
+
 const getQAList = async () => {
   try {
     const { data } = await axios.get(`${API_URL}/qa`)
-    // qaList.value.push(...data)
     // 收集所有處理過的 relations 結果，只顯示共同的部分
     qaList.value = data.map((qa) => ({
       ...qa,
       processedRelation: qa.relations ? findSeries(qa.relations) : '',
     }))
-    console.log(qaList.value) // 檢查處理後的數據
   } catch (error) {
     console.error(error)
   }
@@ -37,15 +41,13 @@ const translatedQAList = computed(() => {
     return {
       ...qa,
       q: translateQ || qa.q,
-      a: translateA || qa.a
+      a: translateA || qa.a,
     }
   })
 })
 
-/**
- * highlightText: 對傳入字串進行括號、引號等符號區塊加上 <mark> 的處理
- */
-function highlightText(str) {
+// highlightText: 對傳入字串進行括號、引號等符號區塊加上 <mark> 的處理
+const highlightText = (str) => {
   if (typeof str !== 'string') return str
 
   let highlighted = str
@@ -94,11 +96,6 @@ const findSeries = (arr) => {
   }
   return baseSegment
 }
-
-// 將共同的部分存在 commonLabel
-// const commonLabel = computed(() => {
-//   return findSeries(relations)
-// })
 
 const goBack = () => {
   router.go(-1)
@@ -164,6 +161,12 @@ const search = () => {
 const clearSearch = () => {
   searchQuery.value = ''
   filteredData.value = sortedData.value
+}
+
+// 進入問答詳情頁
+const openFaqInfo = (id) => {
+  console.log('進入問答詳情頁:', id)
+  router.push({ name: 'FaqInfo', params: { id } })
 }
 
 watch(searchQuery, () => {
@@ -332,6 +335,7 @@ onMounted(async () => {
             class="flex flex-col cursor-pointer group"
             v-for="qa in translatedQAList"
             :key="qa.id"
+            @click="openFaqInfo(qa.id)"
           >
             <div
               class="relative px-2 py-1 ml-auto bg-white rounded-full z-1 w-fit"

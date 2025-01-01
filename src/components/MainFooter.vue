@@ -12,16 +12,12 @@ const footerData = [
   },
   {
     title: '資源',
-    linkText: [
-      '遊々亭價格',
-      '基本規則',
-      '禁卡表',
+    linkText: ['遊々亭價格', '基本規則', '禁卡表'],
+    url: [
+      'https://yuyu-tei.jp/',
+      'https://ws-tcg.com/rules/',
+      'https://ws-tcg.com/rules/deck_rule/',
     ],
-    url:[
-    'https://yuyu-tei.jp/', 
-    'https://ws-tcg.com/rules/', 
-    'https://ws-tcg.com/rules/deck_rule/'
-    ]
   },
   {
     title: '常用連結',
@@ -45,11 +41,12 @@ const footerData = [
           </li>
           <li
             class="main-footer-flexbox-left-item-link"
-            v-for="(link, index) in item.linkText" 
-            :key="index"          
-            >
-            <a class="main-footer-flexbox-left-item-link-text"
-              :href="item.url[index]" 
+            v-for="(link, index) in item.linkText"
+            :key="index"
+          >
+            <a
+              class="main-footer-flexbox-left-item-link-text"
+              :href="item.url[index]"
             >
               {{ link }}
             </a>

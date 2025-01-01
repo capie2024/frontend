@@ -300,8 +300,28 @@ onBeforeUnmount(() => {
             ></path>
           </svg>
         </button>
-        <div class="w-full min-w-0 font-bold text-white justify-start">
-          <h2 class="header-title truncate text-2xl font-bold">帳號管理</h2>
+        <button
+          class="flex-none p-1 text-white rounded-full arrow-right bg-black/50 default-transition hover:bg-zinc-800/50 disabled:opacity-30"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+            ></path>
+          </svg>
+        </button>
+        <div class="justify-start w-full min-w-0 font-bold text-white">
+          <h2 class="text-2xl font-bold truncate header-title">帳號管理</h2>
         </div>
         <div class="icons">
           <button class="logout" @click="logout">
@@ -343,7 +363,7 @@ onBeforeUnmount(() => {
             <label class="cursor-pointer upload group" @click.stop="uploadPic">
               <Loading v-if="isUploading" />
               <div
-                class="rounded-full relative h-full w-full shadow-[0_4px_60px_rgba(0,0,0,.5)] overflow-hidden"
+                class="max-w-[240px] max-h-[240px] rounded-full relative h-full w-full shadow-[0_4px_60px_rgba(0,0,0,.5)] overflow-hidden"
                 style="background-color: rgb(50, 201, 255)"
               >
                 <img
@@ -650,7 +670,12 @@ onBeforeUnmount(() => {
                       class="relative grid w-full m-0 mx-auto overflow-hidden shadow-xl rounded-xl place-content-center"
                     >
                       <img
-                        src="https://bottleneko.app/images/cover.png"
+                        :src="
+                          post && post.post_picture
+                            ? post.post_picture
+                            : 'https://bottleneko.app/images/cover.png'
+                        "
+                        :alt="post && post.title ? post.title : 'Default Title'"
                         class="object-cover object-top w-full h-full overflow-hidden shadow-lg select-none aspect-square rounded-xl"
                       />
                     </div>
@@ -662,12 +687,10 @@ onBeforeUnmount(() => {
                           fill="currentColor"
                           aria-hidden="true"
                           data-slot="icon"
-                          class="flex-none size-4"
+                          class="size-4 flex-none"
                         >
                           <path
-                            fill-rule="evenodd"
-                            d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z"
-                            clip-rule="evenodd"
+                            d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"
                           ></path>
                         </svg>
                         <p class="text-xs truncate">{{ post.post_code }}</p>
@@ -781,8 +804,8 @@ onBeforeUnmount(() => {
               </section>
             </div>
           </div>
+          <MainFooter />
         </div>
-        <MainFooter />
       </main>
     </div>
   </div>

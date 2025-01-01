@@ -1,124 +1,265 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import axios from 'axios';
-import SidebarGrid from '../components/SidebarGrid.vue';
-import NavLoginBtn from '../components/NavLoginBtn.vue';
-import Notice from '../components/notification/notice.vue';
-import MainFooter from '../components/MainFooter.vue';
-const API_URL = import.meta.env.VITE_API_URL; 
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import axios from 'axios'
+import SidebarGrid from '../components/SidebarGrid.vue'
+import NavLoginBtn from '../components/NavLoginBtn.vue'
+import Notice from '../components/notification/notice.vue'
+import MainFooter from '../components/MainFooter.vue'
+import userPicture from '@/img/avatar.png'
+const API_URL = import.meta.env.VITE_API_URL
 
-const articles = ref([]);
-const searchQuery = ref('');
-const filteredArticles = ref([]);
+const articles = ref([])
+const searchQuery = ref('')
+const filteredArticles = ref([])
 const socialHistory = ref(
   JSON.parse(localStorage.getItem('socialHistory')) || []
-);
-const isScrolled = ref(false);
-let intervalId = null;
+)
 
+const originalSeries = ref([])
+const filteredDecks = ref([])
+const menuExpanded = ref(false)
+const codeMenuExpanded = ref(false)
+const seriesName = ref('篩選系列')
+const seriesFilter = ref('CODE')
+const searchSeriesQuery = ref('')
+
+const isScrolled = ref(false)
+let intervalId = null
 
 const fetchArticles = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/articles`);
+    const response = await axios.get(`${API_URL}/api/articles`)
     articles.value = response.data.sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
-    filteredArticles.value = articles.value;
+    )
+    filteredArticles.value = articles.value
   } catch (error) {
-    console.error('獲取文章列表失敗', error);
+    console.error('獲取文章列表失敗', error)
   }
-};
-
-
-const formatDate = (date) => {
-  if (!date) return '';
-  return date.split('T')[0];
-};
+}
 
 
 const searchArticles = () => {
   if (!searchQuery.value.trim()) {
-    filteredArticles.value = articles.value;
+    filteredArticles.value = articles.value
   } else {
-    const query = searchQuery.value.toLowerCase();
+    const query = searchQuery.value.toLowerCase()
     filteredArticles.value = articles.value.filter(
       (article) =>
         article.title.toLowerCase().includes(query) ||
         article.content.toLowerCase().includes(query) ||
         article.post_code.includes(query)
-    );
+    )
   }
-};
-
-
-const addSearchHistory = () => {
-  if (searchQuery.value.trim()) {
-    const newHistory = { searchQuery: searchQuery.value.trim() };
-    const existingIndex = socialHistory.value.findIndex(
-      (item) => item.searchQuery === newHistory.searchQuery
-    );
-
-    if (existingIndex !== -1) {
-      socialHistory.value.splice(existingIndex, 1);
-    }
-    socialHistory.value = [newHistory, ...socialHistory.value];
-    localStorage.setItem(
-      'socialHistory',
-      JSON.stringify(socialHistory.value)
-    );
-  }
-};
+}
 
 
 const handleEnter = () => {
-  searchArticles();
-  addSearchHistory();
-  searchQuery.value = '';
-};
-
-
-const handleHistoryClick = (query) => {
-  searchQuery.value = query;
-  searchArticles();
-  addSearchHistory();
-};
+  searchArticles()
+  addSearchHistory()
+  searchQuery.value = ''
+}
 
 
 const clearSearch = () => {
-  searchQuery.value = '';
-  filteredArticles.value = articles.value;
-};
+  searchQuery.value = ''
+  filteredArticles.value = articles.value
+}
 
+
+const toggleMenu = () => {
+  menuExpanded.value = !menuExpanded.value
+}
+
+
+const toggleCodeMenu = () => {
+  codeMenuExpanded.value = !codeMenuExpanded.value
+}
+
+
+const fetchCardseries = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/series`)
+    originalSeries.value = response.data
+    filteredDecks.value = response.data
+  } catch (err) {
+    error.value = '獲取系列卡表資料失敗' + err.message
+  }
+}
+
+
+const searchSeries = () => {
+  if (!searchSeriesQuery.value.trim()) {
+    filteredDecks.value = originalSeries.value
+  } else {
+    const query = searchSeriesQuery.value.toLowerCase()
+    filteredDecks.value = originalSeries.value.filter((deck) =>
+      deck.name?.toLowerCase().includes(query)
+    )
+  }
+}
+
+
+const clearMenuSearch = () => {
+  searchSeriesQuery.value = ''
+  filteredDecks.value = originalSeries.value
+}
+
+
+const selectDeck = (deck) => {
+  seriesName.value = deck.name
+  menuExpanded.value = !menuExpanded.value
+  seriesFilter.value = deck.name
+  codeMenuExpanded.value = !codeMenuExpanded.value
+
+
+  let findDecks = articles.value.filter((decksItem) => {
+    const deckList = decksItem.deck_list
+    const query = searchQuery.value.toLowerCase()
+    
+    const isInSeries =
+      deckList &&
+      deckList.deck &&
+      Array.isArray(deckList.deck) &&
+      deckList.deck.some(
+        (card) => card.seriesCode && deck.code.includes(card.seriesCode)
+      )
+
+    const isInSearchQuery = 
+      searchQuery.value.trim() === '' || 
+      decksItem.title.toLowerCase().includes(query) ||
+      decksItem.content.toLowerCase().includes(query) ||
+      decksItem.post_code.includes(query)
+
+    return isInSeries && isInSearchQuery
+
+  })
+
+  filteredArticles.value = [...findDecks]
+  addSearchHistory()
+}
+
+
+const clearSearchSeries = () => {
+  seriesName.value = '篩選系列'
+  seriesFilter.value = 'CODE'
+  menuExpanded.value = !menuExpanded.value
+  filteredArticles.value = articles.value
+  searchQuery.value = ''
+}
+
+
+const clearSeriesSearch = () => {
+  seriesFilter.value = 'CODE'
+  seriesName.value = '篩選系列'
+  codeMenuExpanded.value = !codeMenuExpanded.value
+  filteredArticles.value = articles.value
+  searchQuery.value = ''
+}
+
+
+const searchResultCount = computed(() => filteredArticles.value.length)
+
+
+const addSearchHistory = () => {
+  
+  const searchValue = searchQuery.value.trim() || '-'
+  const seriesValue =
+    seriesName.value && seriesName.value !== '篩選系列'
+      ? seriesName.value
+      : '-'
+
+  
+  if (searchValue !== '-' || seriesValue !== '-') {
+    
+    const newHistory = {
+      searchQuery: searchValue,
+      seriesName: seriesValue,
+    }
+
+   
+    const existingIndex = socialHistory.value.findIndex(
+      (item) =>
+        item.searchQuery === newHistory.searchQuery &&
+        item.seriesName === newHistory.seriesName
+    )
+
+    
+    if (existingIndex !== -1) {
+      socialHistory.value.splice(existingIndex, 1)
+    }
+
+    
+    socialHistory.value = [newHistory, ...socialHistory.value]
+
+    
+    localStorage.setItem(
+      'socialHistory',
+      JSON.stringify(socialHistory.value)
+    )
+  }
+}
+
+const handleHistoryClick = (query, series) => {
+  searchQuery.value = query === '-' ? '' : query
+
+  if (series === '-') {
+    seriesName.value = series === '-' ? '篩選系列' : series
+    seriesFilter.value = series === '-' ? 'CODE' : series
+  } else {
+    seriesName.value = series
+    seriesFilter.value = series
+  }
+
+  const selectedDeck = originalSeries.value.find((deck) => deck.name === series)
+  if (selectedDeck) {
+    selectDeck(selectedDeck)
+  } else {
+    searchArticles()
+    menuExpanded.value = !menuExpanded.value
+    codeMenuExpanded.value = !codeMenuExpanded.value
+  }
+
+  
+  addSearchHistory()
+  if (seriesName.value !== '-') {
+    menuExpanded.value = !menuExpanded.value
+    codeMenuExpanded.value = !codeMenuExpanded.value
+  }
+}
+
+const formatDate = (date) => {
+  if (!date) return ''
+  return date.split('T')[0]
+}
 
 const handleScroll = () => {
-  const mainElement = document.querySelector('.main');
-  isScrolled.value = mainElement && mainElement.scrollTop > 0;
-};
+  const mainElement = document.querySelector('.main')
+  isScrolled.value = mainElement && mainElement.scrollTop > 0
+}
 
 
 const startFunction = () => {
   if (intervalId) {
-    clearInterval(intervalId);
+    clearInterval(intervalId)
   }
   intervalId = setInterval(() => {
-    handleScroll();
-  }, 100);
-};
-
-
-const searchResultCount = computed(() => filteredArticles.value.length);
+    handleScroll()
+  }, 100)
+}
 
 
 onMounted(() => {
-  fetchArticles();
-  startFunction();
-});
+  fetchArticles()
+  startFunction()
+  fetchCardseries()
+})
 
 onBeforeUnmount(() => {
   if (intervalId) {
-    clearInterval(intervalId);
+    clearInterval(intervalId)
   }
-});
+})
 </script>
 
 <template>
@@ -127,10 +268,25 @@ onBeforeUnmount(() => {
     <div class="main">
       <div
         class="header-container"
-        :class="{ 'header-change': this.isScrolled }"
+        :class="{ 'header-change': isScrolled }"
       >
         <div class="search-container">
-          <i class="fa-solid fa-magnifying-glass"></i>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke-width="1.5" 
+            stroke="currentColor" 
+            aria-hidden="true" 
+            data-slot="icon" 
+            class="flex-none size-5 stroke-2 cursor-pointer text-zinc-700"
+          >
+            <path 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            ></path>
+          </svg>
           <input
             v-model="searchQuery"
             @keyup.enter="handleEnter"
@@ -156,26 +312,168 @@ onBeforeUnmount(() => {
             ></path>
           </svg>
         </div>
-        <button class="filter">
-          <i class="fa-regular fa-window-restore"></i>
-          篩選系列
-          <i class="fa-solid fa-x"></i>
+        <div style="position: relative">
+          <button 
+          class="filter" 
+          :class="{
+            'active-series': seriesName !== '篩選系列', 
+            'default-series': seriesName === '篩選系列'}"
+          @click="toggleMenu"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke-width="1.5" 
+              stroke="currentColor" 
+              aria-hidden="true" 
+              data-slot="icon" 
+              class="flex-none w-7 h-7"
+            >
+              <path 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+              ></path>
+            </svg>
+            {{ seriesName }}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
+              @click="clearSearchSeries"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+          <ul
+            class="menu-area"
+            v-show="menuExpanded"
+          >
+            <li class="menu-search">
+              <input
+                v-model="searchSeriesQuery"
+                @keyup="searchSeries"
+                class="keyword"
+                type="text"
+                placeholder="Keyword"
+              />
+              <button @click="clearMenuSearch">✖</button>
+            </li>
+            <div class="menu-inner-area">
+              <li
+                class="menu"
+                v-for="deck in filteredDecks"
+                :key="deck.id"
+                @click="selectDeck(deck)"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke-width="1.5" 
+                  stroke="currentColor" 
+                  aria-hidden="true" 
+                  data-slot="icon"
+                >
+                  <path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+                  ></path>
+                </svg>
+                <p class="text-xs truncate">{{ deck.name }}</p>
+              </li>
+            </div>
+          </ul>
+        </div>
+        <button 
+          class="filter-hidden" 
+          :class="{
+            'active-series': seriesFilter !== 'CODE', 
+            'default-series': seriesFilter === 'CODE'}"
+          @click="toggleCodeMenu"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke-width="1.5" 
+            stroke="currentColor" 
+            aria-hidden="true" 
+            data-slot="icon" 
+            class="flex-none w-7 h-7"
+          >
+            <path 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+            ></path>
+          </svg>
+          <p>{{ seriesFilter }}</p>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
+            class="flex-none cursor-pointer stroke-2 size-5 text-zinc-700"
+            @click="clearSeriesSearch"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18 18 6M6 6l12 12"
+            ></path>
+          </svg>
         </button>
-        <button class="filter-hidden">
-          <i class="fa-regular fa-window-restore"></i>
-          CODE
-          <i class="fa-solid fa-x"></i>
-        </button>
+        <ul
+          class="code-area"
+          v-show="codeMenuExpanded"
+        >
+          <li class="menu-search">
+            <input
+              v-model="searchSeriesQuery"
+              @keyup="searchSeries"
+              class="keyword"
+              type="text"
+              placeholder="Keyword"
+            />
+            <button @click="clearMenuSearch">✖</button>
+          </li>
+          <div class="menu-inner-area">
+            <li
+              class="menu"
+              v-for="deck in filteredDecks"
+              :key="deck.id"
+              @click="selectDeck(deck)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 28 28" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
+              <p class="text-xs truncate">{{ deck.name }}</p>
+            </li>
+          </div>
+        </ul>
         <div class="sign-container">
           <a :href="'/add'">
             <button class="add-article">
-              <i class="fa-solid fa-pen-to-square"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg>
               新增文章
             </button>
           </a>
           <a :href="'/add'">
             <button class="add-article-hidden">
-              <i class="fa-solid fa-pen-to-square"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg>
             </button>
           </a>
           <div class="bell">
@@ -191,16 +489,29 @@ onBeforeUnmount(() => {
           v-for="(item, index) in socialHistory"
           :key="index"
           class="user-button"
-          @click="handleHistoryClick(item.searchQuery)"
+          @click="handleHistoryClick(item.searchQuery || '-', item.seriesName || '-')"
         >
           <a href="#">
             <div class="user-link">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <span>{{ item.searchQuery }}</span>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" viewBox="0 0 24 24" 
+                stroke-width="1.5" 
+                stroke="currentColor" 
+                aria-hidden="true" 
+                data-slot="icon" 
+                class="flex-none size-5 select-none"
+                ><path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                ></path>
+              </svg>
+              <span>{{ item.searchQuery || '-' }}</span>
             </div>
             <div class="user-link">
-              <i class="fa-regular fa-window-restore"></i>
-              <span>-</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="flex-none size-5 select-none"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"></path></svg>
+              <span>{{ item.seriesName && item.seriesName !== 'seriesName' ? item.seriesName : '-' }}</span>
             </div>
           </a>
         </button>
@@ -230,17 +541,17 @@ onBeforeUnmount(() => {
           <div class="card-user">
             <div class="card-user-flex">
               <div class="card-user-img">
-                <img :src="article.users.picture" alt="用戶頭像" />
+                <img :src="article.users.picture || userPicture" alt="用戶頭像" />
               </div>
               <div class="card-user-p">
                 <p>{{ article.users.username }}</p>
                 <div class="date-container">
                   <p class="date">{{ formatDate(article.created_at) }}</p>
-                  <i class="fa-solid fa-globe"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="size-4 flex-none"><path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"></path></svg>
                   <p class="card-code">{{ article.post_code }}</p>
                   <div class="chat">
-                    <i class="fa-regular fa-comment"></i>
-                    <p>1</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="ml-auto size-4 flex-none"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"></path></svg>
+                    <p></p>
                   </div>
                 </div>
               </div>
@@ -258,6 +569,85 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.menu {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  color: white;
+  cursor: pointer;
+  gap: 5px;
+  height: 35px;
+  box-sizing: border-box;
+}
+
+.menu svg {
+  width:28px;
+  height:28px;
+}
+
+.menu-area {
+  position: absolute;
+  top: 100%; 
+  display: grid;
+  position: absolute;
+  background-color: #202020;
+  border-radius: 7px;
+  width: 275px;
+  overflow: hidden;
+  transition: height 1s ease;
+  z-index: 3;
+}
+
+.menu-inner-area {
+  max-height: 210px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+
+.menu-search {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  color: white;
+  position: relative;
+  width: 255px;
+}
+
+.keyword {
+  box-sizing: border-box;
+  color: white;
+  padding: 4px 8px;
+  border: 1px solid gray;
+  border-radius: 10px;
+  display: flex;
+  background-color: transparent;
+  outline: none;
+  width: 255px;
+}
+
+.menu-search button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: white;
+  position: absolute;
+  right: 12px;
+}
+
+li p,li svg{
+  color: rgba(255, 255, 255, 0.750);
+}
+
+li:hover p,li:hover svg{
+  color: rgb(255, 255, 255);
+}
+
+.code-area {
+  display: none;
+}
+
 html,
 body {
   width: 100%;
@@ -325,7 +715,7 @@ a {
   position: relative;
 }
 
-.search-container svg {
+.search-container svg:nth-of-type(2) {
   cursor: pointer;
   width: 22px;
   height: 22px;
@@ -333,8 +723,7 @@ a {
   right: 10px;
 }
 
-.search-container i::before,
-.header-container i::before {
+.search-container svg::before {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -353,22 +742,38 @@ a {
 }
 
 .filter {
-  background-color: #f0f0f0;
-  border: 1px solid #f0f0f0;
   width: 120px;
   border-radius: 20px;
   height: 36px;
   transform: translateY(14px);
   font-weight: 700;
   cursor: pointer;
+  width: auto;
+  display: flex;
+  align-items: center;
+  gap:5px;
+}
+
+.active-series {
+  background: linear-gradient(to right, #5eead4, #93c5fd);
+  border: none
+}
+
+.default-series {
+  background-color: #f0f0f0;
+  border: none
+}
+
+.filter svg {
+  width:20px;
+  height:20px;
+  display: inline;
 }
 
 .filter-hidden {
-  border: 1px solid #f0f0f0;
   width: 100px;
   height: 36px;
   border-radius: 20px;
-  background-color: #f0f0f0;
   position: absolute;
   top: 14px;
   right: 59px;
@@ -377,20 +782,27 @@ a {
   display: none;
 }
 
+.filter-hidden svg {
+  width:20px;
+  height:20px;
+  display: inline;
+}
+
+.filter-hidden p {
+  line-height: 20px;
+  height:20px;
+  width:calc(100% - 40px);
+  display: inline;
+  overflow: hidden;
+}
+
+
 .sign-container {
   display: flex;
   align-items: center;
   position: absolute;
   top: 14px;
-  right: 322px;
-}
-
-.bell i::before,
-.user-sign i::before {
-  color: #d4d4d8;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
+  right: 300px;
 }
 
 .sign-container {
@@ -406,6 +818,9 @@ a {
   font-weight: 900;
   cursor: pointer;
   border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .add-article-hidden {
@@ -420,29 +835,15 @@ a {
   display: none;
 }
 
-.user-sign {
-  width: 92px;
-  background-color: #1c1c1e;
-  border-radius: 20px;
-  color: #d4d4d8;
-}
-
-.user-sign:hover {
-  background-color: #2b2b2c;
-}
-
-.user-sign span {
-  font-weight: 700;
-  font-size: 14px;
-}
-
 .flex-item-hidden {
   display: flex;
-  padding-left: 20px;
+  padding: 0 20px;
   height: 62px;
   border-radius: 20px;
   margin-top: 80px;
   gap: 16px;
+  overflow-x: scroll;
+  scrollbar-width: none;
 }
 
 .user-button {
@@ -452,6 +853,8 @@ a {
   background-color: #18181b;
   color: #d4d4d8;
   width: 80px;
+  min-width: 80px;
+  overflow: hidden;
   border-radius: 10px;
   display: flex;
   cursor: pointer;
@@ -466,14 +869,23 @@ a {
   gap: 5px;
 }
 
-.user-link i {
+.user-link svg {
   width: 20px;
   height: 20px;
   line-height: 1.25rem;
 }
 
 .user-link span {
+  height: 20px;
+  overflow: hidden;
   line-height: 1.25rem;
+}
+
+.size-5 {
+  height: 1.25rem;
+  min-height: 1.25rem;
+  min-width: 1.25rem;
+  width: 1.25rem;
 }
 
 .title {
@@ -562,16 +974,17 @@ a {
   display: flex;
   gap: 4px;
   color: rgb(170, 168, 168);
+  align-items: center;
 }
 
 .date {
   width: 62px;
 }
 
-.date-container i {
+.date-container svg {
   display: flex;
-  font-size: 14px;
-  margin: 0 2px;
+  width:15px;
+  height:15px;
 }
 
 .chat {
@@ -601,129 +1014,6 @@ a {
   font-weight: 900;
 }
 
-.deck-container {
-  width: 100%;
-  padding-right: 8px;
-  height: 56px;
-  position: fixed;
-  bottom: 65.5px;
-  display: none;
-}
-
-.deck-img {
-  overflow: hidden;
-  border-radius: 10px;
-  transform: translateX(8px);
-  z-index: 1;
-}
-
-.deck-img img {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-}
-
-.deck-content {
-  width: 92%;
-  height: 56px;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  padding-left: 8px;
-  border-radius: 0 10px 10px 0;
-  align-items: center;
-  position: relative;
-}
-
-.line {
-  position: absolute;
-  bottom: 52px;
-  width: 96%;
-  border-top: 4px solid;
-  border-image: linear-gradient(
-      to right,
-      rgb(234, 179, 8) 0%,
-      rgb(234, 179, 8) 89.0476%,
-      rgb(34, 197, 94) 94.0476%,
-      rgb(34, 197, 94) 95%
-    )
-    5 / 1 / 0 stretch;
-}
-
-.total-cards {
-  width: 80%;
-  padding-top: 8px;
-  padding-left: 8px;
-}
-
-.total-cards h2 {
-  font-size: 15px;
-  font-weight: 00;
-  color: #fff;
-  margin-bottom: 2px;
-}
-
-.total-cards span {
-  font-size: 13px;
-  color: #dad7d7;
-  font-weight: 700;
-}
-
-.deckbtn-area {
-  display: flex;
-  align-items: center;
-  width: 20%;
-  position: relative;
-  padding-left: 8px;
-}
-
-.deck-btn {
-  all: unset;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  color: #f0f0f0;
-  background-color: rgba(86, 68, 10, 0.9);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  right: 120px;
-  cursor: pointer;
-}
-
-.deck-btn:hover {
-  background-color: #42ebeb;
-}
-
-.deck-btn i::before {
-  font-size: 24px;
-}
-
-.pay-btn {
-  padding-left: 5px;
-  position: absolute;
-  right: 8px;
-  width: 86px;
-  min-width: 94px;
-  height: 32px;
-  background-color: #daa61e;
-  display: flex;
-  align-items: center;
-  color: #dad7d7;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.pay-btn:hover {
-  background-color: #e27637;
-}
-
-.pay-btn span {
-  font-size: 14px;
-  margin-left: 5px;
-}
-
 @media screen and (min-width: 1470px) {
   .card-area {
     grid-template-columns: repeat(5, 1fr);
@@ -731,6 +1021,24 @@ a {
 }
 
 @media screen and (max-width: 1200px) {
+  .menu-area {
+    display: none;
+  }
+
+  .code-area {
+    position: absolute;
+    top: 100%; 
+    display: grid;
+    position: absolute;
+    background-color: #202020;
+    border-radius: 7px;
+    width: 275px;
+    overflow: hidden;
+    transition: height 1s ease;
+    z-index: 3;
+    right: 59px;
+  }
+  
   .main {
     margin: 0px;
   }
@@ -747,7 +1055,7 @@ a {
   }
 
   .search {
-    width: calc(100% - 191px);
+    width: 100%
   }
 
   #xx {
@@ -761,7 +1069,9 @@ a {
   }
 
   .filter-hidden {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
   }
 
   .add-article {
@@ -769,7 +1079,8 @@ a {
   }
 
   .add-article-hidden {
-    display: block;
+    display: flex;
+    align-items: center;
   }
 
   .bell,
@@ -779,10 +1090,6 @@ a {
 
   .card-area {
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .deck-container {
-    display: flex;
   }
 
   .chat {

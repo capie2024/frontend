@@ -4,12 +4,12 @@ import NavLoginBtn from '../components/NavLoginBtn.vue'
 import notice from '../components/notification/notice.vue'
 import MainFooter from '../components/MainFooter.vue'
 import { useCardSeriesStore } from '@/stores/card-series'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
 
-const { locale } = useI18n();
+const { locale } = useI18n()
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -252,7 +252,7 @@ const translatedCardSeries = computed(() => {
     const translateName = card.i18n?.[locale.value]?.name
     return {
       ...card,
-      name: translateName || card.name 
+      name: translateName || card.name,
     }
   })
 })
@@ -262,14 +262,29 @@ const translatedViewedSeries = computed(() => {
     const translateName = card.i18n?.[locale.value]?.name
     return {
       ...card,
-      name: translateName || card.name 
+      name: translateName || card.name,
     }
   })
 })
 
-onMounted(async () => {
-  await fetchCardseries()
+// 根據滾動位置判斷顯示 header 標題和背景色
+const isScrolled = ref(false)
+let mainElement = ref(null)
+const handleScroll = () => {
+  const scrollTop = mainElement.value.scrollTop
+  isScrolled.value = scrollTop > 0
+}
 
+const main = () => {
+  mainElement.value = document.querySelector('.background')
+  if (mainElement.value) {
+    mainElement.value.addEventListener('scroll', handleScroll)
+  }
+}
+
+onMounted(async () => {
+  main()
+  await fetchCardseries()
   const viewed = JSON.parse(localStorage.getItem('viewedSeries')) || []
 
   // 匹配卡片信息並渲染已查看的系列
@@ -279,14 +294,20 @@ onMounted(async () => {
     })
     .filter(Boolean)
 })
+
+onBeforeUnmount(() => {
+  if (mainElement.value) {
+    mainElement.value.removeEventListener('scroll', handleScroll)
+  }
+})
 </script>
 
 <template>
   <div class="All root-container">
     <SidebarGrid style="grid-area: sidebar" />
-    <div class="aa" style="grid-area: main">
+    <div class="aa background" style="grid-area: main">
       <div class="all-card">
-        <div class="top-container">
+        <header class="top-container" :class="{ scrolled: isScrolled }">
           <div class="Top-bar">
             <div class="search-bar">
               <span><i class="fa-solid fa-magnifying-glass"></i></span>
@@ -333,61 +354,99 @@ onMounted(async () => {
               </button>
             </div>
           </div>
-                            <div class="icons">
-                                <notice/>
-                                <NavLoginBtn/>
-                            </div>
-                        </div>
-                        <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
-                        <section class="show-card">
-                            <a v-for="card in translatedViewedSeries" :key="card.id" href="#" class="transition-colors url" @click.prevent="handleSeries(card.id)" >
-
-                                    <div>
-                                        <img :src ="card.cover || '/src/img/cover.png'" alt="">
-                                    </div>
-                                    <div class="card-text">
-                                        <div class="flex">
-                                            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none icon-size color-a1">
-                                                <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                                                </path>
-                                                <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                                                </path>
-                                            </svg>
-                                            <p class="color-a1">{{ card.code.join(', ') }}</p>
-                                        </div>
-                                        <p class="font-size20 color-white padding-bottom" >{{ card.name }}</p>
-                                        <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
-                                    </div>
-                            </a>
-                        </section>
-                        <h2 class="font-size30 color-white">系列<br>
-                            <span class="font-size75rem color-a1">一共有  {{ searchResultCount }}  結果</span>
-                        </h2>
-                        <section class="grid-card">
-                           
-                            <a v-for="card in translatedCardSeries" :key="card.id" href="#" class="transition-colors url" @click.prevent="handleSeries(card.id)" >
-                                    <div>
-                                        <img :src ="card.cover || 'https://bottleneko.app/images/cover.png'" alt="">
-                                    </div>
-                                    <div class="card-text">
-                                        <div class="flex">
-                                            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" class="flex-none icon-size color-a1">
-                                                <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z">
-                                                </path>
-                                                <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z">
-                                                </path>
-                                            </svg>
-                                            <p class="color-a1">{{ card.code.join(', ') }}</p>
-                                        </div>
-                                        <p class="font-size20 color-white padding-bottom" >{{ card.name }}</p>
-                                        <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
-                                    </div>
-                            </a>   
-                        </section>
-                    </div>
-                    <MainFooter/>
-                </div>
+          <div class="icons">
+            <notice />
+            <NavLoginBtn />
+          </div>
+        </header>
+        <h2 class="font-size30 color-white h2-padding">之前查看系列</h2>
+        <section class="show-card">
+          <a
+            v-for="card in translatedViewedSeries"
+            :key="card.id"
+            href="#"
+            class="transition-colors url"
+            @click.prevent="handleSeries(card.id)"
+          >
+            <div>
+              <img :src="card.cover || '/src/img/cover.png'" alt="" />
+            </div>
+            <div class="card-text">
+              <div class="flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="flex-none icon-size color-a1"
+                >
+                  <path
+                    d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"
+                  ></path>
+                  <path
+                    d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"
+                  ></path>
+                </svg>
+                <p class="color-a1">{{ card.code.join(', ') }}</p>
               </div>
+              <p class="font-size20 color-white padding-bottom">
+                {{ card.name }}
+              </p>
+              <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
+            </div>
+          </a>
+        </section>
+        <h2 class="font-size30 color-white">
+          系列<br />
+          <span class="font-size75rem color-a1"
+            >一共有 {{ searchResultCount }} 結果</span
+          >
+        </h2>
+        <section class="grid-card">
+          <a
+            v-for="card in translatedCardSeries"
+            :key="card.id"
+            href="#"
+            class="transition-colors url"
+            @click.prevent="handleSeries(card.id)"
+          >
+            <div>
+              <img
+                :src="card.cover || 'https://bottleneko.app/images/cover.png'"
+                alt=""
+              />
+            </div>
+            <div class="card-text">
+              <div class="flex">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="flex-none icon-size color-a1"
+                >
+                  <path
+                    d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"
+                  ></path>
+                  <path
+                    d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"
+                  ></path>
+                </svg>
+                <p class="color-a1">{{ card.code.join(', ') }}</p>
+              </div>
+              <p class="font-size20 color-white padding-bottom">
+                {{ card.name }}
+              </p>
+              <p class="color-a1">{{ card.sellAt[0] || '-' }}</p>
+            </div>
+          </a>
+        </section>
+      </div>
+      <MainFooter />
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -407,9 +466,7 @@ onMounted(async () => {
 .aa {
   position: absolute;
   top: 0;
-  /* left: 270px; */
   background-color: #121212;
-  padding: 10px;
   box-sizing: border-box;
   margin: 8px 8px 8px 0;
   border-radius: 1rem;
@@ -422,15 +479,21 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #121212;
-  padding: 20px 30px;
-  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.05s ease;
+  padding: 0 20px;
   justify-content: space-between;
   position: fixed;
-  width: calc(99% - 336px);
-  top: 8px;
-  /* left: 270px; */
+  top: 0;
+  width: calc(100% - 278px);
+  box-sizing: border-box;
+  height: 64px;
 }
+
+header.scrolled {
+  background-color: #000000;
+}
+
 .Top-bar {
   display: flex;
   gap: 0.5rem;
@@ -664,7 +727,7 @@ a {
     height: 100vh;
   }
   .top-container {
-    width: calc(100% - 48px);
+    width: 100%;
     top: 0;
     left: 0;
   }
@@ -689,7 +752,7 @@ a {
     padding: 24px 0 8px 0;
   }
   .show-card {
-    padding: 0px;
+    padding: 0 10px;
     margin: 0;
   }
   .show-card > * {
@@ -697,7 +760,7 @@ a {
     flex: none;
   }
   .grid-card {
-    padding: 0;
+    padding: 0 10px;
     margin: 0;
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -741,7 +804,6 @@ a {
     padding: 24px 0 8px 0;
   }
   .show-card {
-    padding: 0px;
     margin: 0;
   }
   .show-card > * {
@@ -749,7 +811,6 @@ a {
     flex: none;
   }
   .grid-card {
-    padding: 0px;
     margin: 0;
   }
   .url {
@@ -791,7 +852,6 @@ a {
     padding: 24px 0 8px 0;
   }
   .show-card {
-    padding: 0px;
     margin: 0;
   }
   .show-card > * {
@@ -799,7 +859,6 @@ a {
     flex: none;
   }
   .grid-card {
-    padding: 0px;
     margin: 0;
   }
   .url {

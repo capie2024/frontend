@@ -6,6 +6,7 @@ import SidebarGrid from '@/components/SidebarGrid.vue'
 import PaypalCheckout from '@/components/PaypalCheckout.vue'
 import axios from 'axios'
 import router from '@/router'
+import initHeroMemberAnimation from '@/assets/js/hero-member/hero-member-animation.js'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -35,8 +36,8 @@ const switchBtn = (value) => {
 }
 
 onMounted(async () => {
-  await import('@/assets/js/hero-member/hero-member-animation.js')
   await checkHeroMember()
+  initHeroMemberAnimation()
 })
 </script>
 
@@ -621,7 +622,7 @@ onMounted(async () => {
                 <div
                   class="hero-member-main-member-type-section-content-item-btn"
                 >
-                  <button>前往註冊帳號</button>
+                  <button v-if="!isTokenAvailable && !isHeroMember" @click="router.push('/signup')" >前往註冊帳號</button>
                 </div>
               </div>
             </a>

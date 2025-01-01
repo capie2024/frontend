@@ -8,10 +8,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:unit": "vitest",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "prepare": "husky"
   },
   "dependencies": {
     "@fancyapps/ui": "^5.0.36",
+    "@fortawesome/fontawesome-free": "^6.7.0",
     "@paypal/paypal-js": "^8.1.2",
     "@tinymce/tinymce-vue": "^6.1.0",
     "autoprefixer": "^10.4.20",

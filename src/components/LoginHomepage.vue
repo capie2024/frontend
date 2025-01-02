@@ -18,12 +18,14 @@ const API_DATA = async () => {
 
     // 處理 topics 資料
     if (topics) {
-      items.value.topics = topics.items.map((item) => ({
-        ...item.data, // 解構出每個 topic 的資料
-        title: formatValue(item.data.title),
-        link: formatValue(item.data.link),
-        cover: formatValue(item.data.cover),
-      }))
+      items.value.topics = topics.items
+        .filter((_, index) => index !== 0 && index !== 3)
+        .map((item) => ({
+          ...item.data, // 解構出每個 topic 的資料
+          title: formatValue(item.data.title),
+          link: formatValue(item.data.link),
+          cover: formatValue(item.data.cover),
+        }))
     }
 
     // 處理 videos 資料
@@ -88,19 +90,15 @@ onMounted(async () => {
 
 <template>
   <div class="All">
-    <!-- <SidebarGrid /> -->
     <div class="container">
       <!-- 通知與登入 -->
       <div class="icons">
         <div class="search-bar">
           <div class="search-icon">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <a href="/social">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
           </div>
-          <input
-            type="text"
-            class="search-bar-input search-bar-input-hidden"
-            placeholder="我想找找...?"
-          />
           <div class="xmark-icon xmark-icon-hidden">
             <i class="fa-solid fa-xmark"></i>
           </div>
@@ -113,8 +111,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-
-    <div class="aa">
+    <div class="content">
       <div class="card1">
         <!-- first swiper -->
         <div class="swiper first-swiper-container">
@@ -162,7 +159,6 @@ onMounted(async () => {
       <div class="card2">
         <h2>プレミアムブースター リコリス・リコイル</h2>
         <span class="card2-top-span">▼2024/11/15（金）発売</span>
-
         <!-- second swiper -->
         <div class="swiper second-swiper-container">
           <div class="swiper-wrapper second-swiper-wrapper">
@@ -227,6 +223,7 @@ onMounted(async () => {
               >
                 <img
                   src="https://live.staticflickr.com/65535/54229413836_3068f8523a_o.png"
+
                   alt=""
                 />
               </a>
@@ -260,7 +257,6 @@ onMounted(async () => {
           </div>
         </div>
         <!-- second swiper -->
-
         <span class="card2-bottom-span">2024-11-14</span>
       </div>
       <h2 class="title">發燒影片</h2>
@@ -277,7 +273,7 @@ onMounted(async () => {
                 <div class="third-swiper-slide-content">
                   <div class="third-swiper-slide-content-img">
                     <img
-                      src="@/assets/img/login-homepage/新手教學.jpg"
+                      src="https://live.staticflickr.com/65535/54241373235_42beca4917_b.jpg"
                       alt=""
                     />
                   </div>
@@ -356,7 +352,6 @@ onMounted(async () => {
           </div>
         </a>
       </section>
-
       <h2 class="title">
         <a :href="`${BASE_URL}/series`" class="title-a2">卡片系列</a>
         <a :href="`${BASE_URL}/series`" class="title-a3">
@@ -415,12 +410,8 @@ onMounted(async () => {
           </div>
         </a>
       </section>
-
       <MainFooter />
     </div>
-
-    <!-- fix -->
-    <!-- fix -->
   </div>
 </template>
 

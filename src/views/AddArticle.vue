@@ -149,6 +149,14 @@ const clearSearch = () => {
   calculateMenuHeight()
 }
 
+const goBack = () => {
+  if (window.history.length > 1) {
+    window.history.back()
+  } else {
+    router.push('/')
+  }
+}
+
 onMounted(() => {
   getUserDecks()
 })
@@ -159,7 +167,10 @@ onMounted(() => {
   <main>
     <header>
       <div class="pagebtn-area">
-        <button class="page-btn">
+        <button 
+          class="page-btn"
+          @click="goBack"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -234,7 +245,9 @@ onMounted(() => {
           </svg>
         </button>
         <Notice />
-        <NavLoginBtn />
+        <div class="user-sign">
+          <NavLoginBtn />      
+        </div>
       </div>
     </header>
     <section class="title-area">
@@ -403,7 +416,6 @@ onMounted(() => {
               d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
             ></path>
           </svg>
-          <input type="text" placeholder="#Tag1#Tag2" />
         </div>
 
         <editor
@@ -441,7 +453,7 @@ onMounted(() => {
                 d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
               ></path>
             </svg>
-            <input class="enter-message" type="text" placeholder="留言..." />
+            <input class="enter-message" type="text" placeholder="留言..." disabled/>
             <button>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -759,6 +771,7 @@ header {
   position: relative;
   overflow: hidden;
 }
+
 .preview-image {
   width: 100%;
   object-fit: cover;
@@ -1100,16 +1113,6 @@ footer {
   background: linear-gradient(to bottom, rgb(19, 22, 23), #121212);
 }
 
-.footer-nav {
-  width: 100%;
-  height: 66px;
-  display: flex;
-  background-color: #0d0b0c;
-  position: fixed;
-  bottom: 0;
-  display: none;
-}
-
 .nav-link {
   width: 16.66%;
   display: flex;
@@ -1150,6 +1153,10 @@ footer {
 
 .social-icon span {
   color: white;
+}
+
+input:disabled {
+    cursor: not-allowed;
 }
 
 @media screen and (max-width: 1200px) {
@@ -1246,7 +1253,7 @@ footer {
   }
 
   .cannot-change p {
-    font-size: 20px;
+    font-size: 14px;
     width: calc(100% - 16px);
   }
 
@@ -1293,10 +1300,6 @@ footer {
     right: 20px;
   }
 
-  .footer-nav {
-    display: flex;
-  }
-
   .edit-area {
     width: 95%;
     box-sizing: border-box;
@@ -1333,8 +1336,8 @@ footer {
     right: 20px;
   }
 
-  .footer-nav {
-    display: flex;
+  .user-sign {
+    display: none;
   }
 }
 </style>

@@ -15,64 +15,67 @@ const formattedTime = (createdAt) => {
 }
 
 const fetchNotices = async () => {
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token')
 
-    if (!token) {
-        return null;
-    }
+  if (!token) {
+    return null
+  }
 
-    try {
-        const response = await fetch(`${API_URL}/api/notices`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        const data = await response.json();
-        notices.value = (data.notices || []).sort((a, b) => {
-            return new Date(b.created_at) - new Date(a.created_at);
-        });
-        unreadCount.value = data.unreadCount || 0;
-    } catch (error) {
-        console.error('Error fetching notices:', error);
-    }
-};
+  try {
+    const response = await fetch(`${API_URL}/api/notices`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    const data = await response.json()
+    notices.value = (data.notices || []).sort((a, b) => {
+      return new Date(b.created_at) - new Date(a.created_at)
+    })
+    unreadCount.value = data.unreadCount || 0
+  } catch (error) {
+    console.error('Error fetching notices:', error)
+  }
+}
 
 const markAsRead = async (noticeId, postCode) => {
-    try {
-        const notice = notices.value.find(n => n.id === noticeId);
+  try {
+    const notice = notices.value.find((n) => n.id === noticeId)
 
-        if (notice && notice.is_read) {
-            goToPost(postCode);
-            return;
-        }
-
-        const response = await axios.post(`${API_URL}/api/mark-as-read`, { noticeId }, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-       
-        if (response.data.is_read) {
-            if (notice) {
-                notice.is_read = true;
-            }
-            unreadCount.value -= 1;
-
-            goToPost(postCode);
-        }
-    } catch (error) {
-        console.error('Error marking as read:', error);
+    if (notice && notice.is_read) {
+      goToPost(postCode)
+      return
     }
-};
 
+    const response = await axios.post(
+      `${API_URL}/api/mark-as-read`,
+      { noticeId },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    )
+
+    if (response.data.is_read) {
+      if (notice) {
+        notice.is_read = true
+      }
+      unreadCount.value -= 1
+
+      goToPost(postCode)
+    }
+  } catch (error) {
+    console.error('Error marking as read:', error)
+  }
+}
 
 const goToPost = (postCode) => {
   window.location.href = `${BASE_URL}/social/${postCode}`
 }
 
 onMounted(() => {
-    fetchNotices();
-});
+  fetchNotices()
+})
 </script>
 
 <template>
@@ -215,7 +218,7 @@ onMounted(() => {
 }
 
 .notice-grid-down-1::-webkit-scrollbar {
-  display: none; 
+  display: none;
 }
 
 .notice-icon {

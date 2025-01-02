@@ -5,10 +5,7 @@ const footerData = [
   {
     title: '簡介',
     linkText: ['關於我們', '與我聯絡', 'Weiβ Schwarz'],
-    url : [
-      `${BASE_URL}/team`,
-      `${BASE_URL}/contact`, 
-      'https://ws-tcg.com/']
+    url: [`${BASE_URL}/team`, `${BASE_URL}/contact`, 'https://ws-tcg.com/'],
   },
   {
     title: '資源',
@@ -22,11 +19,7 @@ const footerData = [
   {
     title: '常用連結',
     linkText: ['卡片問答集', '我的專頁', '英雄榜'],
-    url:[
-      `${BASE_URL}/faq`,
-      `${BASE_URL}/user`,
-      `${BASE_URL}/hero-member`
-    ]
+    url: [`${BASE_URL}/faq`, `${BASE_URL}/user`, `${BASE_URL}/hero-member`],
   },
 ]
 </script>

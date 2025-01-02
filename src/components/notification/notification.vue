@@ -1,11 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import dayjs from 'dayjs';
-import axios from 'axios';
-import SideBar from '../SidebarGrid.vue';
-import Notice from './notice.vue';
-import Footer from '../MainFooter.vue';
-import Login from '../NavLoginBtn.vue';
+import { ref, onMounted } from 'vue'
+import dayjs from 'dayjs'
+import axios from 'axios'
+import SideBar from '../SidebarGrid.vue'
+import Notice from './notice.vue'
+import Footer from '../MainFooter.vue'
+import Login from '../NavLoginBtn.vue'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const API_URL = import.meta.env.VITE_API_URL
@@ -30,9 +30,8 @@ const fetchNotices = async () => {
     notices.value = (data.notices || []).sort((a, b) => {
       return new Date(b.created_at) - new Date(a.created_at)
     })
-    
+
     unreadCount.value = data.unreadCount || 0
-    
   } catch (error) {
     console.error('Error fetching notices:', error)
   }
@@ -40,8 +39,7 @@ const fetchNotices = async () => {
 
 const markAsRead = async (noticeId, postCode) => {
   try {
-    
-    const notice = notices.value.find((n) => n.id === noticeId);
+    const notice = notices.value.find((n) => n.id === noticeId)
 
     if (notice && notice.is_read) {
       goToPost(postCode)
@@ -63,7 +61,7 @@ const markAsRead = async (noticeId, postCode) => {
         notice.is_read = true
       }
 
-      unreadCount.value -= 1;
+      unreadCount.value -= 1
 
       goToPost(postCode)
     }

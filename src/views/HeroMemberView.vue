@@ -87,7 +87,10 @@ onMounted(async () => {
               class="hero-member-main-function-section-content-item"
               id="function-item-card-price"
             >
-              <img src="https://live.staticflickr.com/65535/54229812200_92c39f2dc8_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54229812200_92c39f2dc8_b.jpg"
+                alt=""
+              />
               <div class="hero-member-main-function-section-content-item-info">
                 <p>洞見漲跌</p>
                 <h3
@@ -152,7 +155,10 @@ onMounted(async () => {
               class="hero-member-main-function-section-content-item"
               id="function-item-card-cover"
             >
-              <img src="https://live.staticflickr.com/65535/54229812210_76f54dcf5e_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54229812210_76f54dcf5e_b.jpg"
+                alt=""
+              />
               <div class="hero-member-main-function-section-content-item-info">
                 <p>精美亮麗</p>
                 <h3
@@ -218,7 +224,10 @@ onMounted(async () => {
               class="hero-member-main-function-section-content-item"
               id="function-item-deck-chart"
             >
-              <img src="https://live.staticflickr.com/65535/54229410211_b33cd5a837_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54229410211_b33cd5a837_b.jpg"
+                alt=""
+              />
               <div class="hero-member-main-function-section-content-item-info">
                 <p>分析，一目瞭然</p>
                 <h3
@@ -283,7 +292,10 @@ onMounted(async () => {
               class="hero-member-main-function-section-content-item"
               id="function-item-switch-version"
             >
-              <img src="https://live.staticflickr.com/65535/54229649569_3def06599e_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54229649569_3def06599e_b.jpg"
+                alt=""
+              />
               <div class="hero-member-main-function-section-content-item-info">
                 <p>一鍵更新、快速好用</p>
                 <h3
@@ -348,7 +360,10 @@ onMounted(async () => {
               class="hero-member-main-function-section-content-item"
               id="function-item-quick-note"
             >
-              <img src="https://live.staticflickr.com/65535/54229637863_d6582a308b_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54229637863_d6582a308b_b.jpg"
+                alt=""
+              />
               <div class="hero-member-main-function-section-content-item-info">
                 <p>大小事不遺忘</p>
                 <h3
@@ -413,7 +428,10 @@ onMounted(async () => {
               class="hero-member-main-function-section-content-item"
               id="function-item-price-top10"
             >
-              <img src="https://live.staticflickr.com/65535/54229637898_7df7db3b0a_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54229637898_7df7db3b0a_b.jpg"
+                alt=""
+              />
               <div class="hero-member-main-function-section-content-item-info">
                 <p>掌握最新價格變動</p>
                 <h3
@@ -475,7 +493,10 @@ onMounted(async () => {
               </div>
             </div>
             <div class="hero-member-main-function-section-content-last-item">
-              <img src="https://live.staticflickr.com/65535/54229410101_a8c94e2b94_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54229410101_a8c94e2b94_b.jpg"
+                alt=""
+              />
               <div
                 class="hero-member-main-function-section-content-last-item-info"
               >
@@ -704,7 +725,10 @@ onMounted(async () => {
             <div
               class="hero-member-main-sponsors-creators-section-content-item"
             >
-              <img src="https://live.staticflickr.com/65535/54228500762_7d0da146e0_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54228500762_7d0da146e0_b.jpg"
+                alt=""
+              />
               <div
                 class="hero-member-main-sponsors-creators-section-content-item-info"
               >
@@ -724,7 +748,10 @@ onMounted(async () => {
             <div
               class="hero-member-main-sponsors-creators-section-content-item"
             >
-              <img src="https://live.staticflickr.com/65535/54229637908_3983cb85d9_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54229637908_3983cb85d9_b.jpg"
+                alt=""
+              />
               <div
                 class="hero-member-main-sponsors-creators-section-content-item-info"
               >
@@ -744,7 +771,10 @@ onMounted(async () => {
             <div
               class="hero-member-main-sponsors-creators-section-content-item"
             >
-              <img src="https://live.staticflickr.com/65535/54228500862_ee28417fed_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54228500862_ee28417fed_b.jpg"
+                alt=""
+              />
               <div
                 class="hero-member-main-sponsors-creators-section-content-item-info"
               >
@@ -764,7 +794,10 @@ onMounted(async () => {
             <div
               class="hero-member-main-sponsors-creators-section-content-item"
             >
-              <img src="https://live.staticflickr.com/65535/54228500827_8d102dea43_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54228500827_8d102dea43_b.jpg"
+                alt=""
+              />
               <div
                 class="hero-member-main-sponsors-creators-section-content-item-info"
               >
@@ -784,7 +817,10 @@ onMounted(async () => {
             <div
               class="hero-member-main-sponsors-creators-section-content-item"
             >
-              <img src="https://live.staticflickr.com/65535/54228500822_3eb940008c_b.jpg" alt="" />
+              <img
+                src="https://live.staticflickr.com/65535/54228500822_3eb940008c_b.jpg"
+                alt=""
+              />
               <div
                 class="hero-member-main-sponsors-creators-section-content-item-info"
               >

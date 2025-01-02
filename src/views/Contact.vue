@@ -72,9 +72,7 @@ const handleBack = () => {
                 </div>
                 <div>
                   <h3 class="font-bold text-lg">關於卡派團隊</h3>
-                  <p class="text-zinc-300">
-                    專注於提供趣味卡牌遊戲的七人小組
-                  </p>
+                  <p class="text-zinc-300">專注於提供趣味卡牌遊戲的七人小組</p>
                 </div>
               </a>
               <a
@@ -86,9 +84,7 @@ const handleBack = () => {
                 </div>
                 <div>
                   <h3 class="font-bold text-lg">卡派 Discord</h3>
-                  <p class="text-zinc-300">
-                    加入 Discord 一起討論與分享消息
-                  </p>
+                  <p class="text-zinc-300">加入 Discord 一起討論與分享消息</p>
                 </div>
               </a>
             </div>

@@ -1,12 +1,12 @@
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
-import placeholderImage from '@/img/card-loading.png' // 預設圖片
+import placeholderImage from '@/img/card-loading.png'
 import NavLoginBtn from './NavLoginBtn.vue'
 import Notice from '@/components/notification/notice.vue'
 import MainFooter from '../components/MainFooter.vue'
 
-const isScrolled = ref(false) // 是否滾動
+const isScrolled = ref(false)
 
 const handleScroll = () => {
   const scrollTop = mainElement.value.scrollTop
@@ -22,8 +22,8 @@ const main = () => {
   }
 }
 
-const numberOfGrids = 10 // 總共有幾個 grid
-const itemsPerGrid = 10 // 每個 grid 有幾個卡片
+const numberOfGrids = 10
+const itemsPerGrid = 10
 
 const grids = ref(
   Array.from({ length: numberOfGrids }, () =>
@@ -42,7 +42,6 @@ const fetchGrids = async () => {
           const response = await axios.get(`${API_URL}/cards/random`)
           const covers = response.data.covers
 
-          // 隨機選擇一個圖片網址，如果為空值則使用預設圖片
           return covers.length > 0
             ? covers[Math.floor(Math.random() * covers.length)]
             : placeholderImage
@@ -517,7 +516,8 @@ onBeforeUnmount(() => {
 
               如果您對此仍不熟悉，歡迎至Capie Discord
               頻道讓大家一起幫你解答：<span>
-                <a href="https://discord.com/channels/1303258823104135219/1321898702750748752"
+                <a
+                  href="https://discord.com/channels/1303258823104135219/1321898702750748752"
                   >Discord
                 </a></span
               >
@@ -996,156 +996,11 @@ header {
   background-color: transparent;
 }
 
-.notice-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 20px;
-  cursor: pointer;
-  border-radius: 50%;
-  background-color: transparent;
-  transition:
-    background-color 0.3s ease,
-    opacity 0.3s ease;
-}
-
-.notice-icon:hover {
-  background-color: #2a2727;
-  opacity: 0.8;
-}
-
-.notice {
-  position: relative;
-}
-
-.notice-txt {
-  position: absolute;
-  top: 50px;
-  right: 15px;
-  background-color: black;
-  color: white;
-  width: 40px;
-  line-height: 25px;
-  border-radius: 10px;
-  padding: 3px;
-  text-align: center;
-  font-weight: bold;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.notice:hover .notice-txt {
-  opacity: 1;
-}
-
-.notice-grid-up h2 {
-  color: white;
-  font-weight: bolder;
-  font-size: 24px;
-}
-
-.notice-grid {
-  display: grid;
-  grid-template-columns: 352px;
-  grid-template-rows: 64px 416px;
-  position: absolute;
-  top: 120%;
-  left: 50%;
-  transform: translateX(-70%);
-  opacity: 0;
-  height: 0;
-  transition:
-    opacity 0.3s ease,
-    height 0.3s ease,
-    transform 0.3s ease;
-}
-
-#notice-jump:checked ~ .notice-grid {
-  opacity: 1;
-  height: 480px;
-}
-
-#notice-jump {
-  display: none;
-}
-
-.notice-grid-up {
-  grid-area: 1/1/2/2;
-  background-color: #27272a;
-  padding: 24px 16px 8px 16px;
-  border-radius: 10px 10px 0px 0px;
-}
-
-.notice-grid-down {
-  grid-area: 2/1/3/2;
-  background-color: #1f1f22;
-  border-radius: 0px 0px 10px 10px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.notice-grid-down img {
-  width: 240px;
-  height: 240px;
-  margin-bottom: 30px;
-}
-
-.notice-grid-down h2 {
-  font-size: 3rem;
-  font-weight: 700;
-  line-height: 1;
-  color: #f4f4f5;
-}
-
-.notice-grid-down p {
-  color: rgb(161 161 170);
-  font-size: 16px;
-  text-align: center;
-  margin-top: 10px;
-  line-height: 20px;
-}
-
-.login-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 96px;
-  height: 32px;
-  border: none;
-  border-radius: 20px;
-  background-color: #111010;
-  cursor: pointer;
-}
-
-.login-btn > svg:first-child {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  margin: 4px;
-  background-color: black;
-}
-
-.login-btn > svg:last-child {
-  width: 16px;
-  height: 16px;
-}
-
-.login-btn > p {
-  color: white;
-  font-size: 16px;
-}
-
-.login-btn:hover {
-  background-color: #2a2727;
-}
-
 .content-container {
   margin-top: calc(-64px + 0.5rem);
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
-  height: calc(100vh - 0.5rem);
+  height: calc(100vh - 1rem);
   width: calc(100vw - 270px - 0.5rem);
   /* grid-area: main-view; */
   background-color: #121212;
@@ -1959,7 +1814,7 @@ input[type='checkbox']:not(:checked) + label .dropdown-icon {
 }
 
 .specialthank-img::-webkit-scrollbar {
-  display: none; 
+  display: none;
 }
 
 .specialthank-img img {
@@ -2348,16 +2203,16 @@ link-area3 a svg {
   }
 
   .card1 {
-    margin-left: 0px ;
-    margin-right: 0px ;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   .card2 {
     flex-direction: column;
     justify-content: center;
-    overflow: hidden ;
-    margin-left: 0px ;
-    margin-right: 0px ;
+    overflow: hidden;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   .card2-left,

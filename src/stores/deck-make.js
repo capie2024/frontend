@@ -30,7 +30,11 @@ export const useDeckMakeStore = defineStore('deck-make', () => {
     const cardIndex = selectedCards.value.findIndex(
       (item) => item.id === card.id
     )
-    selectedCards.value.splice(cardIndex, 1)
+    if(cardIndex >= 0){
+      selectedCards.value.splice(cardIndex, 1)
+    }else{
+      return
+    }
     saveLastDeckEdit()
     switchSortMode()
   }

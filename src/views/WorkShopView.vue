@@ -4,10 +4,8 @@ import PageControl from '@/components/work-shop/PageControl.vue'
 import SidebarGrid from '@/components/SidebarGrid.vue'
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
-import FindCard from '../components/Mycard/find-card.vue'
-import RemitCard from '../components/Mycard/remit-card.vue'
-
-
+import FindCard from '@/components/Mycard/find-card.vue'
+import RemitCard from '@/components/Mycard/remit-card.vue'
 
 const workShopData = [
   {
@@ -72,11 +70,11 @@ const getAccount = async () => {
   }
 }
 
-function toggleFindCard(){
+function toggleFindCard() {
   showFindCard.value = !showFindCard.value
 }
 
-function toggleRemitCard(){
+function toggleRemitCard() {
   showRemitCard.value = !showRemitCard.value
 }
 
@@ -145,7 +143,7 @@ onMounted(async () => {
             class="work-shop-outer"
             v-for="i in workShopData"
           >
-            <div class="work-shop-item" @click="i.function" >
+            <div class="work-shop-item" @click="i.function">
               <img :src="i.imgUrl" alt="" />
               <div class="work-shop-item-content">
                 <div class="work-shop-item-content-icon">

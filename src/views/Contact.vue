@@ -58,7 +58,7 @@ const handleBack = () => {
             <div class="mt-12 mb-8">
               <h2 class="text-center text-3xl font-black">與我聯絡</h2>
               <p class="mt-2 text-center">
-                無論您有任何問題、意見與建議，歡迎透過以下方式與我聯絡！
+                無論您有任何問題、意見與建議，歡迎透過以下方式與我們聯絡！
               </p>
             </div>
             <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -73,14 +73,13 @@ const handleBack = () => {
                 <div>
                   <h3 class="font-bold text-lg">關於卡派團隊</h3>
                   <p class="text-zinc-300">
-                    專注於提供輕鬆趣味卡牌遊戲的七人小組
+                    專注於提供趣味卡牌遊戲的七人小組
                   </p>
                 </div>
               </a>
               <a
                 class="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-[#0866ff50] to-zinc-700 hover:shadow-lg hover:shadow-zinc-700/50"
                 href="https://discord.com/channels/1303258823104135219/1321898702750748752"
-                target="_blank"
               >
                 <div class="capie-img">
                   <img src="../img/capie-user.png" />
@@ -88,7 +87,7 @@ const handleBack = () => {
                 <div>
                   <h3 class="font-bold text-lg">卡派 Discord</h3>
                   <p class="text-zinc-300">
-                    加入 Discord 與大家一起討論與分享消息
+                    加入 Discord 一起討論與分享消息
                   </p>
                 </div>
               </a>

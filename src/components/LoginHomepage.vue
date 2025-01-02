@@ -170,11 +170,11 @@ onMounted(async () => {
               <a
                 href="#"
                 data-fancybox="card-list"
-                data-src="./src/assets/img/login-homepage/default-card/20241114_yt01.png"
+                data-src="https://live.staticflickr.com/65535/54229641318_905fb943f7_o.png"
                 data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売"
               >
                 <img
-                  src="@/assets/img/login-homepage/default-card/20241114_yt01.png"
+                  src="https://live.staticflickr.com/65535/54229641318_905fb943f7_o.png"
                   alt=""
                 />
               </a>
@@ -183,11 +183,11 @@ onMounted(async () => {
               <a
                 href="#"
                 data-fancybox="card-list"
-                data-src="./src/assets/img/login-homepage/default-card/20241114_yt02.png"
+                data-src="https://live.staticflickr.com/65535/54229641308_a3fccb7d05_o.png"
                 data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売"
               >
                 <img
-                  src="@/assets/img/login-homepage/default-card/20241114_yt02.png"
+                  src="https://live.staticflickr.com/65535/54229641308_a3fccb7d05_o.png"
                   alt=""
                 />
               </a>
@@ -196,11 +196,11 @@ onMounted(async () => {
               <a
                 href="#"
                 data-fancybox="card-list"
-                data-src="./src/assets/img/login-homepage/default-card/20241114_yt03.png"
+                data-src="https://live.staticflickr.com/65535/54229815665_1020885b78_o.png"
                 data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売"
               >
                 <img
-                  src="@/assets/img/login-homepage/default-card/20241114_yt03.png"
+                  src="https://live.staticflickr.com/65535/54229815665_1020885b78_o.png"
                   alt=""
                 />
               </a>
@@ -209,11 +209,11 @@ onMounted(async () => {
               <a
                 href="#"
                 data-fancybox="card-list"
-                data-src="./src/assets/img/login-homepage/default-card/20241114_yt04.png"
+                data-src="https://live.staticflickr.com/65535/54228504232_22ffd68a8c_o.png"
                 data-caption="ブースターパック 「Re:ゼロから始める異世界生活」Vol.3 - ▼2024/11/22（金）発売"
               >
                 <img
-                  src="@/assets/img/login-homepage/default-card/20241114_yt04.png"
+                  src="https://live.staticflickr.com/65535/54228504232_22ffd68a8c_o.png"
                   alt=""
                 />
               </a>
@@ -222,11 +222,11 @@ onMounted(async () => {
               <a
                 href="#"
                 data-fancybox="card-list"
-                data-src="./src/assets/img/login-homepage/default-card/20241114_yt05.png"
+                data-src="https://live.staticflickr.com/65535/54229413836_3068f8523a_o.png"
                 data-caption="プレミアムブースター リコリス・リコイル - ▼2024/11/15（金）発売"
               >
                 <img
-                  src="@/assets/img/login-homepage/default-card/20241114_yt05.png"
+                  src="https://live.staticflickr.com/65535/54229413836_3068f8523a_o.png"
                   alt=""
                 />
               </a>
@@ -235,11 +235,11 @@ onMounted(async () => {
               <a
                 href="#"
                 data-fancybox="card-list"
-                data-src="./src/assets/img/login-homepage/default-card/20241114_yt06.png"
+                data-src="https://live.staticflickr.com/65535/54229641303_b1a36453b7_o.png"
                 data-caption="プレミアムブースター リコリス・リコイル - ▼2024/11/15（金）発売"
               >
                 <img
-                  src="@/assets/img/login-homepage/default-card/20241114_yt06.png"
+                  src="https://live.staticflickr.com/65535/54229641303_b1a36453b7_o.png"
                   alt=""
                 />
               </a>
@@ -248,11 +248,11 @@ onMounted(async () => {
               <a
                 href="#"
                 data-fancybox="card-list"
-                data-src="./src/assets/img/login-homepage/default-card/20241114_yt07.png"
+                data-src="https://live.staticflickr.com/65535/54229641313_0be78bd7a4_o.png"
                 data-caption="プレミアムブースター リコリス・リコイル - ▼2024/11/15（金）発売"
               >
                 <img
-                  src="@/assets/img/login-homepage/default-card/20241114_yt07.png"
+                  src="https://live.staticflickr.com/65535/54229641313_0be78bd7a4_o.png"
                   alt=""
                 />
               </a>
@@ -277,7 +277,7 @@ onMounted(async () => {
                 <div class="third-swiper-slide-content">
                   <div class="third-swiper-slide-content-img">
                     <img
-                      src="@/assets/img/login-homepage/新手教學.png"
+                      src="@/assets/img/login-homepage/新手教學.jpg"
                       alt=""
                     />
                   </div>

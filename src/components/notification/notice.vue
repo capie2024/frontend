@@ -15,62 +15,64 @@ const formattedTime = (createdAt) => {
 }
 
 const fetchNotices = async () => {
-  const token = localStorage.getItem('token')
-  try {
-    const response = await fetch(`${API_URL}/api/notices`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    const data = await response.json()
-    notices.value = (data.notices || []).sort((a, b) => {
-      return new Date(b.created_at) - new Date(a.created_at)
-    })
-    unreadCount.value = data.unreadCount || 0
-  } catch (error) {
-    console.error('Error fetching notices:', error)
-  }
-}
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/notices`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+        notices.value = (data.notices || []).sort((a, b) => {
+            return new Date(b.created_at) - new Date(a.created_at);
+        });
+        unreadCount.value = data.unreadCount || 0;
+    } catch (error) {
+        console.error('Error fetching notices:', error);
+    }
+};
 
 const markAsRead = async (noticeId, postCode) => {
-  try {
-    const notice = notices.value.find((n) => n.id === noticeId)
+    try {
+        const notice = notices.value.find(n => n.id === noticeId);
 
-    if (notice && notice.is_read) {
-      goToPost(postCode)
-      return
+        if (notice && notice.is_read) {
+            goToPost(postCode);
+            return;
+        }
+
+        const response = await axios.post(`${API_URL}/api/mark-as-read`, { noticeId }, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+       
+        if (response.data.is_read) {
+            if (notice) {
+                notice.is_read = true;
+            }
+            unreadCount.value -= 1;
+
+            goToPost(postCode);
+        }
+    } catch (error) {
+        console.error('Error marking as read:', error);
     }
+};
 
-    const response = await axios.post(
-      `${API_URL}/api/mark-as-read`,
-      { noticeId },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      }
-    )
-
-    if (response.data.is_read) {
-      if (notice) {
-        notice.is_read = true
-      }
-      unreadCount.value -= 1
-
-      goToPost(postCode)
-    }
-  } catch (error) {
-    console.error('Error marking as read:', error)
-  }
-}
 
 const goToPost = (postCode) => {
   window.location.href = `${BASE_URL}/social/${postCode}`
 }
 
 onMounted(() => {
-  fetchNotices()
-})
+    fetchNotices();
+});
 </script>
 
 <template>
@@ -106,7 +108,7 @@ onMounted(() => {
 
       <div class="z-10 notice-grid">
         <div class="notice-grid-up">
-          <h2>通知({{ unreadCount }})</h2>
+          <h2>通知({{ unreadCount || 0 }})</h2>
         </div>
         <div class="notice-grid-down-1" v-if="notices.length > 0">
           <a
@@ -185,6 +187,18 @@ onMounted(() => {
 <style scoped>
 @import '@/assets/base.css';
 
+.notice-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 999;
+}
+
+.notice {
+  position: relative;
+  z-index: 999;
+}
+
 .notice-item.read {
   background-color: #1f1f22;
 }
@@ -195,23 +209,13 @@ onMounted(() => {
 
 .notice-grid-down-1 {
   border-radius: 0px 0px 10px 10px;
-  height: 100%;
+  height: 350px;
+  z-index: 999;
   overflow-y: scroll;
 }
 
 .notice-grid-down-1::-webkit-scrollbar {
-  display: none; /* 隱藏滾動條 */
-}
-
-.notice-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  /* margin-right: 136px; */
-  /* margin-top: 16px; */
-}
-
-.notice {
-  position: relative;
+  display: none; 
 }
 
 .notice-icon {
@@ -229,7 +233,6 @@ onMounted(() => {
 
 .notice-icon:hover {
   background-color: #2a2727;
-  /* opacity: 0.8; */
 }
 
 .notice-grid-up h2 {
@@ -250,8 +253,6 @@ onMounted(() => {
     transform 0.3s ease;
   z-index: 999;
   width: 350px;
-  height: 500px;
-  z-index: 9999;
 }
 
 #notice-jump:checked ~ .notice-grid {
@@ -266,7 +267,6 @@ onMounted(() => {
   background-color: #27272a;
   padding: 24px 16px 8px 16px;
   border-radius: 10px 10px 0px 0px;
-  /* position: sticky; */
 }
 
 .notice-grid-down {
@@ -280,7 +280,6 @@ onMounted(() => {
 }
 
 .notice-grid-down img {
-  /* width: 240px; */
   height: 240px;
   margin-bottom: 30px;
 }

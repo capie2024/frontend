@@ -4,7 +4,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import dayjs from 'dayjs'
 import SidebarGrid from '@/components/SidebarGrid.vue'
-import Notice from '../notification/notice.vue'
+import Notice from '@/components/notification/notice.vue'
 import NavLoginBtn from '../NavLoginBtn.vue'
 import MainFooter from '../MainFooter.vue'
 import RemitCard from '../Mycard/remit-card.vue'
@@ -149,6 +149,7 @@ const fetchDeck = async () => {
     console.error('Failed to fetch specific deck:', error)
   }
 }
+
 const fetchCurrentUser = async () => {
   const userToken = localStorage.getItem('token')
   if (!userToken) {
@@ -186,17 +187,25 @@ const fetchMessages = async () => {
   }
 
   try {
+    const userToken = localStorage.getItem('token')
+    const headers = userToken ? { Authorization: `Bearer ${userToken}` } : {}
+
     const response = await axios.get(
-      `${API_URL}/api/comments?articleId=${article.value.article_id}`
+      `${API_URL}/api/comments?articleId=${article.value.article_id}`,
+      {
+        headers,
+      }
     )
+
     messages.value = response.data.sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at)
     )
+
     messages.value.forEach((message) => {
-      message.liked = message.liked || false
-      message.hated = message.hated || false
+      message.liked = message.isLiked
+      message.hated = message.isHated
       message.likeCount = message.like_count || 0
-      message.pictureUrl = message.users?.picture || '/default-avatar.png'
+      message.pictureUrl = message.users?.picture
     })
   } catch (error) {
     console.error('Error fetching messages:', error)
@@ -217,18 +226,12 @@ const sendMessage = async () => {
 
   const userToken = localStorage.getItem('token')
   if (!userToken) {
-    console.error('User token is missing')
     Swal.fire({
       title: '請先登入',
       text: '留言功能需要登入才能使用。',
       icon: 'warning',
       confirmButtonText: '確定',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = `${BASE_URL}/login`
-      }
     })
-    return
   }
 
   try {
@@ -241,8 +244,9 @@ const sendMessage = async () => {
         },
       }
     )
+
     messages.value.unshift(response.data)
-    newMessage.value = '' // 清空輸入框
+    newMessage.value = ''
   } catch (error) {
     console.error('Error sending message:', error)
   }
@@ -356,8 +360,12 @@ const toggleLike = async (message) => {
   try {
     const userToken = localStorage.getItem('token')
     if (!userToken) {
-      console.error('User token not found.')
-      return
+      Swal.fire({
+        title: '請先登入',
+        text: '按讚功能需要登入才能使用。',
+        icon: 'warning',
+        confirmButtonText: '確定',
+      })
     }
 
     const response = await axios.post(
@@ -379,8 +387,13 @@ const toggleHate = async (message) => {
   try {
     const userToken = localStorage.getItem('token')
     if (!userToken) {
-      console.error('User token not found.')
-      return
+      console.error('User token is missing')
+      Swal.fire({
+        title: '請先登入',
+        text: '按讚功能需要登入才能使用。',
+        icon: 'warning',
+        confirmButtonText: '確定',
+      })
     }
 
     const response = await axios.post(
@@ -389,10 +402,14 @@ const toggleHate = async (message) => {
       { headers: { Authorization: `Bearer ${userToken}` } }
     )
 
-    const { isHated, isLiked, likeCount } = response.data
+    const { isLiked, isHated, likeCount } = response.data
     message.hated = isHated
     message.liked = isLiked
     message.likeCount = likeCount
+
+    if (likeCount === 0) {
+      message.liked = false
+    }
   } catch (error) {
     console.error('Error toggling hate:', error.response || error.message)
   }
@@ -485,7 +502,6 @@ const copyDeck = async () => {
   router.push(`/card-series/${seriesId}`)
 }
 
-// 上一頁
 const goBack = () => {
   if (window.history.length > 1) {
     router.back()
@@ -494,7 +510,6 @@ const goBack = () => {
   }
 }
 
-// 根據滾動位置判斷顯示 header 標題和背景色
 const isScrolled = ref(false)
 let mainElement = ref(null)
 
@@ -887,7 +902,7 @@ onBeforeUnmount(() => {
                 >
                   <section>
                     <div class="message-user-img">
-                      <img :src="message.users.picture" alt="" />
+                      <img :src="message.users.picture || userPicture" alt="" />
                     </div>
                   </section>
                   <div class="message-body">
@@ -1115,7 +1130,10 @@ onBeforeUnmount(() => {
                   >
                     <section>
                       <div class="message-user-img">
-                        <img :src="message.users.picture" alt="" />
+                        <img
+                          :src="message.users.picture || userPicture"
+                          alt=""
+                        />
                       </div>
                     </section>
                     <div class="message-body">

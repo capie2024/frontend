@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-// import { useFaqInfoStore } from '@/stores/faq-info'
 import axios from 'axios'
 import SidebarGrid from '@/components/SidebarGrid.vue'
 import Notice from '../components/notification/notice.vue'
@@ -104,6 +103,7 @@ const goAhead = () => {
 // 排序
 const toggleSort = () => {
   sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc'
+  search()
 }
 
 const sortedData = computed(() => {
@@ -122,7 +122,6 @@ const search = () => {
     filteredData.value = sortedData.value
   } else {
     const query = searchQuery.value.toLowerCase()
-    console.log('搜尋關鍵字:', query)
     filteredData.value = sortedData.value.filter((qa) => {
       const q = qa.q?.toLowerCase() || ''
       const a = qa.a?.toLowerCase() || ''
@@ -137,13 +136,7 @@ const search = () => {
       const commonLabelMatch = findSeries(qa.relations)
         ?.toLowerCase()
         .includes(query)
-      console.log('檢查項目:', {
-        relations: qa.relations,
-        commonLabel: findSeries(qa.relations),
-        hasMatchingRelation: qa.relations?.some((r) =>
-          r.toLowerCase().includes(query)
-        ),
-      })
+
       return (
         q.includes(query) ||
         a.includes(query) ||
@@ -161,7 +154,6 @@ const clearSearch = () => {
 
 // 進入問答詳情頁
 const openFaqInfo = (id) => {
-  console.log('進入問答詳情頁:', id)
   router.push({ name: 'FaqInfo', params: { id } })
 }
 
@@ -524,10 +516,6 @@ section {
     position: fixed;
     top: 0;
     right: 0;
-  }
-
-  .login-btn {
-    display: none;
   }
 
   .background {

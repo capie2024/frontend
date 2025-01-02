@@ -154,10 +154,7 @@ onMounted(() => {
   <main>
     <header>
       <div class="pagebtn-area">
-        <button 
-          class="page-btn"
-          @click="goBack"
-        >
+        <button class="page-btn" @click="goBack">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -233,30 +230,29 @@ onMounted(() => {
         </button>
         <Notice />
         <div class="user-sign">
-          <NavLoginBtn />      
+          <NavLoginBtn />
         </div>
       </div>
     </header>
     <section class="title-area">
       <div class="title-area-container">
         <button class="upload-btn" @click="handleButtonClick">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke-width="1.5" 
-            stroke="currentColor" 
-            aria-hidden="true" 
-            data-slot="icon" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            aria-hidden="true"
+            data-slot="icon"
             class="w-20 h-20"
           >
-            <path 
-              stroke="currentColor" 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
               d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2M12 4v12m0-12 4 4m-4-4L8 8"
-            >
-            </path>
+            ></path>
           </svg>
 
           <img :src="deckData.deck_cover" alt="" />
@@ -287,7 +283,7 @@ onMounted(() => {
             type="text"
             placeholder="請輸入標題"
           />
-          <div class="card-select-area" style="position: relative;">
+          <div class="card-select-area" style="position: relative">
             <button class="card-select-btn" @click="toggleMenu">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -413,7 +409,12 @@ onMounted(() => {
                 d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
               ></path>
             </svg>
-            <input class="enter-message" type="text" placeholder="留言..." disabled/>
+            <input
+              class="enter-message"
+              type="text"
+              placeholder="留言..."
+              disabled
+            />
             <button>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1030,7 +1031,7 @@ header {
 }
 
 input:disabled {
-    cursor: not-allowed;
+  cursor: not-allowed;
 }
 
 @media screen and (max-width: 1200px) {
@@ -1172,7 +1173,6 @@ input:disabled {
     top: 70px;
     right: 20px;
   }
-
 
   .edit-area {
     width: 95%;

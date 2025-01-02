@@ -30,9 +30,9 @@ export const useDeckMakeStore = defineStore('deck-make', () => {
     const cardIndex = selectedCards.value.findIndex(
       (item) => item.id === card.id
     )
-    if(cardIndex >= 0){
+    if (cardIndex >= 0) {
       selectedCards.value.splice(cardIndex, 1)
-    }else{
+    } else {
       return
     }
     saveLastDeckEdit()

@@ -5,7 +5,6 @@ import initCardEffect from '@/assets/js/cardEffect.js'
 onMounted(async () => {
   initCardEffect()
 })
-
 </script>
 <template>
   <div
@@ -15,7 +14,9 @@ onMounted(async () => {
       <div
         class="absolute top-0 left-0 w-full h-full glossy rounded-2xl z-2 mix-blend-lighten"
       ></div>
-      <slot class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image"></slot>
+      <slot
+        class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image"
+      ></slot>
     </div>
   </div>
 </template>
@@ -35,5 +36,4 @@ onMounted(async () => {
 .glossy {
   transition: 0.3s;
 }
-
 </style>

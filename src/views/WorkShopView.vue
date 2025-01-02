@@ -7,8 +7,6 @@ import axios from 'axios'
 import FindCard from '../components/Mycard/find-card.vue'
 import RemitCard from '../components/Mycard/remit-card.vue'
 
-
-
 const workShopData = [
   {
     imgUrl: 'https://bottleneko.app/images/workshop/daily.png',
@@ -72,11 +70,11 @@ const getAccount = async () => {
   }
 }
 
-function toggleFindCard(){
+function toggleFindCard() {
   showFindCard.value = !showFindCard.value
 }
 
-function toggleRemitCard(){
+function toggleRemitCard() {
   showRemitCard.value = !showRemitCard.value
 }
 
@@ -145,7 +143,7 @@ onMounted(async () => {
             class="work-shop-outer"
             v-for="i in workShopData"
           >
-            <div class="work-shop-item" @click="i.function" >
+            <div class="work-shop-item" @click="i.function">
               <img :src="i.imgUrl" alt="" />
               <div class="work-shop-item-content">
                 <div class="work-shop-item-content-icon">
@@ -158,7 +156,7 @@ onMounted(async () => {
         </div>
         <div class="banner">
           <h2>如果你有任何酷點子</h2>
-          <p>歡迎來找我！工程師XX會努力實現他</p>
+          <p>歡迎來找我！Capie團隊會努力實現他</p>
         </div>
       </main>
       <footer class="work-shop-footer">

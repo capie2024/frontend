@@ -305,7 +305,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="All root-container">
     <SidebarGrid style="grid-area: sidebar" />
-    <div class="aa background" style="grid-area: main">
+    <div class="content background" style="grid-area: main">
       <div class="all-card">
         <header class="top-container" :class="{ scrolled: isScrolled }">
           <div class="Top-bar">
@@ -463,7 +463,7 @@ onBeforeUnmount(() => {
   position: relative;
 }
 
-.aa {
+.content {
   position: absolute;
   top: 0;
   background-color: #121212;
@@ -705,7 +705,7 @@ header.scrolled {
 a {
   text-decoration: none;
 }
-.aa a:hover {
+.content a:hover {
   background-color: #27272a;
 }
 @media (width > 1339px) {
@@ -771,7 +771,7 @@ a {
   .all-card {
     width: 100%;
   }
-  .aa {
+  .content {
     left: 0;
     width: 100%;
   }

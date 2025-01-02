@@ -156,7 +156,7 @@ onMounted(async () => {
         </div>
         <div class="banner">
           <h2>如果你有任何酷點子</h2>
-          <p>歡迎來找我！工程師XX會努力實現他</p>
+          <p>歡迎來找我！Capie團隊會努力實現他</p>
         </div>
       </main>
       <footer class="work-shop-footer">

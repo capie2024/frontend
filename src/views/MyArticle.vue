@@ -124,10 +124,6 @@ onMounted(() => {
                       <p class="date">{{ formatDate(article.created_at) }}</p>
                       <i class="fa-solid fa-globe"></i>
                       <p class="card-code">{{ article.post_code }}</p>
-                      <div class="chat">
-                        <i class="fa-regular fa-comment"></i>
-                        <p>留言</p>
-                      </div>
                     </div>
                   </div>
                 </div>

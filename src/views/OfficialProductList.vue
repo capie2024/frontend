@@ -25,7 +25,7 @@ onMounted(async () => {
 <template>
   <div class="All">
     <SidebarGrid />
-    <div class="aa">
+    <div class="content">
       <div class="top-container">
         <!-- 通知與登入 -->
         <div class="left-icon">
@@ -213,7 +213,7 @@ nav {
   height: 1.75rem;
 }
 
-.aa {
+.content {
   position: absolute;
   top: 0;
   left: 270px;
@@ -541,7 +541,7 @@ a {
   .translate-btn + p {
     display: none;
   }
-  .aa {
+  .content {
     left: 0;
     margin: 0px;
   }

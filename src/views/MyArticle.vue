@@ -28,6 +28,8 @@ const getUserArticles = async () => {
         text: '登入後才能查看文章',
         icon: 'warning',
         confirmButtonText: '確定',
+        color: '#e1e1e1',
+        background: '#27272a',
       }).then(() => {
         window.location.href = `${BASE_URL}/login`
       })
@@ -76,7 +78,7 @@ onMounted(() => {
         </div>
         <notice />
         <div
-          class="login-btn rounded-full bg-black/50 text-white items-center gap-1 default-transition hover:bg-zinc-800/50"
+          class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50"
         >
           <NavLoginBtn />
         </div>
@@ -87,7 +89,7 @@ onMounted(() => {
     <div class="background"></div>
     <main class="relative content-container bg-base md:my-2 z-1">
       <div class="h-full content">
-        <section class="main-container px-4 md:px-6">
+        <section class="px-4 main-container md:px-6">
           <h2 class="title">
             我的文章<br />
             <span class="subtitle"> 一共有{{ postCount }}結果 </span>
@@ -122,10 +124,6 @@ onMounted(() => {
                       <p class="date">{{ formatDate(article.created_at) }}</p>
                       <i class="fa-solid fa-globe"></i>
                       <p class="card-code">{{ article.post_code }}</p>
-                      <div class="chat">
-                        <i class="fa-regular fa-comment"></i>
-                        <p>留言</p>
-                      </div>
                     </div>
                   </div>
                 </div>

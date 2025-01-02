@@ -1,8 +1,7 @@
 export default function initCardEffect() {
-  // 選取整個卡片
-  const card = document.querySelector('.card')
-  // 選取亮面
-  const glossy = document.querySelector('.glossy')
+
+  // 獲取所有卡片元素
+  const cardElements = document.querySelectorAll('.card');
 
   // 最大旋轉角度
   const maxRotation = 15
@@ -10,13 +9,13 @@ export default function initCardEffect() {
   const maxZRotation = 2
 
   // 重置 旋轉角度 與 亮面透明度
-  function resetCardRotation() {
+  function resetCardRotation(card, glossy) {
     card.style.transform = 'rotateX(0deg) rotateY(0deg) rotateZ(0deg)'
     glossy.style.opacity = '0'
   }
 
   // 更新旋轉角度
-  function updateCardRotation(e) {
+  function updateCardRotation(e, card, glossy) {
     const rect = card.getBoundingClientRect()
     const cardCenterX = rect.left + rect.width / 2
     const cardCenterY = rect.top + rect.height / 2
@@ -41,7 +40,16 @@ export default function initCardEffect() {
     glossy.style.opacity = '1'
   }
 
-  // 將事件監聽器添加到卡片元素上，避免全螢幕觸發效果
-  card.addEventListener('mousemove', updateCardRotation)
-  card.addEventListener('mouseleave', resetCardRotation)
+  // 選取所有卡片的glossy
+  cardElements.forEach((card) => {
+    const glossy = card.querySelector('.glossy');
+    if (!glossy) return;
+
+    // 將事件監聽器添加到卡片元素上，避免全螢幕觸發效果
+    // 添加mousemove事件來更新卡片的旋轉
+    card.addEventListener('mousemove', (e) => updateCardRotation(e, card, glossy));
+
+    // 添加mouseleave事件來重置卡片的旋轉
+    card.addEventListener('mouseleave', () => resetCardRotation(card, glossy));
+  });
 }

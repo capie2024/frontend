@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
-import placeholderImage from 'https://live.staticflickr.com/65535/54229408246_6ea4536c42_o.png' // 預設圖片
+import placeholderImage from '@/img/card-loading.png'
 import NavLoginBtn from './NavLoginBtn.vue'
 import Notice from '@/components/notification/notice.vue'
 import MainFooter from '../components/MainFooter.vue'
 
-const isScrolled = ref(false) // 是否滾動
+const isScrolled = ref(false)
 
 const handleScroll = () => {
   const scrollTop = mainElement.value.scrollTop
@@ -22,8 +22,8 @@ const main = () => {
   }
 }
 
-const numberOfGrids = 10 // 總共有幾個 grid
-const itemsPerGrid = 10 // 每個 grid 有幾個卡片
+const numberOfGrids = 10
+const itemsPerGrid = 10
 
 const grids = ref(
   Array.from({ length: numberOfGrids }, () =>
@@ -42,7 +42,6 @@ const fetchGrids = async () => {
           const response = await axios.get(`${API_URL}/cards/random`)
           const covers = response.data.covers
 
-          // 隨機選擇一個圖片網址，如果為空值則使用預設圖片
           return covers.length > 0
             ? covers[Math.floor(Math.random() * covers.length)]
             : placeholderImage

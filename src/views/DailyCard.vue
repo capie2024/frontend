@@ -229,7 +229,7 @@ onMounted(async () => {
               <input type="checkbox" id="list-switch" />
               <label
                 for="list-switch"
-                class="list-switch cursor-pointer w-[6.5rem] h-fit p-1 bg-zinc-600/80 text-zinc-200 default-transition rounded-full mb-2.5 fixed"
+                class="list-switch cursor-pointer w-[6.5rem] h-fit p-1 bg-zinc-600/80 text-zinc-200 default-transition rounded-full mb-2.5 fixed z-10"
               >
                 <span class="hide">Close</span
                 ><svg
@@ -676,6 +676,14 @@ header {
 }
 
 @media screen and (width < 768px) {
+  .content-block {
+    width: calc(100vw - 9.5rem);
+  }
+
+  #list-switch:checked ~ .content-block {
+    width: calc(100vw - 2rem);
+  }
+
   .grid-container {
     gap: 1rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));

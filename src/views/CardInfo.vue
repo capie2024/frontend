@@ -164,9 +164,10 @@ onMounted(async () => {
             alt=""
             size="sm:100vw md:50vw lg:600px"
           />
-          <!-- <img class="flex-none object-cover w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image" src="https://jasonxddd.me:7001/imgproxy/uTz5Qc1RtmVq-UACufPxVQk-G0eFfKvKWXNGEImcyHc/rt:fill/w:0/h:0/g:no/el:1/f:png/bG9jYWw6Ly8vL0hPTF9XMTA0XzEyM1NTUC5wbmc.png" alt="" size="sm:100vw md:50vw lg:600px"> -->
           <button
             class="absolute bottom-0 p-4 text-white rounded-full md-arrow left-2 bg-black/50 disabled:bg-black/30 disabled:text-white/20 hover:bg-cyan-500"
+            @click="changeCardInfoCard('left')"
+            :disabled="leftDisabled"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -187,6 +188,8 @@ onMounted(async () => {
           </button>
           <button
             class="absolute bottom-0 p-4 text-white rounded-full md-arrow right-2 bg-black/50 disabled:bg-black/30 disabled:text-white/20 hover:bg-cyan-500"
+            @click="changeCardInfoCard('right')"
+            :disabled="rightDisabled"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -241,7 +244,6 @@ onMounted(async () => {
                   class="flex items-center justify-center stroke-2 size-6"
                   >{{ cardCount }}</span
                 >
-                <!-- <span class="text-center stroke-2 size-6">0</span> -->
               </div>
               <button
                 class="text-white btn btn-sm bg-zinc-700 hover:bg-red-400"
@@ -415,33 +417,8 @@ onMounted(async () => {
                 {{ translatedCardInfo.title }}
               </h3>
               <p class="text-zinc-300">{{ translatedCardInfo.productName }}</p>
-              <!-- <p class="font-mono text-xs text-zinc-300">HOL/W104-123SSP</p>
-                            <h3 class="text-2xl font-bold text-white">STELLAR into the GALAXY 星街すいせい</h3>
-                            <p class="text-zinc-300">#ホロライブプロダクション Vol.2</p> -->
             </div>
           </div>
-          <!-- <div class="flex flex-wrap items-center gap-2 mt-4">
-                        <div class="flex items-center">
-                            <span class="relative px-1 text-blue-100 rounded z-1 whitespace-nowrap bg-blue-700/50">等級</span>
-                            <span class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]">3</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="relative px-1 text-blue-100 rounded z-1 whitespace-nowrap bg-blue-700/50">費用</span>
-                            <span class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]">2</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="relative px-1 text-blue-100 rounded z-1 whitespace-nowrap bg-blue-700/50">魂傷</span>
-                            <span class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]">2</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="relative px-1 text-blue-100 rounded z-1 whitespace-nowrap bg-blue-700/50">攻擊</span>
-                            <span class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]">10000</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="relative px-1 text-blue-100 rounded z-1 whitespace-nowrap bg-blue-700/50">稀有度</span>
-                            <span class="bg-black/30 rounded-r pl-2 pr-1 -ml-1 whitespace-nowrap text-white text-center font-mono md:min-w-[2rem]">SSP</span>
-                        </div>
-                    </div> -->
           <div class="flex flex-wrap items-center gap-2 mt-4">
             <div class="flex items-center">
               <span
@@ -626,7 +603,8 @@ onMounted(async () => {
                 </p>
               </button>
             </a>
-            <a href="#qaarea">
+            <!-- 待開發功能 -->
+            <!-- <a href="#qaarea">
               <button
                 class="flex items-center rounded-full group default-transition bg-zinc-700 text-zinc-100 hover:bg-cyan-700 hover:text-cyan-100"
               >
@@ -656,7 +634,7 @@ onMounted(async () => {
                   留言
                 </p>
               </button>
-            </a>
+            </a> -->
           </div>
           <hr class="my-2 -mx-4 border-zinc-700" />
         </div>
@@ -814,8 +792,9 @@ onMounted(async () => {
             </div>
           </div>
           <div class=""></div>
-          <hr class="my-2 -mx-4 border-zinc-700" />
-          <div id="chat" class="flex flex-col gap-4">
+          <!-- <hr class="my-2 -mx-4 border-zinc-700" /> -->
+          <!-- 待開發功能 -->
+          <!-- <div id="chat" class="flex flex-col gap-4">
             <h4 class="flex items-center gap-1 text-cyan-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -865,7 +844,7 @@ onMounted(async () => {
                 <div class="flex flex-col gap-2"></div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
       <button

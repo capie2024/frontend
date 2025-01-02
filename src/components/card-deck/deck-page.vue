@@ -342,10 +342,7 @@ onMounted(() => {
                 </svg>
                 <div class="description-item description3">發布文章</div>
               </button>
-              <button 
-                class="social-btn-item social-btn3"
-                @click="deleteDeck()"
-              >
+              <button class="social-btn-item social-btn3" @click="deleteDeck()">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

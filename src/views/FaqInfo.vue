@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCardInfoStore } from '@/stores/card-info'
-import initCardEffect from '@/assets/js/cardEffect.js'
+import Card from '@/components/Card.vue'
 import axios from 'axios'
 
 const route = useRoute()
@@ -65,12 +65,10 @@ const getRelationCards = async () => {
       const results = await Promise.all(promises)
       // 過濾掉獲取失敗的卡片
       relationCards.value = results.filter((card) => card !== null)
-      console.log('Relation Cards:', relationCards.value)
     } catch (error) {
       console.error('Error fetching relation cards:', error)
     }
   } else {
-    console.log('No relations found for this FAQ.')
     relationCards.value = []
   }
 }
@@ -115,7 +113,6 @@ const goBack = () => {
 
 onMounted(async () => {
   getFaqData()
-  initCardEffect()
 })
 
 // 監聽路由參數的變化
@@ -222,24 +219,23 @@ watch(
               }}</span>
               <div
                 @click="getCardInfoAndShow(card.data)"
-                class="relative cursor-pointer card-wrapper group"
+                class="relative cursor-pointer group"
               >
-                <div
-                  class="relative overflow-hidden card rounded-card"
-                  style="
-                    transition: transform 0.5s ease-in-out;
-                    transform: rotateY(0deg) rotateX(0deg);
-                  "
-                >
+                <Card>
                   <div
-                    class="absolute top-0 left-0 w-full h-full glossy rounded-2xl z-2 mix-blend-lighten"
-                  ></div>
-                  <img
-                    :src="card.data.cover"
-                    alt="關聯卡牌"
-                    class="flex-none w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image"
-                  />
-                </div>
+                    class="relative overflow-hidden rounded-card"
+                    style="
+                      transition: transform 0.5s ease-in-out;
+                      transform: rotateY(0deg) rotateX(0deg);
+                    "
+                  >
+                    <img
+                      :src="card.data.cover"
+                      alt="關聯卡牌"
+                      class="flex-none w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image"
+                    />
+                  </div>
+                </Card>
                 <div
                   class="absolute z-[2] bottom-0 w-full px-1 pb-1 pt-4 flex items-end gap-1 bg-mask group-hover:bg-none"
                 >
@@ -285,7 +281,6 @@ watch(
 
 <style scoped>
 @import '@/assets/base.css';
-@import '@/assets/css/card-effect.css';
 
 *,
 :after,

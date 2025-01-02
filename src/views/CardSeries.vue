@@ -1685,7 +1685,7 @@ onBeforeUnmount(() => {
                   </div>
                   <Card>
                     <div class="card-image">
-                        <img :src="card.cover" />
+                      <img :src="card.cover" />
                     </div>
                   </Card>
                 </div>

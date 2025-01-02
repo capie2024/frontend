@@ -26,7 +26,6 @@ const sortBy = ref('typeTranslate')
 const toggleTableView = ref(false)
 const togglePriceView = ref(false)
 const article = ref(null)
-const post = ref(null)
 const isVisible = ref(false)
 const currentUser = ref(null)
 const deckData = ref({ deck: [] })
@@ -165,7 +164,7 @@ const fetchCurrentUser = async () => {
   currentUser.value = response.data
 }
 
-const fetchArticleId = async () => {
+const fetchArticles = async () => {
   const postCode = route.params.post_code
   if (!postCode) {
     console.error('Error: postCode is not available in route params')
@@ -177,16 +176,6 @@ const fetchArticleId = async () => {
     await fetchMessages()
   } catch (error) {
     console.error('Error fetching article_id:', error)
-  }
-}
-
-const fetchArticle = async() => {
-  const postCode = route.params.post_code
-  try {
-    const response = await axios.get(`${API_URL}/api/articles/${postCode}`);
-    post.value = response.data; 
-  } catch (error) {
-    console.error('獲取文章資料失敗', error);
   }
 }
 
@@ -415,14 +404,14 @@ const formatDate = (date) => {
 }
 
 const isMyArticle = () => {
-  if (!post.value || post.value.user_id === 'undefined') {
-    console.warn('Invalid article:', post);
+  if (!article.value || article.value.user_id === 'undefined') {
+    console.warn('Invalid article:', article);
     return false;
   }
   const token = localStorage.getItem('token')
   const loggedInUserId = getUserIdFromToken(token)
 
-  return post.value.user_id === loggedInUserId
+  return article.value.user_id === loggedInUserId
 }
 
 const deleteArticle = async () => {
@@ -522,8 +511,7 @@ const main = () => {
 }
 
 onMounted(() => {
-  fetchArticleId()
-  fetchArticle()
+  fetchArticles()
   fetchCurrentUser()
   fetchDeck()
   main()
@@ -581,7 +569,7 @@ onBeforeUnmount(() => {
               ></path>
             </svg>
           </button>
-          <h2 class="header-title" v-if="post">{{ post.title }}</h2>
+          <h2 class="header-title" v-if="article">{{ article.title }}</h2>
         </div>
         <div class="btn-area">
           <button
@@ -703,11 +691,11 @@ onBeforeUnmount(() => {
           <div class="carddeck-img">
             <img
               :src="
-                post && post.post_picture
-                  ? post.post_picture
+                article && article.post_picture
+                  ? article.post_picture
                   : 'https://bottleneko.app/images/cover.png'
               "
-              :alt="post && post.title ? post.title : 'Default Title'"
+              :alt="article && article.title ? article.title : 'Default Title'"
             />
           </div>
           <div class="carddeck-data">
@@ -729,19 +717,19 @@ onBeforeUnmount(() => {
                 ></path>
               </svg>{{ postCode }}
             </p>
-            <h1>{{ post?.title }}</h1>
+            <h1>{{ article?.title }}</h1>
             <div class="data-container">
               <div class="user-link">
                 <div class="user-img">
                   <img
-                    :src="post?.users?.picture || userPicture"
+                    :src="article?.user_picture || userPicture"
                     alt="用戶頭像"
                   />
                 </div>
                 <span class="date-container">
-                  <a href="#">{{ post?.users?.username }}</a>
+                  <a href="#">{{ article?.users?.username }}</a>
                   發布於
-                  <span>{{ formatDate(post?.created_at) }}</span>
+                  <span>{{ formatDate(article?.created_at) }}</span>
                 </span>
               </div>
               <span class="data-item">
@@ -831,7 +819,7 @@ onBeforeUnmount(() => {
               <span>文章內容</span>
             </div>
             <div class="article-content">
-              <p v-html="post?.content"></p>
+              <p v-html="article?.content"></p>
             </div>
           </div>
           <!-- 留言區域 -->

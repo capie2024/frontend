@@ -1617,7 +1617,7 @@ onBeforeUnmount(() => {
         <MainFooter />
       </section>
 
-      <div class="deck-container">
+      <!-- <div class="deck-container">
         <div class="deck-img">
           <img src="/src/img/麻衣.png" alt="" />
         </div>
@@ -1654,7 +1654,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </main>
   </div>
 </template>

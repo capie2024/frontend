@@ -244,7 +244,7 @@ onMounted(() => {
             </svg>
             <div class="notice">通知</div>
           </button>
-          <button class="user-btn">
+          <!-- <button class="user-btn">
             <div class="btn-img">
               <img src="/src/img/麻衣.png" alt="" />
             </div>
@@ -265,7 +265,7 @@ onMounted(() => {
                 d="m19.5 8.25-7.5 7.5-7.5-7.5"
               ></path>
             </svg>
-          </button>
+          </button> -->
         </div>
       </header>
     </div>
@@ -415,7 +415,7 @@ onMounted(() => {
           }"
         />
       </div>
-      <div class="message-area">
+      <!-- <div class="message-area">
         <div class="user-message">
           <div class="message-user-img">
             <img src="/src/img/麻衣.png" alt="" />
@@ -458,13 +458,13 @@ onMounted(() => {
           </div>
         </div>
         <span class="message-count">0則留言</span>
-      </div>
+      </div> -->
     </section>
     <footer>
       <MainFooter />
     </footer>
 
-    <div class="deck-container">
+    <!-- <div class="deck-container">
       <div class="deck-img">
         <img src="/src/img/麻衣.png" alt="" />
       </div>
@@ -501,7 +501,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </main>
 </template>
 

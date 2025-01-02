@@ -895,7 +895,7 @@ onBeforeUnmount(() => {
                 >
                   <section>
                     <div class="message-user-img">
-                      <img :src="message.users.picture" alt="" />
+                      <img :src="message.users.picture || userPicture" alt="" />
                     </div>
                   </section>
                   <div class="message-body">

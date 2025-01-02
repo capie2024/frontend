@@ -182,6 +182,46 @@ const copyDeck = async () => {
   }
 }
 
+const deleteDeck = async () => {
+  const deck_id = route.params.deck_id
+  Swal.fire({
+    title: '確定要刪除牌組嗎？',
+    text: '刪除後將無法復原。',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '確認刪除',
+    cancelButtonText: '取消',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const userToken = localStorage.getItem('token')
+        const response = await axios.delete(`${API_URL}/decks/${deck_id}`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        })
+
+        if (response.status === 200) {
+          Swal.fire({
+            icon: 'success',
+            title: '刪除成功',
+            showConfirmButton: false,
+            timer: 1000,
+          }).then(() => {
+            router.push('/deck')
+          })
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: '刪除失敗',
+          text: '已引用於文章,無法刪除',
+        })
+      }
+    }
+  })
+}
+
 onMounted(() => {
   fetchDeckData()
 })
@@ -302,7 +342,10 @@ onMounted(() => {
                 </svg>
                 <div class="description-item description3">發布文章</div>
               </button>
-              <button class="social-btn-item social-btn3">
+              <button 
+                class="social-btn-item social-btn3"
+                @click="deleteDeck()"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

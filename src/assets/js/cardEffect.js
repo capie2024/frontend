@@ -1,7 +1,6 @@
 export default function initCardEffect() {
-
   // 獲取所有卡片元素
-  const cardElements = document.querySelectorAll('.card');
+  const cardElements = document.querySelectorAll('.card')
 
   // 最大旋轉角度
   const maxRotation = 15
@@ -42,14 +41,16 @@ export default function initCardEffect() {
 
   // 選取所有卡片的glossy
   cardElements.forEach((card) => {
-    const glossy = card.querySelector('.glossy');
-    if (!glossy) return;
+    const glossy = card.querySelector('.glossy')
+    if (!glossy) return
 
     // 將事件監聽器添加到卡片元素上，避免全螢幕觸發效果
     // 添加mousemove事件來更新卡片的旋轉
-    card.addEventListener('mousemove', (e) => updateCardRotation(e, card, glossy));
+    card.addEventListener('mousemove', (e) =>
+      updateCardRotation(e, card, glossy)
+    )
 
     // 添加mouseleave事件來重置卡片的旋轉
-    card.addEventListener('mouseleave', () => resetCardRotation(card, glossy));
-  });
+    card.addEventListener('mouseleave', () => resetCardRotation(card, glossy))
+  })
 }

@@ -17,10 +17,6 @@ const searchQuery = ref('')
 const filteredData = ref([])
 const API_URL = import.meta.env.VITE_API_URL
 
-// 引入FaqInfoStore並使用
-// const faqInfoStore = useFaqInfoStore()
-// const getFaqInfoAndShow = faqInfoStore.getFaqInfoAndShow
-
 const getQAList = async () => {
   try {
     const { data } = await axios.get(`${API_URL}/qa`)
@@ -347,7 +343,7 @@ onMounted(async () => {
             >
               <p
                 v-html="highlightText(qa.q)"
-                class="h-[6rem] overflow-auto mb-4 scrollbar"
+                class="h-[6rem] overflow-auto mb-4 scrollbar leading-6"
               ></p>
               <p
                 class="flex items-center gap-1 font-mono text-sm text-zinc-300"

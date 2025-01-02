@@ -54,6 +54,8 @@ const confirmClose = () => {
     confirmButtonText: '離開',
     cancelButtonText: '取消',
     reverseButtons: true,
+    color: '#e1e1e1',
+    background: '#27272a',
   }).then((result) => {
     if (result.isConfirmed) {
       // 用戶確認離開，隱藏模態框
@@ -81,12 +83,12 @@ const hideModal = () => {
       class="bg-base md:rounded-xl relative h-mobile-full overflow-auto flex flex-col w-[50vw]"
     >
       <header
-        class="pt-4 px-4 sticky top-0 z-20 flex pb-2 bg-zinc-900 border-b border-zinc-800 items-center"
+        class="sticky top-0 z-20 flex items-center px-4 pt-4 pb-2 border-b bg-zinc-900 border-zinc-800"
       >
-        <h2 class="grow-1 w-full text-white" id="title">尋找牌組</h2>
-        <div class="flex-none flex gap-2 justify-end">
+        <h2 class="w-full text-white grow-1" id="title">尋找牌組</h2>
+        <div class="flex justify-end flex-none gap-2">
           <button
-            class="flex-none p-1 rounded-full bg-black/70 hover:bg-white hover:text-black text-white"
+            class="flex-none p-1 text-white rounded-full bg-black/70 hover:bg-white hover:text-black"
             @click="confirmClose"
           >
             <svg
@@ -97,7 +99,7 @@ const hideModal = () => {
               stroke="currentColor"
               aria-hidden="true"
               data-slot="icon"
-              class="h-6 w-6"
+              class="w-6 h-6"
             >
               <path
                 stroke-linecap="round"
@@ -114,11 +116,11 @@ const hideModal = () => {
           query="[object Object]"
         >
           <section class="mb-4">
-            <h3 class="topic my-4">
+            <h3 class="my-4 topic">
               選擇來源 <br />
               <span class="subtitle">選擇你的牌組代碼來源</span>
             </h3>
-            <div class="grid grid-cols-2 md:grid-cols-2 gap-2">
+            <div class="grid grid-cols-2 gap-2 md:grid-cols-2">
               <button
                 @click="changeBtn('deck')"
                 :class="searchType === 'deck' ? 'active' : 'dimmed'"
@@ -168,19 +170,19 @@ const hideModal = () => {
             </div>
           </section>
           <section class="mb-4">
-            <h3 class="topic my-4">輸入代碼</h3>
+            <h3 class="my-4 topic">輸入代碼</h3>
             <div class="grid grid-cols-1 gap-2">
               <div class="item default-transition">
                 <input
-                  class="custom-input w-full p-0 bg-transparent placeholder:text-zinc-500"
+                  class="w-full p-0 bg-transparent custom-input placeholder:text-zinc-500"
                   type="text"
                   placeholder="代碼"
                   v-model="searchCode"
                 />
               </div>
-              <p v-if="error" class="text-red-500 text-sm mt-2">{{ error }}</p>
+              <p v-if="error" class="mt-2 text-sm text-red-500">{{ error }}</p>
             </div>
-            <div class="mt-8 flex justify-center">
+            <div class="flex justify-center mt-8">
               <button
                 class="item md:!w-[20rem] justify-center default-transition gray"
                 @click="fetchAndNavigate"
@@ -207,7 +209,7 @@ const hideModal = () => {
           </section>
         </div>
       </div>
-      <footer class="mt-auto w-full pb-4"></footer>
+      <footer class="w-full pb-4 mt-auto"></footer>
     </div>
   </section>
 </template>

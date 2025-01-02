@@ -27,12 +27,7 @@ const getCardData = async (id) => {
       throw new Error('No data received')
     }
 
-    return {
-      id: data.id,
-      cover: data.cover,
-      title: data.title,
-      i18n: data.i18n,
-    }
+    return data
   } catch (error) {
     console.error(`Error fetching card data for id ${id}:`, error)
     return null
@@ -223,10 +218,10 @@ watch(
               class="flex flex-col items-center"
             >
               <span class="font-mono text-sm truncate text-zinc-200">{{
-                card.id
+                card.data.id
               }}</span>
               <div
-                @click="getCardInfoAndShow(card.id)"
+                @click="getCardInfoAndShow(card.data)"
                 class="relative cursor-pointer card-wrapper group"
               >
                 <div
@@ -240,7 +235,7 @@ watch(
                     class="absolute top-0 left-0 w-full h-full glossy rounded-2xl z-2 mix-blend-lighten"
                   ></div>
                   <img
-                    :src="card.cover"
+                    :src="card.data.cover"
                     alt="關聯卡牌"
                     class="flex-none w-full min-w-0 shadow-lg select-none rounded-card aspect-card default-transition bg-image"
                   />
@@ -252,10 +247,10 @@ watch(
                     class="grow-1 w-full min-w-0 group-hover:opacity-0 will-change-[opacity] transition-opacity select-none"
                   >
                     <p class="font-mono text-sm truncate text-zinc-300">
-                      {{ card.id }}
+                      {{ card.data.id }}
                     </p>
                     <p class="font-bold text-white truncate">
-                      {{ card.title }}
+                      {{ card.data.title }}
                     </p>
                   </div>
                   <button
@@ -307,13 +302,7 @@ watch(
 .page {
   perspective: 1000px;
 }
-.card {
-  transition: transform 0.5s ease-in-out;
-  transform-style: preserve-3d;
-}
-.glossy {
-  transition: 0.3s;
-}
+
 .btn {
   border-radius: 9999px;
   display: grid;

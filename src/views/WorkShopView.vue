@@ -4,8 +4,8 @@ import PageControl from '@/components/work-shop/PageControl.vue'
 import SidebarGrid from '@/components/SidebarGrid.vue'
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
-import FindCard from '../components/Mycard/find-card.vue'
-import RemitCard from '../components/Mycard/remit-card.vue'
+import FindCard from '@/components/Mycard/find-card.vue'
+import RemitCard from '@/components/Mycard/remit-card.vue'
 
 const workShopData = [
   {

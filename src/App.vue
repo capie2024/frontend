@@ -13,6 +13,7 @@ const route = useRoute()
 
 const LoginPage = computed(() => route.name === 'login')
 const SignupPage = computed(() => route.name === 'signup')
+const FaqInfoPage = computed(() => route.name === 'FaqInfo')
 
 const cardInfoStore = useCardInfoStore()
 const { cardInfoDisplay } = storeToRefs(cardInfoStore)

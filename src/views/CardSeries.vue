@@ -19,6 +19,7 @@ import { useCardInfoStore } from '@/stores/card-info'
 import Swal from 'sweetalert2'
 import { useCardFilterStore } from '@/stores/card-filter'
 import { useRoute } from 'vue-router'
+import Card from '@/components/Card.vue'
 
 // 引入CardFilterStore並使用
 const cardFilterStore = useCardFilterStore()
@@ -112,6 +113,8 @@ const clearDeckAndBacktoFirstStep = async () => {
     confirmButtonText: '確定',
     showCancelButton: true,
     cancelButtonText: '取消',
+    color: '#e1e1e1',
+    background: '#27272a',
   })
   if (res.isConfirmed) {
     clearSelectedCards()
@@ -150,6 +153,8 @@ const finalStep = async () => {
         icon: 'error',
         title: '錯誤',
         text: '請重新登入',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
       router.push('/login')
     }
@@ -165,6 +170,8 @@ const finalStep = async () => {
         icon: 'success',
         title: '成功',
         text: '成功創建牌組',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
       router.push(`/deck/${res.data.data.deck_id}`)
     } else if (res.status == 403) {
@@ -172,6 +179,8 @@ const finalStep = async () => {
         icon: 'error',
         title: '錯誤',
         text: '請重新登入',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
       router.push('/login')
     } else {
@@ -179,6 +188,8 @@ const finalStep = async () => {
         icon: 'error',
         title: '錯誤',
         text: '創建牌組失敗',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     }
   } else {
@@ -187,18 +198,24 @@ const finalStep = async () => {
         icon: 'error',
         title: '錯誤',
         text: '需填寫牌組名',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     } else if (deckDescription.value.trim() == '') {
       Swal.fire({
         icon: 'error',
         title: '錯誤',
         text: '需填寫牌組描述',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     } else if (chooseCoverCard.value.trim() == '') {
       Swal.fire({
         icon: 'error',
         title: '錯誤',
         text: '未選擇封面卡',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
     }
   }
@@ -1666,9 +1683,11 @@ onBeforeUnmount(() => {
                     <span>{{ card.price.number }}</span>
                     <span>{{ card.rare }}</span>
                   </div>
-                  <div class="card-image">
-                    <img :src="card.cover" />
-                  </div>
+                  <Card>
+                    <div class="card-image">
+                        <img :src="card.cover" />
+                    </div>
+                  </Card>
                 </div>
               </div>
             </div>
@@ -2178,7 +2197,9 @@ onBeforeUnmount(() => {
                 @click.stop="addCard(seriesCardList[index])"
               >
                 <div class="card-info-image">
-                  <img :src="card.cover" />
+                  <Card>
+                    <img :src="card.cover" />
+                  </Card>
                   <div
                     class="card-inner-info"
                     @click.stop="getCardInfoAndShow(seriesCardList[index])"

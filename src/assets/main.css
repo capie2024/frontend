@@ -84,8 +84,20 @@ video {
   padding: 0;
   border: 0;
   font-size: 100%;
-  font: inherit;
   vertical-align: baseline;
+}
+html {
+  font-family:
+    Roboto,
+    Noto Sans TC,
+    ui-sans-serif,
+    system-ui,
+    sans-serif,
+    Apple Color Emoji,
+    Segoe UI Emoji,
+    Segoe UI Symbol,
+    Noto Color Emoji,
+    sans-serif;
 }
 /* HTML5 display-role reset for older browsers */
 article,

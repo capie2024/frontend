@@ -256,11 +256,11 @@
 .card-image {
   display: flex;
   position: relative;
-  object-fit: cover;
   border-radius: 10px;
   overflow: hidden;
   margin: 5px;
   box-sizing: border-box;
+  height: 100%;
 }
 
 .col-choice {
@@ -272,6 +272,7 @@
   width: 100%;
   height: auto;
   display: block;
+  object-fit: cover;
 }
 
 .card-count {

@@ -240,6 +240,8 @@ export default {
         confirmButtonText: '離開',
         cancelButtonText: '取消',
         reverseButtons: true,
+        color: '#e1e1e1',
+        background: '#27272a',
       }).then((result) => {
         if (result.isConfirmed) {
           this.hideModal()

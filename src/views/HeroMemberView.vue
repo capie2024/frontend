@@ -622,7 +622,12 @@ onMounted(async () => {
                 <div
                   class="hero-member-main-member-type-section-content-item-btn"
                 >
-                  <button v-if="!isTokenAvailable && !isHeroMember" @click="router.push('/signup')" >前往註冊帳號</button>
+                  <button
+                    v-if="!isTokenAvailable && !isHeroMember"
+                    @click="router.push('/signup')"
+                  >
+                    前往註冊帳號
+                  </button>
                 </div>
               </div>
             </a>

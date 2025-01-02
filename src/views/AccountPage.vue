@@ -32,8 +32,10 @@ const getAccount = async () => {
   if (!token) {
     Swal.fire({
       icon: 'error',
-      title: '沒有 token',
-      text: '請重新登入',
+      title: '尚未登入',
+      text: '請先登入',
+      color: '#e1e1e1',
+      background: '#27272a',
     })
     await nextTick()
     router.replace({ name: 'login' })
@@ -57,8 +59,10 @@ const getAccount = async () => {
     if (error.response && error.response.status === 403) {
       Swal.fire({
         icon: 'error',
-        title: 'token 無效或過期',
+        title: '已超過登入期限',
         text: '請重新登入',
+        color: '#e1e1e1',
+        background: '#27272a',
       })
       await nextTick()
       router.replace({ name: 'login' })
@@ -92,8 +96,10 @@ const saveName = async () => {
   if (!token) {
     Swal.fire({
       icon: 'error',
-      title: '没有 token',
-      text: '請重新登入',
+      title: '尚未登入',
+      text: '請先登入',
+      color: '#e1e1e1',
+      background: '#27272a',
     })
     await nextTick()
     router.replace({ name: 'login' })
@@ -115,6 +121,8 @@ const saveName = async () => {
       icon: 'success',
       title: '名稱更新成功',
       showConfirmButton: false,
+      color: '#e1e1e1',
+      background: '#27272a',
       timer: 1500,
     })
   } catch (error) {
@@ -122,6 +130,8 @@ const saveName = async () => {
       icon: 'error',
       title: '更新名稱失敗',
       text: error.response?.data?.message || '請稍後重試',
+      color: '#e1e1e1',
+      background: '#27272a',
     })
   }
 }
@@ -148,8 +158,10 @@ const handleFileChange = async (event) => {
   if (!token) {
     Swal.fire({
       icon: 'error',
-      title: '沒有 token',
-      text: '請重新登入',
+      title: '尚未登入',
+      text: '請先登入',
+      color: '#e1e1e1',
+      background: '#27272a',
     })
     router.push({ name: 'login' })
     return
@@ -176,12 +188,16 @@ const handleFileChange = async (event) => {
       title: '圖片上傳成功',
       showConfirmButton: false,
       timer: 1500,
+      color: '#e1e1e1',
+      background: '#27272a',
     })
   } catch (error) {
     Swal.fire({
       icon: 'error',
       title: '圖片上傳失敗',
       text: error.response?.data?.message || '請稍後重試',
+      color: '#e1e1e1',
+      background: '#27272a',
     })
   } finally {
     isUploading.value = false // 上傳結束
@@ -208,6 +224,8 @@ const getUserDecks = async () => {
       icon: 'error',
       title: '獲取用戶牌組失敗',
       text: error.response?.data?.message || '請稍後重試',
+      color: '#e1e1e1',
+      background: '#27272a',
     })
   }
 }
@@ -232,6 +250,8 @@ const getUserArticles = async () => {
       icon: 'error',
       title: '獲取用戶文章失敗',
       text: error.response?.data?.message || '請稍後重試',
+      color: '#e1e1e1',
+      background: '#27272a',
     })
   }
 }
@@ -687,7 +707,7 @@ onBeforeUnmount(() => {
                           fill="currentColor"
                           aria-hidden="true"
                           data-slot="icon"
-                          class="size-4 flex-none"
+                          class="flex-none size-4"
                         >
                           <path
                             d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.385 17.385 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.18 17.18 0 0 1-2.228-4.605ZM7.777 15.23a18.87 18.87 0 0 1-.214-4.774 12.753 12.753 0 0 1-4.34-2.708 9.711 9.711 0 0 0-.944 5.004 17.165 17.165 0 0 0 5.498 2.477ZM21.356 14.752a9.765 9.765 0 0 1-7.478 6.817 18.64 18.64 0 0 0 1.988-4.718 18.627 18.627 0 0 0 5.49-2.098ZM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 0 0 1.988 4.718 9.765 9.765 0 0 1-7.478-6.816ZM13.878 2.43a9.755 9.755 0 0 1 6.116 3.986 11.267 11.267 0 0 1-3.746 2.504 18.63 18.63 0 0 0-2.37-6.49ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM10.122 2.43a18.629 18.629 0 0 0-2.37 6.49 11.266 11.266 0 0 1-3.746-2.504 9.754 9.754 0 0 1 6.116-3.985Z"

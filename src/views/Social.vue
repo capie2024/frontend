@@ -219,8 +219,6 @@ const startFunction = () => {
   }, 100)
 }
 
-const searchResultCount = computed(() => filteredArticles.value.length)
-
 onMounted(() => {
   fetchArticles()
   startFunction()

@@ -782,7 +782,7 @@ onBeforeUnmount(() => {
                   >
                 </h2>
                 <div class="main-setting-bar">
-                  <button @click="logout" >
+                  <button @click="logout">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="white"

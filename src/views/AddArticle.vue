@@ -26,18 +26,29 @@ const searchQuery = ref('')
 const seriesName = ref('選擇牌組')
 
 const submitArticle = async () => {
-  try {
-    const formData = new FormData()
-    formData.append('title', title.value)
-    formData.append('content', content.value)
-    formData.append('deck_id', parseInt(deckId.value, 10))
+  const formData = new FormData()
+  formData.append('title', title.value)
+  formData.append('content', content.value)
+  formData.append('deck_id', parseInt(deckId.value, 10))
 
-    if (uploadedImage.value) {
-      formData.append('picture', uploadedImage.value)
-    } else if (imageUrl.value) {
-      formData.append('post_picture', imageUrl.value)
+  if (uploadedImage.value) {
+    formData.append('picture', uploadedImage.value)
+  } else if (imageUrl.value) {
+    formData.append('post_picture', imageUrl.value)
+  }
+  const API_URL = import.meta.env.VITE_API_URL
+  try {
+
+    if(!title.value) {
+      Swal.fire({
+        icon: 'error',
+        title: '標題不能為空',
+        color: '#e1e1e1',
+        background: '#27272a',
+      })
+      return
     }
-    const API_URL = import.meta.env.VITE_API_URL
+
     const response = await axios.post(`${API_URL}/api/articles`, formData, {
       headers: {
         Authorization: `Bearer ${token.value}`,
@@ -50,6 +61,8 @@ const submitArticle = async () => {
       icon: 'success',
       title: '成功',
       showConfirmButton: false,
+      color: '#e1e1e1',
+      background: '#27272a',
       timer: 1000,
     }).then(() => {
       router.push(`/social/${postCode}`)
@@ -71,7 +84,6 @@ const submitArticle = async () => {
       Swal.fire({
         icon: 'error',
         title: '新增文章失敗',
-        text: error.message,
         color: '#e1e1e1',
         background: '#27272a',
       })
@@ -483,147 +495,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-div,
-span,
-applet,
-object,
-iframe,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-blockquote,
-pre,
-a,
-abbr,
-acronym,
-address,
-big,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strike,
-strong,
-sub,
-sup,
-tt,
-var,
-b,
-u,
-i,
-center,
-dl,
-dt,
-dd,
-ol,
-ul,
-li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td,
-article,
-aside,
-canvas,
-details,
-embed,
-figure,
-figcaption,
-footer,
-header,
-hgroup,
-menu,
-nav,
-output,
-ruby,
-section,
-summary,
-time,
-mark,
-audio,
-video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-}
 
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-menu,
-nav,
-section {
-  display: block;
-}
-body {
-  line-height: 1;
-}
-ol,
-ul {
-  list-style: none;
-}
-blockquote,
-q {
-  quotes: none;
-}
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-  content: '';
-  content: none;
-}
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-
-a {
-  text-decoration: none;
-  color: #ffffff;
-}
-
-.black-container {
-  background-color: #121212;
-  font-family:
-    Roboto,
-    Noto Sans TC,
-    sans-serif;
-  overscroll-behavior-x: none;
-  width: 100%;
-}
-
-.black-container::-webkit-scrollbar {
-  display: none;
-}
 
 .sidebar-container {
   position: fixed;
@@ -930,6 +802,9 @@ header {
   font-size: 16px;
   font-weight: 900;
   color: white;
+  line-height: 16px;
+  height: 16px;
+  overflow: hidden;
 }
 
 .card-select-btn:hover {

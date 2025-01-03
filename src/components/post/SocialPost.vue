@@ -438,8 +438,10 @@ const deleteArticle = async () => {
     text: '刪除後將無法復原。',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: '確認刪除',
+    confirmButtonText: '確認',
     cancelButtonText: '取消',
+    color: '#e1e1e1',
+    background: '#27272a',
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
@@ -452,10 +454,17 @@ const deleteArticle = async () => {
           }
         )
 
-        if (response.status === 200) {
-          Swal.fire('刪除成功', '文章已成功刪除', 'success')
-          router.push('/social')
-        }
+        Swal.fire({
+          icon: 'success',
+          title: '刪除成功',
+          showConfirmButton: false,
+          color: '#e1e1e1',
+          background: '#27272a',
+          timer: 1500,
+        })
+        
+        router.push('/social')
+
       } catch (error) {
         if (error.response && error.response.status === 403) {
           Swal.fire({

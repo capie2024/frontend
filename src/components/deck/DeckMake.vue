@@ -753,7 +753,7 @@ onBeforeUnmount(() => {
   >
     <div class="deck-content">
       <div class="deck-img">
-        <img src="../img/capie-icon.png" alt="" />
+        <img src="@/img/capie-icon.png" alt="" />
       </div>
       <div class="line"></div>
       <div class="total-cards">

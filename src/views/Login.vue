@@ -113,7 +113,7 @@ const submit = async () => {
               >
                 <div class="flex items-center gap-2">
                   <img
-                    src="../img/capie-icon.png"
+                    src="@/img/capie-icon.png"
                     alt=""
                     class="h-[5rem] w-[5rem] rounded-full"
                   />

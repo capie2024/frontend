@@ -350,7 +350,7 @@ const goBack = () => {
 </template>
 
 <style scoped>
-@import '../assets/base.css';
+@import '@/assets/base.css';
 .all-question {
   display: none;
 }

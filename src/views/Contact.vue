@@ -68,7 +68,7 @@ const handleBack = () => {
                 target="_blank"
               >
                 <div class="capie-img">
-                  <img src="../img/capie-user.png" />
+                  <img src="@/img/capie-user.png" />
                 </div>
                 <div>
                   <h3 class="font-bold text-lg">關於卡派團隊</h3>
@@ -80,7 +80,7 @@ const handleBack = () => {
                 href="https://discord.com/channels/1303258823104135219/1321898702750748752"
               >
                 <div class="capie-img">
-                  <img src="../img/capie-user.png" />
+                  <img src="@/img/capie-user.png" />
                 </div>
                 <div>
                   <h3 class="font-bold text-lg">卡派 Discord</h3>

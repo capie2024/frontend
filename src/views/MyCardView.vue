@@ -237,8 +237,8 @@ const counts = computed(() => {
 
 // 系列按鈕的排序功能
 const sortedStates = ref({})
-
 const toggleSeriesSort = (codes, index) => {
+  // 恢復牌組排序狀態
   if (sortedStates.value[index]) {
     cardDecks.value = [...originalDecks.value]
 
@@ -267,6 +267,7 @@ const toggleSeriesSort = (codes, index) => {
 
   cardDecks.value = sortedDecks
 
+  // 把其他牌組改成未點擊狀態
   Object.keys(sortedStates.value).forEach((key) => {
     sortedStates.value[key] = false
   })

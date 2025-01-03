@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 import Swal from 'sweetalert2'
@@ -222,181 +222,230 @@ const deleteDeck = async () => {
   })
 }
 
+const isScrolled = ref(false)
+let mainElement = ref(null)
+
+const handleScroll = () => {
+  const scrollTop = mainElement.value.scrollTop
+  isScrolled.value = scrollTop > 0
+}
+
+const main = () => {
+  mainElement.value = document.querySelector('.background')
+  if (mainElement.value) {
+    mainElement.value.addEventListener('scroll', handleScroll)
+  }
+}
+
 onMounted(() => {
   fetchDeckData()
+  main()
+})
+
+onBeforeUnmount(() => {
+  if (mainElement.value) {
+    mainElement.value.removeEventListener('scroll', handleScroll)
+  }
 })
 </script>
 
 <template>
   <div class="container">
     <SidebarGrid />
-    <div class="bg-container">
-      <main>
-        <div v-if="isVisible">
-          <RemitCard v-if="isVisible" />
+    <main class="background">
+      <div v-if="isVisible">
+        <RemitCard v-if="isVisible" />
+      </div>
+      <header :class="{ scrolled: isScrolled }">
+        <div class="pagebtn-area">
+          <button class="page-btn" @click="goBack">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              ></path>
+            </svg>
+          </button>
+          <button class="page-btn next-btn">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              ></path>
+            </svg>
+          </button>
+          <h2 class="header-title">{{ deckData.deck_name }}</h2>
         </div>
-        <div class="bg-black">
-          <header>
-            <div class="pagebtn-area">
-              <button class="page-btn" @click="goBack">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="w-6 h-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.75 19.5 8.25 12l7.5-7.5"
-                  ></path>
-                </svg>
-              </button>
-              <button class="page-btn next-btn">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="w-6 h-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                  ></path>
-                </svg>
-              </button>
-              <h2>{{ deckData.deck_name }}</h2>
-            </div>
-            <div class="btn-area">
-              <button class="social-btn-item social-btn2" @click="copyDeck">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="stroke-2 size-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"
-                  ></path>
-                </svg>
-                <div class="description-item description2 hover-text">
-                  複製牌組
-                </div>
-              </button>
-              <button
-                class="social-btn-item social-btn3"
-                @click="toggleRemitCard"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="stroke-2 size-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                  ></path>
-                </svg>
-                <div class="description-item description7">匯出牌組</div>
-              </button>
-              <button
-                class="social-btn-item social-btn3"
-                @click="goToArticlePage"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="stroke-2 size-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"
-                  ></path>
-                </svg>
-                <div class="description-item description3">發布文章</div>
-              </button>
-              <button class="social-btn-item social-btn3" @click="deleteDeck()">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="stroke-2 size-6 red"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                  ></path>
-                </svg>
-                <div class="description-item description4">刪除牌組</div>
-              </button>
-              <button class="social-btn-item social-btn3">
-                <div class="description-item description5">通知</div>
-                <Notice />
-              </button>
-              <div class="user-btn">
-                <NavLoginBtn />
-              </div>
+        <div class="btn-area">
+          <button class="social-btn-item social-btn2" @click="copyDeck">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"
+              ></path>
+            </svg>
+            <div class="description-item description2 hover-text">複製牌組</div>
+          </button>
+          <button class="social-btn-item social-btn3" @click="toggleRemitCard">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+              ></path>
+            </svg>
+            <div class="description-item description7">匯出牌組</div>
+          </button>
+          <button class="social-btn-item social-btn3" @click="goToArticlePage">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"
+              ></path>
+            </svg>
+            <div class="description-item description3">發布文章</div>
+          </button>
+          <button class="social-btn-item social-btn3" @click="deleteDeck()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="stroke-2 size-6 red"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+              ></path>
+            </svg>
+            <div class="description-item description4">刪除牌組</div>
+          </button>
+          <button class="social-btn-item social-btn3">
+            <div class="description-item description5">通知</div>
+            <Notice />
+          </button>
+          <div class="user-btn">
+            <NavLoginBtn />
+          </div>
 
-              <button class="social-btn-item social-btn5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="stroke-2 size-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-          </header>
+          <button class="social-btn-item social-btn5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="stroke-2 size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
+              ></path>
+            </svg>
+          </button>
         </div>
-        <section class="carddeck-information">
-          <div class="information-container">
-            <div class="carddeck-img">
-              <img :src="deckData.deck_cover" alt="" />
+      </header>
+      <section class="carddeck-information">
+        <div class="information-container">
+          <div class="carddeck-img">
+            <img :src="deckData.deck_cover" alt="" />
+          </div>
+          <div class="carddeck-data">
+            <p class="user-number">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="flex-none size-5 md:size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
+                ></path></svg
+              >{{ deckData.deck_id }}
+            </p>
+            <div class="carddeck-name">
+              <h1>{{ deckData.deck_name }}</h1>
             </div>
-            <div class="carddeck-data">
-              <p class="user-number">
+            <div class="data-container">
+              <div
+                class="user-link"
+                v-if="deckData && deckData.users && deckData.users.username"
+              >
+                <div class="user-img" v-if="deckData.users.picture">
+                  <img :src="deckData.users.picture" alt="" />
+                </div>
+                <span class="date-container">
+                  <a href="#">{{ deckData.users.username }}</a>
+                  發布於
+                  <span>{{ deckData.build_time.slice(0, 10) }}</span>
+                </span>
+              </div>
+              <span
+                class="data-item"
+                v-if="deckData && Array.isArray(deckData.deck)"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -410,124 +459,86 @@ onMounted(() => {
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
+                    d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
                   ></path></svg
-                >{{ deckData.deck_id }}
-              </p>
-              <div class="carddeck-name">
-                <h1>{{ deckData.deck_name }}</h1>
-              </div>
-              <div class="data-container">
-                <div
-                  class="user-link"
-                  v-if="deckData && deckData.users && deckData.users.username"
-                >
-                  <div class="user-img" v-if="deckData.users.picture">
-                    <img :src="deckData.users.picture" alt="" />
-                  </div>
-                  <span class="date-container">
-                    <a href="#">{{ deckData.users.username }}</a>
-                    發布於
-                    <span>{{ deckData.build_time.slice(0, 10) }}</span>
-                  </span>
-                </div>
-                <span
-                  class="data-item"
-                  v-if="deckData && Array.isArray(deckData.deck)"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    data-slot="icon"
-                    class="flex-none size-5 md:size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-                    ></path></svg
-                  >&nbsp; 總數{{ deckData.deck.length }}張
-                </span>
-                <span class="data-item">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    data-slot="icon"
-                    class="flex-none size-5 md:size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
-                    ></path></svg
-                  >&nbsp; 總價
-                  <span>{{ totalPrice }}円</span>
-                </span>
-                <span
-                  class="data-item"
-                  v-if="deckData.deck && deckData.deck.length > 0"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    data-slot="icon"
-                    class="flex-none size-5 md:size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
-                    ></path></svg
-                  >&nbsp; 系列包含
-                  <a
-                    v-for="(product, index) in uniqueProductNames"
-                    :key="index"
-                    href="#"
-                    >{{ product }}</a
-                  >
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section class="main-container">
-          <div class="main-container-bg"></div>
-          <div class="article-area">
-            <div class="text-container">
-              <div class="article-title">
+                >&nbsp; 總數{{ deckData.deck.length }}張
+              </span>
+              <span class="data-item">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
                   viewBox="0 0 24 24"
-                  fill="currentColor"
+                  stroke-width="1.5"
+                  stroke="currentColor"
                   aria-hidden="true"
                   data-slot="icon"
-                  class="text-white/50 size-8"
+                  class="flex-none size-5 md:size-6"
                 >
                   <path
-                    fill-rule="evenodd"
-                    d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97ZM6.75 8.25a.75.75 0 0 1 .75-.75h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H7.5Z"
-                    clip-rule="evenodd"
-                  ></path>
-                </svg>
-                <span>內容描述</span>
-              </div>
-              <div class="article-content">
-                <p>{{ deckData.deck_description }}</p>
-              </div>
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
+                  ></path></svg
+                >&nbsp; 總價
+                <span>{{ totalPrice }}円</span>
+              </span>
+              <span
+                class="data-item"
+                v-if="deckData.deck && deckData.deck.length > 0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                  class="flex-none size-5 md:size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"
+                  ></path></svg
+                >&nbsp; 系列包含
+                <a
+                  v-for="(product, index) in uniqueProductNames"
+                  :key="index"
+                  href="#"
+                  >{{ product }}</a
+                >
+              </span>
             </div>
           </div>
+        </div>
+      </section>
+      <section class="main-container">
+        <div class="article-area">
+          <div class="text-container">
+            <div class="article-title">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="text-white/50 size-8"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97ZM6.75 8.25a.75.75 0 0 1 .75-.75h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H7.5Z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              <span>內容描述</span>
+            </div>
+            <div class="article-content">
+              <p>{{ deckData.deck_description }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-info">
           <nav class="toolbar">
             <div class="toolbar-area1">
               <button
@@ -721,199 +732,95 @@ onMounted(() => {
               </button>
             </div>
           </nav>
-
-          <div class="card-info">
-            <div
-              class="row"
-              v-if="groupedCards && groupedCards.length"
-              v-for="group in groupedCards"
-              :key="group.group"
-            >
-              <div class="card-info-header">
-                <h2 class="group-title">
-                  {{ group.group || '角色' }} - {{ group.cards.length }}
-                </h2>
-                <div class="group-count">
-                  <img src="https://bottleneko.app/soul.gif" class="size-4" />
-                  <span class="flex-none font-mono">{{
-                    countSoulCards(group.cards)
-                  }}</span>
-                </div>
+          <div
+            class="row"
+            v-if="groupedCards && groupedCards.length"
+            v-for="group in groupedCards"
+            :key="group.group"
+          >
+            <div class="card-info-header">
+              <h2 class="group-title">
+                {{ group.group || '角色' }} - {{ group.cards.length }}
+              </h2>
+              <div class="group-count">
+                <img src="https://bottleneko.app/soul.gif" class="size-4" />
+                <span class="flex-none font-mono">{{
+                  countSoulCards(group.cards)
+                }}</span>
               </div>
-              <div class="card-row">
-                <div
-                  class="col-Info"
-                  v-for="card in group.cards"
-                  :key="card.index"
-                >
-                  <p class="price-row" v-if="!togglePriceView">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      data-slot="icon"
-                      class="currency-icon"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                      ></path>
-                    </svg>
-                    <span class="price-row-text">{{ card.price.number }}</span>
-                    <span class="price-row-text">{{ card.rare }}</span>
-                  </p>
+            </div>
+            <div class="card-row">
+              <div
+                class="col-Info"
+                v-for="card in group.cards"
+                :key="card.index"
+              >
+                <p class="price-row" v-if="!togglePriceView">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    data-slot="icon"
+                    class="currency-icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    ></path>
+                  </svg>
+                  <span class="price-row-text">{{ card.price.number }}</span>
+                  <span class="price-row-text">{{ card.rare }}</span>
+                </p>
 
-                  <div class="card-info-image">
-                    <img :src="card.cover" />
-                    <div class="card-inner-info">
-                      <div class="card-inner-info-header">
-                        <p>{{ card.id }}</p>
-                        <p>{{ card.rare }}</p>
-                      </div>
-                      <h3>{{ card.title }}</h3>
-                      <div class="details" v-if="!toggleTableView">
-                        <div><span>類型</span>{{ card.typeTranslate }}</div>
-                        <div><span>魂傷</span>{{ card.soul }}</div>
-                        <div><span>等級</span>{{ card.level }}</div>
-                        <div><span>攻擊</span>{{ card.attack }}</div>
-                        <div><span>費用</span>{{ card.cost }}</div>
-                      </div>
-                      <div class="price-download" v-if="!toggleTableView">
-                        <p>${{ card.price.number }}</p>
-                        <button>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            aria-hidden="true"
-                            data-slot="icon"
-                            class="text-white stroke-2 size-7"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"
-                            ></path>
-                          </svg>
-                        </button>
-                      </div>
+                <div class="card-info-image">
+                  <img :src="card.cover" />
+                  <div class="card-inner-info">
+                    <div class="card-inner-info-header">
+                      <p>{{ card.id }}</p>
+                      <p>{{ card.rare }}</p>
+                    </div>
+                    <h3>{{ card.title }}</h3>
+                    <div class="details" v-if="!toggleTableView">
+                      <div><span>類型</span>{{ card.typeTranslate }}</div>
+                      <div><span>魂傷</span>{{ card.soul }}</div>
+                      <div><span>等級</span>{{ card.level }}</div>
+                      <div><span>攻擊</span>{{ card.attack }}</div>
+                      <div><span>費用</span>{{ card.cost }}</div>
+                    </div>
+                    <div class="price-download" v-if="!toggleTableView">
+                      <p>${{ card.price.number }}</p>
+                      <button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                          data-slot="icon"
+                          class="text-white stroke-2 size-7"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"
+                          ></path>
+                        </svg>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
-        <nav class="footer-nav">
-          <a class="nav-link" href="#">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none w-7 h-7 link-svg"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-              ></path>
-            </svg>
-            <span class="link-word">首頁</span>
-          </a>
-          <a class="nav-link" href="#">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none w-7 h-7 link-svg"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-              ></path>
-            </svg>
-            <span class="link-word">系列卡表</span>
-          </a>
-          <a class="nav-link" href="#">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none w-7 h-7 link-svg"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
-              ></path>
-            </svg>
-            <span class="link-word">我的牌組</span>
-          </a>
-          <a class="nav-link social-icon" href="#">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none w-7 h-7 link-svg"
-            >
-              <path
-                d="M15.75 8.25a.75.75 0 0 1 .75.75c0 1.12-.492 2.126-1.27 2.812a.75.75 0 1 1-.992-1.124A2.243 2.243 0 0 0 15 9a.75.75 0 0 1 .75-.75Z"
-              ></path>
-              <path
-                fill-rule="evenodd"
-                d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM4.575 15.6a8.25 8.25 0 0 0 9.348 4.425 1.966 1.966 0 0 0-1.84-1.275.983.983 0 0 1-.97-.822l-.073-.437c-.094-.565.25-1.11.8-1.267l.99-.282c.427-.123.783-.418.982-.816l.036-.073a1.453 1.453 0 0 1 2.328-.377L16.5 15h.628a2.25 2.25 0 0 1 1.983 1.186 8.25 8.25 0 0 0-6.345-12.4c.044.262.18.503.389.676l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 0 1-1.161.886l-.143.048a1.107 1.107 0 0 0-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 0 1-1.652.928l-.679-.906a1.125 1.125 0 0 0-1.906.172L4.575 15.6Z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            <span class="link-word">社群</span>
-          </a>
-          <a class="nav-link" href="#">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="flex-none w-7 h-7 link-svg"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-              ></path>
-            </svg>
-            <span class="link-word">通知</span>
-          </a>
-          <a class="nav-link" href="#">
-            <div class="link-word">工作坊</div>
-          </a>
-        </nav>
-      </main>
-      <MainFooter />
-    </div>
+        </div>
+        <MainFooter />
+      </section>
+    </main>
   </div>
 </template>
 
@@ -949,6 +856,7 @@ onMounted(() => {
 }
 
 .card-row {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   margin: 0 -5px;
@@ -986,12 +894,12 @@ onMounted(() => {
 }
 
 .row {
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .card-image {
-  /* display: flex; */
   position: relative;
   object-fit: cover;
   border-radius: 10px;
@@ -1082,13 +990,12 @@ onMounted(() => {
 /* card-info */
 
 .card-info {
+  width: 100%;
   padding: 20px;
+  padding-right: 0;
   box-sizing: border-box;
-  position: absolute;
-  top: 250px;
   display: flex;
   flex-direction: column;
-  /* background-color: #121212; */
   background: linear-gradient(transparent 500px, #121212);
 }
 
@@ -1665,14 +1572,33 @@ main::-webkit-scrollbar {
 }
 
 header {
-  background: linear-gradient(to right, #e7b00a, #ea6532);
-  border-radius: 20px 20px 0 0;
-  position: absolute;
+  background-color: rgb(59, 130, 246, 0);
+  border-radius: 1rem 1rem 0 0;
+  transition: 0.5s ease;
+  position: fixed;
   top: 8px;
-  width: 100%;
+  width: calc(100% - 278px);
   height: 64px;
   display: flex;
   align-items: center;
+  z-index: 10;
+}
+
+.scrolled {
+  background-color: rgb(59, 130, 246, 1);
+}
+
+.header-title {
+  opacity: 0;
+  transform: translateY(-100%);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+header.scrolled .header-title {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .pagebtn-area {
@@ -1855,32 +1781,28 @@ header {
 
 /* -- */
 
-.bg-container {
-  width: calc(100% - 270px);
-  padding-bottom: 1rem;
-  margin-left: 270px;
-}
-
 main {
+  width: calc(100% - 278px);
+  margin-top: 8px;
+  margin-left: 270px;
   position: relative;
-  height: auto;
+  height: calc(100vh - 16px);
   overflow: hidden;
   overflow-y: scroll;
   scroll-behavior: smooth;
-  border-radius: 20px 20px 0 0;
-  width: calc(100% - 8px);
+  border-radius: 1rem;
+  scrollbar-width: none;
 }
 
 .carddeck-information {
   width: 100%;
-  height: 450px;
   padding: 0 1.5rem 2rem;
   background: linear-gradient(to right, #daa613, #df6230);
   display: flex;
 }
 
 .information-container {
-  margin-top: 200px;
+  margin-top: 170px;
   width: 100%;
   box-sizing: border-box;
   gap: 32px;
@@ -1982,6 +1904,10 @@ span svg {
 /* -- */
 
 .main-container {
+  background: linear-gradient(
+    rgba(59, 130, 246, 0.44) 300px,
+    transparent 500px
+  );
   width: 100%;
   height: 100vh;
   box-sizing: border-box;
@@ -1989,19 +1915,6 @@ span svg {
   flex-direction: column;
   overflow: visible;
   position: relative;
-}
-
-.main-container-bg {
-  background: linear-gradient(
-    rgba(59, 130, 246, 0.44) 100px,
-    transparent 500px
-  );
-  width: 100%;
-  height: 500px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
 }
 
 .article-area {
@@ -2134,11 +2047,11 @@ span svg {
 .toolbar {
   width: 100%;
   display: flex;
-  margin-left: 24px;
-  position: absolute;
-  top: 200px;
-  z-index: 1;
-  /* display: none; */
+  padding: 15px 24px 15px 0;
+  position: sticky;
+  top: 64px;
+  z-index: 10;
+  backdrop-filter: blur(5px);
 }
 
 .toolbar-area1 {
@@ -2471,8 +2384,7 @@ span svg {
     width: 100%;
   }
   .toolbar {
-    position: absolute;
-    top: 300px;
+    top: 72px;
   }
 
   .card-info {
@@ -2508,6 +2420,8 @@ span svg {
   }
 
   main {
+    border-radius: 0;
+    margin-left: 0;
     margin-top: 0;
     width: 100%;
     /* scroll-behavior: smooth; */
@@ -2550,7 +2464,6 @@ span svg {
 
   .carddeck-information {
     width: 100%;
-    height: 615px;
     padding: 0;
   }
 
@@ -2591,7 +2504,7 @@ span svg {
   .carddeck-data {
     width: 100%;
     margin: 18px 8px 0 8px;
-    height: 200px;
+    height: 210px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -2620,7 +2533,6 @@ span svg {
 
   .text-container {
     width: 95%;
-    height: 50%;
     margin: 16px auto;
     padding: 8px;
     margin: 1rem auto;

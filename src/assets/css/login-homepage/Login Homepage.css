@@ -48,7 +48,7 @@ nav {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #121212;
+  background: rgba(0, 0, 0, 0);
   padding: 16px 25px;
   position: fixed;
   /* fix */

@@ -223,7 +223,6 @@ onMounted(async () => {
               >
                 <img
                   src="https://live.staticflickr.com/65535/54229413836_3068f8523a_o.png"
-
                   alt=""
                 />
               </a>

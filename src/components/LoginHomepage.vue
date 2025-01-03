@@ -11,22 +11,8 @@ const API_DATA = async () => {
     const response = await axios.get(`${API_URL}/api/topics`)
     const apiData = response.data.data // API 返回的資料
 
-    // 分別處理 topics 和 videos 資料
-    const topics = apiData.find((item) => item.title === 'topics')
     const videos = apiData.find((item) => item.title === 'videos')
     const latest = apiData.find((item) => item.title === '最新商品')
-
-    // 處理 topics 資料
-    if (topics) {
-      items.value.topics = topics.items
-        .filter((_, index) => index !== 0 && index !== 3)
-        .map((item) => ({
-          ...item.data, // 解構出每個 topic 的資料
-          title: formatValue(item.data.title),
-          link: formatValue(item.data.link),
-          cover: formatValue(item.data.cover),
-        }))
-    }
 
     // 處理 videos 資料
     if (videos) {
@@ -115,19 +101,41 @@ onMounted(async () => {
       <div class="card1">
         <!-- first swiper -->
         <div class="swiper first-swiper-container">
-          <div
-            class="swiper-wrapper first-swiper-wrapper"
-            id=""
-            v-if="items.topics.length"
-          >
-            <div
-              class="swiper-slide first-swiper-slide"
-              v-for="(item, index) in items.topics"
-              :key="index"
-            >
-              <a href="#">
-                <img :src="item.cover" :alt="item.title" />
-                <p>{{ item.title }}</p>
+          <div class="swiper-wrapper first-swiper-wrapper" id="">
+            <div class="swiper-slide first-swiper-slide">
+              <a href="/social">
+                <img
+                  src="https://live.staticflickr.com/65535/54241373235_97b0eccb08_o.jpg"
+                  alt=""
+                />
+                <p>社群交流</p>
+              </a>
+            </div>
+            <div class="swiper-slide first-swiper-slide">
+              <a href="/hero-member">
+                <img
+                  src="https://live.staticflickr.com/65535/54229411676_a42d1f3584_o.png"
+                  alt=""
+                />
+                <p>全新英雄榜登場</p>
+              </a>
+            </div>
+            <div class="swiper-slide first-swiper-slide">
+              <a href="/contact">
+                <img
+                  src="https://live.staticflickr.com/65535/54229639353_5dc882296c_o.png"
+                  alt=""
+                />
+                <p>與我聯絡</p>
+              </a>
+            </div>
+            <div class="swiper-slide first-swiper-slide">
+              <a href="/series">
+                <img
+                  src="https://live.staticflickr.com/65535/54229411631_50fd6c43f7_o.jpg"
+                  alt=""
+                />
+                <p>所有卡片系列</p>
               </a>
             </div>
           </div>
@@ -223,7 +231,6 @@ onMounted(async () => {
               >
                 <img
                   src="https://live.staticflickr.com/65535/54229413836_3068f8523a_o.png"
-
                   alt=""
                 />
               </a>
@@ -273,7 +280,7 @@ onMounted(async () => {
                 <div class="third-swiper-slide-content">
                   <div class="third-swiper-slide-content-img">
                     <img
-                      src="https://live.staticflickr.com/65535/54241373235_42beca4917_b.jpg"
+                      src="https://live.staticflickr.com/65535/54242227912_d266b8b545_o.jpg"
                       alt=""
                     />
                   </div>

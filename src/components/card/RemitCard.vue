@@ -194,7 +194,7 @@ const exportToPDF = async () => {
     pdf.save(`${deck_name}_deck.pdf`)
   } catch (error) {
     console.error('匯出 PDF 時發生錯誤:', error.message)
-    alert('匯出 PDF 時發生錯誤：' + error.message)
+    alert('匯出 PDF 時發生錯誤')
   }
 }
 </script>

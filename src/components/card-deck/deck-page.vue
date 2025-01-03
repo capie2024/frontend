@@ -908,49 +908,9 @@ onMounted(() => {
             <span class="link-word">通知</span>
           </a>
           <a class="nav-link" href="#">
-            <img src="/src/img/麻衣.png" alt="" />
             <div class="link-word">工作坊</div>
           </a>
         </nav>
-
-        <div class="deck-container">
-          <div class="deck-img">
-            <img src="/src/img/麻衣.png" alt="" />
-          </div>
-          <div class="deck-content">
-            <div class="line"></div>
-            <div class="total-cards">
-              <h2>刪除 DG/S02-027R</h2>
-              <span>牌組製作，共84張卡</span>
-            </div>
-            <div class="deckbtn-area">
-              <button class="deck-btn">
-                <i class="fa-regular fa-circle-up"></i>
-              </button>
-              <div class="pay-btn">
-                <svg
-                  width="24px"
-                  height="24px"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                  class="flex-none size-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m9 7.5 3 4.5m0 0 3-4.5M12 12v5.25M15 12H9m6 3H9m12-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  ></path>
-                </svg>
-                <span>00000 ¥</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </main>
       <MainFooter />
     </div>

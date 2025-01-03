@@ -387,7 +387,7 @@ onMounted(() => {
           }"
         />
       </div>
-      <div class="message-area">
+      <!-- <div class="message-area">
         <div class="user-message">
           <div class="message-user-img">
             <img src="/src/img/avatar.png" alt="" />
@@ -435,7 +435,7 @@ onMounted(() => {
           </div>
         </div>
         <span class="message-count">0則留言</span>
-      </div>
+      </div> -->
     </section>
     <MainFooter />
   </main>

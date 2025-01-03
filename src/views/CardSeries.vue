@@ -11,7 +11,7 @@ import {
   watch,
   nextTick,
 } from 'vue'
-import router from '../router/index'
+import { useRouter } from 'vue-router' 
 import { storeToRefs } from 'pinia'
 import { useCardSeriesStore } from '@/stores/card-series'
 import { useDeckMakeStore } from '@/stores/deck-make'
@@ -21,6 +21,7 @@ import { useCardFilterStore } from '@/stores/card-filter'
 import { useRoute } from 'vue-router'
 import Card from '@/components/card/Card.vue'
 
+const router = useRouter()
 // 引入CardFilterStore並使用
 const cardFilterStore = useCardFilterStore()
 const { applyBtnStatus, keyWordGroup, myFiltersGroup } =

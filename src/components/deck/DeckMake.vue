@@ -1,14 +1,14 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
-import router from '../../router/index'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useCardSeriesStore } from '@/stores/card-series'
 import { useDeckMakeStore } from '@/stores/deck-make'
 import { useCardInfoStore } from '@/stores/card-info'
 import Swal from 'sweetalert2'
-import { useRoute } from 'vue-router'
 
 const cardSeriesStore = useCardSeriesStore()
+const router = useRouter();
 const getLastViewSeries = cardSeriesStore.getLastViewSeries
 const saveLastViewSeries = cardSeriesStore.saveLastViewSeries
 

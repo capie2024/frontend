@@ -2,10 +2,10 @@
 import { ref, onMounted } from 'vue'
 import dayjs from 'dayjs'
 import axios from 'axios'
-import SideBar from '../SidebarGrid.vue'
-import Notice from './notice.vue'
-import Footer from '../MainFooter.vue'
-import Login from '../NavLoginBtn.vue'
+import SideBar from '@/components/home/SidebarGrid.vue'
+import Notice from '@/components/notice/Notice.vue'
+import Footer from '@/components/home/MainFooter.vue'
+import Login from '@/components/login/NavLoginBtn.vue'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const API_URL = import.meta.env.VITE_API_URL

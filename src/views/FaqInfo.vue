@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCardInfoStore } from '@/stores/card-info'
-import Card from '@/components/Card.vue'
+import Card from '@/components/card/Card.vue'
 import axios from 'axios'
 
 const route = useRoute()

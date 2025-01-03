@@ -1,13 +1,13 @@
 <script setup>
-import MainFooter from '@/components/MainFooter.vue'
-import SidebarGrid from '../components/SidebarGrid.vue'
+import MainFooter from '../components/home/MainFooter.vue'
+import SidebarGrid from '../components/home/SidebarGrid.vue'
 import { onMounted, ref, computed, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
-import Notice from '../components/notification/notice.vue'
-import RemitCard from '../components/mycard/RemitCard.vue'
-import FindCard from '../components/mycard/FindCard.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
+import Notice from '@/components/notice/Notice.vue'
+import RemitCard from '@/components/card/RemitCard.vue'
+import FindCard from '@/components/card/FindCard.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 

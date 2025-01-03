@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-import CardInfo from '@/views/CardInfo.vue'
 import { storeToRefs } from 'pinia'
 import { useCardInfoStore } from '@/stores/card-info'
-import DeckMake from './components/DeckMake.vue'
+import CardInfo from '@/views/CardInfo.vue'
+import DeckMake from '@/components/deck/DeckMake.vue'
 
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'

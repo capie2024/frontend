@@ -3,10 +3,10 @@ import { ref, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import SidebarGrid from '../components/SidebarGrid.vue'
-import GoogleLogin from '../components/GoogleLogin.vue'
-import Notice from '@/components/notification/notice.vue'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import GoogleLogin from '@/components/login/GoogleLogin.vue'
+import Notice from '@/components/notice/Notice.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const API_URL = import.meta.env.VITE_API_URL

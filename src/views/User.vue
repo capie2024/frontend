@@ -3,11 +3,11 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import Loading from '../components/Loading.vue'
-import SideBar from '../components/SidebarGrid.vue'
-import Notice from '../components/notification/notice.vue'
-import Login from '../components/NavLoginBtn.vue'
-import MainFooter from '../components/MainFooter.vue'
+import Loading from '@/components/loading/Loading.vue'
+import SideBar from '@/components/home/SidebarGrid.vue'
+import Notice from '@/components/notice/Notice.vue'
+import Login from '@/components/login/NavLoginBtn.vue'
+import MainFooter from '@/components/home/MainFooter.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 const router = useRouter()

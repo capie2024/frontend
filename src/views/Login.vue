@@ -3,10 +3,10 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import GoogleLogin from '../components/GoogleLogin.vue'
-import SidebarGrid from '../components/SidebarGrid.vue'
-import notice from '../components/notification/notice.vue'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
+import GoogleLogin from '@/components/login/GoogleLogin.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import notice from '@/components/notice/Notice.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
 
 const router = useRouter()
 

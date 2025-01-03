@@ -1,215 +1,3 @@
-<template>
-  <div class="modal-overlay"></div>
-  <section
-    class="modal fade"
-    id="remit"
-    tabindex="-1"
-    aria-labelledby="remitLabel"
-    ref="remitModal"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title topic" id="remitLabel">匯出牌組</h2>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-            @click="confirmClose"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M6 18 18 6M6 6l12 12"
-              ></path>
-            </svg>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <h3 class="my-4 topic">
-            選擇牌組
-            <span class="subtitle">選擇你的牌組來源</span>
-          </h3>
-        </div>
-
-        <div class="input-button">
-          <button
-            :class="{ active: buttons[0] }"
-            @click="toggleActive(0)"
-            class="z-20 button-remit item focus-button"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="icon size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
-              ></path>
-            </svg>
-            <span class="font-mono text-sm">牌組編號</span>
-          </button>
-
-          <div class="input-item-2">
-            <input
-              class="input-text"
-              id="input-text"
-              type="text"
-              placeholder="代碼"
-              v-model="deckId"
-            />
-
-            <button
-              class="input-button-2 item default-transition"
-              id="input-button-2"
-              @click="checkDeckId"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-                data-slot="icon"
-                class="icon-input size-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                ></path>
-              </svg>
-            </button>
-          </div>
-
-          <!-- 當 deckId 有對應的牌組時顯示綠色提示 -->
-          <div v-if="deckValid" class="show-text-green">
-            <div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m4.5 12.75 6 6 9-13.5"
-                ></path>
-              </svg>
-            </div>
-            <span class="font-mono text-green-500 truncate">找到牌組</span>
-          </div>
-
-          <!-- 當 deckId 沒有對應的牌組時顯示紅色提示 -->
-          <div v-if="deckInvalid" class="show-text-red">
-            <div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18 18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </div>
-            <span>無效代碼</span>
-          </div>
-        </div>
-        <div class="modal-body">
-          <h3 class="my-4 topic">
-            匯出設定
-            <span class="subtitle">選擇你的匯出格式內容</span>
-          </h3>
-          <h3 class="my-4 topic">選擇匯出格式</h3>
-        </div>
-
-        <div class="input-button">
-          <button
-            class="button-remit item focus-button"
-            :class="{ active: buttons[1] }"
-            @click="toggleActive(1)"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="icon size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-              ></path>
-            </svg>
-            <span class="font-mono text-sm">PDF</span>
-          </button>
-        </div>
-
-        <div class="seeting">
-          <button
-            class="justify-center item default-transition gray setting-text"
-            id="setting-text"
-            @click="exportToPDF"
-            :disabled="!allButtonsActive"
-            :class="{ black: allButtonsActive, gray: !allButtonsActive }"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-              class="icon size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m4.5 12.75 6 6 9-13.5"
-              ></path>
-            </svg>
-            <span class="font-mono text-sm input-text" id="input-text">
-              設定完成
-            </span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-</template>
-
 <script>
 import jsPDF from 'jspdf'
 import axios from 'axios'
@@ -440,6 +228,218 @@ export default {
   },
 }
 </script>
+
+<template>
+  <div class="modal-overlay"></div>
+  <section
+    class="modal fade"
+    id="remit"
+    tabindex="-1"
+    aria-labelledby="remitLabel"
+    ref="remitModal"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title topic" id="remitLabel">匯出牌組</h2>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            @click="confirmClose"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <h3 class="my-4 topic">
+            選擇牌組
+            <span class="subtitle">選擇你的牌組來源</span>
+          </h3>
+        </div>
+
+        <div class="input-button">
+          <button
+            :class="{ active: buttons[0] }"
+            @click="toggleActive(0)"
+            class="z-20 button-remit item focus-button"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="icon size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+              ></path>
+            </svg>
+            <span class="font-mono text-sm">牌組編號</span>
+          </button>
+
+          <div class="input-item-2">
+            <input
+              class="input-text"
+              id="input-text"
+              type="text"
+              placeholder="代碼"
+              v-model="deckId"
+            />
+
+            <button
+              class="input-button-2 item default-transition"
+              id="input-button-2"
+              @click="checkDeckId"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                aria-hidden="true"
+                data-slot="icon"
+                class="icon-input size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                ></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- 當 deckId 有對應的牌組時顯示綠色提示 -->
+          <div v-if="deckValid" class="show-text-green">
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m4.5 12.75 6 6 9-13.5"
+                ></path>
+              </svg>
+            </div>
+            <span class="font-mono text-green-500 truncate">找到牌組</span>
+          </div>
+
+          <!-- 當 deckId 沒有對應的牌組時顯示紅色提示 -->
+          <div v-if="deckInvalid" class="show-text-red">
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </div>
+            <span>無效代碼</span>
+          </div>
+        </div>
+        <div class="modal-body">
+          <h3 class="my-4 topic">
+            匯出設定
+            <span class="subtitle">選擇你的匯出格式內容</span>
+          </h3>
+          <h3 class="my-4 topic">選擇匯出格式</h3>
+        </div>
+
+        <div class="input-button">
+          <button
+            class="button-remit item focus-button"
+            :class="{ active: buttons[1] }"
+            @click="toggleActive(1)"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="icon size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+              ></path>
+            </svg>
+            <span class="font-mono text-sm">PDF</span>
+          </button>
+        </div>
+
+        <div class="seeting">
+          <button
+            class="justify-center item default-transition gray setting-text"
+            id="setting-text"
+            @click="exportToPDF"
+            :disabled="!allButtonsActive"
+            :class="{ black: allButtonsActive, gray: !allButtonsActive }"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+              class="icon size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m4.5 12.75 6 6 9-13.5"
+              ></path>
+            </svg>
+            <span class="font-mono text-sm input-text" id="input-text">
+              設定完成
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
 
 <style scoped>
 @import '@/assets/base.css';

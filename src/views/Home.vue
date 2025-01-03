@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import MainPage from '../components/MainPage.vue'
-import SidebarGrid from '../components/SidebarGrid.vue'
-import LoginHomepage from '../components/LoginHomepage.vue'
+import MainPage from '@/components/home/MainPage.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import LoginHomepage from '@/components/home/LoginHomepage.vue'
 
 const isLoggedIn = ref(false)
 

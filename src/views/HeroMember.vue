@@ -1,9 +1,9 @@
 <script setup>
-import MainFooter from '@/components/MainFooter.vue'
-import PageControl from '@/components/work-shop/PageControl.vue'
+import MainFooter from '@/components/home/MainFooter.vue'
+import PageControl from '@/components/workshop/PageControl.vue'
 import { onMounted, ref, watch } from 'vue'
-import SidebarGrid from '@/components/SidebarGrid.vue'
-import PaypalCheckout from '@/components/PaypalCheckout.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import PaypalCheckout from '@/components/paypal/PaypalCheckout.vue'
 import axios from 'axios'
 import router from '@/router'
 import initHeroMemberAnimation from '@/assets/js/hero-member/hero-member-animation.js'

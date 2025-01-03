@@ -1,9 +1,9 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import SideBar from '@/components/SidebarGrid.vue'
-import Notice from '@/components/notification/notice.vue'
-import Footer from '@/components/MainFooter.vue'
-import Login from '@/components/NavLoginBtn.vue'
+import SideBar from '@/components/home/SidebarGrid.vue'
+import Notice from '@/components/notice/Notice.vue'
+import Footer from '@/components/home/MainFooter.vue'
+import Login from '@/components/login/NavLoginBtn.vue'
 
 const router = useRouter()
 const BASE_URL = import.meta.env.VITE_BASE_URL

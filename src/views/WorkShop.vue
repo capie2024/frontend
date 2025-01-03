@@ -1,11 +1,11 @@
 <script setup>
-import MainFooter from '@/components/MainFooter.vue'
-import PageControl from '@/components/work-shop/PageControl.vue'
-import SidebarGrid from '@/components/SidebarGrid.vue'
+import MainFooter from '@/components/home/MainFooter.vue'
+import PageControl from '@/components/workshop/PageControl.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
-import FindCard from '../components/mycard/FindCard.vue'
-import RemitCard from '../components/mycard/RemitCard.vue'
+import FindCard from '@/components/card/FindCard.vue'
+import RemitCard from '@/components/card/RemitCard.vue'
 
 const workShopData = [
   {

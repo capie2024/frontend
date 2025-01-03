@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import notice from './notification/notice.vue'
-import NavLoginBtn from './NavLoginBtn.vue'
-import MainFooter from './MainFooter.vue'
+import Notice from '@/components/notice/Notice.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
+import MainFooter from '@/components/home/MainFooter.vue'
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const API_URL = import.meta.env.VITE_API_URL
 const API_DATA = async () => {
@@ -90,7 +90,7 @@ onMounted(async () => {
           </div>
         </div>
         <div class="icon">
-          <notice />
+          <Notice />
         </div>
         <div class="login" id="login">
           <NavLoginBtn />

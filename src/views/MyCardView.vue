@@ -6,8 +6,8 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import NavLoginBtn from '../components/NavLoginBtn.vue'
 import Notice from '../components/notification/notice.vue'
-import RemitCard from '../components/Mycard/remit-card.vue'
-import FindCard from '../components/Mycard/find-card.vue'
+import RemitCard from '../components/mycard/RemitCard.vue'
+import FindCard from '../components/mycard/FindCard.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 

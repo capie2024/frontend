@@ -3,7 +3,7 @@ import Home from '../views/HomeView.vue'
 import WorkShopView from '@/views/WorkShopView.vue'
 import HeroMemberView from '@/views/HeroMemberView.vue'
 import OfficialProductList from '@/views/OfficialProductList.vue'
-import CardListbySeries from '@/views/Card List by Series.vue'
+import Series from '@/views/Series.vue'
 import AccountPage from '@/views/AccountPage.vue'
 import DailyCard from '../views/DailyCard.vue'
 import Faq from '../views/Faq.vue'
@@ -15,14 +15,11 @@ import Carddeck from '../components/card-deck/Carddeck.vue'
 import AddArticle from '../views/AddArticle.vue'
 import Social from '../views/Social.vue'
 import MyCardView from '../views/MyCardView.vue'
-import Findcard from '../components/Mycard/find-card.vue'
-import Remitcard from '../components/Mycard/remit-card.vue'
-import RemitCardNf from '../components/Mycard/remit-cardnf.vue'
+import Findcard from '../components/mycard/FindCard.vue'
+import Remitcard from '../components/mycard/RemitCard.vue'
 import AuthSuccess from '../views/AuthSuccess.vue'
 import MyArticle from '../views/MyArticle.vue'
-import Warning from '../components/Mycard/warning.vue'
-import Delete from '../components/Mycard/delete.vue'
-import deckPage from '../components/card-deck/deck-page.vue'
+import deckPage from '../components/card-deck/DeckPage.vue'
 import AddPostDeck from '../components/card-deck/AddPostDeck.vue'
 import Notice from '../components/notification/notice.vue'
 import Notification from '../components/notification/notification.vue'
@@ -55,7 +52,7 @@ const router = createRouter({
     {
       path: '/series',
       name: 'series',
-      component: CardListbySeries,
+      component: Series,
     },
     {
       path: '/daily-card',
@@ -71,7 +68,6 @@ const router = createRouter({
       path: '/faq/:id',
       name: 'FaqInfo',
       component: FaqInfo,
-      // props: true
     },
     {
       path: '/user',
@@ -122,11 +118,6 @@ const router = createRouter({
       component: Remitcard,
     },
     {
-      path: '/remitcardnf',
-      name: 'remitcardnf',
-      component: RemitCardNf,
-    },
-    {
       path: '/deck',
       name: 'deck',
       component: MyCardView,
@@ -140,16 +131,6 @@ const router = createRouter({
       path: '/social/my',
       name: 'my-article',
       component: MyArticle,
-    },
-    {
-      path: '/warning',
-      name: 'warning',
-      component: Warning,
-    },
-    {
-      path: '/delete',
-      name: 'delete',
-      component: Delete,
     },
     {
       path: '/deck/:deck_id',

@@ -11,7 +11,7 @@ import {
   watch,
   nextTick,
 } from 'vue'
-import { useRouter } from 'vue-router' 
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useCardSeriesStore } from '@/stores/card-series'
 import { useDeckMakeStore } from '@/stores/deck-make'

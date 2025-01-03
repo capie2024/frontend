@@ -8,7 +8,7 @@ import { useCardInfoStore } from '@/stores/card-info'
 import Swal from 'sweetalert2'
 
 const cardSeriesStore = useCardSeriesStore()
-const router = useRouter();
+const router = useRouter()
 const getLastViewSeries = cardSeriesStore.getLastViewSeries
 const saveLastViewSeries = cardSeriesStore.saveLastViewSeries
 

@@ -12,7 +12,7 @@ const redirectToGoogleAuth = () => {
     @click="redirectToGoogleAuth"
     class="flex items-center w-full gap-2 p-2 bg-white border shadow cursor-pointer rounded-2xl"
   >
-    <img src="../img/google-icon.png" class="flex-none size-7" />
+    <img src="@/img/google-icon.png" class="flex-none size-7" />
     <span class="block w-full text-center"> Sign in with Google</span>
   </button>
   <!-- <div id="google-sign-in-button"></div> -->

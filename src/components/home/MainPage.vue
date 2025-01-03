@@ -125,7 +125,7 @@ onBeforeUnmount(() => {
         <div class="logo-banner">
           <div class="bg-zinc-900 rounded-xl">
             <img
-              src="../img/capie-icon.png"
+              src="@/img/capie-icon.png"
               alt=""
               class="w-32 h-32 shadow-2xl rounded-2xl shadow-black/50"
             />

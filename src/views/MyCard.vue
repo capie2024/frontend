@@ -1,9 +1,9 @@
 <script setup>
-import MainFooter from '../components/home/MainFooter.vue'
-import SidebarGrid from '../components/home/SidebarGrid.vue'
 import { onMounted, ref, computed, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
+import MainFooter from '@/components/home/MainFooter.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
 import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
 import Notice from '@/components/notice/Notice.vue'
 import RemitCard from '@/components/card/RemitCard.vue'
@@ -719,7 +719,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-@import '../assets/base.css';
+@import '@/assets/base.css';
 
 ::-webkit-scrollbar {
   width: 0;
@@ -1518,4 +1518,4 @@ header.scrolled {
   }
 }
 </style>
-<style src="../assets/css/work-shop/work-shop-rwd.css" scoped></style>
+<style src="@/assets/css/work-shop/work-shop-rwd.css" scoped></style>

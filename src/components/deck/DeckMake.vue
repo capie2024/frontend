@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, onBeforeMount } from 'vue'
-import router from '../router/index'
+import router from '../../router/index'
 import { storeToRefs } from 'pinia'
 import { useCardSeriesStore } from '@/stores/card-series'
 import { useDeckMakeStore } from '@/stores/deck-make'

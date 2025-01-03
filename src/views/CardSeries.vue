@@ -1,7 +1,7 @@
 <script setup>
-import SidebarGrid from '../components/SidebarGrid.vue'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
-import Notice from '../components/notification/notice.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
+import Notice from '@/components/notice/Notice.vue'
 import {
   ref,
   computed,
@@ -19,7 +19,7 @@ import { useCardInfoStore } from '@/stores/card-info'
 import Swal from 'sweetalert2'
 import { useCardFilterStore } from '@/stores/card-filter'
 import { useRoute } from 'vue-router'
-import Card from '@/components/Card.vue'
+import Card from '@/components/card/Card.vue'
 
 // 引入CardFilterStore並使用
 const cardFilterStore = useCardFilterStore()

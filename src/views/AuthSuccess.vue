@@ -1,6 +1,6 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import Loading from '../components/Loading.vue'
+import Loading from '@/components/loading/Loading.vue'
 
 const route = useRoute()
 const router = useRouter()

@@ -5,11 +5,11 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import { useDeckMakeStore } from '@/stores/deck-make'
 import { useCardSeriesStore } from '@/stores/card-series'
-import SidebarGrid from '../SidebarGrid.vue'
-import RemitCard from '../mycard/RemitCard.vue'
-import NavLoginBtn from '../NavLoginBtn.vue'
-import MainFooter from '../MainFooter.vue'
-import Notice from '@/components/notification/notice.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import RemitCard from '@/components/card/RemitCard.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
+import MainFooter from '@/components/home/MainFooter.vue'
+import Notice from '@/components/notice/Notice.vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 

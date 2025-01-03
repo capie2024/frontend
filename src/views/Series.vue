@@ -1,8 +1,8 @@
 <script setup>
-import SidebarGrid from '../components/SidebarGrid.vue'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
-import notice from '../components/notification/notice.vue'
-import MainFooter from '../components/MainFooter.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
+import notice from '@/components/notice/Notice.vue'
+import MainFooter from '@/components/home/MainFooter.vue'
 import { useCardSeriesStore } from '@/stores/card-series'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'

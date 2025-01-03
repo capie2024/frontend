@@ -40,8 +40,8 @@ onMounted(() => {
 <template>
   <nav class="sidebar-container">
     <router-link to="/" class="sidebar-head">
-      <img src="../img/capie-icon.png" alt="" class="icon" />
-      <img src="../img/capie-text.png" alt="" class="icon-text" />
+      <img src="@/img/capie-icon.png" alt="" class="icon" />
+      <img src="@/img/capie-text.png" alt="" class="icon-text" />
       <h1 class="hidden">Capie</h1>
     </router-link>
     <ul class="sidebar-menu">

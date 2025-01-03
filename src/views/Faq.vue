@@ -2,10 +2,10 @@
 import { onMounted, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import SidebarGrid from '@/components/SidebarGrid.vue'
-import Notice from '../components/notification/notice.vue'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
-import MainFooter from '../components/MainFooter.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import Notice from '@/components/notice/Notice.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
+import MainFooter from '@/components/home/MainFooter.vue'
 import { useI18n } from 'vue-i18n'
 
 const router = useRouter()

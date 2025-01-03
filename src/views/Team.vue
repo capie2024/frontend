@@ -1,8 +1,8 @@
 <script setup>
-import SidebarGrid from '../components/SidebarGrid.vue'
-import MainFooter from '../components/MainFooter.vue'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
-import Notice from '../components/notification/notice.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import MainFooter from '@/components/home/MainFooter.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
+import Notice from '@/components/notice/Notice.vue'
 const goBack = () => {
   if (window.history.length > 1) {
     window.history.back()

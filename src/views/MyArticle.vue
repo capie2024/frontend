@@ -2,10 +2,10 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import SidebarGrid from '@/components/SidebarGrid.vue'
-import MainFooter from '@/components/MainFooter.vue'
-import NavLoginBtn from '../components/NavLoginBtn.vue'
-import notice from '../components/notification/notice.vue'
+import SidebarGrid from '@/components/home/SidebarGrid.vue'
+import MainFooter from '@/components/home/MainFooter.vue'
+import NavLoginBtn from '@/components/login/NavLoginBtn.vue'
+import Notice from '@/components/notice/Notice.vue'
 
 const articles = ref([])
 const postCount = computed(() => articles.value.length)
@@ -76,7 +76,7 @@ onMounted(() => {
         <div class="w-full min-w-0 text-lg font-bold text-white md:text-2xl">
           <h2 class="text-2xl font-bold truncate">我的文章</h2>
         </div>
-        <notice />
+        <Notice />
         <div
           class="items-center gap-1 text-white rounded-full login-btn bg-black/50 default-transition hover:bg-zinc-800/50"
         >

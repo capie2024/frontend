@@ -1,30 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/HomeView.vue'
-import WorkShopView from '@/views/WorkShopView.vue'
-import HeroMemberView from '@/views/HeroMemberView.vue'
-import OfficialProductList from '@/views/OfficialProductList.vue'
+import Home from '@/views/Home.vue'
+import WorkShop from '@/views/WorkShop.vue'
+import HeroMember from '@/views/HeroMember.vue'
+import OfficialProduct from '@/views/OfficialProduct.vue'
 import Series from '@/views/Series.vue'
-import AccountPage from '@/views/AccountPage.vue'
-import DailyCard from '../views/DailyCard.vue'
-import Faq from '../views/Faq.vue'
-import FaqInfo from '../views/FaqInfo.vue'
-import Login from '../views/Login.vue'
-import Signup from '../views/Signup.vue'
+import User from '@/views/User.vue'
+import DailyCard from '@/views/DailyCard.vue'
+import Faq from '@/views/Faq.vue'
+import FaqInfo from '@/views/FaqInfo.vue'
+import Login from '@/views/Login.vue'
+import Signup from '@/views/Signup.vue'
 import CardSeries from '@/views/CardSeries.vue'
-import Carddeck from '../components/card-deck/Carddeck.vue'
-import AddArticle from '../views/AddArticle.vue'
-import Social from '../views/Social.vue'
-import MyCardView from '../views/MyCardView.vue'
-import Findcard from '../components/mycard/FindCard.vue'
-import Remitcard from '../components/mycard/RemitCard.vue'
-import AuthSuccess from '../views/AuthSuccess.vue'
-import MyArticle from '../views/MyArticle.vue'
-import deckPage from '../components/card-deck/DeckPage.vue'
-import AddPostDeck from '../components/card-deck/AddPostDeck.vue'
-import Notice from '../components/notification/notice.vue'
-import Notification from '../components/notification/notification.vue'
-import Team from '../views/Team.vue'
-import Contact from '../views/Contact.vue'
+import AddArticle from '@/views/AddArticle.vue'
+import Social from '@/views/Social.vue'
+import MyCard from '@/views/MyCard.vue'
+import AuthSuccess from '@/views/AuthSuccess.vue'
+import MyArticle from '@/views/MyArticle.vue'
+import Team from '@/views/Team.vue'
+import Contact from '@/views/Contact.vue'
+import SocialPost from '@/components/post/SocialPost.vue'
+import FindCard from '@/components/card/FindCard.vue'
+import RemitCard from '@/components/card/RemitCard.vue'
+import DeckPage from '@/components/deck/DeckPage.vue'
+import AddPostDeck from '@/components/deck/AddPostDeck.vue'
+import Notice from '@/components/notice/Notice.vue'
+import Notification from '@/components/notice/Notification.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,17 +37,17 @@ const router = createRouter({
     {
       path: '/workshop',
       name: 'workshop',
-      component: WorkShopView,
+      component: WorkShop,
     },
     {
       path: '/hero-member',
       name: 'hero-member',
-      component: HeroMemberView,
+      component: HeroMember,
     },
     {
       path: '/products',
       name: 'products',
-      component: OfficialProductList,
+      component: OfficialProduct,
     },
     {
       path: '/series',
@@ -72,7 +72,7 @@ const router = createRouter({
     {
       path: '/user',
       name: 'user',
-      component: AccountPage,
+      component: User,
     },
     {
       path: '/login',
@@ -90,7 +90,7 @@ const router = createRouter({
     },
     {
       path: '/social/:post_code',
-      component: Carddeck,
+      component: SocialPost,
     },
     {
       path: '/add',
@@ -103,24 +103,19 @@ const router = createRouter({
       component: Social,
     },
     {
-      path: '/mycard',
-      name: 'mycard',
-      component: MyCardView,
-    },
-    {
       path: '/findcard',
-      name: 'findcard',
-      component: Findcard,
+      name: 'find-card',
+      component: FindCard,
     },
     {
       path: '/remitcard',
-      name: 'remitcard',
-      component: Remitcard,
+      name: 'remit-card',
+      component: RemitCard,
     },
     {
       path: '/deck',
       name: 'deck',
-      component: MyCardView,
+      component: MyCard,
     },
     {
       path: '/auth-success',
@@ -135,11 +130,11 @@ const router = createRouter({
     {
       path: '/deck/:deck_id',
       name: 'deckPage',
-      component: deckPage,
+      component: DeckPage,
     },
     {
       path: '/add/:deck_id',
-      name: 'AddPostDeck',
+      name: 'add-post-deck',
       component: AddPostDeck,
     },
     {
@@ -154,7 +149,7 @@ const router = createRouter({
     },
     {
       path: '/team',
-      name: 'Team',
+      name: 'team',
       component: Team,
     },
     {

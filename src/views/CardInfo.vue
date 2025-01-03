@@ -33,91 +33,33 @@ const countCards = deckMakeStore.countCards
 
 const cardInfoDesc = computed(() => {
   return translatedCardInfo.value.effect
-  .replace(
-    /『(.*?)』/g,
-    '<mark class="mark-1">『$1』</mark>'
-  )
-  .replace(
-    /\[(.*?)\]/g,
-    '<mark class="mark-2">[$1]</mark>'
-  )
-  .replace(
-    /「(.*?)」/g,
-    '<mark class="mark-3">「$1」</mark>'
-  )
-  .replace(
-    /【(.*?)】/g,
-    '<mark class="mark-4">【$1】</mark>'
-  )
-  .replace(
-    /《(.*?)》/g,
-    '<mark class="mark-5">《$1》</mark>'
-  )
-  .replace(
-    /\(([^)]*)\)/g,
-    '<mark class="mark-6">($1)</mark>'
-  )
+    .replace(/『(.*?)』/g, '<mark class="mark-1">『$1』</mark>')
+    .replace(/\[(.*?)\]/g, '<mark class="mark-2">[$1]</mark>')
+    .replace(/「(.*?)」/g, '<mark class="mark-3">「$1」</mark>')
+    .replace(/【(.*?)】/g, '<mark class="mark-4">【$1】</mark>')
+    .replace(/《(.*?)》/g, '<mark class="mark-5">《$1》</mark>')
+    .replace(/\(([^)]*)\)/g, '<mark class="mark-6">($1)</mark>')
 })
 
 const cardInfoQA = computed(() => {
   return translatedCardQAList.value.map((qa) => {
-
     return {
       ...qa,
-      q:  qa.q
-          .replace(
-          /『(.*?)』/g,
-          '<mark class="mark-1">『$1』</mark>'
-          )
-          .replace(
-            /\[(.*?)\]/g,
-            '<mark class="mark-2">[$1]</mark>'
-          )
-          .replace(
-            /「(.*?)」/g,
-            '<mark class="mark-3">「$1」</mark>'
-          )
-          .replace(
-            /【(.*?)】/g,
-            '<mark class="mark-4">【$1】</mark>'
-          )
-          .replace(
-            /《(.*?)》/g,
-            '<mark class="mark-5">《$1》</mark>'
-          )
-          .replace(
-            /\(([^)]*)\)/g,
-            '<mark class="mark-6">($1)</mark>'
-          ),
-      a:  qa.a
-          .replace(
-          /『(.*?)』/g,
-          '<mark class="mark-1">『$1』</mark>'
-          )
-          .replace(
-            /\[(.*?)\]/g,
-            '<mark class="mark-2">[$1]</mark>'
-          )
-          .replace(
-            /「(.*?)」/g,
-            '<mark class="mark-3">「$1」</mark>'
-          )
-          .replace(
-            /【(.*?)】/g,
-            '<mark class="mark-4">【$1】</mark>'
-          )
-          .replace(
-            /《(.*?)》/g,
-            '<mark class="mark-5">《$1》</mark>'
-          )
-          .replace(
-            /\(([^)]*)\)/g,
-            '<mark class="mark-6">($1)</mark>'
-          )
+      q: qa.q
+        .replace(/『(.*?)』/g, '<mark class="mark-1">『$1』</mark>')
+        .replace(/\[(.*?)\]/g, '<mark class="mark-2">[$1]</mark>')
+        .replace(/「(.*?)」/g, '<mark class="mark-3">「$1」</mark>')
+        .replace(/【(.*?)】/g, '<mark class="mark-4">【$1】</mark>')
+        .replace(/《(.*?)》/g, '<mark class="mark-5">《$1》</mark>')
+        .replace(/\(([^)]*)\)/g, '<mark class="mark-6">($1)</mark>'),
+      a: qa.a
+        .replace(/『(.*?)』/g, '<mark class="mark-1">『$1』</mark>')
+        .replace(/\[(.*?)\]/g, '<mark class="mark-2">[$1]</mark>')
+        .replace(/「(.*?)」/g, '<mark class="mark-3">「$1」</mark>')
+        .replace(/【(.*?)】/g, '<mark class="mark-4">【$1】</mark>')
+        .replace(/《(.*?)》/g, '<mark class="mark-5">《$1》</mark>')
+        .replace(/\(([^)]*)\)/g, '<mark class="mark-6">($1)</mark>'),
     }
-    
-
-    
   })
 })
 
@@ -489,13 +431,22 @@ onMounted(async () => {
                 </svg>
               </div>
               <!-- <p class="w-full text-xs text-center text-white truncate">角色</p> -->
-              <p v-if="translatedCardInfo.type === 'キャラ'" class="w-full text-xs text-center text-white truncate">
+              <p
+                v-if="translatedCardInfo.type === 'キャラ'"
+                class="w-full text-xs text-center text-white truncate"
+              >
                 角色
               </p>
-              <p v-else-if="translatedCardInfo.type === 'イベント'" class="w-full text-xs text-center text-white truncate">
+              <p
+                v-else-if="translatedCardInfo.type === 'イベント'"
+                class="w-full text-xs text-center text-white truncate"
+              >
                 事件
               </p>
-              <p v-else-if="translatedCardInfo.type === 'クライマックス'" class="w-full text-xs text-center text-white truncate">
+              <p
+                v-else-if="translatedCardInfo.type === 'クライマックス'"
+                class="w-full text-xs text-center text-white truncate"
+              >
                 名場
               </p>
             </div>
@@ -830,8 +781,10 @@ onMounted(async () => {
               <div
                 class="bg-gradient-to-tr from-emerald-500 to-green-300 p-2 rounded-2xl max-w-[80%]"
               >
-                <p v-html="qa.q" class="text-sm leading-relaxed whitespace-pre-line">
-                </p>
+                <p
+                  v-html="qa.q"
+                  class="text-sm leading-relaxed whitespace-pre-line"
+                ></p>
               </div>
               <div class="flex flex-col">
                 <p class="font-bold text-zinc-300">Q.{{ qa.id }}</p>
@@ -844,8 +797,10 @@ onMounted(async () => {
               <div
                 class="bg-gradient-to-bl from-white to-neutral-400 p-2 rounded-2xl max-w-[80%]"
               >
-                <p v-html="qa.a" class="text-sm leading-relaxed whitespace-pre-line">
-                </p>
+                <p
+                  v-html="qa.a"
+                  class="text-sm leading-relaxed whitespace-pre-line"
+                ></p>
               </div>
               <div class="flex flex-col text-right">
                 <p class="font-bold text-zinc-300">A.{{ qa.id }}</p>

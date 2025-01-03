@@ -61,8 +61,7 @@ const groupedCards = computed(() => {
   } else if (sortBy.value === 'type') {
     const typeOrder = ['キャラ', 'イベント', 'クライマックス']
     sorted = [...cards.value].sort(
-      (a, b) =>
-        typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type)
+      (a, b) => typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type)
     )
   } else if (sortBy.value === 'rare') {
     sorted = [...cards.value].sort((a, b) => {
@@ -1545,7 +1544,10 @@ onBeforeUnmount(() => {
               <h2 v-else-if="group.group === 'イベント'" class="group-title">
                 事件 - {{ group.cards.length }}
               </h2>
-              <h2 v-else-if="group.group === 'クライマックス'" class="group-title">
+              <h2
+                v-else-if="group.group === 'クライマックス'"
+                class="group-title"
+              >
                 名場 - {{ group.cards.length }}
               </h2>
               <h2 v-else class="group-title">
@@ -1594,9 +1596,15 @@ onBeforeUnmount(() => {
                     </div>
                     <h3>{{ card.title }}</h3>
                     <div class="details" v-if="!toggleTableView">
-                      <div v-if="card.type === 'キャラ'" ><span>類型</span>角色</div>
-                      <div v-else-if="card.type === 'イベント'" ><span>類型</span>事件</div>
-                      <div v-else-if="card.type === 'クライマックス'" ><span>類型</span>名場</div>
+                      <div v-if="card.type === 'キャラ'">
+                        <span>類型</span>角色
+                      </div>
+                      <div v-else-if="card.type === 'イベント'">
+                        <span>類型</span>事件
+                      </div>
+                      <div v-else-if="card.type === 'クライマックス'">
+                        <span>類型</span>名場
+                      </div>
                       <div><span>魂傷</span>{{ card.soul }}</div>
                       <div><span>等級</span>{{ card.level }}</div>
                       <div><span>攻擊</span>{{ card.attack }}</div>

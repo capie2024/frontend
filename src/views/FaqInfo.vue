@@ -187,7 +187,9 @@ watch(
                 ></p>
               </div>
               <div class="flex flex-col">
-                <span class="font-bold text-zinc-300">Q.{{ translatedFaqItem.id }}</span>
+                <span class="font-bold text-zinc-300"
+                  >Q.{{ translatedFaqItem.id }}</span
+                >
                 <span
                   class="font-mono text-xs whitespace-nowrap text-zinc-500"
                   >{{ translatedFaqItem.date }}</span
@@ -204,7 +206,9 @@ watch(
                 ></p>
               </div>
               <div class="flex flex-col text-right">
-                <span class="font-bold text-zinc-300">A.{{ translatedFaqItem.id }}</span>
+                <span class="font-bold text-zinc-300"
+                  >A.{{ translatedFaqItem.id }}</span
+                >
                 <span
                   class="font-mono text-xs whitespace-nowrap text-zinc-500"
                   >{{ translatedFaqItem.date }}</span
@@ -216,7 +220,11 @@ watch(
             關聯卡牌
             <span class="subtitle"
               >一共有
-              {{ translatedFaqItem && translatedFaqItem.relations ? translatedFaqItem.relations.length : 0 }}
+              {{
+                translatedFaqItem && translatedFaqItem.relations
+                  ? translatedFaqItem.relations.length
+                  : 0
+              }}
               張</span
             >
           </h3>

@@ -2211,17 +2211,14 @@ onBeforeUnmount(() => {
                     </div>
                     <h3>{{ card.title }}</h3>
                     <div class="details">
-                      <div v-if="card.type === 'キャラ'" >
-                        <span :class="`bg-${card.color}`">類型</span
-                        >角色
+                      <div v-if="card.type === 'キャラ'">
+                        <span :class="`bg-${card.color}`">類型</span>角色
                       </div>
-                      <div v-else-if="card.type === 'イベント'" >
-                        <span :class="`bg-${card.color}`">類型</span
-                        >事件
+                      <div v-else-if="card.type === 'イベント'">
+                        <span :class="`bg-${card.color}`">類型</span>事件
                       </div>
-                      <div v-else-if="card.type === 'クライマックス'" >
-                        <span :class="`bg-${card.color}`">類型</span
-                        >名場
+                      <div v-else-if="card.type === 'クライマックス'">
+                        <span :class="`bg-${card.color}`">類型</span>名場
                       </div>
                       <div>
                         <span :class="`bg-${card.color}`">魂傷</span
